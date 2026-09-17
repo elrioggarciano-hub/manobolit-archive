@@ -3,6 +3,9 @@ import { prisma } from '@/lib/database/prisma'
 import DeleteButton from '@/components/DeleteButton'
 import LogoutButton from '@/components/LogoutButton'
 
+// Auth-gated by middleware on every request; must not be statically prerendered at build time.
+export const dynamic = 'force-dynamic'
+
 const GENRE_COLORS: Record<string, string> = {
   MYTH: '#8b5cf6', LEGEND: '#3b82f6', FOLKTALE: '#10b981', EPIC: '#f59e0b',
   RIDDLE: '#ec4899', PROVERB: '#14b8a6', SONG: '#f97316', CHANT: '#6366f1',

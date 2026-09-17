@@ -414,7 +414,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             {/* Quote block */}
             <div style={{ borderLeft: '4px solid #f1b80d', background: '#FAF9F6', padding: '20px 24px', marginTop: '24px', borderRadius: '0px' }}>
               <p style={{ margin: 0, fontSize: '14px', color: '#5e5e5e', fontStyle: 'italic', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
-                "By combining these frameworks, ManoboLit ensures that every piece of recorded history is placed within its rightful cultural and linguistic context."
+                &ldquo;By combining these frameworks, ManoboLit ensures that every piece of recorded history is placed within its rightful cultural and linguistic context.&rdquo;
               </p>
             </div>
           </div>

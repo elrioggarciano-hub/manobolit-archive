@@ -162,7 +162,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
     {
       id: 'EUG-04',
       title: 'Epics',
-      description: <>Long narrative poems centered on a hero's exploits<br className="hidden md:inline" /> and supernatural journeys.</>,
+      description: <>Long narrative poems centered on a hero&apos;s exploits<br className="hidden md:inline" /> and supernatural journeys.</>,
       tags: ['HERO', 'QUEST', 'ANCESTORS'],
     },
     {
