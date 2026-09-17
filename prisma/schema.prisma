@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model LiteratureEntry {
+  id                String   @id @default(cuid())
+  title             String
+  manoboTitle       String?
+  englishTitle      String?
+  type              String   // "ORAL_LITERATURE" | "FOLK_SONG"
+  content           String
+  transcription     String?
+  translation       String?
+  audioFile         String?
+  audioDuration     Int?
+  source            String
+  yearCollected     Int?
+  narrator          String?
+  communityLocation String
+  province          String
+  municipality      String
+  barangay          String?
+
+  // Classification fields
+  genre             String
+  themes            String   // JSON array stored as string
+  culturalElements  String   // JSON array stored as string
+
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  createdBy         String?
+
+  classifications   Classification[]
+}
+
+model Classification {
+  id               String          @id @default(cuid())
+  entryId          String
+  entry            LiteratureEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  classifiedGenre  String
+  classifiedThemes String          // JSON array stored as string
+  confidenceScore  Float
+  rulesApplied     String          // JSON array stored as string
+  timestamp        DateTime        @default(now())
+}
