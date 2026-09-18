@@ -143,7 +143,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', flex: 1, paddingLeft: '16px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8F000D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
               <input 
@@ -249,16 +249,16 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8F000D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block' }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block' }}>
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                <path d="M12 21V7l3.5-3.5v14z" fill="#8F000D" stroke="#8F000D" strokeWidth="1" strokeLinejoin="round" />
+                <path d="M12 21V7l3.5-3.5v14z" fill="var(--brand-accent)" stroke="var(--brand-accent)" strokeWidth="1" strokeLinejoin="round" />
               </svg>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#7c6a68', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE A</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE A</span>
             </div>
             <div style={{ marginTop: '28px' }}>
               <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={oralLit} /></div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#501B18', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Oral Literature Pieces</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Oral Literature Pieces</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
               Classified myths, legends, and epics from Agusan regions.
@@ -292,11 +292,11 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                 <circle cx="8" cy="18" r="4" fill="#f1b80d" />
                 <path d="M12 18V2l7 4" />
               </svg>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#7c6a68', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE B</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE B</span>
             </div>
             <div style={{ marginTop: '28px' }}>
               <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={folkSongs} /></div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#501B18', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Folk Songs</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Folk Songs</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
               Authentic rhythmic recordings with melodic annotations.
@@ -326,14 +326,14 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8F000D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block' }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block' }}>
                 <path d="M4 10v4M8 6v12M12 3v18M16 6v12M20 10v4" />
               </svg>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#7c6a68', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE C</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE C</span>
             </div>
             <div style={{ marginTop: '28px' }}>
               <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={totalEntries} /></div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#501B18', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Audio Transcriptions</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Audio Transcriptions</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
               High-fidelity linguistic records with morphological tagging.
@@ -387,7 +387,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
 
           {/* Right: Scientific details */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#8F000D', letterSpacing: '0.1em' }}>CLASSIFICATION FRAMEWORKS</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-accent)', letterSpacing: '0.1em' }}>CLASSIFICATION FRAMEWORKS</span>
             
             <h2 style={{ margin: 0, fontSize: '36px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1.2 }}>
               A Scientific Approach to Oral Tradition
@@ -397,7 +397,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               {/* Bullet 1 */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <div style={{ width: '32px', height: '32px', border: '1.5px solid #8F000D', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8F000D', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}>1</div>
+                  <div style={{ width: '32px', height: '32px', border: '1.5px solid #8F000D', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-accent)', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}>1</div>
                   <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Eugenio (1993)</h3>
                 </div>
                 <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
@@ -408,7 +408,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               {/* Bullet 2 */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <div style={{ width: '32px', height: '32px', border: '1.5px solid #8F000D', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8F000D', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}>2</div>
+                  <div style={{ width: '32px', height: '32px', border: '1.5px solid #8F000D', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-accent)', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}>2</div>
                   <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Andress (1985)</h3>
                 </div>
                 <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>

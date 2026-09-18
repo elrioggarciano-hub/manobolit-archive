@@ -67,7 +67,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
           style={{ 
             fontSize: '9px', 
             fontWeight: 800, 
-            color: '#8F000D', 
+            color: 'var(--brand-accent)', 
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             display: 'block',
@@ -131,7 +131,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                   margin: '0 0 12px', 
                   fontSize: '10px', 
                   fontWeight: 800, 
-                  color: '#8F000D', 
+                  color: 'var(--brand-accent)', 
                   letterSpacing: '0.05em',
                   borderBottom: '1px solid var(--border-color)',
                   paddingBottom: '8px'
@@ -160,7 +160,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                   margin: '0 0 12px', 
                   fontSize: '10px', 
                   fontWeight: 800, 
-                  color: '#8F000D', 
+                  color: 'var(--brand-accent)', 
                   letterSpacing: '0.05em',
                   borderBottom: '1px solid var(--border-color)',
                   paddingBottom: '8px'
@@ -236,7 +236,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                 margin: '0 0 16px 0', 
                 fontSize: '10px', 
                 fontWeight: 800, 
-                color: '#8F000D', 
+                color: 'var(--brand-accent)', 
                 letterSpacing: '0.05em' 
               }}
             >
@@ -262,7 +262,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                 </span>
                 
                 {/* Custom Edit/Review Icon */}
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8F000D" strokeWidth="2.5" style={{ cursor: 'pointer' }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" style={{ cursor: 'pointer' }}>
                   <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
                 </svg>
               </div>
@@ -278,7 +278,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                     className="stagger-item"
                     style={{
                       background: '#fee2e2',
-                      color: '#8F000D',
+                      color: 'var(--brand-accent)',
                       fontSize: '9px',
                       fontWeight: 700,
                       padding: '4px 10px',
@@ -294,8 +294,8 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
             {/* Singer / Cultural Bearer */}
             <div style={{ marginBottom: '16px' }}>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: '#8F000D', marginBottom: '4px', letterSpacing: '0.05em' }}>🎤 SINGER / CULTURAL BEARER</div>
-              <div style={{ fontSize: '13px', color: '#8F000D', fontWeight: 700 }}>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--brand-accent)', marginBottom: '4px', letterSpacing: '0.05em' }}>🎤 SINGER / CULTURAL BEARER</div>
+              <div style={{ fontSize: '13px', color: 'var(--brand-accent)', fontWeight: 700 }}>
                 {entry.singer || entry.narrator || 'Bae Malingeb & Tribal Elders'}
               </div>
             </div>
@@ -334,7 +334,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                 margin: '0 0 12px 0', 
                 fontSize: '10px', 
                 fontWeight: 800, 
-                color: '#8F000D', 
+                color: 'var(--brand-accent)', 
                 letterSpacing: '0.05em' 
               }}
             >
@@ -348,7 +348,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             {/* Confidence Slider */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 800, marginBottom: '6px', letterSpacing: '0.05em' }}>
-                <span style={{ color: '#8F000D' }}>CONFIDENCE LEVEL</span>
+                <span style={{ color: 'var(--brand-accent)' }}>CONFIDENCE LEVEL</span>
                 <span style={{ color: 'var(--text-primary)' }}>{confidence}%</span>
               </div>
               <div style={{ height: '2px', background: '#fee2e2', position: 'relative' }}>

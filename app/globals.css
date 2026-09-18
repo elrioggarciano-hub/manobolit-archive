@@ -32,6 +32,11 @@ html {
   --header-border: rgba(226, 232, 240, 0.8);
   --player-waveform: #e2e8f0;
   --hero-gradient-center: #8F000D;
+  /* Brand red used as TEXT/icon color on a surface (not as a filled button
+     background, where white text on top is fine either way). #8F000D reads
+     fine on the light cream/white surfaces but fails contrast against the
+     dark surfaces below, so this token swaps to a lighter, softer red. */
+  --brand-accent: #8F000D;
 }
 
 [data-theme="dark"] {
@@ -51,6 +56,9 @@ html {
   --header-border: rgba(51, 65, 85, 0.8);
   --player-waveform: #334155;
   --hero-gradient-center: #8F000D;
+  /* Softer, higher-contrast red for text/icons on dark surfaces — avoids
+     both the near-invisible dark-on-dark maroon and an eye-straining neon red. */
+  --brand-accent: #f0908f;
 }
 
 body {

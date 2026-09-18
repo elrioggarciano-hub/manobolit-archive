@@ -94,7 +94,7 @@ export default function DashboardClient({
             style={{ 
               fontSize: '11px', 
               fontWeight: 700, 
-              color: '#8F000D', 
+              color: 'var(--brand-accent)', 
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               marginBottom: '8px'
@@ -142,7 +142,7 @@ export default function DashboardClient({
                   margin: 0,
                   fontSize: '28px', 
                   fontWeight: 700, 
-                  color: '#8F000D', 
+                  color: 'var(--brand-accent)', 
                   fontFamily: "'Playfair Display', Georgia, serif" 
                 }}
               >
@@ -161,7 +161,7 @@ export default function DashboardClient({
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'KEYWORDS' ? '4px solid #8F000D' : '4px solid transparent', 
                   background: activeCategory === 'KEYWORDS' ? 'var(--bg-surface)' : 'transparent',
-                  color: activeCategory === 'KEYWORDS' ? '#8F000D' : 'var(--text-secondary)',
+                  color: activeCategory === 'KEYWORDS' ? 'var(--brand-accent)' : 'var(--text-secondary)',
                   fontWeight: activeCategory === 'KEYWORDS' ? 700 : 500
                 }}
               >
@@ -180,7 +180,7 @@ export default function DashboardClient({
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent', 
                   background: activeCategory === 'GENRES' ? 'var(--bg-surface)' : 'transparent',
-                  color: activeCategory === 'GENRES' ? '#8F000D' : 'var(--text-secondary)',
+                  color: activeCategory === 'GENRES' ? 'var(--brand-accent)' : 'var(--text-secondary)',
                   fontWeight: activeCategory === 'GENRES' ? 700 : 500
                 }}
               >
@@ -201,7 +201,7 @@ export default function DashboardClient({
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'THEMES' ? '4px solid #8F000D' : '4px solid transparent', 
                   background: activeCategory === 'THEMES' ? 'var(--bg-surface)' : 'transparent',
-                  color: activeCategory === 'THEMES' ? '#8F000D' : 'var(--text-secondary)',
+                  color: activeCategory === 'THEMES' ? 'var(--brand-accent)' : 'var(--text-secondary)',
                   fontWeight: activeCategory === 'THEMES' ? 700 : 500
                 }}
               >
@@ -221,7 +221,7 @@ export default function DashboardClient({
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'LOCATIONS' ? '4px solid #8F000D' : '4px solid transparent', 
                   background: activeCategory === 'LOCATIONS' ? 'var(--bg-surface)' : 'transparent',
-                  color: activeCategory === 'LOCATIONS' ? '#8F000D' : 'var(--text-secondary)',
+                  color: activeCategory === 'LOCATIONS' ? 'var(--brand-accent)' : 'var(--text-secondary)',
                   fontWeight: activeCategory === 'LOCATIONS' ? 700 : 500
                 }}
               >
@@ -372,7 +372,7 @@ export default function DashboardClient({
                       {/* Segment 1: Folk Songs (38%) - Burgundy #8F000D */}
                       <path 
                         d="M 77.66 77.66 L 95.31 95.31 A 16 16 0 0 0 100 84 L 100 16 A 16 16 0 0 0 84 0 L 50 0 L 50 20 L 72 20 A 8 8 0 0 1 80 28 L 80 72 A 8 8 0 0 1 77.66 77.66 Z"
-                        fill="#8F000D"
+                        fill="var(--brand-accent)"
                       />
                       {/* Segment 2: Proverbs (27%) - Yellow #f1b80d */}
                       <path 
@@ -577,7 +577,7 @@ export default function DashboardClient({
                       style={{ 
                         fontSize: '10px', 
                         fontWeight: 800, 
-                        color: '#8F000D', 
+                        color: 'var(--brand-accent)', 
                         letterSpacing: '0.05em', 
                         display: 'block', 
                         marginBottom: '8px',
@@ -602,7 +602,7 @@ export default function DashboardClient({
                           }}
                         >
                           <span style={{ color: 'var(--text-secondary)' }}>{loc.location}</span>
-                          <span style={{ color: i < 2 ? '#8F000D' : 'var(--text-primary)', fontWeight: i < 2 ? 700 : 600 }}>
+                          <span style={{ color: i < 2 ? 'var(--brand-accent)' : 'var(--text-primary)', fontWeight: i < 2 ? 700 : 600 }}>
                             {loc.count}
                           </span>
                         </div>
@@ -638,7 +638,7 @@ export default function DashboardClient({
                   >
                     System Accuracy
                   </h3>
-                  <span style={{ fontSize: '11px', color: '#7a5c58', fontWeight: 500, letterSpacing: '0.02em' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, letterSpacing: '0.02em' }}>
                     AI Verification Metrics
                   </span>
                 </div>
@@ -657,7 +657,7 @@ export default function DashboardClient({
                     {/* Red wedge indicator at bottom right representing 94.2% */}
                     <polygon 
                       points="108,70 122,60 122,85 108,85" 
-                      fill="#8F000D" 
+                      fill="var(--brand-accent)" 
                     />
                   </svg>
                   {/* Gauge value overlays */}
@@ -677,7 +677,7 @@ export default function DashboardClient({
                       style={{ 
                         fontSize: '8px', 
                         fontWeight: 800, 
-                        color: '#7a5c58', 
+                        color: 'var(--text-muted)', 
                         letterSpacing: '0.08em', 
                         marginTop: '4px',
                         fontFamily: 'Inter, sans-serif'

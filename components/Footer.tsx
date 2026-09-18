@@ -31,10 +31,10 @@ export default function Footer() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <h2 
               style={{ 
-                margin: 0, 
-                fontSize: '30px', 
-                fontWeight: 700, 
-                color: '#8F000D',
+                margin: 0,
+                fontSize: '30px',
+                fontWeight: 700,
+                color: '#f0908f',
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                 letterSpacing: '-0.02em',
                 lineHeight: 1.1

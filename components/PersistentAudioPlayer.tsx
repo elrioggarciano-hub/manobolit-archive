@@ -94,7 +94,7 @@ export default function PersistentAudioPlayer() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <div>
-              <span style={{ fontSize: '9px', fontWeight: 800, color: '#8F000D', letterSpacing: '0.1em' }}>SUNG LYRICS & TRANSCRIPT</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--brand-accent)', letterSpacing: '0.1em' }}>SUNG LYRICS & TRANSCRIPT</span>
               <h4 style={{ margin: '2px 0 0 0', fontSize: '14px', fontWeight: 700, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{currentTrack.title}</h4>
               <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>Singer: {singerName}</p>
             </div>
@@ -157,7 +157,7 @@ export default function PersistentAudioPlayer() {
                 style={{
                   fontSize: '9px',
                   fontWeight: 800,
-                  color: '#8F000D',
+                  color: 'var(--brand-accent)',
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
                   marginBottom: '2px',
@@ -251,7 +251,7 @@ export default function PersistentAudioPlayer() {
               flexDirection: 'column',
               alignItems: 'center',
               gap: '4px',
-              color: showTranscript ? '#8F000D' : 'var(--text-muted)',
+              color: showTranscript ? 'var(--brand-accent)' : 'var(--text-muted)',
               transition: 'color 0.2s',
             }}
           >
