@@ -22,6 +22,7 @@ interface AudioContextType {
   playTrack: (track: Track) => void
   togglePlay: () => void
   pauseTrack: () => void
+  closeTrack: () => void
   setPlaybackSpeed: (speed: number) => void
   seek: (ratio: number) => void
   speakText: (text: string, title?: string) => void
@@ -212,6 +213,21 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const closeTrack = () => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+    }
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.src = ''
+    }
+    setCurrentTrack(null)
+    setIsPlaying(false)
+    setProgress(0)
+    setCurrentTime(0)
+    setDuration(0)
+  }
+
   const setPlaybackSpeed = (newSpeed: number) => {
     setSpeed(newSpeed)
     if (audioRef.current) {
@@ -241,6 +257,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         playTrack,
         togglePlay,
         pauseTrack,
+        closeTrack,
         setPlaybackSpeed,
         seek,
         speakText,
