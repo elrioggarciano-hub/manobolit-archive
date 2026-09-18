@@ -203,13 +203,13 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
   }, [categoryParam])
 
   return (
-    <div className="w-full bg-[#FAF9F6] text-[#1e293b]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <div className="w-full px-6 md:px-8 py-6 lg:h-[calc(100vh-64px-75px)] lg:overflow-hidden">
         <div className="flex flex-col lg:flex-row gap-8 h-full">
           
           {/* LEFT SIDEBAR: FILTERS */}
           <aside className="w-full lg:w-64 flex-shrink-0 lg:h-full lg:overflow-y-auto pr-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <div className="border-b border-slate-200 pb-2 mb-4">
+            <div className="border-b border-[var(--border-color)] pb-2 mb-4">
               <h2 
                 style={{ 
                   margin: 0,
@@ -221,12 +221,12 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               >
                 Archive Filters
               </h2>
-              <span className="text-xs text-slate-500 tracking-wide">Scholarly Classification</span>
+              <span className="text-xs text-[var(--text-muted)] tracking-wide">Scholarly Classification</span>
             </div>
 
             {/* Main Categories */}
             <div className="flex flex-col mb-4">
-              <div className="text-[10px] font-bold text-slate-400 tracking-wider mb-2">GENRES</div>
+              <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">GENRES</div>
               <div className="flex flex-col gap-1">
                 {/* Genres Item */}
                 <button
@@ -234,9 +234,9 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
-                    background: activeCategory === 'GENRES' ? '#ffffff' : 'transparent',
+                    background: activeCategory === 'GENRES' ? 'var(--bg-surface)' : 'transparent',
                     borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent',
-                    color: activeCategory === 'GENRES' ? '#8F000D' : '#475569',
+                    color: activeCategory === 'GENRES' ? '#8F000D' : 'var(--text-secondary)',
                     fontWeight: activeCategory === 'GENRES' ? 700 : 500,
                     fontSize: '13px',
                   }}
@@ -258,9 +258,9 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
-                    background: activeCategory === 'KEYWORDS' ? '#ffffff' : 'transparent',
+                    background: activeCategory === 'KEYWORDS' ? 'var(--bg-surface)' : 'transparent',
                     borderLeft: activeCategory === 'KEYWORDS' ? '4px solid #8F000D' : '4px solid transparent',
-                    color: activeCategory === 'KEYWORDS' ? '#8F000D' : '#475569',
+                    color: activeCategory === 'KEYWORDS' ? '#8F000D' : 'var(--text-secondary)',
                     fontWeight: activeCategory === 'KEYWORDS' ? 700 : 500,
                     fontSize: '13px',
                   }}
@@ -280,9 +280,9 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
-                    background: activeCategory === 'THEMES' ? '#ffffff' : 'transparent',
+                    background: activeCategory === 'THEMES' ? 'var(--bg-surface)' : 'transparent',
                     borderLeft: activeCategory === 'THEMES' ? '4px solid #8F000D' : '4px solid transparent',
-                    color: activeCategory === 'THEMES' ? '#8F000D' : '#475569',
+                    color: activeCategory === 'THEMES' ? '#8F000D' : 'var(--text-secondary)',
                     fontWeight: activeCategory === 'THEMES' ? 700 : 500,
                     fontSize: '13px',
                   }}
@@ -303,9 +303,9 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
-                    background: activeCategory === 'LOCATIONS' ? '#ffffff' : 'transparent',
+                    background: activeCategory === 'LOCATIONS' ? 'var(--bg-surface)' : 'transparent',
                     borderLeft: activeCategory === 'LOCATIONS' ? '4px solid #8F000D' : '4px solid transparent',
-                    color: activeCategory === 'LOCATIONS' ? '#8F000D' : '#475569',
+                    color: activeCategory === 'LOCATIONS' ? '#8F000D' : 'var(--text-secondary)',
                     fontWeight: activeCategory === 'LOCATIONS' ? 700 : 500,
                     fontSize: '13px',
                   }}
@@ -323,13 +323,13 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
             {/* Keywords Search Input (only shown if Keywords is active) */}
             {activeCategory === 'KEYWORDS' && (
-              <div className="mb-4 pl-7 pr-2 py-1 border-l border-slate-200 ml-3">
+              <div className="mb-4 pl-7 pr-2 py-1 border-l border-[var(--border-color)] ml-3">
                 <input
                   type="text"
                   placeholder="Enter keywords..."
                   value={searchInput}
                   onChange={e => handleSearchChange(e.target.value)}
-                  className="w-full text-xs p-1.5 border border-slate-200 outline-none focus:border-[#8F000D] text-slate-800 placeholder-slate-400"
+                  className="w-full text-xs p-1.5 border border-[var(--border-color)] outline-none focus:border-[#8F000D] text-[var(--text-primary)] placeholder-slate-400"
                   style={{ borderRadius: '0px' }}
                 />
               </div>
@@ -337,7 +337,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
             {/* Locations checkbox list (only shown if Locations is active) */}
             {activeCategory === 'LOCATIONS' && (
-              <div className="mb-4 flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-slate-200 ml-3">
+              <div className="mb-4 flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-[var(--border-color)] ml-3">
                 {[
                   { key: 'TRENTO', label: 'Trento' },
                   { key: 'STA_MARIA', label: 'Sta. Maria' },
@@ -346,7 +346,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 ].map(item => {
                   const isChecked = selectedLocations.includes(item.key)
                   return (
-                    <label key={item.key} className="flex items-center gap-2.5 text-xs font-semibold text-slate-700 cursor-pointer select-none py-0.5">
+                    <label key={item.key} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none py-0.5">
                       <input
                         type="checkbox"
                         checked={isChecked}
@@ -357,7 +357,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                         style={{
                           width: '14px',
                           height: '14px',
-                          border: isChecked ? 'none' : '1px solid #cbd5e1',
+                          border: isChecked ? 'none' : '1px solid var(--border-hover)',
                           background: isChecked ? '#8F000D' : 'transparent',
                           borderRadius: '0px',
                           display: 'flex',
@@ -382,7 +382,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
             {/* ACTIVE GENRES Section - ALWAYS SHOWN to match screenshot! */}
             <div className="mb-4">
-              <div className="text-[10px] font-bold text-slate-400 tracking-wider mb-2">ACTIVE GENRES</div>
+              <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">ACTIVE GENRES</div>
               <div className="flex flex-col gap-1.5 pl-1">
                 {[
                   { key: 'MYTH', label: 'Myth (Oggayam)' },
@@ -396,7 +396,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 ].map(item => {
                   const isChecked = selectedGenres.includes(item.key)
                   return (
-                    <label key={item.key} className="flex items-center gap-2.5 text-xs font-semibold text-slate-700 cursor-pointer select-none py-0.5">
+                    <label key={item.key} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none py-0.5">
                       <input
                         type="checkbox"
                         checked={isChecked}
@@ -407,7 +407,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                         style={{
                           width: '14px',
                           height: '14px',
-                          border: isChecked ? 'none' : '1px solid #cbd5e1',
+                          border: isChecked ? 'none' : '1px solid var(--border-hover)',
                           background: isChecked ? '#8F000D' : 'transparent',
                           borderRadius: '0px',
                           display: 'flex',
@@ -432,7 +432,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
             {/* PRIMARY THEMES Section - ALWAYS SHOWN to match screenshot! */}
             <div className="mb-5">
-              <div className="text-[10px] font-bold text-slate-400 tracking-wider mb-2">PRIMARY THEMES</div>
+              <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">PRIMARY THEMES</div>
               <div className="flex flex-wrap gap-2">
                 {[
                   { key: 'CREATION', label: 'CREATION' },
@@ -448,8 +448,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                       className="text-[9px] font-bold py-1 px-2.5 tracking-wider transition-colors btn-anim"
                       style={{
                         borderRadius: '0px',
-                        background: isChecked ? '#8F000D' : '#e2e8f0',
-                        color: isChecked ? '#ffffff' : '#475569',
+                        background: isChecked ? '#8F000D' : 'var(--bg-input)',
+                        color: isChecked ? '#ffffff' : 'var(--text-secondary)',
                         border: 'none',
                         cursor: 'pointer'
                       }}
@@ -495,7 +495,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
             </div>
 
             {/* Main Page Headers */}
-            <div className="border-b border-slate-200 pb-6 mb-8">
+            <div className="border-b border-[var(--border-color)] pb-6 mb-8">
               <h1
                 style={{
                   margin: 0,
@@ -503,19 +503,19 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   fontWeight: 700,
                   fontFamily: 'Cormorant Garamond, Georgia, serif',
                   lineHeight: 1.1,
-                  color: '#1e293b'
+                  color: 'var(--text-primary)'
                 }}
               >
                 Archive Explorer
               </h1>
-              <p className="text-xs text-slate-500 mt-2 max-w-xl leading-relaxed" style={{ whiteSpace: 'pre-line' }}>
+              <p className="text-xs text-[var(--text-muted)] mt-2 max-w-xl leading-relaxed" style={{ whiteSpace: 'pre-line' }}>
                 Navigating the digital weave of Agusan Manobo oral literature. Currently{"\n"}displaying {filteredEntries.length} entries from the scholarly collection.
               </p>
             </div>
 
             {/* Search Input Bar */}
             <div className="mb-6 relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <circle cx="11" cy="11" r="8" />
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -526,7 +526,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 value={searchInput}
                 onChange={e => handleSearchChange(e.target.value)}
                 placeholder="Search entries by title, content, themes, keywords..."
-                className="w-full pl-12 pr-10 py-3 bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#8F000D] input-anim shadow-sm"
+                className="w-full pl-12 pr-10 py-3 bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-slate-400 focus:outline-none focus:border-[#8F000D] input-anim shadow-sm"
                 style={{
                   borderRadius: '0px',
                   fontSize: '14px',
@@ -535,7 +535,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               {searchInput && (
                 <button
                   onClick={() => handleSearchChange('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors btn-anim anim-scale-in"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors btn-anim anim-scale-in"
                   style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -558,7 +558,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   return (
                     <div
                       key={entry.id}
-                      className="col-span-1 md:col-span-2 bg-white flex flex-col sm:flex-row justify-between shadow-sm stagger-item card-hover"
+                      className="col-span-1 md:col-span-2 bg-[var(--bg-surface)] flex flex-col sm:flex-row justify-between shadow-sm stagger-item card-hover"
                       style={{
                         borderTop: '4px solid #8F000D',
                         borderLeft: '1px solid #8F000D',
@@ -583,7 +583,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           </div>
 
                           {/* Title */}
-                          <Link href={`/archive/${entry.id}`} style={{ textDecoration: 'none', color: '#1e293b' }}>
+                          <Link href={`/archive/${entry.id}`} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
                             <h3 
                               style={{ 
                                 margin: 0,
@@ -616,7 +616,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           )}
 
                           {/* Description */}
-                          <p className="text-slate-600 text-xs leading-relaxed mb-6" style={{ whiteSpace: 'pre-line' }}>
+                          <p className="text-[var(--text-secondary)] text-xs leading-relaxed mb-6" style={{ whiteSpace: 'pre-line' }}>
                             {entry.content}
                           </p>
                         </div>
@@ -645,16 +645,16 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                                 style={{ width: `${entry.confidence ?? 0}%` }}
                               />
                             </div>
-                            <div className="flex flex-col text-[9px] font-bold text-slate-500 leading-none" style={{ letterSpacing: '0.05em' }}>
-                              <span style={{ fontSize: '10px', color: '#1e293b' }}>{entry.confidence ?? 0}%</span>
-                              <span style={{ fontSize: '8px', color: '#64748b' }}>CONFIDENCE</span>
+                            <div className="flex flex-col text-[9px] font-bold text-[var(--text-muted)] leading-none" style={{ letterSpacing: '0.05em' }}>
+                              <span style={{ fontSize: '10px', color: 'var(--text-primary)' }}>{entry.confidence ?? 0}%</span>
+                              <span style={{ fontSize: '8px', color: 'var(--text-muted)' }}>CONFIDENCE</span>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Right side weave graphic */}
-                      <div className="w-full sm:w-44 h-48 sm:h-auto flex-shrink-0 relative overflow-hidden bg-slate-900 border-t sm:border-t-0 sm:border-l border-slate-100">
+                      <div className="w-full sm:w-44 h-48 sm:h-auto flex-shrink-0 relative overflow-hidden bg-slate-900 border-t sm:border-t-0 sm:border-l border-[var(--border-color)]">
                         <img 
                           src="/weave.png" 
                           alt="Agusan Manobo Weave" 
@@ -673,7 +673,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 return (
                   <div
                     key={entry.id}
-                    className="bg-white flex flex-col justify-between p-6 shadow-sm stagger-item card-hover"
+                    className="bg-[var(--bg-surface)] flex flex-col justify-between p-6 shadow-sm stagger-item card-hover"
                     style={{
                       borderTop: `4px solid ${borderColor}`,
                       borderLeft: `1px solid ${borderColor}`,
@@ -696,7 +696,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                       </div>
 
                       {/* Title */}
-                      <Link href={`/archive/${entry.id}`} style={{ textDecoration: 'none', color: '#1e293b' }}>
+                      <Link href={`/archive/${entry.id}`} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
                         <h3 
                           style={{ 
                             margin: 0,
@@ -729,13 +729,13 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                       )}
 
                       {/* Description */}
-                      <p className="text-slate-600 text-xs leading-relaxed mb-6" style={{ whiteSpace: 'pre-line' }}>
+                      <p className="text-[var(--text-secondary)] text-xs leading-relaxed mb-6" style={{ whiteSpace: 'pre-line' }}>
                         {entry.content}
                       </p>
                     </div>
 
                     {/* Bottom Actions */}
-                    <div className="flex items-center mt-auto pt-4 border-t border-slate-100">
+                    <div className="flex items-center mt-auto pt-4 border-t border-[var(--border-color)]">
                       <button
                         onClick={(e) => handlePlayClick(e, entry)}
                         className="flex items-center gap-1.5 font-bold text-xs transition-colors btn-anim"
@@ -764,8 +764,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="w-8 h-8 flex items-center justify-center border border-slate-200 text-slate-600 transition-colors disabled:opacity-50 btn-anim"
-                  style={{ borderRadius: '0px', background: '#f1f5f9' }}
+                  className="w-8 h-8 flex items-center justify-center border border-[var(--border-color)] text-[var(--text-secondary)] transition-colors disabled:opacity-50 btn-anim"
+                  style={{ borderRadius: '0px', background: 'var(--bg-input)' }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="15 18 9 12 15 6" />
@@ -784,7 +784,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                         background: 'transparent',
                         border: 'none',
                         borderBottom: isCurrent ? '2px solid #8F000D' : '2px solid transparent',
-                        color: isCurrent ? '#8F000D' : '#64748b',
+                        color: isCurrent ? '#8F000D' : 'var(--text-muted)',
                         borderRadius: '0px',
                       }}
                     >
@@ -797,8 +797,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="w-8 h-8 flex items-center justify-center border border-slate-200 text-slate-600 transition-colors disabled:opacity-50 btn-anim"
-                  style={{ borderRadius: '0px', background: '#f1f5f9' }}
+                  className="w-8 h-8 flex items-center justify-center border border-[var(--border-color)] text-[var(--text-secondary)] transition-colors disabled:opacity-50 btn-anim"
+                  style={{ borderRadius: '0px', background: 'var(--bg-input)' }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="9 18 15 12 9 6" />

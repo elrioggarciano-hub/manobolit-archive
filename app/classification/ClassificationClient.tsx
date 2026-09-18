@@ -213,7 +213,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   ]
 
   return (
-    <div className="w-full bg-[#FAF9F6] text-[#1e293b]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <div className="w-full px-6 md:px-8 py-8">
         
         {/* Top Header Section (Full Width, matches sidebar left edge) */}
@@ -240,7 +240,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               fontWeight: 700, 
               fontFamily: 'Cormorant Garamond, Georgia, serif',
               lineHeight: 1.1,
-              color: '#1e293b'
+              color: 'var(--text-primary)'
             }}
           >
             Classification Frameworks
@@ -249,7 +249,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
           <p 
             style={{
               fontSize: '14px',
-              color: '#5e5e5e',
+              color: 'var(--text-secondary)',
               lineHeight: 1.6,
               margin: '0'
             }}
@@ -259,13 +259,13 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
         </div>
 
         {/* Separator Line */}
-        <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '32px 0 24px 0' }} />
+        <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '32px 0 24px 0' }} />
 
         <div className="flex flex-col lg:flex-row gap-8">
           
           {/* LEFT SIDEBAR: FILTERS */}
           <aside className="w-full lg:w-64 flex-shrink-0" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <div className="border-b border-slate-200 pb-4 mb-6">
+            <div className="border-b border-[var(--border-color)] pb-4 mb-6">
               <h2 
                 style={{ 
                   margin: 0,
@@ -277,7 +277,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               >
                 Archive Filters
               </h2>
-              <span className="text-xs text-slate-500 tracking-wide">Scholarly Classification</span>
+              <span className="text-xs text-[var(--text-muted)] tracking-wide">Scholarly Classification</span>
             </div>
 
             {/* Main Navigation Options inside the Filters */}
@@ -292,7 +292,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      background: '#ffffff',
+                      background: 'var(--bg-surface)',
                       borderLeft: '4px solid #8F000D',
                       padding: '8px 12px',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
@@ -361,8 +361,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 style={{
                   fontSize: '13px',
                   borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent',
-                  background: activeCategory === 'GENRES' ? '#ffffff' : 'transparent',
-                  color: activeCategory === 'GENRES' ? '#8F000D' : '#475569',
+                  background: activeCategory === 'GENRES' ? 'var(--bg-surface)' : 'transparent',
+                  color: activeCategory === 'GENRES' ? '#8F000D' : 'var(--text-secondary)',
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -389,8 +389,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   style={{
                     fontSize: '13px',
                     borderLeft: activeCategory === 'THEMES' ? '4px solid #8F000D' : '4px solid transparent',
-                    background: activeCategory === 'THEMES' ? '#ffffff' : 'transparent',
-                    color: activeCategory === 'THEMES' ? '#8F000D' : '#475569',
+                    background: activeCategory === 'THEMES' ? 'var(--bg-surface)' : 'transparent',
+                    color: activeCategory === 'THEMES' ? '#8F000D' : 'var(--text-secondary)',
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -401,7 +401,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   <span>Themes</span>
                 </button>
                 {activeCategory === 'THEMES' && (
-                  <div className="flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-slate-200 ml-3 mt-1">
+                  <div className="flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-[var(--border-color)] ml-3 mt-1">
                     {[
                       { key: 'CREATION', label: 'Creation Myths' },
                       { key: 'COURTSHIP', label: 'Courtship & Marriage' },
@@ -422,7 +422,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           }}
                           className="text-left text-xs py-1.5 px-2 hover:bg-slate-100 transition-colors"
                           style={{
-                            color: isActive ? '#8F000D' : '#64748b',
+                            color: isActive ? '#8F000D' : 'var(--text-muted)',
                             fontWeight: isActive ? 700 : 500,
                             background: isActive ? '#fee2e2' : 'transparent',
                             borderRadius: '2px'
@@ -451,8 +451,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   style={{
                     fontSize: '13px',
                     borderLeft: activeCategory === 'LOCATIONS' ? '4px solid #8F000D' : '4px solid transparent',
-                    background: activeCategory === 'LOCATIONS' ? '#ffffff' : 'transparent',
-                    color: activeCategory === 'LOCATIONS' ? '#8F000D' : '#475569',
+                    background: activeCategory === 'LOCATIONS' ? 'var(--bg-surface)' : 'transparent',
+                    color: activeCategory === 'LOCATIONS' ? '#8F000D' : 'var(--text-secondary)',
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -462,7 +462,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   <span>Locations</span>
                 </button>
                 {activeCategory === 'LOCATIONS' && (
-                  <div className="flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-slate-200 ml-3 mt-1">
+                  <div className="flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-[var(--border-color)] ml-3 mt-1">
                     {[
                       { key: 'TRENTO', label: 'Trento' },
                       { key: 'STA_MARIA', label: 'Sta. Maria' },
@@ -482,7 +482,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           }}
                           className="text-left text-xs py-1.5 px-2 hover:bg-slate-100 transition-colors"
                           style={{
-                            color: isActive ? '#8F000D' : '#64748b',
+                            color: isActive ? '#8F000D' : 'var(--text-muted)',
                             fontWeight: isActive ? 700 : 500,
                             background: isActive ? '#fee2e2' : 'transparent',
                             borderRadius: '2px'
@@ -520,7 +520,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   fontSize: '32px', 
                   fontWeight: 700, 
                   fontFamily: 'Cormorant Garamond, Georgia, serif',
-                  color: '#1e293b'
+                  color: 'var(--text-primary)'
                 }}
               >
                 Eugenio (1993) Taxonomy
@@ -528,7 +528,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               <p 
                 style={{
                   fontSize: '13px',
-                  color: '#5e5e5e',
+                  color: 'var(--text-secondary)',
                   lineHeight: 1.6,
                   margin: '0 auto 32px auto',
                   textAlign: 'center'
@@ -551,7 +551,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     key={card.id}
                     className="stagger-item card-hover"
                     style={{
-                      background: '#ffffff',
+                      background: 'var(--bg-surface)',
                       border: '1px solid #8F000D',
                       borderRadius: '0px',
                       padding: '24px',
@@ -571,7 +571,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                             fontSize: '22px',
                             fontWeight: 700,
                             fontFamily: 'Cormorant Garamond, Georgia, serif',
-                            color: '#1e293b'
+                            color: 'var(--text-primary)'
                           }}
                         >
                           {card.title}
@@ -596,7 +596,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         style={{
                           margin: '0 0 16px 0',
                           fontSize: '13px',
-                          color: '#475569',
+                          color: 'var(--text-secondary)',
                           lineHeight: 1.5,
                           fontStyle: 'italic',
                           maxWidth: 'none'
@@ -635,26 +635,26 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               
               {/* Header with Horizontal Lines */}
               <div style={{ display: 'flex', alignItems: 'center', margin: '0 0 12px 0' }}>
-                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+                <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
                 <h2 
                   style={{ 
                     margin: '0 24px',
                     fontSize: '32px', 
                     fontWeight: 700, 
                     fontFamily: 'Cormorant Garamond, Georgia, serif',
-                    color: '#1e293b',
+                    color: 'var(--text-primary)',
                     textAlign: 'center'
                   }}
                 >
                   Andress (1985) Thematic Grid
                 </h2>
-                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+                <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
               </div>
 
               <p 
                 style={{
                   fontSize: '13px',
-                  color: '#5e5e5e',
+                  color: 'var(--text-secondary)',
                   lineHeight: 1.6,
                   margin: '0 auto 32px auto',
                   textAlign: 'center'
@@ -672,8 +672,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     key={card.num}
                     className="stagger-item card-hover"
                     style={{
-                      background: '#ffffff',
-                      border: '1px solid #e2e8f0',
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--border-color)',
                       borderLeft: '4px solid #f1b80d',
                       borderRadius: '0px',
                       padding: '20px',
@@ -695,7 +695,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       style={{
                         margin: 0,
                         fontSize: '12px',
-                        color: '#5e5e5e',
+                        color: 'var(--text-secondary)',
                         lineHeight: 1.5
                       }}
                     >

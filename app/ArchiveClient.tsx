@@ -193,8 +193,8 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'flex-end', 
-            borderBottom: '1px solid #e2e8f0', 
-            paddingBottom: '8px', 
+            borderBottom: '1px solid var(--border-color)',
+            paddingBottom: '8px',
             marginBottom: '40px' 
           }}
         >
@@ -216,9 +216,9 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             style={{ 
               fontSize: '11px', 
               fontWeight: 700, 
-              color: '#71717a', 
-              letterSpacing: '0.08em', 
-              textTransform: 'uppercase' 
+              color: 'var(--text-muted)',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase'
             }}
           >
             REAL-TIME DATA
@@ -230,7 +230,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           <div
             className="stagger-item"
             style={{
-              background: '#ffffff',
+              background: 'var(--bg-surface)',
               borderRadius: '0px',
               borderTop: '5px solid #8F000D',
               padding: '40px 32px 36px 32px',
@@ -257,10 +257,10 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <span style={{ fontSize: '11px', fontWeight: 600, color: '#7c6a68', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE A</span>
             </div>
             <div style={{ marginTop: '28px' }}>
-              <div style={{ fontSize: '64px', fontWeight: 400, color: '#1e293b', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={oralLit} /></div>
+              <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={oralLit} /></div>
               <div style={{ fontSize: '13px', fontWeight: 700, color: '#501B18', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Oral Literature Pieces</div>
             </div>
-            <p style={{ margin: 0, fontSize: '13px', color: '#5e5e5e', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
               Classified myths, legends, and epics from Agusan regions.
             </p>
           </div>
@@ -269,7 +269,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           <div
             className="stagger-item"
             style={{
-              background: '#ffffff',
+              background: 'var(--bg-surface)',
               borderRadius: '0px',
               borderTop: '5px solid #f1b80d',
               padding: '40px 32px 36px 32px', 
@@ -295,10 +295,10 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <span style={{ fontSize: '11px', fontWeight: 600, color: '#7c6a68', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE B</span>
             </div>
             <div style={{ marginTop: '28px' }}>
-              <div style={{ fontSize: '64px', fontWeight: 400, color: '#1e293b', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={folkSongs} /></div>
+              <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={folkSongs} /></div>
               <div style={{ fontSize: '13px', fontWeight: 700, color: '#501B18', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Folk Songs</div>
             </div>
-            <p style={{ margin: 0, fontSize: '13px', color: '#5e5e5e', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
               Authentic rhythmic recordings with melodic annotations.
             </p>
           </div>
@@ -307,7 +307,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           <div
             className="stagger-item"
             style={{
-              background: '#ffffff',
+              background: 'var(--bg-surface)',
               borderRadius: '0px',
               borderTop: '5px solid #8F000D',
               padding: '40px 32px 36px 32px',
@@ -332,10 +332,10 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <span style={{ fontSize: '11px', fontWeight: 600, color: '#7c6a68', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE C</span>
             </div>
             <div style={{ marginTop: '28px' }}>
-              <div style={{ fontSize: '64px', fontWeight: 400, color: '#1e293b', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={totalEntries} /></div>
+              <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={totalEntries} /></div>
               <div style={{ fontSize: '13px', fontWeight: 700, color: '#501B18', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Audio Transcriptions</div>
             </div>
-            <p style={{ margin: 0, fontSize: '13px', color: '#5e5e5e', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
               High-fidelity linguistic records with morphological tagging.
             </p>
           </div>
@@ -343,7 +343,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
       </section>
 
       {/* 3. SCIENTIFIC APPROACH SECTION */}
-      <section id="about" className="scroll-reveal" style={{ background: '#ffffff', padding: '80px 24px' }}>
+      <section id="about" className="scroll-reveal" style={{ background: 'var(--bg-surface)', padding: '80px 24px' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '48px', alignItems: 'center' }}>
           {/* Left: Manobo Chanter Photo with Since overlay */}
           <div style={{ position: 'relative', width: '100%', maxWidth: '550px' }}>
@@ -400,7 +400,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                   <div style={{ width: '32px', height: '32px', border: '1.5px solid #8F000D', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8F000D', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}>1</div>
                   <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Eugenio (1993)</h3>
                 </div>
-                <p style={{ margin: 0, fontSize: '14px', color: '#5e5e5e', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
+                <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
                   Focuses on the categorization of Philippine folk literature into myths, legends, fables, and fantastic stories, providing a taxonomic framework for structural analysis.
                 </p>
               </div>
@@ -411,15 +411,15 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                   <div style={{ width: '32px', height: '32px', border: '1.5px solid #8F000D', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8F000D', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}>2</div>
                   <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Andress (1985)</h3>
                 </div>
-                <p style={{ margin: 0, fontSize: '14px', color: '#5e5e5e', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
+                <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
                   The foundational linguistic framework for Agusan Manobo, offering deep phonological and morphological rules essential for accurate transcription.
                 </p>
               </div>
             </div>
 
             {/* Quote block */}
-            <div style={{ borderLeft: '4px solid #f1b80d', background: '#FAF9F6', padding: '20px 24px', marginTop: '24px', borderRadius: '0px' }}>
-              <p style={{ margin: 0, fontSize: '14px', color: '#5e5e5e', fontStyle: 'italic', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
+            <div style={{ borderLeft: '4px solid #f1b80d', background: 'var(--bg-main)', padding: '20px 24px', marginTop: '24px', borderRadius: '0px' }}>
+              <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontStyle: 'italic', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
                 &ldquo;By combining these frameworks, ManoboLit ensures that every piece of recorded history is placed within its rightful cultural and linguistic context.&rdquo;
               </p>
             </div>
@@ -431,10 +431,10 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
       <section className="scroll-reveal" style={{ padding: '80px 24px', background: 'var(--bg-main)' }}>
         <div 
           style={{ 
-            maxWidth: '1000px', 
-            margin: '0 auto', 
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
+            maxWidth: '1000px',
+            margin: '0 auto',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-color)',
             padding: '80px 40px',
             display: 'flex', 
             flexDirection: 'column', 
@@ -447,7 +447,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           <h2 style={{ margin: 0, fontSize: '42px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
             Experience the Living Heritage
           </h2>
-          <p style={{ margin: 0, fontSize: '15px', color: '#5e5e5e', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, maxWidth: '650px' }}>
+          <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, maxWidth: '650px' }}>
             Dive into the rich tapestry of the Agusan Manobo. Use our rule-based search<br />to find specific themes, genres, or locations.
           </p>
           <button 

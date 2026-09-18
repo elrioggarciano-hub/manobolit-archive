@@ -50,7 +50,7 @@ export default function AboutClient() {
             </div>
 
             {/* Divider */}
-            <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '0' }} />
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '0' }} />
 
             {/* Retrieval System block */}
             <div>
@@ -221,7 +221,7 @@ export default function AboutClient() {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
             gap: '0',
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--border-color)',
           }}>
 
             {/* Left: landscape image with overlay */}
@@ -264,7 +264,7 @@ export default function AboutClient() {
             {/* Right: text content */}
             <div style={{
               padding: isMobile ? '32px 24px' : '56px 48px',
-              background: '#ffffff',
+              background: 'var(--bg-surface)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -330,17 +330,17 @@ export default function AboutClient() {
 
       {/* ── SECTION 3: RESEARCH & PRESERVATION PARTNERS ── */}
       <section className="scroll-reveal" style={{
-        borderTop: '1px solid #e2e8f0',
-        borderBottom: '1px solid #e2e8f0',
+        borderTop: '1px solid var(--border-color)',
+        borderBottom: '1px solid var(--border-color)',
         padding: '56px 24px',
-        background: '#ffffff',
+        background: 'var(--bg-surface)',
       }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <span style={{
               fontSize: '10px',
               fontWeight: 700,
-              color: '#94a3b8',
+              color: 'var(--text-muted)',
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
             }}>
@@ -414,7 +414,7 @@ export default function AboutClient() {
                 <span style={{
                   fontSize: '10px',
                   fontWeight: 700,
-                  color: '#94a3b8',
+                  color: 'var(--text-muted)',
                   letterSpacing: '0.08em',
                   lineHeight: 1.5,
                 }}>

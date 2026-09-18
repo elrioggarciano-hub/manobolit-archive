@@ -84,7 +84,7 @@ export default function DashboardClient({
   }
 
   return (
-    <div className="w-full bg-[#FAF9F6] text-[#1e293b]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <div className="w-full px-6 md:px-8 py-8">
         
         {/* Top Header Section (Full Width, matches classification page header) */}
@@ -111,7 +111,7 @@ export default function DashboardClient({
               fontWeight: 700, 
               fontFamily: "'Playfair Display', Georgia, serif",
               lineHeight: 1.1,
-              color: '#1e293b'
+              color: 'var(--text-primary)'
             }}
           >
             Research Dashboard
@@ -120,7 +120,7 @@ export default function DashboardClient({
           <p 
             style={{
               fontSize: '14px',
-              color: '#5e5e5e',
+              color: 'var(--text-secondary)',
               lineHeight: 1.6,
               margin: '0'
             }}
@@ -130,13 +130,13 @@ export default function DashboardClient({
         </div>
 
         {/* Separator Line */}
-        <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '32px 0 24px 0' }} />
+        <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '32px 0 24px 0' }} />
 
         <div className="flex flex-col lg:flex-row gap-8">
           
           {/* LEFT SIDEBAR: FILTERS */}
           <aside className="w-full lg:w-64 flex-shrink-0" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <div className="border-b border-slate-200 pb-4 mb-6">
+            <div className="border-b border-[var(--border-color)] pb-4 mb-6">
               <h2 
                 style={{ 
                   margin: 0,
@@ -148,7 +148,7 @@ export default function DashboardClient({
               >
                 Archive Filters
               </h2>
-              <span className="text-xs text-slate-500 tracking-wide">Scholarly Classification</span>
+              <span className="text-xs text-[var(--text-muted)] tracking-wide">Scholarly Classification</span>
             </div>
 
             {/* Sidebar navigation options */}
@@ -160,8 +160,8 @@ export default function DashboardClient({
                 style={{ 
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'KEYWORDS' ? '4px solid #8F000D' : '4px solid transparent', 
-                  background: activeCategory === 'KEYWORDS' ? '#ffffff' : 'transparent',
-                  color: activeCategory === 'KEYWORDS' ? '#8F000D' : '#475569',
+                  background: activeCategory === 'KEYWORDS' ? 'var(--bg-surface)' : 'transparent',
+                  color: activeCategory === 'KEYWORDS' ? '#8F000D' : 'var(--text-secondary)',
                   fontWeight: activeCategory === 'KEYWORDS' ? 700 : 500
                 }}
               >
@@ -179,8 +179,8 @@ export default function DashboardClient({
                 style={{ 
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent', 
-                  background: activeCategory === 'GENRES' ? '#ffffff' : 'transparent',
-                  color: activeCategory === 'GENRES' ? '#8F000D' : '#475569',
+                  background: activeCategory === 'GENRES' ? 'var(--bg-surface)' : 'transparent',
+                  color: activeCategory === 'GENRES' ? '#8F000D' : 'var(--text-secondary)',
                   fontWeight: activeCategory === 'GENRES' ? 700 : 500
                 }}
               >
@@ -200,8 +200,8 @@ export default function DashboardClient({
                 style={{ 
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'THEMES' ? '4px solid #8F000D' : '4px solid transparent', 
-                  background: activeCategory === 'THEMES' ? '#ffffff' : 'transparent',
-                  color: activeCategory === 'THEMES' ? '#8F000D' : '#475569',
+                  background: activeCategory === 'THEMES' ? 'var(--bg-surface)' : 'transparent',
+                  color: activeCategory === 'THEMES' ? '#8F000D' : 'var(--text-secondary)',
                   fontWeight: activeCategory === 'THEMES' ? 700 : 500
                 }}
               >
@@ -220,8 +220,8 @@ export default function DashboardClient({
                 style={{ 
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'LOCATIONS' ? '4px solid #8F000D' : '4px solid transparent', 
-                  background: activeCategory === 'LOCATIONS' ? '#ffffff' : 'transparent',
-                  color: activeCategory === 'LOCATIONS' ? '#8F000D' : '#475569',
+                  background: activeCategory === 'LOCATIONS' ? 'var(--bg-surface)' : 'transparent',
+                  color: activeCategory === 'LOCATIONS' ? '#8F000D' : 'var(--text-secondary)',
                   fontWeight: activeCategory === 'LOCATIONS' ? 700 : 500
                 }}
               >
@@ -242,7 +242,7 @@ export default function DashboardClient({
 
               {/* Total Entries Card */}
               <div
-                className="bg-white p-5 flex flex-col justify-between stagger-item card-hover"
+                className="bg-[var(--bg-surface)] p-5 flex flex-col justify-between stagger-item card-hover"
                 style={{
                   border: '1px solid #fee2e2',
                   borderTop: '4px solid #8F000D',
@@ -251,13 +251,13 @@ export default function DashboardClient({
                 }}
               >
                 <div>
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', letterSpacing: '0.05em' }}>TOTAL ENTRIES</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>TOTAL ENTRIES</span>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '6px' }}>
                     <span
                       style={{
                         fontSize: '36px',
                         fontWeight: 700,
-                        color: '#000000',
+                        color: 'var(--text-primary)',
                         fontFamily: "'Playfair Display', Georgia, serif"
                       }}
                     >
@@ -265,12 +265,12 @@ export default function DashboardClient({
                     </span>
                   </div>
                 </div>
-                <span style={{ fontSize: '10px', color: '#64748b', marginTop: '8px', fontWeight: 500 }}>Preserved oral narratives</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '8px', fontWeight: 500 }}>Preserved oral narratives</span>
               </div>
 
               {/* Most Common Genre Card */}
               <div
-                className="bg-white p-5 flex flex-col justify-between stagger-item card-hover"
+                className="bg-[var(--bg-surface)] p-5 flex flex-col justify-between stagger-item card-hover"
                 style={{
                   border: '1px solid #fef3c7',
                   borderTop: '4px solid #f1b80d',
@@ -279,13 +279,13 @@ export default function DashboardClient({
                 }}
               >
                 <div>
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', letterSpacing: '0.05em' }}>MOST COMMON GENRE</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>MOST COMMON GENRE</span>
                   <div style={{ marginTop: '6px' }}>
                     <span
                       style={{
                         fontSize: '32px',
                         fontWeight: 700,
-                        color: '#000000',
+                        color: 'var(--text-primary)',
                         fontFamily: "'Playfair Display', Georgia, serif"
                       }}
                     >
@@ -293,7 +293,7 @@ export default function DashboardClient({
                     </span>
                   </div>
                 </div>
-                <span style={{ fontSize: '10px', color: '#64748b', marginTop: '8px', fontWeight: 500 }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '8px', fontWeight: 500 }}>
                   {mostCommonGenre
                     ? `Representing ${mostCommonGenre.percent}% of archive (${mostCommonGenre.count} ${mostCommonGenre.count === 1 ? 'entry' : 'entries'})`
                     : 'No entries yet'}
@@ -302,7 +302,7 @@ export default function DashboardClient({
 
               {/* Most Frequent Theme Card */}
               <div
-                className="bg-white p-5 flex flex-col justify-between stagger-item card-hover"
+                className="bg-[var(--bg-surface)] p-5 flex flex-col justify-between stagger-item card-hover"
                 style={{
                   border: '1px solid #fee2e2',
                   borderTop: '4px solid #8F000D',
@@ -311,13 +311,13 @@ export default function DashboardClient({
                 }}
               >
                 <div>
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', letterSpacing: '0.05em' }}>MOST FREQUENT THEME</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>MOST FREQUENT THEME</span>
                   <div style={{ marginTop: '6px' }}>
                     <span
                       style={{
                         fontSize: '32px',
                         fontWeight: 700,
-                        color: '#000000',
+                        color: 'var(--text-primary)',
                         fontFamily: "'Playfair Display', Georgia, serif"
                       }}
                     >
@@ -325,7 +325,7 @@ export default function DashboardClient({
                     </span>
                   </div>
                 </div>
-                <span style={{ fontSize: '10px', color: '#64748b', marginTop: '8px', fontWeight: 500 }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '8px', fontWeight: 500 }}>
                   {mostFrequentTheme
                     ? `Tagged in ${mostFrequentTheme.count} ${mostFrequentTheme.count === 1 ? 'entry' : 'entries'}`
                     : 'No entries yet'}
@@ -339,9 +339,9 @@ export default function DashboardClient({
               
               {/* Genre Distribution Card */}
               <div
-                className="bg-white p-6 flex flex-col justify-between scroll-reveal card-hover"
+                className="bg-[var(--bg-surface)] p-6 flex flex-col justify-between scroll-reveal card-hover"
                 style={{
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '0px',
                   minHeight: '340px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
@@ -353,13 +353,13 @@ export default function DashboardClient({
                       margin: '0 0 4px 0', 
                       fontSize: '20px', 
                       fontWeight: 700, 
-                      color: '#000000', 
+                      color: 'var(--text-primary)', 
                       fontFamily: "'Playfair Display', Georgia, serif" 
                     }}
                   >
                     Genre Distribution
                   </h3>
-                  <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 500 }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
                     According to Eugenio (1993) Classification
                   </span>
                 </div>
@@ -414,33 +414,33 @@ export default function DashboardClient({
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '10px', height: '10px', background: '#8F000D' }} />
-                        <span style={{ color: '#475569' }}>Folk Songs</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>Folk Songs</span>
                       </div>
-                      <span style={{ color: '#000000', fontWeight: 700 }}>38%</span>
+                      <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>38%</span>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '10px', height: '10px', background: '#f1b80d' }} />
-                        <span style={{ color: '#475569' }}>Proverbs</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>Proverbs</span>
                       </div>
-                      <span style={{ color: '#000000', fontWeight: 700 }}>27%</span>
+                      <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>27%</span>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '10px', height: '10px', background: '#18181b' }} />
-                        <span style={{ color: '#475569' }}>Myths & Legends</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>Myths & Legends</span>
                       </div>
-                      <span style={{ color: '#000000', fontWeight: 700 }}>20%</span>
+                      <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>20%</span>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '10px', height: '10px', background: '#7f7370' }} />
-                        <span style={{ color: '#475569' }}>Other Genres</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>Other Genres</span>
                       </div>
-                      <span style={{ color: '#000000', fontWeight: 700 }}>15%</span>
+                      <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>15%</span>
                     </div>
                   </div>
                 </div>
@@ -448,9 +448,9 @@ export default function DashboardClient({
 
               {/* Theme Frequency Card */}
               <div
-                className="bg-white p-6 flex flex-col justify-between scroll-reveal card-hover"
+                className="bg-[var(--bg-surface)] p-6 flex flex-col justify-between scroll-reveal card-hover"
                 style={{
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '0px',
                   minHeight: '340px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
@@ -463,13 +463,13 @@ export default function DashboardClient({
                         margin: '0 0 4px 0', 
                         fontSize: '20px', 
                         fontWeight: 700, 
-                        color: '#000000', 
+                        color: 'var(--text-primary)', 
                         fontFamily: "'Playfair Display', Georgia, serif" 
                       }}
                     >
                       Theme Frequency
                     </h3>
-                    <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 500 }}>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
                       Taxonomy based on Andress (1985)
                     </span>
                   </div>
@@ -478,7 +478,7 @@ export default function DashboardClient({
                   <button
                     onClick={downloadThemeDataset}
                     disabled={themeFrequency.length === 0}
-                    className="text-slate-400 hover:text-[#8F000D] transition-colors p-1 disabled:opacity-40 disabled:cursor-not-allowed btn-anim"
+                    className="text-[var(--text-muted)] hover:text-[#8F000D] transition-colors p-1 disabled:opacity-40 disabled:cursor-not-allowed btn-anim"
                     title="Download Theme Dataset (CSV)"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -495,8 +495,8 @@ export default function DashboardClient({
                     themeFrequency.map(theme => (
                       <div key={theme.theme}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600, marginBottom: '6px' }}>
-                          <span style={{ color: '#1e293b' }}>{formatThemeLabel(theme.theme)}</span>
-                          <span style={{ color: '#64748b' }}>{theme.count} {theme.count === 1 ? 'entry' : 'entries'}</span>
+                          <span style={{ color: 'var(--text-primary)' }}>{formatThemeLabel(theme.theme)}</span>
+                          <span style={{ color: 'var(--text-muted)' }}>{theme.count} {theme.count === 1 ? 'entry' : 'entries'}</span>
                         </div>
                         <div style={{ height: '6px', background: '#fee2e2', position: 'relative' }}>
                           <div style={{ height: '100%', width: `${theme.percent}%`, background: '#8F000D', transition: 'width 0.8s var(--ease-out-smooth, ease-out)' }} />
@@ -504,7 +504,7 @@ export default function DashboardClient({
                       </div>
                     ))
                   ) : (
-                    <span style={{ fontSize: '12px', color: '#94a3b8', fontStyle: 'italic' }}>No entries yet</span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>No entries yet</span>
                   )}
                 </div>
               </div>
@@ -516,9 +516,9 @@ export default function DashboardClient({
               
               {/* Combined Regional Heatmap and Municipality Rank Card */}
               <div
-                className="col-span-1 lg:col-span-2 bg-white flex flex-col md:flex-row justify-between scroll-reveal card-hover"
+                className="col-span-1 lg:col-span-2 bg-[var(--bg-surface)] flex flex-col md:flex-row justify-between scroll-reveal card-hover"
                 style={{
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '0px',
                   minHeight: '260px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
@@ -532,13 +532,13 @@ export default function DashboardClient({
                         margin: '0 0 2px 0', 
                         fontSize: '18px', 
                         fontWeight: 700, 
-                        color: '#000000', 
+                        color: 'var(--text-primary)', 
                         fontFamily: "'Playfair Display', Georgia, serif" 
                       }}
                     >
                       Regional Heatmap
                     </h3>
-                    <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 500 }}>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
                       Frequency by Location in Agusan del Sur
                     </span>
                   </div>
@@ -553,7 +553,7 @@ export default function DashboardClient({
                       zIndex: 0,
                       overflow: 'hidden',
                       background: '#f8fafc',
-                      border: '1px solid #e2e8f0'
+                      border: '1px solid var(--border-color)'
                     }}
                   >
                     <RegionalMap locationStats={topLocations} />
@@ -563,10 +563,10 @@ export default function DashboardClient({
                 {/* Right Part: Municipality Rank (integrated, light beige background and left border) */}
                 <div 
                   style={{ 
-                    flex: 1, 
-                    padding: '20px', 
-                    background: '#FAF9F6', 
-                    borderLeft: '1px solid #e2e8f0',
+                    flex: 1,
+                    padding: '20px',
+                    background: 'var(--bg-main)',
+                    borderLeft: '1px solid var(--border-color)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between'
@@ -601,14 +601,14 @@ export default function DashboardClient({
                             fontWeight: 600,
                           }}
                         >
-                          <span style={{ color: '#475569' }}>{loc.location}</span>
-                          <span style={{ color: i < 2 ? '#8F000D' : '#1e293b', fontWeight: i < 2 ? 700 : 600 }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>{loc.location}</span>
+                          <span style={{ color: i < 2 ? '#8F000D' : 'var(--text-primary)', fontWeight: i < 2 ? 700 : 600 }}>
                             {loc.count}
                           </span>
                         </div>
                       ))
                     ) : (
-                      <span style={{ fontSize: '12px', color: '#94a3b8', fontStyle: 'italic' }}>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
                         No entries yet
                       </span>
                     )}
@@ -618,9 +618,9 @@ export default function DashboardClient({
 
               {/* System Accuracy Card */}
               <div
-                className="bg-white p-6 flex flex-col justify-between scroll-reveal card-hover"
+                className="bg-[var(--bg-surface)] p-6 flex flex-col justify-between scroll-reveal card-hover"
                 style={{
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '0px',
                   minHeight: '280px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
@@ -632,7 +632,7 @@ export default function DashboardClient({
                       margin: '0 0 4px 0', 
                       fontSize: '24px', 
                       fontWeight: 700, 
-                      color: '#000000', 
+                      color: 'var(--text-primary)', 
                       fontFamily: "'Playfair Display', Georgia, serif" 
                     }}
                   >
@@ -647,12 +647,12 @@ export default function DashboardClient({
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '14px 0', position: 'relative' }}>
                   <svg width="150" height="95" viewBox="0 0 140 90">
                     {/* Background track (arch) */}
-                    <path 
-                      d="M 25 85 L 25 35 A 20 20 0 0 1 45 15 L 95 15 A 20 20 0 0 1 115 35 L 115 85" 
-                      fill="none" 
-                      stroke="#FAF9F6" 
-                      strokeWidth="14" 
-                      strokeLinecap="butt" 
+                    <path
+                      d="M 25 85 L 25 35 A 20 20 0 0 1 45 15 L 95 15 A 20 20 0 0 1 115 35 L 115 85"
+                      fill="none"
+                      style={{ stroke: 'var(--bg-main)' }}
+                      strokeWidth="14"
+                      strokeLinecap="butt"
                     />
                     {/* Red wedge indicator at bottom right representing 94.2% */}
                     <polygon 
@@ -666,7 +666,7 @@ export default function DashboardClient({
                       style={{ 
                         fontSize: '34px', 
                         fontWeight: 700, 
-                        color: '#1e293b', 
+                        color: 'var(--text-primary)', 
                         fontFamily: "'Playfair Display', Georgia, serif",
                         lineHeight: 1 
                       }}
@@ -693,16 +693,16 @@ export default function DashboardClient({
                 {/* Bottom Accuracy Metrics Details */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
-                    <span style={{ color: '#1e293b' }}>Precision</span>
-                    <span style={{ color: '#1e293b', fontWeight: 700 }}>0.96</span>
+                    <span style={{ color: 'var(--text-primary)' }}>Precision</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>0.96</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
-                    <span style={{ color: '#1e293b' }}>Recall</span>
-                    <span style={{ color: '#1e293b', fontWeight: 700 }}>0.92</span>
+                    <span style={{ color: 'var(--text-primary)' }}>Recall</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>0.92</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
-                    <span style={{ color: '#1e293b' }}>F1 Score</span>
-                    <span style={{ color: '#1e293b', fontWeight: 700 }}>0.94</span>
+                    <span style={{ color: 'var(--text-primary)' }}>F1 Score</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>0.94</span>
                   </div>
                 </div>
 

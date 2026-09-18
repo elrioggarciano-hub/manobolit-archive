@@ -7,6 +7,7 @@ import ClickRipple from "@/components/ClickRipple"
 import PageTransition from "@/components/PageTransition"
 import { AudioProvider } from "@/lib/context/AudioContext"
 import { ToastProvider } from "@/lib/context/ToastContext"
+import { ThemeProvider } from "@/lib/context/ThemeContext"
 
 export const metadata: Metadata = {
   title: "ManoboLit Archive",
@@ -25,7 +26,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                var theme = localStorage.getItem('theme') || 'light';
+                var stored = localStorage.getItem('theme');
+                var theme = stored === 'light' || stored === 'dark'
+                  ? stored
+                  : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                 document.documentElement.setAttribute('data-theme', theme);
               })();
             `,
@@ -33,15 +37,17 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <ToastProvider>
-          <AudioProvider>
-            <ClickRipple />
-            <Header />
-            <PageTransition>{children}</PageTransition>
-            <Footer />
-            <PersistentAudioPlayer />
-          </AudioProvider>
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <AudioProvider>
+              <ClickRipple />
+              <Header />
+              <PageTransition>{children}</PageTransition>
+              <Footer />
+              <PersistentAudioPlayer />
+            </AudioProvider>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
