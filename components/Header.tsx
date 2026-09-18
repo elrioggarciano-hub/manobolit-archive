@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export default function Header() {
   const pathname = usePathname()
@@ -47,11 +48,12 @@ export default function Header() {
   ]
 
   return (
-    <header 
+    <header
       className="sticky top-0 z-50 transition-all duration-300"
       style={{
-        background: '#ffffff',
-        borderBottom: '1px solid #e2e8f0',
+        background: 'var(--header-bg)',
+        backdropFilter: 'blur(8px)',
+        borderBottom: '1px solid var(--header-border)',
         boxShadow: isScrolled ? '0 4px 20px rgba(0,0,0,0.03)' : 'none',
         fontFamily: 'Inter, sans-serif',
       }}
@@ -112,11 +114,13 @@ export default function Header() {
                 <input
                   type="text"
                   placeholder="Search archive..."
-                  className="pl-9 pr-4 py-2 text-xs bg-[#f1f5f9] border-0 text-slate-800 placeholder-slate-500 focus:outline-none focus:bg-slate-100 input-anim"
+                  className="pl-9 pr-4 py-2 text-xs border-0 placeholder-slate-500 focus:outline-none input-anim"
                   style={{
                     borderRadius: '4px',
                     height: '36px',
                     width: '220px',
+                    background: 'var(--bg-input)',
+                    color: 'var(--text-primary)',
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -127,9 +131,12 @@ export default function Header() {
               </div>
             )}
 
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Profile Circle Icon */}
-            <Link 
-              href="/admin" 
+            <Link
+              href="/admin"
               className="hidden sm:flex items-center justify-center transition-colors"
               title="Admin Panel"
               style={{
@@ -172,10 +179,16 @@ export default function Header() {
         <div
           className="block md:hidden border-t px-6 py-4 dropdown-anim"
           style={{
-            background: '#ffffff',
-            borderTop: '1px solid #e2e8f0',
+            background: 'var(--bg-surface)',
+            borderTop: '1px solid var(--header-border)',
           }}
         >
+          <div className="flex items-center justify-between mb-4 stagger-item">
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
+              APPEARANCE
+            </span>
+            <ThemeToggle />
+          </div>
           <nav className="flex flex-col gap-4">
             {navItems.map((item, i) => {
               const isActive = pathname === item.href
@@ -197,10 +210,11 @@ export default function Header() {
 
             <Link
               href="/admin"
-              className="mt-2 text-center py-2 rounded-md text-sm font-bold border border-slate-200 btn-anim stagger-item"
+              className="mt-2 text-center py-2 rounded-md text-sm font-bold btn-anim stagger-item"
               style={{
                 color: 'var(--text-primary)',
                 textDecoration: 'none',
+                border: '1px solid var(--border-color)',
                 animationDelay: `${navItems.length * 40}ms`,
               }}
             >

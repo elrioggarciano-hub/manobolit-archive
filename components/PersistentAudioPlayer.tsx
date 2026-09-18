@@ -42,12 +42,12 @@ export default function PersistentAudioPlayer() {
           left: 0,
           right: 0,
           minHeight: '75px',
-          background: '#ffffff',
-          borderTop: '1px solid #e2e8f0',
+          background: 'var(--bg-surface)',
+          borderTop: '1px solid var(--border-color)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#64748b',
+          color: 'var(--text-muted)',
           fontSize: '13px',
           fontWeight: 500,
           zIndex: 1000,
@@ -82,8 +82,8 @@ export default function PersistentAudioPlayer() {
             left: isMobile ? '12px' : 'auto',
             width: isMobile ? 'auto' : '380px',
             maxHeight: '320px',
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-color)',
             borderTop: '4px solid #8F000D',
             boxShadow: '0 -8px 24px rgba(0,0,0,0.12)',
             zIndex: 999,
@@ -96,17 +96,17 @@ export default function PersistentAudioPlayer() {
             <div>
               <span style={{ fontSize: '9px', fontWeight: 800, color: '#8F000D', letterSpacing: '0.1em' }}>SUNG LYRICS & TRANSCRIPT</span>
               <h4 style={{ margin: '2px 0 0 0', fontSize: '14px', fontWeight: 700, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{currentTrack.title}</h4>
-              <p style={{ margin: 0, fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Singer: {singerName}</p>
+              <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>Singer: {singerName}</p>
             </div>
             <button
               onClick={() => setShowTranscript(false)}
               className="btn-anim"
-              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '16px', fontWeight: 700 }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '16px', fontWeight: 700 }}
             >
               ✕
             </button>
           </div>
-          <p style={{ fontSize: '12px', lineHeight: 1.6, color: '#334155', whiteSpace: 'pre-line', margin: 0, background: '#FAF9F6', padding: '12px', borderLeft: '3px solid #8F000D' }}>
+          <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--text-secondary)', whiteSpace: 'pre-line', margin: 0, background: 'var(--bg-main)', padding: '12px', borderLeft: '3px solid #8F000D' }}>
             {currentTrack.textToRecite || 'Lantawod diya lawod nig duma kan bayod soe tribu ko no daog-daog mahawig no katuigan...'}
           </p>
         </div>
@@ -120,8 +120,8 @@ export default function PersistentAudioPlayer() {
           left: 0,
           right: 0,
           height: '75px',
-          background: '#ffffff',
-          borderTop: '1px solid #e2e8f0',
+          background: 'var(--bg-surface)',
+          borderTop: '1px solid var(--border-color)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -170,7 +170,7 @@ export default function PersistentAudioPlayer() {
               style={{ 
                 fontSize: '15px', 
                 fontWeight: 700, 
-                color: '#1e293b', 
+                color: 'var(--text-primary)', 
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                 whiteSpace: 'nowrap', 
                 overflow: 'hidden', 
@@ -220,7 +220,7 @@ export default function PersistentAudioPlayer() {
             style={{
               width: '100%',
               height: '4px',
-              background: '#e2e8f0',
+              background: 'var(--border-color)',
               cursor: 'pointer',
               position: 'relative',
               borderRadius: '0px',
@@ -251,7 +251,7 @@ export default function PersistentAudioPlayer() {
               flexDirection: 'column',
               alignItems: 'center',
               gap: '4px',
-              color: showTranscript ? '#8F000D' : '#71717a',
+              color: showTranscript ? '#8F000D' : 'var(--text-muted)',
               transition: 'color 0.2s',
             }}
           >

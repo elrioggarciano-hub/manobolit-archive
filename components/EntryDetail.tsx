@@ -81,7 +81,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             margin: '0 0 4px', 
             fontSize: '40px', 
             fontWeight: 700, 
-            color: '#000000', 
+            color: 'var(--text-primary)', 
             fontFamily: 'Cormorant Garamond, Georgia, serif',
             lineHeight: 1.1 
           }}
@@ -93,7 +93,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             style={{ 
               margin: 0, 
               fontSize: '18px', 
-              color: '#000000', 
+              color: 'var(--text-primary)', 
               fontFamily: 'Cormorant Garamond, Georgia, serif',
               fontStyle: 'italic' 
             }}
@@ -133,7 +133,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                   fontWeight: 800, 
                   color: '#8F000D', 
                   letterSpacing: '0.05em',
-                  borderBottom: '1px solid #f1f5f9',
+                  borderBottom: '1px solid var(--border-color)',
                   paddingBottom: '8px'
                 }}
               >
@@ -144,7 +144,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                   margin: 0, 
                   fontSize: '13px', 
                   lineHeight: 1.6, 
-                  color: '#475569', 
+                  color: 'var(--text-secondary)', 
                   whiteSpace: 'pre-line',
                   fontFamily: 'Inter, sans-serif'
                 }}
@@ -162,7 +162,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                   fontWeight: 800, 
                   color: '#8F000D', 
                   letterSpacing: '0.05em',
-                  borderBottom: '1px solid #f1f5f9',
+                  borderBottom: '1px solid var(--border-color)',
                   paddingBottom: '8px'
                 }}
               >
@@ -173,7 +173,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                   margin: 0, 
                   fontSize: '13px', 
                   lineHeight: 1.6, 
-                  color: '#475569', 
+                  color: 'var(--text-secondary)', 
                   whiteSpace: 'pre-line',
                   fontFamily: 'Inter, sans-serif'
                 }}
@@ -191,28 +191,28 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', 
               gap: '16px', 
               marginTop: '32px', 
-              borderTop: '1px solid #e2e8f0', 
+              borderTop: '1px solid var(--border-color)', 
               paddingTop: '20px' 
             }}
           >
             <div>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', marginBottom: '4px', letterSpacing: '0.05em' }}>RECORDING YEAR</div>
-              <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>{entry.yearCollected || '1992'}</div>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>RECORDING YEAR</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{entry.yearCollected || '1992'}</div>
             </div>
             
             <div>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', marginBottom: '4px', letterSpacing: '0.05em' }}>PROVINCE</div>
-              <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>{entry.province}</div>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>PROVINCE</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{entry.province}</div>
             </div>
 
             <div>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', marginBottom: '4px', letterSpacing: '0.05em' }}>MUNICIPALITY</div>
-              <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>{entry.municipality}</div>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>MUNICIPALITY</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{entry.municipality}</div>
             </div>
 
             <div>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', marginBottom: '4px', letterSpacing: '0.05em' }}>BARANGAY</div>
-              <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>{entry.barangay || 'Langasian'}</div>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>BARANGAY</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{entry.barangay || 'Langasian'}</div>
             </div>
           </div>
 
@@ -225,8 +225,8 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
           <div
             className="stagger-item card-hover"
             style={{
-              background: '#FAF9F6',
-              border: '1px solid #e2e8f0',
+              background: 'var(--bg-main)',
+              border: '1px solid var(--border-color)',
               padding: '20px',
               borderRadius: '0px'
             }}
@@ -245,7 +245,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
             {/* Genre */}
             <div style={{ marginBottom: '16px' }}>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', marginBottom: '6px', letterSpacing: '0.05em' }}>GENRE (EUGENIO)</div>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>GENRE (EUGENIO)</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span 
                   style={{ 
@@ -270,7 +270,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
             {/* Themes */}
             <div style={{ marginBottom: '16px' }}>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', marginBottom: '6px', letterSpacing: '0.05em' }}>THEMES (ANDRESS)</div>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>THEMES (ANDRESS)</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {entry.themes.map(t => (
                   <span
@@ -302,16 +302,16 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
             {/* Narrator */}
             <div style={{ marginBottom: '16px' }}>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', marginBottom: '4px', letterSpacing: '0.05em' }}>NARRATOR / INFORMANT</div>
-              <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 700 }}>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>NARRATOR / INFORMANT</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 700 }}>
                 {entry.narrator || entry.singer || 'Datu Malingeb'}
               </div>
             </div>
 
             {/* Source Code */}
             <div>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', marginBottom: '4px', letterSpacing: '0.05em' }}>SOURCE CODE</div>
-              <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 700 }}>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>SOURCE CODE</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 700 }}>
                 {entry.source || 'ML-ADS-1992-04'}
               </div>
             </div>
@@ -322,8 +322,8 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
           <div
             className="stagger-item card-hover"
             style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border-color)',
               borderLeft: '4px solid #8F000D',
               padding: '20px',
               borderRadius: '0px'
@@ -341,7 +341,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               RULE-BASED ANALYSIS
             </h4>
             
-            <p style={{ margin: '0 0 20px 0', fontSize: '12px', lineHeight: 1.5, color: '#475569' }}>
+            <p style={{ margin: '0 0 20px 0', fontSize: '12px', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
               {getAnalysisText(entry)}
             </p>
 
@@ -349,7 +349,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 800, marginBottom: '6px', letterSpacing: '0.05em' }}>
                 <span style={{ color: '#8F000D' }}>CONFIDENCE LEVEL</span>
-                <span style={{ color: '#1e293b' }}>{confidence}%</span>
+                <span style={{ color: 'var(--text-primary)' }}>{confidence}%</span>
               </div>
               <div style={{ height: '2px', background: '#fee2e2', position: 'relative' }}>
                 <div
@@ -369,8 +369,8 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
           <div
             className="stagger-item"
             style={{
-              background: '#f1f5f9',
-              border: '1px solid #e2e8f0',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border-color)',
               borderRadius: '0px',
               height: '140px',
               position: 'relative',

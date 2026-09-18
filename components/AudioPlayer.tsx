@@ -62,14 +62,14 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
   if (!audioFile) {
     return (
       <div style={{
-        background: '#ffffff',
-        border: '1px solid #e2e8f0',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-color)',
         borderRadius: '0px',
         padding: '16px 20px',
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        color: '#64748b',
+        color: 'var(--text-muted)',
         fontSize: '13px',
         fontWeight: 500,
         fontFamily: 'Inter, sans-serif'
@@ -82,8 +82,8 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
   return (
     <div 
       style={{
-        background: '#ffffff',
-        border: '1px solid #e2e8f0',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-color)',
         borderRadius: '0px',
         padding: '20px 24px',
         fontFamily: 'Inter, sans-serif',
@@ -133,12 +133,12 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
               justifyContent: 'space-between', 
               fontSize: '10px', 
               fontWeight: 800, 
-              color: '#64748b', 
+              color: 'var(--text-muted)', 
               letterSpacing: '0.05em' 
             }}
           >
             <span>{formatTime(isCurrent ? currentTime : 0)} / {formatTime(displayDuration)}</span>
-            <span style={{ color: '#475569' }}>AUDIO ARCHIVE #{archiveId}</span>
+            <span style={{ color: 'var(--text-secondary)' }}>AUDIO ARCHIVE #{archiveId}</span>
           </div>
 
           {/* Waveform Slider */}

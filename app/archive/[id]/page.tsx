@@ -53,7 +53,7 @@ export default async function EntryDetailPage({ params }: Props) {
     }
 
     return (
-      <main style={{ minHeight: '100vh', background: '#FAF9F6', paddingTop: '40px', color: '#1e293b' }}>
+      <main style={{ minHeight: '100vh', background: 'var(--bg-main)', paddingTop: '40px', color: 'var(--text-primary)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 16px' }}>
           <Link href="/explore" className="btn-anim" style={{
             display: 'inline-flex', alignItems: 'center', gap: '6px',
@@ -85,7 +85,7 @@ export default async function EntryDetailPage({ params }: Props) {
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#FAF9F6', paddingTop: '40px', color: '#1e293b' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--bg-main)', paddingTop: '40px', color: 'var(--text-primary)' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 16px' }}>
         <Link href="/explore" className="btn-anim" style={{
           display: 'inline-flex', alignItems: 'center', gap: '6px',
