@@ -4,7 +4,10 @@ import React from 'react'
 import dynamic from 'next/dynamic'
 import AudioPlayer from './AudioPlayer'
 
-const RegionalMap = dynamic(() => import('./RegionalMap'), { ssr: false })
+const RegionalMap = dynamic(() => import('./RegionalMap'), {
+  ssr: false,
+  loading: () => <div className="skeleton" style={{ width: '100%', height: '100%' }} />,
+})
 
 interface Classification {
   classifiedGenre: string
@@ -56,7 +59,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
   const confidence = latestClassification ? Math.round(latestClassification.confidenceScore * 100) : 84
   
   return (
-    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 80px', fontFamily: 'Inter, sans-serif' }}>
+    <div className="anim-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 80px', fontFamily: 'Inter, sans-serif' }}>
       
       {/* Title Header Block */}
       <div style={{ marginBottom: '24px' }}>
@@ -219,12 +222,13 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
           {/* Card 1: Archive Classification */}
-          <div 
-            style={{ 
-              background: '#FAF9F6', 
-              border: '1px solid #e2e8f0', 
-              padding: '20px', 
-              borderRadius: '0px' 
+          <div
+            className="stagger-item card-hover"
+            style={{
+              background: '#FAF9F6',
+              border: '1px solid #e2e8f0',
+              padding: '20px',
+              borderRadius: '0px'
             }}
           >
             <h4 
@@ -269,14 +273,15 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748b', marginBottom: '6px', letterSpacing: '0.05em' }}>THEMES (ANDRESS)</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {entry.themes.map(t => (
-                  <span 
+                  <span
                     key={t}
-                    style={{ 
-                      background: '#fee2e2', 
-                      color: '#8F000D', 
-                      fontSize: '9px', 
-                      fontWeight: 700, 
-                      padding: '4px 10px', 
+                    className="stagger-item"
+                    style={{
+                      background: '#fee2e2',
+                      color: '#8F000D',
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      padding: '4px 10px',
                       borderRadius: '0px',
                       letterSpacing: '0.05em'
                     }}
@@ -314,13 +319,14 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
           </div>
 
           {/* Card 2: Rule-Based Analysis */}
-          <div 
-            style={{ 
-              background: '#ffffff', 
-              border: '1px solid #e2e8f0', 
-              borderLeft: '4px solid #8F000D', 
-              padding: '20px', 
-              borderRadius: '0px' 
+          <div
+            className="stagger-item card-hover"
+            style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderLeft: '4px solid #8F000D',
+              padding: '20px',
+              borderRadius: '0px'
             }}
           >
             <h4 
@@ -346,12 +352,13 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                 <span style={{ color: '#1e293b' }}>{confidence}%</span>
               </div>
               <div style={{ height: '2px', background: '#fee2e2', position: 'relative' }}>
-                <div 
-                  style={{ 
-                    height: '100%', 
-                    width: `${confidence}%`, 
-                    background: '#8F000D' 
-                  }} 
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${confidence}%`,
+                    background: '#8F000D',
+                    transition: 'width 0.8s var(--ease-out-smooth, ease-out)',
+                  }}
                 />
               </div>
             </div>
@@ -360,6 +367,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
           {/* Card 3: Location Map */}
           <div
+            className="stagger-item"
             style={{
               background: '#f1f5f9',
               border: '1px solid #e2e8f0',

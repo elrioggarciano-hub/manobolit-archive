@@ -74,6 +74,7 @@ export default function PersistentAudioPlayer() {
       {/* Transcript / Lyrics Modal Overlay */}
       {showTranscript && (
         <div
+          className="modal-content"
           style={{
             position: 'fixed',
             bottom: isMobile ? '75px' : '75px',
@@ -99,6 +100,7 @@ export default function PersistentAudioPlayer() {
             </div>
             <button
               onClick={() => setShowTranscript(false)}
+              className="btn-anim"
               style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '16px', fontWeight: 700 }}
             >
               ✕
@@ -111,6 +113,7 @@ export default function PersistentAudioPlayer() {
       )}
 
       <div
+        className="anim-slide-up"
         style={{
           position: 'fixed',
           bottom: 0,
@@ -184,6 +187,7 @@ export default function PersistentAudioPlayer() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
             <button
               onClick={togglePlay}
+              className="btn-anim"
               style={{
                 width: '38px',
                 height: '38px',
@@ -238,6 +242,7 @@ export default function PersistentAudioPlayer() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px', minWidth: 0, flex: isMobile ? '0 0 auto' : 1, justifyContent: 'flex-end' }}>
           <button
             onClick={() => setShowTranscript(prev => !prev)}
+            className="btn-anim"
             style={{
               background: 'none',
               border: 'none',
@@ -247,6 +252,7 @@ export default function PersistentAudioPlayer() {
               alignItems: 'center',
               gap: '4px',
               color: showTranscript ? '#8F000D' : '#71717a',
+              transition: 'color 0.2s',
             }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

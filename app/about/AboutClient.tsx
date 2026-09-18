@@ -10,7 +10,7 @@ export default function AboutClient() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-primary)', fontFamily: 'Inter, sans-serif' }}>
 
       {/* ── SECTION 1: CULTURAL MISSION ── */}
-      <section style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '48px 20px 40px' : '80px 24px 64px' }}>
+      <section className="anim-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '48px 20px 40px' : '80px 24px 64px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 420px', gap: isMobile ? '40px' : '64px', alignItems: 'start' }}>
 
           {/* Left Column */}
@@ -215,7 +215,7 @@ export default function AboutClient() {
       </section>
 
       {/* ── SECTION 2: COMMUNITY & STEWARDSHIP ── */}
-      <section style={{ padding: '0 0 80px' }}>
+      <section className="scroll-reveal" style={{ padding: '0 0 80px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
           <div style={{
             display: 'grid',
@@ -298,6 +298,7 @@ export default function AboutClient() {
               <div style={{ marginTop: '8px' }}>
                 <Link
                   href="/ethics"
+                  className="btn-anim"
                   style={{
                     display: 'inline-block',
                     padding: '11px 24px',
@@ -328,7 +329,7 @@ export default function AboutClient() {
       </section>
 
       {/* ── SECTION 3: RESEARCH & PRESERVATION PARTNERS ── */}
-      <section style={{
+      <section className="scroll-reveal" style={{
         borderTop: '1px solid #e2e8f0',
         borderBottom: '1px solid #e2e8f0',
         padding: '56px 24px',
@@ -399,6 +400,7 @@ export default function AboutClient() {
             ].map((partner) => (
               <div
                 key={partner.label}
+                className="stagger-item"
                 style={{
                   display: 'flex',
                   flexDirection: 'column',

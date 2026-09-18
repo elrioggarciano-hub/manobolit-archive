@@ -81,12 +81,13 @@ export default function Header() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="relative py-2 text-xs font-bold tracking-wider transition-colors duration-200"
+                  className="relative py-2 text-xs font-bold tracking-wider"
                   style={{
                     textDecoration: 'none',
                     color: isActive ? '#8F000D' : 'var(--text-secondary)',
                     borderBottom: isActive ? '2px solid #8F000D' : '2px solid transparent',
                     paddingBottom: '4px',
+                    transition: 'color 0.2s ease, border-color 0.25s ease',
                   }}
                   onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = 'var(--text-primary)' }}
                   onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'var(--text-secondary)' }}
@@ -111,7 +112,7 @@ export default function Header() {
                 <input
                   type="text"
                   placeholder="Search archive..."
-                  className="pl-9 pr-4 py-2 text-xs bg-[#f1f5f9] border-0 text-slate-800 placeholder-slate-500 focus:outline-none focus:bg-slate-100 transition-colors"
+                  className="pl-9 pr-4 py-2 text-xs bg-[#f1f5f9] border-0 text-slate-800 placeholder-slate-500 focus:outline-none focus:bg-slate-100 input-anim"
                   style={{
                     borderRadius: '4px',
                     height: '36px',
@@ -147,13 +148,14 @@ export default function Header() {
             </Link>
 
             {/* Hamburger Button */}
-            <button 
+            <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="block md:hidden p-2 hover:text-[#1e293b] focus:outline-none"
+              className="block md:hidden p-2 hover:text-[#1e293b] focus:outline-none btn-anim"
               style={{ background: 'transparent', color: 'var(--text-secondary)' }}
               aria-label="Toggle menu"
+              aria-expanded={isMobileMenuOpen}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transition: 'transform 0.25s var(--ease-out-smooth, ease)', transform: isMobileMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>
                 {isMobileMenuOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
@@ -167,37 +169,39 @@ export default function Header() {
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div 
-          className="block md:hidden border-t px-6 py-4 transition-all duration-300"
+        <div
+          className="block md:hidden border-t px-6 py-4 dropdown-anim"
           style={{
             background: '#ffffff',
             borderTop: '1px solid #e2e8f0',
           }}
         >
           <nav className="flex flex-col gap-4">
-            {navItems.map((item) => {
+            {navItems.map((item, i) => {
               const isActive = pathname === item.href
               return (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="py-1 text-sm font-semibold tracking-wider transition-colors duration-200"
+                  className="py-1 text-sm font-semibold tracking-wider transition-colors duration-200 stagger-item"
                   style={{
                     textDecoration: 'none',
                     color: isActive ? 'var(--primary-red)' : 'var(--text-secondary)',
+                    animationDelay: `${i * 40}ms`,
                   }}
                 >
                   {item.label}
                 </Link>
               )
             })}
-            
-            <Link 
-              href="/admin" 
-              className="mt-2 text-center py-2 rounded-md text-sm font-bold border border-slate-200"
+
+            <Link
+              href="/admin"
+              className="mt-2 text-center py-2 rounded-md text-sm font-bold border border-slate-200 btn-anim stagger-item"
               style={{
                 color: 'var(--text-primary)',
                 textDecoration: 'none',
+                animationDelay: `${navItems.length * 40}ms`,
               }}
             >
               Admin Dashboard

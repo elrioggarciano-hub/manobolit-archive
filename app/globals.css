@@ -136,3 +136,221 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 9999;
   animation: click-ripple-pulse 0.5s ease-out forwards;
 }
+
+/* ==========================================================================
+   Animation system — timing tokens, keyframes, and reusable utility classes.
+   Everything here animates transform/opacity only, so it stays GPU-friendly,
+   and is neutralized under prefers-reduced-motion at the bottom of this file.
+   ========================================================================== */
+
+:root {
+  --dur-fast: 180ms;
+  --dur-normal: 300ms;
+  --dur-slow: 450ms;
+  --ease-out-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideLeft { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideRight { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes scaleOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.96); } }
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes skeletonShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes modalOverlayEnter { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalContentEnter {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toastEnter {
+  from { opacity: 0; transform: translateX(24px) translateY(0); }
+  to { opacity: 1; transform: translateX(0) translateY(0); }
+}
+@keyframes toastExit {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(24px); }
+}
+
+@keyframes pageTransition {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Utility classes ---------------------------------------------------- */
+
+.anim-fade-in { animation: fadeIn var(--dur-normal) var(--ease-out-smooth) both; }
+.anim-slide-up { animation: slideUp var(--dur-normal) var(--ease-out-smooth) both; }
+.anim-slide-down { animation: slideDown var(--dur-normal) var(--ease-out-smooth) both; }
+.anim-slide-left { animation: slideLeft var(--dur-normal) var(--ease-out-smooth) both; }
+.anim-slide-right { animation: slideRight var(--dur-normal) var(--ease-out-smooth) both; }
+.anim-scale-in { animation: scaleIn var(--dur-fast) var(--ease-out-smooth) both; }
+.anim-shake { animation: shake 0.4s var(--ease-standard); }
+.anim-pulse { animation: pulse 1.6s ease-in-out infinite; }
+.anim-spin { animation: spin 0.7s linear infinite; }
+
+/* Page-level transition — applied to a wrapper keyed by route */
+.page-transition {
+  animation: pageTransition var(--dur-slow) var(--ease-out-smooth) both;
+}
+
+/* Staggered children — add alongside a fade/slide class on the parent's
+   children (e.g. cards in a grid) for a natural cascading appearance. */
+/* backwards (not both/forwards): once the entrance finishes, the element
+   should fall back to its normal (non-animated) cascade so a later :hover
+   rule on the same transform property — e.g. .card-hover — isn't blocked by
+   the animation still "owning" that property. slideUp's end state already
+   equals the initial value (opacity 1, transform none), so this is visually
+   identical to `both` while the animation is active or delayed. */
+.stagger-item { animation: slideUp var(--dur-normal) var(--ease-out-smooth) backwards; }
+.stagger-item:nth-child(1) { animation-delay: 0ms; }
+.stagger-item:nth-child(2) { animation-delay: 50ms; }
+.stagger-item:nth-child(3) { animation-delay: 100ms; }
+.stagger-item:nth-child(4) { animation-delay: 150ms; }
+.stagger-item:nth-child(5) { animation-delay: 200ms; }
+.stagger-item:nth-child(6) { animation-delay: 250ms; }
+.stagger-item:nth-child(7) { animation-delay: 300ms; }
+.stagger-item:nth-child(8) { animation-delay: 350ms; }
+.stagger-item:nth-child(n+9) { animation-delay: 400ms; }
+
+/* Cards — gentle lift + shadow growth on hover, no layout shift */
+.card-hover {
+  transition: transform var(--dur-fast) var(--ease-out-smooth), box-shadow var(--dur-fast) var(--ease-out-smooth), border-color var(--dur-fast) var(--ease-out-smooth);
+  will-change: transform;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -12px rgba(15, 23, 42, 0.18);
+}
+
+/* Buttons — lift on hover, compress on press (layered on top of the
+   global button/a active-scale rule above) */
+.btn-anim {
+  transition: transform var(--dur-fast) var(--ease-out-smooth), box-shadow var(--dur-fast) var(--ease-out-smooth), filter var(--dur-fast) var(--ease-out-smooth), opacity var(--dur-fast) var(--ease-out-smooth);
+}
+.btn-anim:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+.btn-anim:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+}
+.btn-anim:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Inline loading spinner for buttons */
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: currentColor;
+  animation: spin 0.7s linear infinite;
+  vertical-align: -2px;
+}
+
+/* Skeleton loaders */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, var(--bg-input) 25%, var(--border-color) 37%, var(--bg-input) 63%);
+  background-size: 400% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+/* Modals */
+.modal-overlay {
+  animation: modalOverlayEnter var(--dur-fast) var(--ease-out-smooth) both;
+}
+.modal-overlay.closing {
+  animation: fadeOut var(--dur-fast) var(--ease-standard) both;
+}
+.modal-content {
+  animation: modalContentEnter var(--dur-normal) var(--ease-out-smooth) both;
+}
+.modal-content.closing {
+  animation: scaleOut var(--dur-fast) var(--ease-standard) both;
+}
+
+/* Toasts */
+.toast-enter {
+  animation: toastEnter var(--dur-normal) var(--ease-out-smooth) both;
+}
+.toast-exit {
+  animation: toastExit var(--dur-fast) var(--ease-standard) both;
+}
+
+/* Dropdowns / mobile menus */
+.dropdown-anim {
+  animation: slideDown var(--dur-fast) var(--ease-out-smooth) both;
+  transform-origin: top;
+}
+
+/* Table rows */
+.row-anim {
+  animation: fadeIn var(--dur-fast) var(--ease-out-smooth) both;
+}
+
+/* Success checkmark pop */
+.check-pop {
+  animation: checkPop 0.4s var(--ease-out-smooth) both;
+}
+
+/* Smooth focus ring for inputs — pairs with an element that already
+   transitions border-color/box-shadow inline; this covers the rest. */
+.input-anim {
+  transition: border-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard);
+}
+.input-anim:focus {
+  border-color: var(--primary-red-dark) !important;
+  box-shadow: 0 0 0 3px rgba(143, 0, 13, 0.12);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .card-hover:hover,
+  .btn-anim:hover:not(:disabled),
+  .btn-anim:active:not(:disabled) {
+    transform: none !important;
+  }
+}

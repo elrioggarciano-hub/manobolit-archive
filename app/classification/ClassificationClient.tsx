@@ -547,8 +547,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 }}
               >
                 {eugenioCards.map(card => (
-                  <div 
+                  <div
                     key={card.id}
+                    className="stagger-item card-hover"
                     style={{
                       background: '#ffffff',
                       border: '1px solid #8F000D',
@@ -667,8 +668,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 className="grid grid-cols-1 md:grid-cols-3 gap-6"
               >
                 {andressCards.map(card => (
-                  <div 
+                  <div
                     key={card.num}
+                    className="stagger-item card-hover"
                     style={{
                       background: '#ffffff',
                       border: '1px solid #e2e8f0',
@@ -798,6 +800,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     <select
                       value={selectedGenreFilter}
                       onChange={(e) => setSelectedGenreFilter(e.target.value)}
+                      className="input-anim"
                       style={{
                         width: '100%',
                         background: '#09090b',

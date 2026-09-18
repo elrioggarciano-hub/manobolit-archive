@@ -36,7 +36,7 @@ export default async function AdminPage() {
             </p>
           </div>
           <div className="flex gap-2.5">
-            <Link href="/admin/new" className="text-center sm:text-left" style={{
+            <Link href="/admin/new" className="text-center sm:text-left btn-anim" style={{
               padding: '10px 22px',
               background: 'linear-gradient(135deg, var(--primary-red), var(--primary-red-dark))',
               color: '#fff', textDecoration: 'none',
@@ -56,7 +56,7 @@ export default async function AdminPage() {
             { label: 'Folk Songs', value: entries.filter(e => e.type === 'FOLK_SONG').length, icon: '🎵' },
             { label: 'Unique Genres', value: new Set(entries.map(e => e.genre)).size, icon: '🏷' },
           ].map(stat => (
-            <div key={stat.label} style={{
+            <div key={stat.label} className="stagger-item card-hover" style={{
               background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '16px',
             }}>
               <div style={{ fontSize: '22px', marginBottom: '4px' }}>{stat.icon}</div>
@@ -87,7 +87,7 @@ export default async function AdminPage() {
             {parsed.map(entry => {
               const color = GENRE_COLORS[entry.genre] || '#6366f1'
               return (
-                <div key={entry.id} className="flex flex-col sm:flex-row gap-4 p-4 sm:p-5 justify-between sm:items-center" style={{
+                <div key={entry.id} className="flex flex-col sm:flex-row gap-4 p-4 sm:p-5 justify-between sm:items-center row-anim card-hover" style={{
                   background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '12px',
                 }}>
                   <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -119,13 +119,13 @@ export default async function AdminPage() {
                   </div>
 
                   <div className="flex gap-2 sm:gap-2.5 mt-2 sm:mt-0 justify-end flex-shrink-0">
-                    <Link href={`/archive/${entry.id}`} style={{
+                    <Link href={`/archive/${entry.id}`} className="btn-anim" style={{
                       padding: '6px 14px', background: 'var(--bg-input)', border: '1px solid var(--border-color)',
                       color: 'var(--text-secondary)', textDecoration: 'none', borderRadius: '6px', fontSize: '12px',
                     }}>
                       View
                     </Link>
-                    <Link href={`/admin/${entry.id}/edit`} style={{
+                    <Link href={`/admin/${entry.id}/edit`} className="btn-anim" style={{
                       padding: '6px 14px', background: 'rgba(196, 30, 58, 0.1)', border: '1px solid rgba(196, 30, 58, 0.3)',
                       color: 'var(--primary-red)', textDecoration: 'none', borderRadius: '6px', fontSize: '12px',
                     }}>
