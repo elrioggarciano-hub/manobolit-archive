@@ -22,6 +22,7 @@ export default function PersistentAudioPlayer() {
     duration,
     togglePlay,
     seek,
+    closeTrack,
   } = useAudio()
 
   const [showTranscript, setShowTranscript] = useState(false)
@@ -65,6 +66,11 @@ export default function PersistentAudioPlayer() {
     const rect = e.currentTarget.getBoundingClientRect()
     const ratio = (e.clientX - rect.left) / rect.width
     seek(ratio)
+  }
+
+  const handleClose = () => {
+    setShowTranscript(false)
+    closeTrack()
   }
 
   const singerName = currentTrack.singer || currentTrack.narrator || 'Agusan Manobo Vocalist'
@@ -263,6 +269,34 @@ export default function PersistentAudioPlayer() {
               <line x1="6" y1="12" x2="14" y2="12" strokeWidth="1.5" />
             </svg>
             <span style={{ fontSize: '8px', fontWeight: 800, letterSpacing: '0.05em' }}>TRANSCRIPT</span>
+          </button>
+
+          <button
+            onClick={handleClose}
+            className="btn-anim"
+            aria-label="Close player"
+            title="Close player"
+            style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border-color)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-muted)',
+              flexShrink: 0,
+              transition: 'color 0.2s, border-color 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'var(--brand-accent)'; e.currentTarget.style.borderColor = 'var(--brand-accent)' }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border-color)' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
       </div>
