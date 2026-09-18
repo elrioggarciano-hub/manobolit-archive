@@ -64,7 +64,7 @@ export default function Header() {
           <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             <h1 style={{
               margin: 0,
-              color: '#8F000D',
+              color: 'var(--brand-accent)',
               fontFamily: 'Cormorant Garamond, Georgia, serif',
               fontSize: '34px',
               fontWeight: 700,
@@ -86,7 +86,7 @@ export default function Header() {
                   className="relative py-2 text-xs font-bold tracking-wider"
                   style={{
                     textDecoration: 'none',
-                    color: isActive ? '#8F000D' : 'var(--text-secondary)',
+                    color: isActive ? 'var(--brand-accent)' : 'var(--text-secondary)',
                     borderBottom: isActive ? '2px solid #8F000D' : '2px solid transparent',
                     paddingBottom: '4px',
                     transition: 'color 0.2s ease, border-color 0.25s ease',
@@ -144,7 +144,7 @@ export default function Header() {
                 height: '30px',
                 borderRadius: '50%',
                 border: '1.5px solid #8F000D',
-                color: '#8F000D',
+                color: 'var(--brand-accent)',
                 background: 'transparent',
               }}
             >

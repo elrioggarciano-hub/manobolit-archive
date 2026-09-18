@@ -215,7 +215,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   margin: 0,
                   fontSize: '28px', 
                   fontWeight: 700, 
-                  color: '#8F000D', 
+                  color: 'var(--brand-accent)', 
                   fontFamily: 'Cormorant Garamond, Georgia, serif' 
                 }}
               >
@@ -236,7 +236,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                     borderRadius: '0px',
                     background: activeCategory === 'GENRES' ? 'var(--bg-surface)' : 'transparent',
                     borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent',
-                    color: activeCategory === 'GENRES' ? '#8F000D' : 'var(--text-secondary)',
+                    color: activeCategory === 'GENRES' ? 'var(--brand-accent)' : 'var(--text-secondary)',
                     fontWeight: activeCategory === 'GENRES' ? 700 : 500,
                     fontSize: '13px',
                   }}
@@ -260,7 +260,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                     borderRadius: '0px',
                     background: activeCategory === 'KEYWORDS' ? 'var(--bg-surface)' : 'transparent',
                     borderLeft: activeCategory === 'KEYWORDS' ? '4px solid #8F000D' : '4px solid transparent',
-                    color: activeCategory === 'KEYWORDS' ? '#8F000D' : 'var(--text-secondary)',
+                    color: activeCategory === 'KEYWORDS' ? 'var(--brand-accent)' : 'var(--text-secondary)',
                     fontWeight: activeCategory === 'KEYWORDS' ? 700 : 500,
                     fontSize: '13px',
                   }}
@@ -282,7 +282,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                     borderRadius: '0px',
                     background: activeCategory === 'THEMES' ? 'var(--bg-surface)' : 'transparent',
                     borderLeft: activeCategory === 'THEMES' ? '4px solid #8F000D' : '4px solid transparent',
-                    color: activeCategory === 'THEMES' ? '#8F000D' : 'var(--text-secondary)',
+                    color: activeCategory === 'THEMES' ? 'var(--brand-accent)' : 'var(--text-secondary)',
                     fontWeight: activeCategory === 'THEMES' ? 700 : 500,
                     fontSize: '13px',
                   }}
@@ -305,7 +305,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                     borderRadius: '0px',
                     background: activeCategory === 'LOCATIONS' ? 'var(--bg-surface)' : 'transparent',
                     borderLeft: activeCategory === 'LOCATIONS' ? '4px solid #8F000D' : '4px solid transparent',
-                    color: activeCategory === 'LOCATIONS' ? '#8F000D' : 'var(--text-secondary)',
+                    color: activeCategory === 'LOCATIONS' ? 'var(--brand-accent)' : 'var(--text-secondary)',
                     fontWeight: activeCategory === 'LOCATIONS' ? 700 : 500,
                     fontSize: '13px',
                   }}
@@ -606,7 +606,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                               style={{ 
                                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                                 fontStyle: 'italic',
-                                color: '#8F000D',
+                                color: 'var(--brand-accent)',
                                 fontSize: '16px',
                                 margin: '4px 0 16px 0'
                               }}
@@ -719,7 +719,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           style={{ 
                             fontFamily: 'Cormorant Garamond, Georgia, serif',
                             fontStyle: 'italic',
-                            color: '#8F000D',
+                            color: 'var(--brand-accent)',
                             fontSize: '14px',
                             margin: '4px 0 16px 0'
                           }}
@@ -742,7 +742,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                         style={{
                           background: 'transparent',
                           border: 'none',
-                          color: '#8F000D',
+                          color: 'var(--brand-accent)',
                           padding: 0,
                         }}
                       >
@@ -784,7 +784,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                         background: 'transparent',
                         border: 'none',
                         borderBottom: isCurrent ? '2px solid #8F000D' : '2px solid transparent',
-                        color: isCurrent ? '#8F000D' : 'var(--text-muted)',
+                        color: isCurrent ? 'var(--brand-accent)' : 'var(--text-muted)',
                         borderRadius: '0px',
                       }}
                     >

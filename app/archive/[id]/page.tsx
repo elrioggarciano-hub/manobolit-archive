@@ -57,7 +57,7 @@ export default async function EntryDetailPage({ params }: Props) {
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 16px' }}>
           <Link href="/explore" className="btn-anim" style={{
             display: 'inline-flex', alignItems: 'center', gap: '6px',
-            color: '#8F000D', textDecoration: 'none', fontSize: '14px',
+            color: 'var(--brand-accent)', textDecoration: 'none', fontSize: '14px',
             marginBottom: '16px',
             fontFamily: 'Inter, sans-serif',
             fontWeight: 'bold',
@@ -89,7 +89,7 @@ export default async function EntryDetailPage({ params }: Props) {
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 16px' }}>
         <Link href="/explore" className="btn-anim" style={{
           display: 'inline-flex', alignItems: 'center', gap: '6px',
-          color: '#8F000D', textDecoration: 'none', fontSize: '14px',
+          color: 'var(--brand-accent)', textDecoration: 'none', fontSize: '14px',
           marginBottom: '16px',
           fontFamily: 'Inter, sans-serif',
           fontWeight: 'bold',

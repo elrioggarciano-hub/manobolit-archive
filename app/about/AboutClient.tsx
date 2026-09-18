@@ -21,7 +21,7 @@ export default function AboutClient() {
               <span style={{
                 fontSize: '11px',
                 fontWeight: 700,
-                color: '#8F000D',
+                color: 'var(--brand-accent)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 display: 'block',
@@ -58,7 +58,7 @@ export default function AboutClient() {
                 margin: '0 0 12px',
                 fontSize: '22px',
                 fontWeight: 700,
-                color: '#8F000D',
+                color: 'var(--brand-accent)',
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
               }}>
                 The Retrieval System
@@ -84,7 +84,7 @@ export default function AboutClient() {
                   }}>
                     17
                   </div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#8F000D', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-accent)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                     Oral Literature Pieces
                   </div>
                 </div>
@@ -303,7 +303,7 @@ export default function AboutClient() {
                     display: 'inline-block',
                     padding: '11px 24px',
                     border: '1.5px solid #8F000D',
-                    color: '#8F000D',
+                    color: 'var(--brand-accent)',
                     fontSize: '11px',
                     fontWeight: 700,
                     letterSpacing: '0.06em',

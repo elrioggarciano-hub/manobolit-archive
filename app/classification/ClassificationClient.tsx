@@ -223,7 +223,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
             style={{ 
               fontSize: '11px', 
               fontWeight: 700, 
-              color: '#8F000D', 
+              color: 'var(--brand-accent)', 
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               marginBottom: '8px'
@@ -271,7 +271,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   margin: 0,
                   fontSize: '28px', 
                   fontWeight: 700, 
-                  color: '#8F000D', 
+                  color: 'var(--brand-accent)', 
                   fontFamily: 'Cormorant Garamond, Georgia, serif' 
                 }}
               >
@@ -299,7 +299,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       gap: '10px'
                     }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8F000D" strokeWidth="2.5">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5">
                       <circle cx="11" cy="11" r="8" />
                       <line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
@@ -319,7 +319,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         outline: 'none',
                         fontSize: '13px',
                         fontWeight: 700,
-                        color: '#8F000D',
+                        color: 'var(--brand-accent)',
                         width: '100%',
                         background: 'transparent'
                       }}
@@ -613,7 +613,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           key={tag}
                           style={{
                             background: '#fee2e2',
-                            color: '#8F000D',
+                            color: 'var(--brand-accent)',
                             fontSize: '9px',
                             fontWeight: 800,
                             padding: '2px 8px',
@@ -685,7 +685,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         margin: '0 0 8px 0',
                         fontSize: '14px',
                         fontWeight: 700,
-                        color: '#8F000D',
+                        color: 'var(--brand-accent)',
                         fontFamily: 'Inter, sans-serif'
                       }}
                     >
