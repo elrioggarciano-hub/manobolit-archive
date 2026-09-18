@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAudio } from '@/lib/context/AudioContext'
+import CountUp from '@/components/CountUp'
 
 interface Entry {
   id: string
@@ -71,6 +72,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-primary)' }}>
       {/* 1. HERO SECTION */}
       <section
+        className="anim-fade-in"
         style={{
           background: 'linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-dark) 100%)',
           padding: '100px 20px 80px',
@@ -160,8 +162,9 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                 }}
               />
             </div>
-            <button 
+            <button
               type="submit"
+              className="btn-anim"
               style={{
                 background: '#8F000D',
                 color: '#ffffff',
@@ -184,7 +187,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
       </section>
 
       {/* 2. ARCHIVE AT A GLANCE SECTION */}
-      <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 24px 60px' }}>
+      <section className="scroll-reveal" style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 24px 60px' }}>
         <div 
           style={{ 
             display: 'flex', 
@@ -224,13 +227,14 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
           {/* Card A */}
-          <div 
-            style={{ 
-              background: '#ffffff', 
-              borderRadius: '0px', 
-              borderTop: '5px solid #8F000D', 
-              padding: '40px 32px 36px 32px', 
-              boxShadow: '0 20px 40px -15px rgba(143, 0, 13, 0.08), 0 15px 30px -10px rgba(0, 0, 0, 0.05)', 
+          <div
+            className="stagger-item"
+            style={{
+              background: '#ffffff',
+              borderRadius: '0px',
+              borderTop: '5px solid #8F000D',
+              padding: '40px 32px 36px 32px',
+              boxShadow: '0 20px 40px -15px rgba(143, 0, 13, 0.08), 0 15px 30px -10px rgba(0, 0, 0, 0.05)',
               display: 'flex', 
               flexDirection: 'column',
               transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
@@ -253,7 +257,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <span style={{ fontSize: '11px', fontWeight: 600, color: '#7c6a68', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE A</span>
             </div>
             <div style={{ marginTop: '28px' }}>
-              <div style={{ fontSize: '64px', fontWeight: 400, color: '#1e293b', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}>{oralLit}</div>
+              <div style={{ fontSize: '64px', fontWeight: 400, color: '#1e293b', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={oralLit} /></div>
               <div style={{ fontSize: '13px', fontWeight: 700, color: '#501B18', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Oral Literature Pieces</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: '#5e5e5e', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
@@ -262,11 +266,12 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           </div>
 
           {/* Card B */}
-          <div 
-            style={{ 
-              background: '#ffffff', 
-              borderRadius: '0px', 
-              borderTop: '5px solid #f1b80d', 
+          <div
+            className="stagger-item"
+            style={{
+              background: '#ffffff',
+              borderRadius: '0px',
+              borderTop: '5px solid #f1b80d',
               padding: '40px 32px 36px 32px', 
               boxShadow: '0 20px 40px -15px rgba(241, 184, 13, 0.12), 0 15px 30px -10px rgba(0, 0, 0, 0.05)', 
               display: 'flex', 
@@ -290,7 +295,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <span style={{ fontSize: '11px', fontWeight: 600, color: '#7c6a68', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE B</span>
             </div>
             <div style={{ marginTop: '28px' }}>
-              <div style={{ fontSize: '64px', fontWeight: 400, color: '#1e293b', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}>{folkSongs}</div>
+              <div style={{ fontSize: '64px', fontWeight: 400, color: '#1e293b', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={folkSongs} /></div>
               <div style={{ fontSize: '13px', fontWeight: 700, color: '#501B18', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Folk Songs</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: '#5e5e5e', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
@@ -299,14 +304,15 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           </div>
 
           {/* Card C */}
-          <div 
-            style={{ 
-              background: '#ffffff', 
-              borderRadius: '0px', 
-              borderTop: '5px solid #8F000D', 
-              padding: '40px 32px 36px 32px', 
-              boxShadow: '0 20px 40px -15px rgba(143, 0, 13, 0.08), 0 15px 30px -10px rgba(0, 0, 0, 0.05)', 
-              display: 'flex', 
+          <div
+            className="stagger-item"
+            style={{
+              background: '#ffffff',
+              borderRadius: '0px',
+              borderTop: '5px solid #8F000D',
+              padding: '40px 32px 36px 32px',
+              boxShadow: '0 20px 40px -15px rgba(143, 0, 13, 0.08), 0 15px 30px -10px rgba(0, 0, 0, 0.05)',
+              display: 'flex',
               flexDirection: 'column',
               transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
@@ -326,7 +332,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <span style={{ fontSize: '11px', fontWeight: 600, color: '#7c6a68', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE C</span>
             </div>
             <div style={{ marginTop: '28px' }}>
-              <div style={{ fontSize: '64px', fontWeight: 400, color: '#1e293b', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}>{totalEntries}</div>
+              <div style={{ fontSize: '64px', fontWeight: 400, color: '#1e293b', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={totalEntries} /></div>
               <div style={{ fontSize: '13px', fontWeight: 700, color: '#501B18', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Audio Transcriptions</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: '#5e5e5e', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
@@ -337,7 +343,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
       </section>
 
       {/* 3. SCIENTIFIC APPROACH SECTION */}
-      <section id="about" style={{ background: '#ffffff', padding: '80px 24px' }}>
+      <section id="about" className="scroll-reveal" style={{ background: '#ffffff', padding: '80px 24px' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '48px', alignItems: 'center' }}>
           {/* Left: Manobo Chanter Photo with Since overlay */}
           <div style={{ position: 'relative', width: '100%', maxWidth: '550px' }}>
@@ -422,7 +428,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
       </section>
 
       {/* 4. EXPERIENCE THE LIVING HERITAGE SECTION */}
-      <section style={{ padding: '80px 24px', background: 'var(--bg-main)' }}>
+      <section className="scroll-reveal" style={{ padding: '80px 24px', background: 'var(--bg-main)' }}>
         <div 
           style={{ 
             maxWidth: '1000px', 

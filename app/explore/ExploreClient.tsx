@@ -231,7 +231,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 {/* Genres Item */}
                 <button
                   onClick={() => setActiveCategory('GENRES')}
-                  className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left"
+                  className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
                     background: activeCategory === 'GENRES' ? '#ffffff' : 'transparent',
@@ -255,7 +255,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 {/* Keywords Item */}
                 <button
                   onClick={() => setActiveCategory('KEYWORDS')}
-                  className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left"
+                  className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
                     background: activeCategory === 'KEYWORDS' ? '#ffffff' : 'transparent',
@@ -277,7 +277,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 {/* Themes Item */}
                 <button
                   onClick={() => setActiveCategory('THEMES')}
-                  className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left"
+                  className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
                     background: activeCategory === 'THEMES' ? '#ffffff' : 'transparent',
@@ -300,7 +300,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 {/* Locations Item */}
                 <button
                   onClick={() => setActiveCategory('LOCATIONS')}
-                  className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left"
+                  className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
                     background: activeCategory === 'LOCATIONS' ? '#ffffff' : 'transparent',
@@ -363,11 +363,12 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          flexShrink: 0
+                          flexShrink: 0,
+                          transition: 'background-color 0.15s ease, border-color 0.15s ease',
                         }}
                       >
                         {isChecked && (
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
+                          <svg className="check-pop" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
                         )}
@@ -412,11 +413,12 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          flexShrink: 0
+                          flexShrink: 0,
+                          transition: 'background-color 0.15s ease, border-color 0.15s ease',
                         }}
                       >
                         {isChecked && (
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
+                          <svg className="check-pop" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
                         )}
@@ -443,7 +445,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                     <button
                       key={item.key}
                       onClick={() => toggleTheme(item.key)}
-                      className="text-[9px] font-bold py-1 px-2.5 tracking-wider transition-colors"
+                      className="text-[9px] font-bold py-1 px-2.5 tracking-wider transition-colors btn-anim"
                       style={{
                         borderRadius: '0px',
                         background: isChecked ? '#8F000D' : '#e2e8f0',
@@ -467,7 +469,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 setAppliedLocations(selectedLocations)
                 setPage(1)
               }}
-              className="w-full text-center text-white py-2.5 font-bold text-xs transition-colors"
+              className="w-full text-center text-white py-2.5 font-bold text-xs transition-colors btn-anim"
               style={{
                 background: '#8F000D',
                 borderRadius: '0px',
@@ -524,7 +526,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 value={searchInput}
                 onChange={e => handleSearchChange(e.target.value)}
                 placeholder="Search entries by title, content, themes, keywords..."
-                className="w-full pl-12 pr-10 py-3 bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#8F000D] transition-colors shadow-sm"
+                className="w-full pl-12 pr-10 py-3 bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#8F000D] input-anim shadow-sm"
                 style={{
                   borderRadius: '0px',
                   fontSize: '14px',
@@ -533,7 +535,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               {searchInput && (
                 <button
                   onClick={() => handleSearchChange('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors btn-anim anim-scale-in"
                   style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -545,7 +547,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
             </div>
 
             {/* CARDS GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div key={page} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               {paginatedEntries.map((entry, index) => {
                 const isFeatured = index === 0 && page === 1
                 const isFolkSong = entry.type === 'FOLK_SONG'
@@ -554,9 +556,9 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 if (isFeatured) {
                   // FEATURED 2-COLUMN HORIZONTAL CARD ("The Ascension of Agyu")
                   return (
-                    <div 
+                    <div
                       key={entry.id}
-                      className="col-span-1 md:col-span-2 bg-white flex flex-col sm:flex-row justify-between shadow-sm transition-shadow"
+                      className="col-span-1 md:col-span-2 bg-white flex flex-col sm:flex-row justify-between shadow-sm stagger-item card-hover"
                       style={{
                         borderTop: '4px solid #8F000D',
                         borderLeft: '1px solid #8F000D',
@@ -623,7 +625,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                         <div className="flex items-center gap-6 mt-auto">
                           <button
                             onClick={(e) => handlePlayClick(e, entry)}
-                            className="flex items-center gap-2 text-white font-bold text-xs py-2.5 px-4 transition-colors"
+                            className="flex items-center gap-2 text-white font-bold text-xs py-2.5 px-4 transition-colors btn-anim"
                             style={{
                               background: '#8F000D',
                               borderRadius: '0px',
@@ -669,9 +671,9 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                 // VERTICAL 1-COLUMN CARDS
                 return (
-                  <div 
+                  <div
                     key={entry.id}
-                    className="bg-white flex flex-col justify-between p-6 shadow-sm transition-shadow"
+                    className="bg-white flex flex-col justify-between p-6 shadow-sm stagger-item card-hover"
                     style={{
                       borderTop: `4px solid ${borderColor}`,
                       borderLeft: `1px solid ${borderColor}`,
@@ -736,7 +738,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                     <div className="flex items-center mt-auto pt-4 border-t border-slate-100">
                       <button
                         onClick={(e) => handlePlayClick(e, entry)}
-                        className="flex items-center gap-1.5 font-bold text-xs transition-colors"
+                        className="flex items-center gap-1.5 font-bold text-xs transition-colors btn-anim"
                         style={{
                           background: 'transparent',
                           border: 'none',
@@ -762,7 +764,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="w-8 h-8 flex items-center justify-center border border-slate-200 text-slate-600 transition-colors disabled:opacity-50"
+                  className="w-8 h-8 flex items-center justify-center border border-slate-200 text-slate-600 transition-colors disabled:opacity-50 btn-anim"
                   style={{ borderRadius: '0px', background: '#f1f5f9' }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -777,7 +779,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                     <button
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
-                      className="h-8 flex items-center justify-center font-bold text-xs transition-colors px-3"
+                      className="h-8 flex items-center justify-center font-bold text-xs transition-colors px-3 btn-anim"
                       style={{
                         background: 'transparent',
                         border: 'none',
@@ -795,7 +797,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="w-8 h-8 flex items-center justify-center border border-slate-200 text-slate-600 transition-colors disabled:opacity-50"
+                  className="w-8 h-8 flex items-center justify-center border border-slate-200 text-slate-600 transition-colors disabled:opacity-50 btn-anim"
                   style={{ borderRadius: '0px', background: '#f1f5f9' }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

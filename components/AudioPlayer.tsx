@@ -94,6 +94,7 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
         {/* Yellow Play/Pause Button */}
         <button
           onClick={handleToggle}
+          className="btn-anim"
           style={{
             width: '44px',
             height: '44px',
@@ -106,7 +107,8 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
             color: '#ffffff',
             cursor: 'pointer',
             flexShrink: 0,
-            transition: 'background 0.2s',
+            transition: 'background 0.2s, box-shadow 0.25s',
+            boxShadow: isThisPlaying ? '0 0 0 4px rgba(241, 184, 13, 0.18)' : 'none',
           }}
           aria-label={isThisPlaying ? "Pause" : "Play"}
         >

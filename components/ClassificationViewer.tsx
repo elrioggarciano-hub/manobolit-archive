@@ -76,7 +76,7 @@ export default function ClassificationViewer({ result, onAccept, onClose }: Prop
   const topThemes = result.themes.slice(0, 4)
 
   return (
-    <div style={{
+    <div className="anim-scale-in" style={{
       background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
       border: '1px solid #334155',
       borderRadius: '16px',
@@ -215,6 +215,7 @@ export default function ClassificationViewer({ result, onAccept, onClose }: Prop
           {onClose && (
             <button
               onClick={onClose}
+              className="btn-anim"
               style={{
                 padding: '8px 20px',
                 background: 'transparent',
@@ -231,6 +232,7 @@ export default function ClassificationViewer({ result, onAccept, onClose }: Prop
           {onAccept && (
             <button
               onClick={() => onAccept(result.genre.value, result.themes.map(t => t.value))}
+              className="btn-anim"
               style={{
                 padding: '8px 20px',
                 background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',

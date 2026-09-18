@@ -4,7 +4,9 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import PersistentAudioPlayer from "@/components/PersistentAudioPlayer"
 import ClickRipple from "@/components/ClickRipple"
+import PageTransition from "@/components/PageTransition"
 import { AudioProvider } from "@/lib/context/AudioContext"
+import { ToastProvider } from "@/lib/context/ToastContext"
 
 export const metadata: Metadata = {
   title: "ManoboLit Archive",
@@ -31,13 +33,15 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <AudioProvider>
-          <ClickRipple />
-          <Header />
-          {children}
-          <Footer />
-          <PersistentAudioPlayer />
-        </AudioProvider>
+        <ToastProvider>
+          <AudioProvider>
+            <ClickRipple />
+            <Header />
+            <PageTransition>{children}</PageTransition>
+            <Footer />
+            <PersistentAudioPlayer />
+          </AudioProvider>
+        </ToastProvider>
       </body>
     </html>
   )

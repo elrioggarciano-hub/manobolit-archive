@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import CountUp from '@/components/CountUp'
 
 export interface LocationStat {
   location: string
@@ -44,11 +45,7 @@ function formatThemeLabel(theme: string): string {
 // dynamically import with ssr disabled rather than importing react-leaflet directly.
 const RegionalMap = dynamic(() => import('@/components/RegionalMap'), {
   ssr: false,
-  loading: () => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '11px', color: '#94a3b8' }}>
-      Loading map…
-    </div>
-  ),
+  loading: () => <div className="skeleton" style={{ width: '100%', height: '100%' }} />,
 })
 
 export default function DashboardClient({
@@ -159,7 +156,7 @@ export default function DashboardClient({
               {/* Keywords Item */}
               <button
                 onClick={() => handleSidebarClick('KEYWORDS')}
-                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left"
+                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left btn-anim"
                 style={{ 
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'KEYWORDS' ? '4px solid #8F000D' : '4px solid transparent', 
@@ -178,7 +175,7 @@ export default function DashboardClient({
               {/* Genres Item */}
               <button
                 onClick={() => handleSidebarClick('GENRES')}
-                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left"
+                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left btn-anim"
                 style={{ 
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent', 
@@ -199,7 +196,7 @@ export default function DashboardClient({
               {/* Themes Item */}
               <button
                 onClick={() => handleSidebarClick('THEMES')}
-                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left"
+                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left btn-anim"
                 style={{ 
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'THEMES' ? '4px solid #8F000D' : '4px solid transparent', 
@@ -219,7 +216,7 @@ export default function DashboardClient({
               {/* Locations Item */}
               <button
                 onClick={() => handleSidebarClick('LOCATIONS')}
-                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left"
+                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left btn-anim"
                 style={{ 
                   fontSize: '13px', 
                   borderLeft: activeCategory === 'LOCATIONS' ? '4px solid #8F000D' : '4px solid transparent', 
@@ -242,13 +239,13 @@ export default function DashboardClient({
             
             {/* Stats Cards Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
+
               {/* Total Entries Card */}
-              <div 
-                className="bg-white p-5 flex flex-col justify-between"
-                style={{ 
-                  border: '1px solid #fee2e2', 
-                  borderTop: '4px solid #8F000D', 
+              <div
+                className="bg-white p-5 flex flex-col justify-between stagger-item card-hover"
+                style={{
+                  border: '1px solid #fee2e2',
+                  borderTop: '4px solid #8F000D',
                   borderRadius: '0px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.03)'
                 }}
@@ -264,7 +261,7 @@ export default function DashboardClient({
                         fontFamily: "'Playfair Display', Georgia, serif"
                       }}
                     >
-                      {totalEntries.toLocaleString()}
+                      <CountUp value={totalEntries} />
                     </span>
                   </div>
                 </div>
@@ -272,11 +269,11 @@ export default function DashboardClient({
               </div>
 
               {/* Most Common Genre Card */}
-              <div 
-                className="bg-white p-5 flex flex-col justify-between"
-                style={{ 
-                  border: '1px solid #fef3c7', 
-                  borderTop: '4px solid #f1b80d', 
+              <div
+                className="bg-white p-5 flex flex-col justify-between stagger-item card-hover"
+                style={{
+                  border: '1px solid #fef3c7',
+                  borderTop: '4px solid #f1b80d',
                   borderRadius: '0px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.03)'
                 }}
@@ -305,7 +302,7 @@ export default function DashboardClient({
 
               {/* Most Frequent Theme Card */}
               <div
-                className="bg-white p-5 flex flex-col justify-between"
+                className="bg-white p-5 flex flex-col justify-between stagger-item card-hover"
                 style={{
                   border: '1px solid #fee2e2',
                   borderTop: '4px solid #8F000D',
@@ -341,11 +338,11 @@ export default function DashboardClient({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
               {/* Genre Distribution Card */}
-              <div 
-                className="bg-white p-6 flex flex-col justify-between"
-                style={{ 
-                  border: '1px solid #e2e8f0', 
-                  borderRadius: '0px', 
+              <div
+                className="bg-white p-6 flex flex-col justify-between scroll-reveal card-hover"
+                style={{
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '0px',
                   minHeight: '340px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
                 }}
@@ -450,11 +447,11 @@ export default function DashboardClient({
               </div>
 
               {/* Theme Frequency Card */}
-              <div 
-                className="bg-white p-6 flex flex-col justify-between"
-                style={{ 
-                  border: '1px solid #e2e8f0', 
-                  borderRadius: '0px', 
+              <div
+                className="bg-white p-6 flex flex-col justify-between scroll-reveal card-hover"
+                style={{
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '0px',
                   minHeight: '340px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
                 }}
@@ -481,7 +478,7 @@ export default function DashboardClient({
                   <button
                     onClick={downloadThemeDataset}
                     disabled={themeFrequency.length === 0}
-                    className="text-slate-400 hover:text-[#8F000D] transition-colors p-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="text-slate-400 hover:text-[#8F000D] transition-colors p-1 disabled:opacity-40 disabled:cursor-not-allowed btn-anim"
                     title="Download Theme Dataset (CSV)"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -502,7 +499,7 @@ export default function DashboardClient({
                           <span style={{ color: '#64748b' }}>{theme.count} {theme.count === 1 ? 'entry' : 'entries'}</span>
                         </div>
                         <div style={{ height: '6px', background: '#fee2e2', position: 'relative' }}>
-                          <div style={{ height: '100%', width: `${theme.percent}%`, background: '#8F000D' }} />
+                          <div style={{ height: '100%', width: `${theme.percent}%`, background: '#8F000D', transition: 'width 0.8s var(--ease-out-smooth, ease-out)' }} />
                         </div>
                       </div>
                     ))
@@ -518,11 +515,11 @@ export default function DashboardClient({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
               {/* Combined Regional Heatmap and Municipality Rank Card */}
-              <div 
-                className="col-span-1 lg:col-span-2 bg-white flex flex-col md:flex-row justify-between"
-                style={{ 
-                  border: '1px solid #e2e8f0', 
-                  borderRadius: '0px', 
+              <div
+                className="col-span-1 lg:col-span-2 bg-white flex flex-col md:flex-row justify-between scroll-reveal card-hover"
+                style={{
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '0px',
                   minHeight: '260px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
                 }}
@@ -620,11 +617,11 @@ export default function DashboardClient({
               </div>
 
               {/* System Accuracy Card */}
-              <div 
-                className="bg-white p-6 flex flex-col justify-between"
-                style={{ 
-                  border: '1px solid #e2e8f0', 
-                  borderRadius: '0px', 
+              <div
+                className="bg-white p-6 flex flex-col justify-between scroll-reveal card-hover"
+                style={{
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '0px',
                   minHeight: '280px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
                 }}

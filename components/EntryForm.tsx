@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import ClassificationViewer from '@/components/ClassificationViewer'
+import { useToast } from '@/lib/context/ToastContext'
 
 const GENRES = ['MYTH', 'LEGEND', 'FOLKTALE', 'EPIC', 'RIDDLE', 'PROVERB', 'SONG', 'CHANT', 'PRAYER', 'INCANTATION']
 const THEMES = [
@@ -36,6 +37,7 @@ interface Props {
 
 export default function EntryForm({ initialData, mode }: Props) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [form, setForm] = useState<FormData>({ ...EMPTY, ...initialData })
   const [saving, setSaving] = useState(false)
   const [classifying, setClassifying] = useState(false)
@@ -43,9 +45,16 @@ export default function EntryForm({ initialData, mode }: Props) {
   const [translationNotice, setTranslationNotice] = useState<string | null>(null)
   const [classResult, setClassResult] = useState<any>(null)
   const [error, setError] = useState('')
+  const [errorTick, setErrorTick] = useState(0)
   const [activeSection, setActiveSection] = useState<'basic' | 'content' | 'location' | 'classification'>('basic')
 
   const set = (key: keyof FormData, value: any) => setForm(prev => ({ ...prev, [key]: value }))
+
+  const raiseError = (msg: string) => {
+    setError(msg)
+    setErrorTick(t => t + 1)
+    showToast('error', msg)
+  }
 
   const toggleTheme = (theme: string) => {
     set('themes', form.themes.includes(theme)
@@ -73,7 +82,7 @@ export default function EntryForm({ initialData, mode }: Props) {
     }
 
     if (!sourceText) {
-      setError(`Please fill the source text before auto-translating to ${field}.`)
+      raiseError(`Please fill the source text before auto-translating to ${field}.`)
       return
     }
 
@@ -95,14 +104,14 @@ export default function EntryForm({ initialData, mode }: Props) {
         throw new Error('No translation returned')
       }
     } catch {
-      setError('Translation request failed.')
+      raiseError('Translation request failed.')
     } finally {
       setTranslatingField(null)
     }
   }
 
   const runClassification = async () => {
-    if (!form.content) { setError('Enter content first to classify.'); return }
+    if (!form.content) { raiseError('Enter content first to classify.'); return }
     setClassifying(true)
     setError('')
     try {
@@ -114,7 +123,8 @@ export default function EntryForm({ initialData, mode }: Props) {
       const data = await res.json()
       setClassResult(data.result)
       setActiveSection('classification')
-    } catch { setError('Classification failed. Please try again.') }
+      showToast('success', 'Classification complete.')
+    } catch { raiseError('Classification failed. Please try again.') }
     finally { setClassifying(false) }
   }
 
@@ -128,7 +138,7 @@ export default function EntryForm({ initialData, mode }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.title || !form.content || !form.source || !form.province || !form.municipality || !form.communityLocation) {
-      setError('Please fill all required fields.')
+      raiseError('Please fill all required fields.')
       return
     }
     setSaving(true)
@@ -152,9 +162,10 @@ export default function EntryForm({ initialData, mode }: Props) {
 
       if (!res.ok) throw new Error('Save failed')
       const data = await res.json()
+      showToast('success', mode === 'create' ? 'Entry created successfully.' : 'Changes saved successfully.')
       router.push(`/archive/${data.entry.id}`)
     } catch (err) {
-      setError('Failed to save entry. Please try again.')
+      raiseError('Failed to save entry. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -189,6 +200,7 @@ export default function EntryForm({ initialData, mode }: Props) {
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
         {sections.map(s => (
           <button key={s.id} type="button" onClick={() => setActiveSection(s.id)}
+            className="btn-anim"
             style={{
               padding: '8px 16px', border: 'none', borderRadius: '8px', cursor: 'pointer',
               fontSize: '13px', fontWeight: 600,
@@ -200,25 +212,25 @@ export default function EntryForm({ initialData, mode }: Props) {
       </div>
 
       {error && (
-        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', color: '#e11d48', fontSize: '14px' }}>
+        <div key={errorTick} className="anim-shake" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', color: '#e11d48', fontSize: '14px' }}>
           ⚠️ {error}
         </div>
       )}
 
       {translationNotice && (
-        <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', color: '#10b981', fontSize: '13px', fontWeight: 600 }}>
+        <div className="anim-slide-down" style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', color: '#10b981', fontSize: '13px', fontWeight: 600 }}>
           {translationNotice}
         </div>
       )}
 
       {/* Basic Info */}
       {activeSection === 'basic' && (
-        <div style={sectionStyle}>
+        <div key="basic" className="anim-fade-in" style={sectionStyle}>
           <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: 700 }}>Basic Information</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={labelStyle}>TITLE *</label>
-              <input style={inputStyle} value={form.title} onChange={e => set('title', e.target.value)} placeholder="Entry title" required />
+              <input className="input-anim" style={inputStyle} value={form.title} onChange={e => set('title', e.target.value)} placeholder="Entry title" required />
             </div>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
@@ -234,26 +246,26 @@ export default function EntryForm({ initialData, mode }: Props) {
                   {translatingField === 'manoboTitle' ? '⏳ Translating...' : '🌐 Auto-Translate (Bible Corpus)'}
                 </button>
               </div>
-              <input style={inputStyle} value={form.manoboTitle} onChange={e => set('manoboTitle', e.target.value)} placeholder="Title in Manobo language" />
+              <input className="input-anim" style={inputStyle} value={form.manoboTitle} onChange={e => set('manoboTitle', e.target.value)} placeholder="Title in Manobo language" />
             </div>
             <div>
               <label style={labelStyle}>ENGLISH TITLE</label>
-              <input style={inputStyle} value={form.englishTitle} onChange={e => set('englishTitle', e.target.value)} placeholder="English title" />
+              <input className="input-anim" style={inputStyle} value={form.englishTitle} onChange={e => set('englishTitle', e.target.value)} placeholder="English title" />
             </div>
             <div>
               <label style={labelStyle}>ENTRY TYPE *</label>
-              <select style={inputStyle} value={form.type} onChange={e => set('type', e.target.value)}>
+              <select className="input-anim" style={inputStyle} value={form.type} onChange={e => set('type', e.target.value)}>
                 <option value="ORAL_LITERATURE">📖 Oral Literature</option>
                 <option value="FOLK_SONG">🎵 Folk Song</option>
               </select>
             </div>
             <div>
               <label style={labelStyle}>SOURCE *</label>
-              <input style={inputStyle} value={form.source} onChange={e => set('source', e.target.value)} placeholder="e.g. Catipay & Curato (2024)" required />
+              <input className="input-anim" style={inputStyle} value={form.source} onChange={e => set('source', e.target.value)} placeholder="e.g. Catipay & Curato (2024)" required />
             </div>
             <div>
               <label style={labelStyle}>NARRATOR</label>
-              <input style={inputStyle} value={form.narrator} onChange={e => set('narrator', e.target.value)} placeholder="Name of narrator" />
+              <input className="input-anim" style={inputStyle} value={form.narrator} onChange={e => set('narrator', e.target.value)} placeholder="Name of narrator" />
             </div>
             <div>
               <label style={labelStyle}>YEAR COLLECTED</label>
@@ -261,7 +273,7 @@ export default function EntryForm({ initialData, mode }: Props) {
             </div>
             <div>
               <label style={labelStyle}>AUDIO FILE PATH</label>
-              <input style={inputStyle} value={form.audioFile} onChange={e => set('audioFile', e.target.value)} placeholder="/audio/filename.mp3" />
+              <input className="input-anim" style={inputStyle} value={form.audioFile} onChange={e => set('audioFile', e.target.value)} placeholder="/audio/filename.mp3" />
             </div>
             <div>
               <label style={labelStyle}>AUDIO DURATION (seconds)</label>
@@ -273,12 +285,12 @@ export default function EntryForm({ initialData, mode }: Props) {
 
       {/* Content */}
       {activeSection === 'content' && (
-        <div style={sectionStyle}>
+        <div key="content" className="anim-fade-in" style={sectionStyle}>
           <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: 700 }}>Content</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div>
               <label style={labelStyle}>EXPLANATION / ANALYSIS (ENGLISH) *</label>
-              <textarea style={{ ...inputStyle, minHeight: '120px', resize: 'vertical' }} value={form.content} onChange={e => set('content', e.target.value)} placeholder="Enter English explanation, description, or analysis of the piece..." required />
+              <textarea className="input-anim" style={{ ...inputStyle, minHeight: '120px', resize: 'vertical' }} value={form.content} onChange={e => set('content', e.target.value)} placeholder="Enter English explanation, description, or analysis of the piece..." required />
             </div>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
@@ -294,7 +306,7 @@ export default function EntryForm({ initialData, mode }: Props) {
                   {translatingField === 'transcription' ? '⏳ Translating...' : '🌐 Auto-Translate (Manobo)'}
                 </button>
               </div>
-              <textarea style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={form.transcription} onChange={e => set('transcription', e.target.value)} placeholder="Enter the original text in Manobo or Cebuano as collected..." />
+              <textarea className="input-anim" style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={form.transcription} onChange={e => set('transcription', e.target.value)} placeholder="Enter the original text in Manobo or Cebuano as collected..." />
             </div>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
@@ -310,23 +322,26 @@ export default function EntryForm({ initialData, mode }: Props) {
                   {translatingField === 'translation' ? '⏳ Translating...' : '🌐 Auto-Translate (English)'}
                 </button>
               </div>
-              <textarea style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={form.translation} onChange={e => set('translation', e.target.value)} placeholder="Enter the English translation..." />
+              <textarea className="input-anim" style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={form.translation} onChange={e => set('translation', e.target.value)} placeholder="Enter the English translation..." />
             </div>
             <div>
               <label style={labelStyle}>CULTURAL ELEMENTS (comma-separated)</label>
-              <input style={inputStyle} value={form.culturalElements} onChange={e => set('culturalElements', e.target.value)} placeholder="e.g. Great Spirit, First Man and Woman, Creation Narrative" />
+              <input className="input-anim" style={inputStyle} value={form.culturalElements} onChange={e => set('culturalElements', e.target.value)} placeholder="e.g. Great Spirit, First Man and Woman, Creation Narrative" />
             </div>
             <button
               type="button"
               onClick={runClassification}
               disabled={classifying || !form.content}
+              className="btn-anim"
               style={{
-                padding: '10px 20px', background: classifying ? 'var(--bg-input)' : 'linear-gradient(135deg, var(--primary-red), var(--primary-red-dark))',
+                padding: '10px 20px', display: 'inline-flex', alignItems: 'center', gap: '8px',
+                background: classifying ? 'var(--bg-input)' : 'linear-gradient(135deg, var(--primary-red), var(--primary-red-dark))',
                 border: 'none', borderRadius: '8px', color: classifying ? 'var(--text-muted)' : '#fff', cursor: classifying ? 'default' : 'pointer',
                 fontSize: '14px', fontWeight: 600, alignSelf: 'flex-start',
               }}
             >
-              {classifying ? '⏳ Classifying...' : '🧠 Run Auto-Classification'}
+              {classifying && <span className="btn-spinner" aria-hidden="true" />}
+              {classifying ? 'Classifying...' : '🧠 Run Auto-Classification'}
             </button>
           </div>
         </div>
@@ -334,26 +349,26 @@ export default function EntryForm({ initialData, mode }: Props) {
 
       {/* Location */}
       {activeSection === 'location' && (
-        <div style={sectionStyle}>
+        <div key="location" className="anim-fade-in" style={sectionStyle}>
           <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: 700 }}>Location Details</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label style={labelStyle}>PROVINCE *</label>
-              <select style={inputStyle} value={form.province} onChange={e => set('province', e.target.value)} required>
+              <select className="input-anim" style={inputStyle} value={form.province} onChange={e => set('province', e.target.value)} required>
                 {PROVINCES.map(p => <option key={p}>{p}</option>)}
               </select>
             </div>
             <div>
               <label style={labelStyle}>MUNICIPALITY *</label>
-              <input style={inputStyle} value={form.municipality} onChange={e => set('municipality', e.target.value)} placeholder="Municipality" required />
+              <input className="input-anim" style={inputStyle} value={form.municipality} onChange={e => set('municipality', e.target.value)} placeholder="Municipality" required />
             </div>
             <div>
               <label style={labelStyle}>BARANGAY</label>
-              <input style={inputStyle} value={form.barangay} onChange={e => set('barangay', e.target.value)} placeholder="Barangay" />
+              <input className="input-anim" style={inputStyle} value={form.barangay} onChange={e => set('barangay', e.target.value)} placeholder="Barangay" />
             </div>
             <div>
               <label style={labelStyle}>COMMUNITY LOCATION *</label>
-              <input style={inputStyle} value={form.communityLocation} onChange={e => set('communityLocation', e.target.value)} placeholder="e.g. Sitio Kalibutan" required />
+              <input className="input-anim" style={inputStyle} value={form.communityLocation} onChange={e => set('communityLocation', e.target.value)} placeholder="e.g. Sitio Kalibutan" required />
             </div>
           </div>
         </div>
@@ -361,7 +376,7 @@ export default function EntryForm({ initialData, mode }: Props) {
 
       {/* Classification */}
       {activeSection === 'classification' && (
-        <div style={sectionStyle}>
+        <div key="classification" className="anim-fade-in" style={sectionStyle}>
           <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: 700 }}>Genre & Theme Classification</h3>
 
           {classResult && (
@@ -403,13 +418,14 @@ export default function EntryForm({ initialData, mode }: Props) {
 
       {/* Submit */}
       <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '8px' }}>
-        <button type="button" onClick={() => router.back()}
+        <button type="button" onClick={() => router.back()} className="btn-anim"
           style={{ padding: '10px 24px', background: 'transparent', border: '1px solid var(--border-hover)', borderRadius: '8px', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '14px' }}>
           Cancel
         </button>
-        <button type="submit" disabled={saving}
-          style={{ padding: '10px 28px', background: saving ? 'var(--bg-input)' : 'linear-gradient(135deg, var(--primary-red), var(--primary-red-dark))', border: 'none', borderRadius: '8px', color: saving ? 'var(--text-muted)' : '#fff', cursor: saving ? 'default' : 'pointer', fontSize: '14px', fontWeight: 700 }}>
-          {saving ? '⏳ Saving...' : mode === 'create' ? '✓ Create Entry' : '✓ Save Changes'}
+        <button type="submit" disabled={saving} className="btn-anim"
+          style={{ padding: '10px 28px', display: 'inline-flex', alignItems: 'center', gap: '8px', background: saving ? 'var(--bg-input)' : 'linear-gradient(135deg, var(--primary-red), var(--primary-red-dark))', border: 'none', borderRadius: '8px', color: saving ? 'var(--text-muted)' : '#fff', cursor: saving ? 'default' : 'pointer', fontSize: '14px', fontWeight: 700 }}>
+          {saving && <span className="btn-spinner" aria-hidden="true" />}
+          {saving ? 'Saving...' : mode === 'create' ? '✓ Create Entry' : '✓ Save Changes'}
         </button>
       </div>
     </form>
