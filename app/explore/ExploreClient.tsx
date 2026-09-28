@@ -571,7 +571,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                       <div className="p-6 flex-1 flex flex-col justify-between min-w-0">
                         <div>
                           {/* Badges */}
-                          <div className="flex gap-2 mb-4">
+                          <div className="flex flex-wrap gap-2 mb-4">
                             <span className="text-[9px] font-bold bg-[#18181b] text-white px-2.5 py-1" style={{ borderRadius: '0px' }}>
                               {entry.genre} ({entry.type === 'FOLK_SONG' ? 'FOLK SONG' : 'ULAGING'})
                             </span>
@@ -684,7 +684,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   >
                     <div>
                       {/* Badges */}
-                      <div className="flex gap-2 mb-4">
+                      <div className="flex flex-wrap gap-2 mb-4">
                         <span className="text-[9px] font-bold bg-[#18181b] text-white px-2.5 py-1" style={{ borderRadius: '0px' }}>
                           {entry.type === 'FOLK_SONG' ? 'FOLK SONG' : entry.genre}
                         </span>
