@@ -44,6 +44,7 @@ export default function EntryForm({ initialData, mode }: Props) {
   const [translatingField, setTranslatingField] = useState<string | null>(null)
   const [translationNotice, setTranslationNotice] = useState<string | null>(null)
   const [classResult, setClassResult] = useState<any>(null)
+  const [uploadingAudio, setUploadingAudio] = useState(false)
   const [error, setError] = useState('')
   const [errorTick, setErrorTick] = useState(0)
   const [activeSection, setActiveSection] = useState<'basic' | 'content' | 'location' | 'classification'>('basic')
@@ -60,6 +61,39 @@ export default function EntryForm({ initialData, mode }: Props) {
     set('themes', form.themes.includes(theme)
       ? form.themes.filter(t => t !== theme)
       : [...form.themes, theme])
+  }
+
+  const handleAudioUpload = async (file: File) => {
+    setUploadingAudio(true)
+    setError('')
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      const res = await fetch('/api/upload-audio', { method: 'POST', body })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed.')
+
+      set('audioFile', data.url)
+      showToast('success', 'Audio file uploaded successfully.')
+
+      // Best-effort: read the real duration straight from the file so the
+      // narrator doesn't have to time it and type it in by hand.
+      const probe = new Audio(URL.createObjectURL(file))
+      probe.addEventListener('loadedmetadata', () => {
+        if (probe.duration && isFinite(probe.duration)) {
+          set('audioDuration', Math.round(probe.duration).toString())
+        }
+      })
+    } catch (err: any) {
+      raiseError(err?.message || 'Failed to upload audio file.')
+    } finally {
+      setUploadingAudio(false)
+    }
+  }
+
+  const clearAudio = () => {
+    set('audioFile', '')
+    set('audioDuration', '')
   }
 
   const handleAutoTranslate = async (field: 'manoboTitle' | 'transcription' | 'translation') => {
@@ -271,13 +305,76 @@ export default function EntryForm({ initialData, mode }: Props) {
               <label style={labelStyle}>YEAR COLLECTED</label>
               <input style={inputStyle} type="number" value={form.yearCollected} onChange={e => set('yearCollected', e.target.value)} placeholder="e.g. 2023" min="1900" max="2100" />
             </div>
-            <div>
-              <label style={labelStyle}>AUDIO FILE PATH</label>
-              <input className="input-anim" style={inputStyle} value={form.audioFile} onChange={e => set('audioFile', e.target.value)} placeholder="/audio/filename.mp3" />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ ...labelStyle, marginBottom: 0 }}>AUDIO RECORDING</label>
+                {form.audioFile && !uploadingAudio && (
+                  <button
+                    type="button"
+                    onClick={clearAudio}
+                    className="btn-anim"
+                    style={{ background: 'transparent', border: 'none', color: '#ef4444', fontSize: '11px', fontWeight: 700, cursor: 'pointer', padding: 0 }}
+                  >
+                    ✕ Remove
+                  </button>
+                )}
+              </div>
+              <input
+                id="audio-upload-input"
+                type="file"
+                accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/mp4,audio/x-m4a,audio/aac,.mp3,.wav,.ogg,.m4a"
+                disabled={uploadingAudio}
+                style={{ display: 'none' }}
+                onChange={e => {
+                  const file = e.target.files?.[0]
+                  if (file) handleAudioUpload(file)
+                  e.target.value = ''
+                }}
+              />
+              <label
+                htmlFor="audio-upload-input"
+                className="btn-anim input-anim"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '12px 14px', borderRadius: '8px',
+                  border: `1.5px dashed var(--border-hover)`,
+                  background: 'var(--bg-input)', fontSize: '13px', color: 'var(--text-secondary)',
+                  cursor: uploadingAudio ? 'default' : 'pointer',
+                }}
+              >
+                {uploadingAudio ? (
+                  <>
+                    <span className="btn-spinner" style={{ borderTopColor: 'var(--primary-red-dark)' }} aria-hidden="true" />
+                    Uploading…
+                  </>
+                ) : form.audioFile ? (
+                  <>
+                    <span>🎵</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                      {decodeURIComponent(form.audioFile.split('/').pop() || form.audioFile)}
+                    </span>
+                    <span style={{ color: 'var(--primary-red-dark)', fontWeight: 700, fontSize: '12px', flexShrink: 0 }}>Change file</span>
+                  </>
+                ) : (
+                  <>
+                    <span>⬆️</span>
+                    Click to upload an MP3, WAV, OGG, or M4A recording (max 15MB)
+                  </>
+                )}
+              </label>
+              {form.audioFile && (
+                <audio
+                  key={form.audioFile}
+                  controls
+                  src={form.audioFile}
+                  className="anim-fade-in"
+                  style={{ width: '100%', marginTop: '10px', height: '36px' }}
+                />
+              )}
             </div>
             <div>
               <label style={labelStyle}>AUDIO DURATION (seconds)</label>
-              <input style={inputStyle} type="number" value={form.audioDuration} onChange={e => set('audioDuration', e.target.value)} placeholder="e.g. 180" />
+              <input className="input-anim" style={inputStyle} type="number" value={form.audioDuration} onChange={e => set('audioDuration', e.target.value)} placeholder="Auto-filled after upload, or enter manually" />
             </div>
           </div>
         </div>
