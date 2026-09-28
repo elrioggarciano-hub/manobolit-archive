@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import ClassificationViewer from '@/components/ClassificationViewer'
 import { useToast } from '@/lib/context/ToastContext'
+import { supabase } from '@/lib/supabase/client'
+
+const AUDIO_BUCKET = 'audio'
+const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/mp4', 'audio/x-m4a', 'audio/aac']
 
 const GENRES = ['MYTH', 'LEGEND', 'FOLKTALE', 'EPIC', 'RIDDLE', 'PROVERB', 'SONG', 'CHANT', 'PRAYER', 'INCANTATION']
 const THEMES = [
@@ -63,34 +67,36 @@ export default function EntryForm({ initialData, mode }: Props) {
       : [...form.themes, theme])
   }
 
-  const MAX_AUDIO_MB = 4
+  const MAX_AUDIO_MB = 10
 
   const handleAudioUpload = async (file: File) => {
     if (file.size > MAX_AUDIO_MB * 1024 * 1024) {
       raiseError(`"${file.name}" is too large. Please upload a file under ${MAX_AUDIO_MB}MB.`)
       return
     }
+    if (file.type && !ALLOWED_AUDIO_TYPES.includes(file.type)) {
+      raiseError(`"${file.name}" isn't a supported audio format. Please upload an MP3, WAV, OGG, or M4A file.`)
+      return
+    }
 
     setUploadingAudio(true)
     setError('')
     try {
-      const body = new FormData()
-      body.append('file', file)
-      const res = await fetch('/api/upload-audio', { method: 'POST', body })
+      // Uploaded straight from the browser to Supabase Storage rather than
+      // through our own API route — Vercel's serverless functions cap
+      // request bodies at ~4.5MB, which a real audio clip can exceed, so
+      // routing it through our server would just hit that ceiling again.
+      const ext = (file.name.split('.').pop() || 'mp3').toLowerCase()
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
 
-      // The hosting platform can reject an oversized request before our
-      // route handler ever runs, returning a plain-text/HTML error page
-      // instead of JSON — parse defensively so that doesn't surface as a
-      // raw "Unexpected token" error.
-      let data: { url?: string; error?: string } = {}
-      try {
-        data = await res.json()
-      } catch {
-        throw new Error(`Upload failed${res.status === 413 ? ` — file is too large (max ${MAX_AUDIO_MB}MB)` : ''}. Please try a smaller file.`)
-      }
-      if (!res.ok) throw new Error(data.error || 'Upload failed.')
+      const { error: uploadError } = await supabase.storage
+        .from(AUDIO_BUCKET)
+        .upload(path, file, { contentType: file.type || 'audio/mpeg', upsert: false })
 
-      set('audioFile', data.url || '')
+      if (uploadError) throw new Error(uploadError.message || 'Upload failed.')
+
+      const { data } = supabase.storage.from(AUDIO_BUCKET).getPublicUrl(path)
+      set('audioFile', data.publicUrl)
       showToast('success', 'Audio file uploaded successfully.')
 
       // Best-effort: read the real duration straight from the file so the
