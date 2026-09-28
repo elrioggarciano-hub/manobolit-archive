@@ -69,15 +69,9 @@ const PRESETS = {
     DEFAULT: "The stars were born from the breath of the Father Sky in the beginning of all things."
   },
   GENRES: {
-    DEFAULT: "The great warrior embarked on a journey to protect his people, fighting valiantly in the battle against the invaders.",
-    MYTH: "In the beginning of all things, the Father Sky gave birth to the stars from his breath in those ancient times, before the world was formed.",
-    LEGEND: "According to legend, a guardian spirit blessed this sacred mountain, and to this day the local people still tell the story.",
-    FOLKTALE: "Once upon a time, in a faraway village, a clever trickster monkey outwitted a foolish crocodile, and so it is said this became a lesson for all.",
-    EPIC: "The great warrior embarked on a journey to protect his people, fighting valiantly in the battle against the invaders.",
-    RIDDLE: "What am I? I have no legs but I can travel far. Can you guess the answer to this riddle?",
-    PROVERB: "As the elders say, it is better to endure hardship than to lose your integrity, for a wise man always remembers this saying.",
     SONG: "We sing this song together, our voices full of longing and sorrow, as tears fall like rain in our hearts.",
-    CHANT: "We call upon the ancestors and spirits, invoking their blessing with these sacred words in this ritual ceremony."
+    PROVERB: "As the elders say, it is better to endure hardship than to lose your integrity, for a wise man always remembers this saying.",
+    RIDDLE: "What am I? I have no legs but I can travel far. Can you guess the answer to this riddle?",
   },
   THEMES: {
     CREATION: "In the beginning, there was only darkness and water, until the great god Kadgayan shaped the earth from a handful of soil.",
@@ -372,10 +366,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 <button
                   onClick={() => {
                     setActiveCategory('GENRES')
-                    setInputText(PRESETS.GENRES.EPIC)
+                    setInputText(PRESETS.GENRES.SONG)
                     setInputTranscription('')
                     setSelectedEntryId('custom')
-                    setActiveSubCategory('EPIC')
+                    setActiveSubCategory('SONG')
                     setSelectedGenreFilter('ALL')
                     scrollToEngine()
                   }}
@@ -398,14 +392,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 {activeCategory === 'GENRES' && (
                   <div className="flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-[var(--border-color)] ml-3 mt-1">
                     {[
-                      { key: 'MYTH', label: 'Myth (Oggayam)' },
-                      { key: 'LEGEND', label: 'Legend (Tudtul)' },
-                      { key: 'FOLKTALE', label: 'Folktale' },
-                      { key: 'EPIC', label: 'Epic (Ulaging)' },
-                      { key: 'RIDDLE', label: 'Riddle' },
+                      { key: 'SONG', label: 'Folk Song' },
                       { key: 'PROVERB', label: 'Proverb' },
-                      { key: 'SONG', label: 'Song' },
-                      { key: 'CHANT', label: 'Chant' }
+                      { key: 'RIDDLE', label: 'Riddle' },
                     ].map(genreItem => {
                       const isActive = activeSubCategory === genreItem.key
                       return (
