@@ -18,6 +18,7 @@ interface Entry {
   culturalElements: string[]
   audioFile?: string | null
   confidence?: number
+  narrator?: string | null
   communityLocation?: string | null
   municipality?: string | null
   barangay?: string | null
@@ -150,8 +151,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
       playTrack({
         audioFile: entry.audioFile,
         title: entry.title,
-        singer: (entry as any).singer || entry.manoboTitle || 'Agusan Manobo Vocalist',
-        narrator: entry.manoboTitle || 'Agusan Manobo',
+        singer: entry.narrator || 'Agusan Manobo Vocalist',
+        narrator: entry.narrator || 'Agusan Manobo Vocalist',
         duration: 25,
         textToRecite: entry.content
       })
