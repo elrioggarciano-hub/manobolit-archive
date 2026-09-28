@@ -634,7 +634,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                               <path d="M8 5v14l11-7z" />
                             </svg>
-                            <span>LISTEN TO ORAL TEXT</span>
+                            <span>PLAY RECORDING</span>
                           </button>
 
                           <div className="flex items-center gap-3">
