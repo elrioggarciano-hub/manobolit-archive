@@ -63,17 +63,34 @@ export default function EntryForm({ initialData, mode }: Props) {
       : [...form.themes, theme])
   }
 
+  const MAX_AUDIO_MB = 4
+
   const handleAudioUpload = async (file: File) => {
+    if (file.size > MAX_AUDIO_MB * 1024 * 1024) {
+      raiseError(`"${file.name}" is too large. Please upload a file under ${MAX_AUDIO_MB}MB.`)
+      return
+    }
+
     setUploadingAudio(true)
     setError('')
     try {
       const body = new FormData()
       body.append('file', file)
       const res = await fetch('/api/upload-audio', { method: 'POST', body })
-      const data = await res.json()
+
+      // The hosting platform can reject an oversized request before our
+      // route handler ever runs, returning a plain-text/HTML error page
+      // instead of JSON — parse defensively so that doesn't surface as a
+      // raw "Unexpected token" error.
+      let data: { url?: string; error?: string } = {}
+      try {
+        data = await res.json()
+      } catch {
+        throw new Error(`Upload failed${res.status === 413 ? ` — file is too large (max ${MAX_AUDIO_MB}MB)` : ''}. Please try a smaller file.`)
+      }
       if (!res.ok) throw new Error(data.error || 'Upload failed.')
 
-      set('audioFile', data.url)
+      set('audioFile', data.url || '')
       showToast('success', 'Audio file uploaded successfully.')
 
       // Best-effort: read the real duration straight from the file so the
@@ -358,7 +375,7 @@ export default function EntryForm({ initialData, mode }: Props) {
                 ) : (
                   <>
                     <span>⬆️</span>
-                    Click to upload an MP3, WAV, OGG, or M4A recording (max 15MB)
+                    Click to upload an MP3, WAV, OGG, or M4A recording (max {MAX_AUDIO_MB}MB)
                   </>
                 )}
               </label>

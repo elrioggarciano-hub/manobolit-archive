@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase/client'
 
 const BUCKET = 'audio'
-const MAX_SIZE_BYTES = 15 * 1024 * 1024 // 15MB
+// Kept comfortably under Vercel's ~4.5MB request body ceiling for
+// serverless Route Handlers — anything larger is rejected by the platform
+// itself before this code ever runs, as a non-JSON error page.
+const MAX_SIZE_BYTES = 4 * 1024 * 1024 // 4MB
 const ALLOWED_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/mp4', 'audio/x-m4a', 'audio/aac']
 
 // POST /api/upload-audio — uploads a recording to Supabase Storage and
@@ -18,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (file.size > MAX_SIZE_BYTES) {
-      return NextResponse.json({ error: 'File is too large. Maximum size is 15MB.' }, { status: 413 })
+      return NextResponse.json({ error: 'File is too large. Maximum size is 4MB.' }, { status: 413 })
     }
 
     if (file.type && !ALLOWED_TYPES.includes(file.type)) {
