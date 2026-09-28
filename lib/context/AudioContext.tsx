@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useRef } from 'react'
+import { useToast } from '@/lib/context/ToastContext'
 
 export interface Track {
   audioFile: string
@@ -25,12 +26,12 @@ interface AudioContextType {
   closeTrack: () => void
   setPlaybackSpeed: (speed: number) => void
   seek: (ratio: number) => void
-  speakText: (text: string, title?: string) => void
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined)
 
 export function AudioProvider({ children }: { children: React.ReactNode }) {
+  const { showToast } = useToast()
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -39,68 +40,20 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [speed, setSpeed] = useState(1)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const speechUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
 
-  // Clean up audio & speech on unmount
+  // Clean up audio on unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause()
         audioRef.current.src = ''
       }
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel()
-      }
     }
   }, [])
-
-  // Speech Synthesis fallback helper
-  const speakText = (text: string, title?: string) => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return
-
-    window.speechSynthesis.cancel()
-    if (audioRef.current) {
-      audioRef.current.pause()
-    }
-
-    const track: Track = {
-      audioFile: `tts-${Date.now()}`,
-      title: title || 'Oral Reading Recitation',
-      narrator: 'Web Speech Engine',
-      duration: Math.max(10, Math.ceil(text.length / 15)),
-      textToRecite: text,
-    }
-
-    setCurrentTrack(track)
-    setDuration(track.duration || 15)
-    setCurrentTime(0)
-    setProgress(0)
-
-    const utterance = new SpeechSynthesisUtterance(text)
-    speechUtteranceRef.current = utterance
-    utterance.rate = speed
-
-    utterance.onstart = () => setIsPlaying(true)
-    utterance.onend = () => {
-      setIsPlaying(false)
-      setProgress(100)
-    }
-    utterance.onerror = () => setIsPlaying(false)
-
-    window.speechSynthesis.speak(utterance)
-  }
 
   // Manage Audio element lifecycle based on currentTrack
   useEffect(() => {
     if (!currentTrack) return
-
-    // If track is TTS based, skip HTML5 audio loading
-    if (currentTrack.audioFile.startsWith('tts-')) return
-
-    // Cancel any running speech synthesis
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
-    }
 
     // Pause and clean previous audio
     if (audioRef.current) {
@@ -139,12 +92,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     })
 
     audio.addEventListener('error', (e) => {
-      console.warn('Audio file playback encounter error, falling back to speech recitation if available:', e)
-      if (currentTrack.textToRecite) {
-        speakText(currentTrack.textToRecite, currentTrack.title)
-      } else {
-        setIsPlaying(false)
-      }
+      console.warn('Audio playback error:', e)
+      setIsPlaying(false)
+      showToast('error', 'This recording could not be played.')
     })
 
     if (isPlaying) {
@@ -158,30 +108,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audio.pause()
       audio.src = ''
     }
-  }, [currentTrack])
+  }, [currentTrack]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const playTrack = (track: Track) => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
-    }
     setCurrentTrack(track)
     setIsPlaying(true)
   }
 
   const togglePlay = () => {
-    if (currentTrack?.audioFile.startsWith('tts-')) {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        if (isPlaying) {
-          window.speechSynthesis.pause()
-          setIsPlaying(false)
-        } else {
-          window.speechSynthesis.resume()
-          setIsPlaying(true)
-        }
-      }
-      return
-    }
-
     const audio = audioRef.current
     if (!audio) return
 
@@ -198,14 +132,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }
 
   const pauseTrack = () => {
-    if (currentTrack?.audioFile.startsWith('tts-')) {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.pause()
-        setIsPlaying(false)
-      }
-      return
-    }
-
     const audio = audioRef.current
     if (audio && isPlaying) {
       audio.pause()
@@ -214,9 +140,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }
 
   const closeTrack = () => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
-    }
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current.src = ''
@@ -260,7 +183,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         closeTrack,
         setPlaybackSpeed,
         seek,
-        speakText,
       }}
     >
       {children}
@@ -275,4 +197,3 @@ export function useAudio() {
   }
   return context
 }
-

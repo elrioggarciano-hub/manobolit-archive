@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAudio } from '@/lib/context/AudioContext'
+import { useToast } from '@/lib/context/ToastContext'
 
 interface Entry {
   id: string
@@ -28,6 +29,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
   const searchParams = useSearchParams()
   
   const { playTrack, currentTrack, isPlaying, togglePlay } = useAudio()
+  const { showToast } = useToast()
 
   // Active category button (GENRES, KEYWORDS, THEMES, LOCATIONS)
   const [activeCategory, setActiveCategory] = useState<'GENRES' | 'KEYWORDS' | 'THEMES' | 'LOCATIONS'>('GENRES')
@@ -138,18 +140,17 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
   const handlePlayClick = (e: React.MouseEvent, entry: Entry) => {
     e.preventDefault()
     e.stopPropagation()
-    
-    // Fall back to a per-entry (nonexistent) path when there's no real recording —
-    // AudioContext's error handler will catch the failed load and recite the text
-    // via speech synthesis instead. Must be unique per entry, or switching between
-    // two entries with no audio wrongly looks like "the same track" and just toggles.
-    const audioPath = entry.audioFile || `/audio/${entry.id}.mp3`
 
-    if (currentTrack?.audioFile === audioPath) {
+    if (!entry.audioFile) {
+      showToast('warning', 'No audio recording has been uploaded for this entry yet.')
+      return
+    }
+
+    if (currentTrack?.audioFile === entry.audioFile) {
       togglePlay()
     } else {
       playTrack({
-        audioFile: audioPath,
+        audioFile: entry.audioFile,
         title: entry.title,
         singer: (entry as any).singer || entry.manoboTitle || 'Agusan Manobo Vocalist',
         narrator: entry.manoboTitle || 'Agusan Manobo',
@@ -629,6 +630,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                             style={{
                               background: '#8F000D',
                               borderRadius: '0px',
+                              opacity: entry.audioFile ? 1 : 0.5,
+                              cursor: entry.audioFile ? 'pointer' : 'not-allowed',
                             }}
                           >
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
@@ -744,6 +747,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           border: 'none',
                           color: 'var(--brand-accent)',
                           padding: 0,
+                          opacity: entry.audioFile ? 1 : 0.5,
+                          cursor: entry.audioFile ? 'pointer' : 'not-allowed',
                         }}
                       >
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
