@@ -141,8 +141,8 @@ export default function Footer() {
         >
           <span>&copy; {new Date().getFullYear()} ManoboLit Archive. All rights reserved.</span>
           <div style={{ display: 'flex', gap: '16px' }}>
-            <Link href="/" style={{ color: '#64748b', textDecoration: 'none' }}>Privacy Policy</Link>
-            <Link href="/" style={{ color: '#64748b', textDecoration: 'none' }}>Terms of Service</Link>
+            <Link href="/privacy" className="btn-anim" style={{ color: '#64748b', textDecoration: 'none' }}>Privacy Policy</Link>
+            <Link href="/terms" className="btn-anim" style={{ color: '#64748b', textDecoration: 'none' }}>Terms of Service</Link>
           </div>
         </div>
       </div>
