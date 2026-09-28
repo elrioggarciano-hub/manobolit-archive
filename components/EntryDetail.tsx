@@ -111,6 +111,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             title={entry.title}
             duration={entry.audioDuration}
             transcription={entry.transcription}
+            narrator={entry.type === 'FOLK_SONG' ? 'AI Generated' : (entry.narrator || entry.singer || 'AI Generated')}
           />
         </div>
       )}

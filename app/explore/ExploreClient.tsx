@@ -148,11 +148,16 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     if (currentTrack?.audioFile === entry.audioFile) {
       togglePlay()
     } else {
+      const isFolkSong = entry.type === 'FOLK_SONG'
       playTrack({
         audioFile: entry.audioFile,
         title: entry.title,
-        singer: entry.narrator || 'Agusan Manobo Vocalist',
-        narrator: entry.narrator || 'Agusan Manobo Vocalist',
+        // Folk song recordings have no real credited vocalist, so this is
+        // labeled honestly as "AI Generated" rather than implying a real
+        // singer performed it. Oral literature narrations keep using the
+        // actual collected narrator when one is on record.
+        singer: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
+        narrator: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
         duration: 25,
         textToRecite: entry.content
       })

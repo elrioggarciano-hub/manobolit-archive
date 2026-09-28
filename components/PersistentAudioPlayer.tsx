@@ -73,7 +73,7 @@ export default function PersistentAudioPlayer() {
     closeTrack()
   }
 
-  const singerName = currentTrack.singer || currentTrack.narrator || 'Agusan Manobo Vocalist'
+  const singerName = currentTrack.singer || currentTrack.narrator || 'AI Generated'
 
   return (
     <>

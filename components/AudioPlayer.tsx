@@ -7,6 +7,7 @@ interface Props {
   title?: string
   duration?: number | null
   transcription?: string | null
+  narrator?: string | null
 }
 
 function formatTime(seconds: number): string {
@@ -16,7 +17,7 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-export default function AudioPlayer({ audioFile, title = 'Audio Recording', duration, transcription }: Props) {
+export default function AudioPlayer({ audioFile, title = 'Audio Recording', duration, transcription, narrator = 'AI Generated' }: Props) {
   const { playTrack, currentTrack, isPlaying, togglePlay, currentTime, duration: globalDuration, progress, seek } = useAudio()
 
   const isCurrent = currentTrack?.audioFile === audioFile
@@ -31,7 +32,7 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
       playTrack({
         audioFile,
         title,
-        narrator: 'Agusan Manobo Oral Recording',
+        narrator,
         duration: displayDuration,
         textToRecite: transcription,
       })
