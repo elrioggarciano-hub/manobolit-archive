@@ -88,6 +88,7 @@ export async function POST(request: NextRequest) {
         content: body.content,
         transcription,
         translation,
+        bisayaTranslation: body.bisayaTranslation || null,
         audioFile: body.audioFile || null,
         audioDuration: body.audioDuration ? Number(body.audioDuration) : null,
         source: body.source,
