@@ -20,6 +20,7 @@ export default async function EditEntryPage({ params }: Props) {
     content: entry.content,
     transcription: entry.transcription || '',
     translation: entry.translation || '',
+    bisayaTranslation: entry.bisayaTranslation || '',
     audioFile: entry.audioFile || '',
     audioDuration: entry.audioDuration?.toString() || '',
     source: entry.source,

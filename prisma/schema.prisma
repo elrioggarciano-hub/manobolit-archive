@@ -19,6 +19,7 @@ model LiteratureEntry {
   content           String
   transcription     String?
   translation       String?
+  bisayaTranslation String?
   audioFile         String?
   audioDuration     Int?
   source            String

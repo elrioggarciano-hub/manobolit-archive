@@ -20,6 +20,7 @@ const PROVINCES = ['Agusan del Norte', 'Agusan del Sur', 'Surigao del Norte', 'S
 interface FormData {
   title: string; manoboTitle: string; englishTitle: string
   type: string; content: string; transcription: string; translation: string
+  bisayaTranslation: string
   audioFile: string; audioDuration: string; source: string; yearCollected: string
   narrator: string; communityLocation: string; province: string
   municipality: string; barangay: string; genre: string
@@ -28,7 +29,7 @@ interface FormData {
 
 const EMPTY: FormData = {
   title: '', manoboTitle: '', englishTitle: '', type: 'ORAL_LITERATURE',
-  content: '', transcription: '', translation: '', audioFile: '',
+  content: '', transcription: '', translation: '', bisayaTranslation: '', audioFile: '',
   audioDuration: '', source: '', yearCollected: '', narrator: '',
   communityLocation: '', province: 'Agusan del Sur', municipality: '', barangay: '',
   genre: 'MYTH', themes: [], culturalElements: '',
@@ -443,6 +444,10 @@ export default function EntryForm({ initialData, mode }: Props) {
                 </button>
               </div>
               <textarea className="input-anim" style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={form.translation} onChange={e => set('translation', e.target.value)} placeholder="Enter the English translation..." />
+            </div>
+            <div>
+              <label style={labelStyle}>BISAYA (CEBUANO) TRANSLATION</label>
+              <textarea className="input-anim" style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={form.bisayaTranslation} onChange={e => set('bisayaTranslation', e.target.value)} placeholder="Enter the Bisaya (Cebuano) translation..." />
             </div>
             <div>
               <label style={labelStyle}>CULTURAL ELEMENTS (comma-separated)</label>

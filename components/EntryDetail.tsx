@@ -26,6 +26,7 @@ interface Entry {
   content: string
   transcription?: string | null
   translation?: string | null
+  bisayaTranslation?: string | null
   audioFile?: string | null
   audioDuration?: number | null
   source: string
@@ -180,6 +181,35 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                 }}
               >
                 {entry.translation || 'No translation available.'}
+              </p>
+            </div>
+
+            {/* Bisaya (Cebuano) Translation */}
+            <div>
+              <h3
+                style={{
+                  margin: '0 0 12px',
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  color: 'var(--brand-accent)',
+                  letterSpacing: '0.05em',
+                  borderBottom: '1px solid var(--border-color)',
+                  paddingBottom: '8px'
+                }}
+              >
+                TRANSLATION (BISAYA/CEBUANO)
+              </h3>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: '13px',
+                  lineHeight: 1.6,
+                  color: 'var(--text-secondary)',
+                  whiteSpace: 'pre-line',
+                  fontFamily: 'Inter, sans-serif'
+                }}
+              >
+                {entry.bisayaTranslation || 'No translation available.'}
               </p>
             </div>
 
