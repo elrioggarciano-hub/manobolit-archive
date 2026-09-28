@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { classifyEntry, genreRules, themeRules, locationRules } from '@/lib/classification'
 
@@ -69,7 +69,15 @@ const PRESETS = {
     DEFAULT: "The stars were born from the breath of the Father Sky in the beginning of all things."
   },
   GENRES: {
-    DEFAULT: "The great warrior embarked on a journey to protect his people, fighting valiantly in the battle against the invaders."
+    DEFAULT: "The great warrior embarked on a journey to protect his people, fighting valiantly in the battle against the invaders.",
+    MYTH: "In the beginning of all things, the Father Sky gave birth to the stars from his breath in those ancient times, before the world was formed.",
+    LEGEND: "According to legend, a guardian spirit blessed this sacred mountain, and to this day the local people still tell the story.",
+    FOLKTALE: "Once upon a time, in a faraway village, a clever trickster monkey outwitted a foolish crocodile, and so it is said this became a lesson for all.",
+    EPIC: "The great warrior embarked on a journey to protect his people, fighting valiantly in the battle against the invaders.",
+    RIDDLE: "What am I? I have no legs but I can travel far. Can you guess the answer to this riddle?",
+    PROVERB: "As the elders say, it is better to endure hardship than to lose your integrity, for a wise man always remembers this saying.",
+    SONG: "We sing this song together, our voices full of longing and sorrow, as tears fall like rain in our hearts.",
+    CHANT: "We call upon the ancestors and spirits, invoking their blessing with these sacred words in this ritual ceremony."
   },
   THEMES: {
     CREATION: "In the beginning, there was only darkness and water, until the great god Kadgayan shaped the earth from a handful of soil.",
@@ -121,6 +129,16 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [inputText, setInputText] = useState(initialEntry ? getEntryClassificationText(initialEntry) : PRESETS.KEYWORDS.DEFAULT)
   const [inputTranscription, setInputTranscription] = useState(initialEntry ? (initialEntry.transcription || '') : '')
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>('ALL')
+
+  // The sidebar drives the live simulator further down the page — jump the
+  // reader straight to the result whenever they pick a filter, instead of
+  // silently updating a panel they'd have to go hunting for.
+  const logicEngineRef = useRef<HTMLElement>(null)
+  const scrollToEngine = () => {
+    requestAnimationFrame(() => {
+      logicEngineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
 
   const classificationResult = classifyEntry(inputText, inputTranscription, selectedGenreFilter)
 
@@ -287,8 +305,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
               {/* Keywords Item */}
               {activeCategory === 'KEYWORDS' ? (
-                <form onSubmit={handleKeywordSearch} className="w-full">
-                  <div 
+                <form onSubmit={(e) => { handleKeywordSearch(e); scrollToEngine() }} className="w-full">
+                  <div
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -303,7 +321,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       <circle cx="11" cy="11" r="8" />
                       <line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
-                    <input 
+                    <input
                       type="text"
                       placeholder="Keywords"
                       value={keywordInput}
@@ -313,6 +331,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         setInputTranscription('')
                         setSelectedEntryId('custom')
                         setSelectedGenreFilter('ALL')
+                        scrollToEngine()
                       }}
                       style={{
                         border: 'none',
@@ -335,6 +354,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     setSelectedEntryId('custom')
                     setActiveSubCategory('DEFAULT')
                     setSelectedGenreFilter('ALL')
+                    scrollToEngine()
                   }}
                   className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left text-slate-600 font-semibold"
                   style={{ fontSize: '13px', borderLeft: '4px solid transparent', background: 'transparent' }}
@@ -348,31 +368,72 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               )}
 
               {/* Genres Item */}
-              <button
-                onClick={() => {
-                  setActiveCategory('GENRES')
-                  setInputText(PRESETS.GENRES.DEFAULT)
-                  setInputTranscription('')
-                  setSelectedEntryId('custom')
-                  setActiveSubCategory('DEFAULT')
-                  setSelectedGenreFilter('ALL')
-                }}
-                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left font-semibold"
-                style={{
-                  fontSize: '13px',
-                  borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent',
-                  background: activeCategory === 'GENRES' ? 'var(--bg-surface)' : 'transparent',
-                  color: activeCategory === 'GENRES' ? '#8F000D' : 'var(--text-secondary)',
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 11h2a2 2 0 0 1 2 2v3a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4v-1" />
-                  <path d="M16 14h.01M19 14h.01M16 17c.5-.5 1.5-.5 2 0" />
-                  <path d="M5 6a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V6z" />
-                  <path d="M8 5h.01M11 5h.01M8 8c.5.5 1.5.5 2 0" />
-                </svg>
-                <span>Genres</span>
-              </button>
+              <div className="flex flex-col w-full">
+                <button
+                  onClick={() => {
+                    setActiveCategory('GENRES')
+                    setInputText(PRESETS.GENRES.EPIC)
+                    setInputTranscription('')
+                    setSelectedEntryId('custom')
+                    setActiveSubCategory('EPIC')
+                    setSelectedGenreFilter('ALL')
+                    scrollToEngine()
+                  }}
+                  className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left font-semibold"
+                  style={{
+                    fontSize: '13px',
+                    borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent',
+                    background: activeCategory === 'GENRES' ? 'var(--bg-surface)' : 'transparent',
+                    color: activeCategory === 'GENRES' ? '#8F000D' : 'var(--text-secondary)',
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 11h2a2 2 0 0 1 2 2v3a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4v-1" />
+                    <path d="M16 14h.01M19 14h.01M16 17c.5-.5 1.5-.5 2 0" />
+                    <path d="M5 6a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V6z" />
+                    <path d="M8 5h.01M11 5h.01M8 8c.5.5 1.5.5 2 0" />
+                  </svg>
+                  <span>Genres</span>
+                </button>
+                {activeCategory === 'GENRES' && (
+                  <div className="flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-[var(--border-color)] ml-3 mt-1">
+                    {[
+                      { key: 'MYTH', label: 'Myth (Oggayam)' },
+                      { key: 'LEGEND', label: 'Legend (Tudtul)' },
+                      { key: 'FOLKTALE', label: 'Folktale' },
+                      { key: 'EPIC', label: 'Epic (Ulaging)' },
+                      { key: 'RIDDLE', label: 'Riddle' },
+                      { key: 'PROVERB', label: 'Proverb' },
+                      { key: 'SONG', label: 'Song' },
+                      { key: 'CHANT', label: 'Chant' }
+                    ].map(genreItem => {
+                      const isActive = activeSubCategory === genreItem.key
+                      return (
+                        <button
+                          key={genreItem.key}
+                          onClick={() => {
+                            setActiveSubCategory(genreItem.key)
+                            setInputText(PRESETS.GENRES[genreItem.key as keyof typeof PRESETS.GENRES])
+                            setInputTranscription('')
+                            setSelectedEntryId('custom')
+                            setSelectedGenreFilter('ALL')
+                            scrollToEngine()
+                          }}
+                          className="text-left text-xs py-1.5 px-2 hover:bg-slate-100 transition-colors"
+                          style={{
+                            color: isActive ? '#8F000D' : 'var(--text-muted)',
+                            fontWeight: isActive ? 700 : 500,
+                            background: isActive ? '#fee2e2' : 'transparent',
+                            borderRadius: '2px'
+                          }}
+                        >
+                          {genreItem.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
 
               {/* Themes Item */}
               <div className="flex flex-col w-full">
@@ -384,6 +445,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     setSelectedEntryId('custom')
                     setActiveSubCategory('COURTSHIP')
                     setSelectedGenreFilter('ALL')
+                    scrollToEngine()
                   }}
                   className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left font-semibold"
                   style={{
@@ -419,6 +481,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                             setInputTranscription('')
                             setSelectedEntryId('custom')
                             setSelectedGenreFilter('ALL')
+                            scrollToEngine()
                           }}
                           className="text-left text-xs py-1.5 px-2 hover:bg-slate-100 transition-colors"
                           style={{
@@ -446,6 +509,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     setSelectedEntryId('custom')
                     setActiveSubCategory('TRENTO')
                     setSelectedGenreFilter('ALL')
+                    scrollToEngine()
                   }}
                   className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left font-semibold"
                   style={{
@@ -479,6 +543,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                             setInputTranscription('')
                             setSelectedEntryId('custom')
                             setSelectedGenreFilter('ALL')
+                            scrollToEngine()
                           }}
                           className="text-left text-xs py-1.5 px-2 hover:bg-slate-100 transition-colors"
                           style={{
@@ -707,11 +772,12 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
             </section>
 
             {/* SECTION 3: THE LOGIC ENGINE */}
-            <section 
-              style={{ 
-                background: '#18181b', 
-                color: '#e2e8f0', 
-                padding: '40px', 
+            <section
+              ref={logicEngineRef}
+              style={{
+                background: '#18181b',
+                color: '#e2e8f0',
+                padding: '40px',
                 borderRadius: '0px',
                 marginBottom: '60px',
                 boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
