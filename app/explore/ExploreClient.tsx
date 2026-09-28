@@ -114,12 +114,10 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
           const mNorm = (entry.municipality || '').toUpperCase()
           const bNorm = (entry.barangay || '').toUpperCase()
           const cNorm = (entry.communityLocation || '').toUpperCase()
-          const tNorm = [entry.title, entry.content].join(' ').toUpperCase()
 
           if (loc === 'TRENTO') return mNorm.includes('TRENTO')
           if (loc === 'STA_MARIA') return bNorm.includes('MARIA') || cNorm.includes('MARIA')
           if (loc === 'SITIO_DAM') return cNorm.includes('DAM')
-          if (loc === 'MT_MAGDIWATA') return tNorm.includes('MAGDIWATA')
           return false
         })
         if (!matchLocation) return false
@@ -343,7 +341,6 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   { key: 'TRENTO', label: 'Trento' },
                   { key: 'STA_MARIA', label: 'Sta. Maria' },
                   { key: 'SITIO_DAM', label: 'Sitio Dam' },
-                  { key: 'MT_MAGDIWATA', label: 'Mt. Magdiwata' }
                 ].map(item => {
                   const isChecked = selectedLocations.includes(item.key)
                   return (
