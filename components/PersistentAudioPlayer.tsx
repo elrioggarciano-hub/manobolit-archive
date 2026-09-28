@@ -83,7 +83,7 @@ export default function PersistentAudioPlayer() {
           className="modal-content"
           style={{
             position: 'fixed',
-            bottom: isMobile ? '75px' : '75px',
+            bottom: isMobile ? '96px' : '75px',
             right: isMobile ? '12px' : '24px',
             left: isMobile ? '12px' : 'auto',
             width: isMobile ? 'auto' : '380px',
@@ -125,25 +125,26 @@ export default function PersistentAudioPlayer() {
           bottom: 0,
           left: 0,
           right: 0,
-          height: '75px',
+          height: isMobile ? 'auto' : '75px',
           background: 'var(--bg-surface)',
           borderTop: '1px solid var(--border-color)',
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'stretch' : 'center',
           justifyContent: 'space-between',
-          padding: isMobile ? '0 12px' : '0 24px',
-          gap: isMobile ? '10px' : '0',
+          padding: isMobile ? '8px 12px' : '0 24px',
+          gap: isMobile ? '6px' : '0',
           zIndex: 1000,
           boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
           fontFamily: 'Inter, sans-serif',
         }}
       >
-        {/* Left Column: Red sound block & track details */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '16px', minWidth: 0, flex: 1 }}>
+        {/* Mobile row 1: icon, title, transcript & close — desktop: left column (icon + title) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px', minWidth: 0, flex: 1 }}>
           <div
             style={{
-              width: isMobile ? '36px' : '44px',
-              height: isMobile ? '36px' : '44px',
+              width: isMobile ? '32px' : '44px',
+              height: isMobile ? '32px' : '44px',
               background: '#8F000D',
               display: 'flex',
               alignItems: 'center',
@@ -152,12 +153,12 @@ export default function PersistentAudioPlayer() {
               borderRadius: '0px',
             }}
           >
-            <svg width={isMobile ? '16' : '20'} height={isMobile ? '16' : '20'} viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width={isMobile ? '14' : '20'} height={isMobile ? '14' : '20'} viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2v20M17 5v14M22 9v6M7 7v10M2 10v4" />
             </svg>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
             {!isMobile && (
               <span
                 style={{
@@ -172,56 +173,112 @@ export default function PersistentAudioPlayer() {
                 🎤 SINGER: {singerName}
               </span>
             )}
-            <span 
-              style={{ 
-                fontSize: '15px', 
-                fontWeight: 700, 
-                color: 'var(--text-primary)', 
+            <span
+              style={{
+                fontSize: isMobile ? '13px' : '15px',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
-                whiteSpace: 'nowrap', 
-                overflow: 'hidden', 
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
                 textOverflow: 'ellipsis',
               }}
             >
               {currentTrack.title}
             </span>
           </div>
+
+          {/* Transcript & close ride along on mobile's first row so the
+              second row can be dedicated entirely to play + progress. */}
+          {isMobile && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+              <button
+                onClick={() => setShowTranscript(prev => !prev)}
+                className="btn-anim"
+                aria-label={showTranscript ? 'Hide transcript' : 'Show transcript'}
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '50%',
+                  background: showTranscript ? 'rgba(143, 0, 13, 0.1)' : 'var(--bg-input)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: showTranscript ? 'var(--brand-accent)' : 'var(--text-muted)',
+                  flexShrink: 0,
+                  transition: 'color 0.2s, background 0.2s',
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" strokeWidth="1.5" />
+                  <line x1="12" y1="17" x2="12" y2="21" strokeWidth="1.5" />
+                  <line x1="6" y1="8" x2="18" y2="8" strokeWidth="1.5" />
+                  <line x1="6" y1="12" x2="14" y2="12" strokeWidth="1.5" />
+                </svg>
+              </button>
+              <button
+                onClick={handleClose}
+                className="btn-anim"
+                aria-label="Close player"
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '50%',
+                  background: 'var(--bg-input)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--text-muted)',
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Middle Column: Controls & Progress bar */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flex: 2, maxWidth: '400px', justifyContent: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
-            <button
-              onClick={togglePlay}
-              className="btn-anim"
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '50%',
-                background: '#f1b80d',
-                border: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(241, 184, 13, 0.2)',
-              }}
-              aria-label={isPlaying ? "Pause" : "Play"}
-            >
-              {isPlaying ? (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                </svg>
-              ) : (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style={{ marginLeft: '2px' }}>
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              )}
-            </button>
-          </div>
+        {/* Mobile row 2: play + full-width progress — desktop: middle column */}
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', alignItems: 'center', gap: isMobile ? '10px' : '8px', flex: isMobile ? undefined : 2, maxWidth: isMobile ? undefined : '400px', justifyContent: 'center' }}>
+          <button
+            onClick={togglePlay}
+            className="btn-anim"
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              background: '#f1b80d',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              cursor: 'pointer',
+              flexShrink: 0,
+              boxShadow: '0 2px 8px rgba(241, 184, 13, 0.2)',
+            }}
+            aria-label={isPlaying ? "Pause" : "Play"}
+          >
+            {isPlaying ? (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+              </svg>
+            ) : (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style={{ marginLeft: '2px' }}>
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            )}
+          </button>
 
-          <div 
+          <div
             onClick={handleWaveformClick}
             style={{
               width: '100%',
@@ -232,7 +289,7 @@ export default function PersistentAudioPlayer() {
               borderRadius: '0px',
             }}
           >
-            <div 
+            <div
               style={{
                 height: '100%',
                 width: `${progress}%`,
@@ -244,61 +301,63 @@ export default function PersistentAudioPlayer() {
           </div>
         </div>
 
-        {/* Right Column: TRANSCRIPT */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', minWidth: 0, flex: isMobile ? '0 0 auto' : 1, justifyContent: 'flex-end' }}>
-          <button
-            onClick={() => setShowTranscript(prev => !prev)}
-            className="btn-anim"
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              color: showTranscript ? 'var(--brand-accent)' : 'var(--text-muted)',
-              transition: 'color 0.2s',
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-              <line x1="8" y1="21" x2="16" y2="21" strokeWidth="1.5" />
-              <line x1="12" y1="17" x2="12" y2="21" strokeWidth="1.5" />
-              <line x1="6" y1="8" x2="18" y2="8" strokeWidth="1.5" />
-              <line x1="6" y1="12" x2="14" y2="12" strokeWidth="1.5" />
-            </svg>
-            <span style={{ fontSize: '8px', fontWeight: 800, letterSpacing: '0.05em' }}>TRANSCRIPT</span>
-          </button>
+        {/* Right Column: TRANSCRIPT & close — desktop only (mobile has its own compact icons above) */}
+        {!isMobile && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', minWidth: 0, flex: 1, justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => setShowTranscript(prev => !prev)}
+              className="btn-anim"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                color: showTranscript ? 'var(--brand-accent)' : 'var(--text-muted)',
+                transition: 'color 0.2s',
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <line x1="8" y1="21" x2="16" y2="21" strokeWidth="1.5" />
+                <line x1="12" y1="17" x2="12" y2="21" strokeWidth="1.5" />
+                <line x1="6" y1="8" x2="18" y2="8" strokeWidth="1.5" />
+                <line x1="6" y1="12" x2="14" y2="12" strokeWidth="1.5" />
+              </svg>
+              <span style={{ fontSize: '8px', fontWeight: 800, letterSpacing: '0.05em' }}>TRANSCRIPT</span>
+            </button>
 
-          <button
-            onClick={handleClose}
-            className="btn-anim"
-            aria-label="Close player"
-            title="Close player"
-            style={{
-              width: '28px',
-              height: '28px',
-              borderRadius: '50%',
-              background: 'var(--bg-input)',
-              border: '1px solid var(--border-color)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-muted)',
-              flexShrink: 0,
-              transition: 'color 0.2s, border-color 0.2s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'var(--brand-accent)'; e.currentTarget.style.borderColor = 'var(--brand-accent)' }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border-color)' }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
+            <button
+              onClick={handleClose}
+              className="btn-anim"
+              aria-label="Close player"
+              title="Close player"
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                background: 'var(--bg-input)',
+                border: '1px solid var(--border-color)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-muted)',
+                flexShrink: 0,
+                transition: 'color 0.2s, border-color 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--brand-accent)'; e.currentTarget.style.borderColor = 'var(--brand-accent)' }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border-color)' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
     </>
   )
