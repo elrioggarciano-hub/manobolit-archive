@@ -204,7 +204,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
   return (
     <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
-      <div className="w-full px-6 md:px-8 py-6 lg:h-[calc(100vh-64px-75px)] lg:overflow-hidden">
+      <div className="w-full px-6 md:px-8 py-6 pb-28 lg:pb-6 lg:h-[calc(100vh-64px-75px)] lg:overflow-hidden">
         <div className="flex flex-col lg:flex-row gap-8 h-full">
           
           {/* LEFT SIDEBAR: FILTERS */}
