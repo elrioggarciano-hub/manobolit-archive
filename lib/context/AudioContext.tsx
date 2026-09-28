@@ -55,6 +55,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!currentTrack) return
 
+    // Guards every event handler below against firing after this effect has
+    // been cleaned up (track switched/closed). Without it, clearing the OLD
+    // audio's src on cleanup fires a delayed/async 'error' event on that
+    // discarded element, which would otherwise stop the NEW track and show
+    // a false "could not be played" toast for a recording that's actually
+    // playing fine.
+    let cancelled = false
+
     // Pause and clean previous audio
     if (audioRef.current) {
       audioRef.current.pause()
@@ -67,6 +75,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
     // Explicitly set duration if metadata is loaded
     audio.addEventListener('loadedmetadata', () => {
+      if (cancelled) return
       if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
         setDuration(audio.duration)
       }
@@ -78,6 +87,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
 
     audio.addEventListener('timeupdate', () => {
+      if (cancelled) return
       const dur = audio.duration || currentTrack.duration || 0
       setCurrentTime(audio.currentTime)
       if (dur > 0) {
@@ -86,12 +96,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     })
 
     audio.addEventListener('ended', () => {
+      if (cancelled) return
       setIsPlaying(false)
       setProgress(0)
       setCurrentTime(0)
     })
 
     audio.addEventListener('error', (e) => {
+      if (cancelled) return
       console.warn('Audio playback error:', e)
       setIsPlaying(false)
       showToast('error', 'This recording could not be played.')
@@ -99,12 +111,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
     if (isPlaying) {
       audio.play().catch((err) => {
+        if (cancelled) return
         console.warn('Playback failed or restricted:', err)
         setIsPlaying(false)
       })
     }
 
     return () => {
+      cancelled = true
       audio.pause()
       audio.src = ''
     }
