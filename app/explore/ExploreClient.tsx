@@ -386,14 +386,9 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">ACTIVE GENRES</div>
               <div className="flex flex-col gap-1.5 pl-1">
                 {[
-                  { key: 'MYTH', label: 'Myth (Oggayam)' },
-                  { key: 'LEGEND', label: 'Legend (Tudtul)' },
-                  { key: 'EPIC', label: 'Epic (Ulaging)' },
-                  { key: 'FOLKTALE', label: 'Folktale' },
                   { key: 'RIDDLE', label: 'Riddle' },
+                  { key: 'SONG', label: 'Folk Song' },
                   { key: 'PROVERB', label: 'Proverb' },
-                  { key: 'SONG', label: 'Song' },
-                  { key: 'CHANT', label: 'Chant' }
                 ].map(item => {
                   const isChecked = selectedGenres.includes(item.key)
                   return (
