@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useAudio } from '@/lib/context/AudioContext'
 import CountUp from '@/components/CountUp'
 
 interface Entry {
@@ -44,29 +43,9 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
   const router = useRouter()
   const [search, setSearch] = useState('')
 
-  const { playTrack, currentTrack, isPlaying, togglePlay } = useAudio()
-
   const totalEntries = entries.length
   const oralLit = entries.filter(e => e.type === 'ORAL_LITERATURE').length
   const folkSongs = entries.filter(e => e.type === 'FOLK_SONG').length
-
-  const handlePlayClick = (e: React.MouseEvent, entry: Entry) => {
-    e.preventDefault()
-    e.stopPropagation()
-    
-    if (entry.audioFile) {
-      if (currentTrack?.audioFile === entry.audioFile) {
-        togglePlay()
-      } else {
-        playTrack({
-          audioFile: entry.audioFile,
-          title: entry.title,
-          narrator: entry.narrator || entry.source || 'Agusan Manobo',
-          duration: null
-        })
-      }
-    }
-  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-primary)' }}>
