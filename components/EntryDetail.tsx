@@ -123,96 +123,33 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
         {/* Left Columns (Transcription & Translation & Metadata) */}
         <div className="lg:col-span-2">
           
-          {/* Side-by-Side Language Columns */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-            
-            {/* Manobo Transcription */}
-            <div>
-              <h3 
-                style={{ 
-                  margin: '0 0 12px', 
-                  fontSize: '10px', 
-                  fontWeight: 800, 
-                  color: 'var(--brand-accent)', 
-                  letterSpacing: '0.05em',
-                  borderBottom: '1px solid var(--border-color)',
-                  paddingBottom: '8px'
-                }}
-              >
-                TRANSCRIPIAN (MANOBO)
-              </h3>
-              <p 
-                style={{ 
-                  margin: 0, 
-                  fontSize: '13px', 
-                  lineHeight: 1.6, 
-                  color: 'var(--text-secondary)', 
-                  whiteSpace: 'pre-line',
-                  fontFamily: 'Inter, sans-serif'
-                }}
-              >
-                {entry.transcription || 'No transcription available.'}
-              </p>
-            </div>
-
-            {/* English Translation */}
-            <div>
-              <h3 
-                style={{ 
-                  margin: '0 0 12px', 
-                  fontSize: '10px', 
-                  fontWeight: 800, 
-                  color: 'var(--brand-accent)', 
-                  letterSpacing: '0.05em',
-                  borderBottom: '1px solid var(--border-color)',
-                  paddingBottom: '8px'
-                }}
-              >
-                TRANSLATION (ENGLISH)
-              </h3>
-              <p 
-                style={{ 
-                  margin: 0, 
-                  fontSize: '13px', 
-                  lineHeight: 1.6, 
-                  color: 'var(--text-secondary)', 
-                  whiteSpace: 'pre-line',
-                  fontFamily: 'Inter, sans-serif'
-                }}
-              >
-                {entry.translation || 'No translation available.'}
-              </p>
-            </div>
-
-            {/* Bisaya (Cebuano) Translation */}
-            <div>
-              <h3
-                style={{
-                  margin: '0 0 12px',
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  color: 'var(--brand-accent)',
-                  letterSpacing: '0.05em',
-                  borderBottom: '1px solid var(--border-color)',
-                  paddingBottom: '8px'
-                }}
-              >
-                TRANSLATION (BISAYA/CEBUANO)
-              </h3>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: '13px',
-                  lineHeight: 1.6,
-                  color: 'var(--text-secondary)',
-                  whiteSpace: 'pre-line',
-                  fontFamily: 'Inter, sans-serif'
-                }}
-              >
-                {entry.bisayaTranslation || 'No translation available.'}
-              </p>
-            </div>
-
+          {/* Manobo Transcription */}
+          <div>
+            <h3
+              style={{
+                margin: '0 0 12px',
+                fontSize: '10px',
+                fontWeight: 800,
+                color: 'var(--brand-accent)',
+                letterSpacing: '0.05em',
+                borderBottom: '1px solid var(--border-color)',
+                paddingBottom: '8px'
+              }}
+            >
+              TRANSCRIPIAN (MANOBO)
+            </h3>
+            <p
+              style={{
+                margin: 0,
+                fontSize: '13px',
+                lineHeight: 1.6,
+                color: 'var(--text-secondary)',
+                whiteSpace: 'pre-line',
+                fontFamily: 'Inter, sans-serif'
+              }}
+            >
+              {entry.transcription || 'No transcription available.'}
+            </p>
           </div>
 
           {/* Metadata Row */}
