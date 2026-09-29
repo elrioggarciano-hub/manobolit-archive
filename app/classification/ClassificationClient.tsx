@@ -13,6 +13,7 @@ export interface DBEntry {
   content: string
   transcription?: string | null
   translation?: string | null
+  bisayaTranslation?: string | null
   genre: string
   themes: string[]
   culturalElements: string[]
@@ -99,6 +100,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [selectedEntryId, setSelectedEntryId] = useState<string>(initialEntry?.id || 'fb-stars')
   const [inputText, setInputText] = useState(initialEntry ? getEntryClassificationText(initialEntry) : DEFAULT_SIMULATOR_TEXT)
   const [inputTranscription, setInputTranscription] = useState(initialEntry ? (initialEntry.transcription || '') : '')
+  const [selectedTranslation, setSelectedTranslation] = useState(initialEntry?.translation || '')
+  const [selectedBisayaTranslation, setSelectedBisayaTranslation] = useState(initialEntry?.bisayaTranslation || '')
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>('ALL')
 
   const classificationResult = classifyEntry(inputText, inputTranscription, selectedGenreFilter)
@@ -114,10 +117,14 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
         setSelectedEntryId(nextEntry.id)
         setInputText(getEntryClassificationText(nextEntry))
         setInputTranscription(nextEntry.transcription || '')
+        setSelectedTranslation(nextEntry.translation || '')
+        setSelectedBisayaTranslation(nextEntry.bisayaTranslation || '')
       } else {
         setSelectedEntryId('custom')
         setInputText('')
         setInputTranscription('')
+        setSelectedTranslation('')
+        setSelectedBisayaTranslation('')
       }
     }
   }, [selectedGenreFilter, entriesList, selectedEntryId, filteredEntriesList])
@@ -576,6 +583,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           if (found) {
                             setInputText(getEntryClassificationText(found))
                             setInputTranscription(found.transcription || '')
+                            setSelectedTranslation(found.translation || '')
+                            setSelectedBisayaTranslation(found.bisayaTranslation || '')
                           }
                         }
                       }}
@@ -866,6 +875,106 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
               </div>
             </section>
+
+            {/* SECTION 4: ENTRY TRANSLATIONS */}
+            {selectedEntryId !== 'custom' && (selectedTranslation || selectedBisayaTranslation) && (
+              <section style={{ marginBottom: '40px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', margin: '0 0 24px 0' }}>
+                  <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
+                  <h2
+                    style={{
+                      margin: '0 24px',
+                      fontSize: '26px',
+                      fontWeight: 700,
+                      fontFamily: 'Cormorant Garamond, Georgia, serif',
+                      color: 'var(--text-primary)',
+                      textAlign: 'center'
+                    }}
+                  >
+                    Entry Translations
+                  </h2>
+                  <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
+                </div>
+
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, margin: '0 auto 24px auto', textAlign: 'center' }}>
+                  English and Bisaya (Cebuano) translations for the selected archive entry are provided here as a scholarly reference for the classification framework.
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', maxWidth: '1000px', margin: '0 auto' }}>
+                  <div
+                    className="stagger-item card-hover"
+                    style={{
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '0px',
+                      padding: '20px',
+                    }}
+                  >
+                    <h3
+                      style={{
+                        margin: '0 0 12px',
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        color: 'var(--brand-accent)',
+                        letterSpacing: '0.05em',
+                        borderBottom: '1px solid var(--border-color)',
+                        paddingBottom: '8px'
+                      }}
+                    >
+                      TRANSLATION (ENGLISH)
+                    </h3>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: '13px',
+                        lineHeight: 1.6,
+                        color: 'var(--text-secondary)',
+                        whiteSpace: 'pre-line',
+                        fontFamily: 'Inter, sans-serif'
+                      }}
+                    >
+                      {selectedTranslation || 'No translation available.'}
+                    </p>
+                  </div>
+
+                  <div
+                    className="stagger-item card-hover"
+                    style={{
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '0px',
+                      padding: '20px',
+                    }}
+                  >
+                    <h3
+                      style={{
+                        margin: '0 0 12px',
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        color: 'var(--brand-accent)',
+                        letterSpacing: '0.05em',
+                        borderBottom: '1px solid var(--border-color)',
+                        paddingBottom: '8px'
+                      }}
+                    >
+                      TRANSLATION (BISAYA/CEBUANO)
+                    </h3>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: '13px',
+                        lineHeight: 1.6,
+                        color: 'var(--text-secondary)',
+                        whiteSpace: 'pre-line',
+                        fontFamily: 'Inter, sans-serif'
+                      }}
+                    >
+                      {selectedBisayaTranslation || 'No translation available.'}
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
 
           </main>
 

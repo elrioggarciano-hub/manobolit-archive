@@ -22,6 +22,7 @@ export default async function ClassificationPage() {
     content: e.content,
     transcription: e.transcription || '',
     translation: e.translation || '',
+    bisayaTranslation: e.bisayaTranslation || '',
     genre: e.genre,
     themes: JSON.parse(e.themes || '[]') as string[],
     culturalElements: JSON.parse(e.culturalElements || '[]') as string[],
