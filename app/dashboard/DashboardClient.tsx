@@ -24,6 +24,44 @@ export interface ThemeStat {
   percent?: number
 }
 
+export interface AccuracyMetrics {
+  accuracy: number
+  precision: number
+  recall: number
+  f1: number
+  sampleSize: number
+}
+
+export interface ExportRecord {
+  id: string
+  title: string
+  manoboTitle: string
+  englishTitle: string
+  type: string
+  genre: string
+  themes: string
+  culturalElements: string
+  transcription: string
+  translation: string
+  bisayaTranslation: string
+  source: string
+  yearCollected: number | string
+  narrator: string
+  communityLocation: string
+  province: string
+  municipality: string
+  barangay: string
+  audioFile: string
+}
+
+// Wraps a CSV cell in quotes and escapes embedded quotes, so titles,
+// transcriptions, and translations containing commas or line breaks don't
+// corrupt the column structure.
+function csvCell(value: string | number): string {
+  const str = String(value ?? '')
+  return `"${str.replace(/"/g, '""')}"`
+}
+
 const GENRE_LABELS: Record<string, string> = {
   MYTH: 'Myths', LEGEND: 'Legends', FOLKTALE: 'Folktales', EPIC: 'Epics',
   RIDDLE: 'Riddles', PROVERB: 'Proverbs', SONG: 'Folk Songs', CHANT: 'Chants',
@@ -54,12 +92,16 @@ export default function DashboardClient({
   mostCommonGenre = null,
   mostFrequentTheme = null,
   themeFrequency = [],
+  accuracyMetrics = { accuracy: 0, precision: 0, recall: 0, f1: 0, sampleSize: 0 },
+  exportRecords = [],
 }: {
   totalEntries?: number
   locationStats?: LocationStat[]
   mostCommonGenre?: GenreStat | null
   mostFrequentTheme?: ThemeStat | null
   themeFrequency?: ThemeStat[]
+  accuracyMetrics?: AccuracyMetrics
+  exportRecords?: ExportRecord[]
 }) {
   const router = useRouter()
   const [activeCategory, setActiveCategory] = useState<'GENRES' | 'KEYWORDS' | 'THEMES' | 'LOCATIONS'>('GENRES')
@@ -83,50 +125,101 @@ export default function DashboardClient({
     URL.revokeObjectURL(url)
   }
 
+  const EXPORT_COLUMNS: (keyof ExportRecord)[] = [
+    'id', 'title', 'manoboTitle', 'englishTitle', 'type', 'genre', 'themes', 'culturalElements',
+    'transcription', 'translation', 'bisayaTranslation', 'source', 'yearCollected', 'narrator',
+    'communityLocation', 'province', 'municipality', 'barangay', 'audioFile',
+  ]
+
+  const downloadCulturalHeritageRecords = () => {
+    if (exportRecords.length === 0) return
+    const header = EXPORT_COLUMNS.join(',') + '\n'
+    const rows = exportRecords
+      .map(record => EXPORT_COLUMNS.map(col => csvCell(record[col])).join(','))
+      .join('\n')
+    const blob = new Blob(['﻿' + header + rows], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `manobolit-cultural-heritage-records-${new Date().toISOString().slice(0, 10)}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <div className="w-full px-6 md:px-8 py-8">
         
         {/* Top Header Section (Full Width, matches classification page header) */}
         <div style={{ marginBottom: '32px' }}>
-          {/* Header Path */}
-          <div 
-            style={{ 
-              fontSize: '11px', 
-              fontWeight: 700, 
-              color: 'var(--brand-accent)', 
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              marginBottom: '8px'
-            }}
-          >
-            Quantitative Analytics
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              {/* Header Path */}
+              <div
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: 'var(--brand-accent)',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  marginBottom: '8px'
+                }}
+              >
+                Quantitative Analytics
+              </div>
+
+              {/* Page Title */}
+              <h1
+                style={{
+                  margin: '0 0 16px 0',
+                  fontSize: '44px',
+                  fontWeight: 700,
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  lineHeight: 1.1,
+                  color: 'var(--text-primary)'
+                }}
+              >
+                Research Dashboard
+              </h1>
+
+              <p
+                style={{
+                  fontSize: '14px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                  margin: '0'
+                }}
+              >
+                Quantitative overview of Manobo oral literature classifications and regional distribution across the Agusan River basin.
+              </p>
+            </div>
+
+            <button
+              onClick={downloadCulturalHeritageRecords}
+              disabled={exportRecords.length === 0}
+              className="btn-anim flex-shrink-0"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '11px 18px',
+                background: 'var(--brand-accent)',
+                color: '#fff',
+                border: 'none',
+                fontSize: '12px',
+                fontWeight: 700,
+                letterSpacing: '0.03em',
+                cursor: exportRecords.length === 0 ? 'not-allowed' : 'pointer',
+                opacity: exportRecords.length === 0 ? 0.5 : 1,
+              }}
+              title="Export the full archive as a CSV of cultural heritage records"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              EXPORT CULTURAL HERITAGE RECORDS
+            </button>
           </div>
-
-          {/* Page Title */}
-          <h1 
-            style={{ 
-              margin: '0 0 16px 0',
-              fontSize: '44px', 
-              fontWeight: 700, 
-              fontFamily: "'Playfair Display', Georgia, serif",
-              lineHeight: 1.1,
-              color: 'var(--text-primary)'
-            }}
-          >
-            Research Dashboard
-          </h1>
-
-          <p 
-            style={{
-              fontSize: '14px',
-              color: 'var(--text-secondary)',
-              lineHeight: 1.6,
-              margin: '0'
-            }}
-          >
-            Quantitative overview of Manobo oral literature classifications and regional distribution across the Agusan River basin.
-          </p>
         </div>
 
         {/* Separator Line */}
@@ -639,7 +732,7 @@ export default function DashboardClient({
                     System Accuracy
                   </h3>
                   <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, letterSpacing: '0.02em' }}>
-                    AI Verification Metrics
+                    Rule-Based Classifier Metrics
                   </span>
                 </div>
 
@@ -654,36 +747,39 @@ export default function DashboardClient({
                       strokeWidth="14"
                       strokeLinecap="butt"
                     />
-                    {/* Red wedge indicator at bottom right representing 94.2% */}
-                    <polygon 
-                      points="108,70 122,60 122,85 108,85" 
-                      fill="var(--brand-accent)" 
+                    {/* Wedge indicator — a stylized marker rather than a
+                        literal needle, since this arch isn't a simple
+                        circular gauge; the number beside it is the exact,
+                        freshly-computed figure. */}
+                    <polygon
+                      points="108,70 122,60 122,85 108,85"
+                      fill="var(--brand-accent)"
                     />
                   </svg>
                   {/* Gauge value overlays */}
                   <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center', transform: 'translateY(5px)' }}>
-                    <span 
-                      style={{ 
-                        fontSize: '34px', 
-                        fontWeight: 700, 
-                        color: 'var(--text-primary)', 
+                    <span
+                      style={{
+                        fontSize: '34px',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
                         fontFamily: "'Playfair Display', Georgia, serif",
-                        lineHeight: 1 
+                        lineHeight: 1
                       }}
                     >
-                      94.2<span style={{ fontSize: '18px', verticalAlign: 'super', marginLeft: '2px', fontWeight: 600 }}>%</span>
+                      {(accuracyMetrics.accuracy * 100).toFixed(1)}<span style={{ fontSize: '18px', verticalAlign: 'super', marginLeft: '2px', fontWeight: 600 }}>%</span>
                     </span>
-                    <span 
-                      style={{ 
-                        fontSize: '8px', 
-                        fontWeight: 800, 
-                        color: 'var(--text-muted)', 
-                        letterSpacing: '0.08em', 
+                    <span
+                      style={{
+                        fontSize: '8px',
+                        fontWeight: 800,
+                        color: 'var(--text-muted)',
+                        letterSpacing: '0.08em',
                         marginTop: '4px',
                         fontFamily: 'Inter, sans-serif'
                       }}
                     >
-                      CONFIDENCE INTERVAL
+                      CLASSIFIER ACCURACY
                     </span>
                   </div>
                 </div>
@@ -694,15 +790,18 @@ export default function DashboardClient({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
                     <span style={{ color: 'var(--text-primary)' }}>Precision</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>0.96</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.precision.toFixed(2)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
                     <span style={{ color: 'var(--text-primary)' }}>Recall</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>0.92</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.recall.toFixed(2)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
                     <span style={{ color: 'var(--text-primary)' }}>F1 Score</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>0.94</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.f1.toFixed(2)}</span>
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px', fontStyle: 'italic' }}>
+                    Computed live from the classifier&rsquo;s agreement with the curated genre of all {accuracyMetrics.sampleSize} archived entries.
                   </div>
                 </div>
 

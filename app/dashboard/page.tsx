@@ -1,10 +1,11 @@
 import { prisma } from '@/lib/database/prisma'
+import { computeAccuracyMetrics } from '@/lib/classification'
 import DashboardClient from './DashboardClient'
 
 export const revalidate = 0 // Disable cache to get fresh stats
 
 export default async function DashboardPage() {
-  const [totalEntries, grouped, genreGrouped, themeRows] = await Promise.all([
+  const [totalEntries, grouped, genreGrouped, themeRows, allEntries] = await Promise.all([
     prisma.literatureEntry.count(),
     prisma.literatureEntry.groupBy({
       by: ['communityLocation', 'municipality', 'province'],
@@ -15,7 +16,39 @@ export default async function DashboardPage() {
       _count: { _all: true },
     }),
     prisma.literatureEntry.findMany({ select: { themes: true } }),
+    // Full records power two things below: the accuracy metrics (re-running
+    // the classifier against each entry's own curated genre) and the
+    // "export cultural heritage records" download.
+    prisma.literatureEntry.findMany({ orderBy: { createdAt: 'desc' } }),
   ])
+
+  // Evaluate the rule-based classifier against the archive's own curated
+  // genre labels, rather than showing a fixed placeholder accuracy figure.
+  const accuracyMetrics = computeAccuracyMetrics(
+    allEntries.map(e => ({ content: e.content, transcription: e.transcription, genre: e.genre }))
+  )
+
+  const exportRecords = allEntries.map(e => ({
+    id: e.id,
+    title: e.title,
+    manoboTitle: e.manoboTitle || '',
+    englishTitle: e.englishTitle || '',
+    type: e.type,
+    genre: e.genre,
+    themes: (JSON.parse(e.themes || '[]') as string[]).join('; '),
+    culturalElements: (JSON.parse(e.culturalElements || '[]') as string[]).join('; '),
+    transcription: e.transcription || '',
+    translation: e.translation || '',
+    bisayaTranslation: e.bisayaTranslation || '',
+    source: e.source,
+    yearCollected: e.yearCollected ?? '',
+    narrator: e.narrator || '',
+    communityLocation: e.communityLocation,
+    province: e.province,
+    municipality: e.municipality,
+    barangay: e.barangay || '',
+    audioFile: e.audioFile || '',
+  }))
 
   const locationStats = grouped
     .map(g => ({
@@ -60,6 +93,8 @@ export default async function DashboardPage() {
       mostCommonGenre={mostCommonGenre}
       mostFrequentTheme={mostFrequentTheme}
       themeFrequency={themeFrequency}
+      accuracyMetrics={accuracyMetrics}
+      exportRecords={exportRecords}
     />
   )
 }
