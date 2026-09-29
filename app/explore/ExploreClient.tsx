@@ -392,6 +392,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   { key: 'RIDDLE', label: 'Riddle' },
                   { key: 'SONG', label: 'Folk Song' },
                   { key: 'PROVERB', label: 'Proverb' },
+                  { key: 'FOLKTALE', label: 'Folktale' },
                 ].map(item => {
                   const isChecked = selectedGenres.includes(item.key)
                   return (
