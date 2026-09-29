@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { classifyEntry, genreRules, themeRules, locationRules } from '@/lib/classification'
 
@@ -64,29 +64,9 @@ const fallbackEntries: DBEntry[] = [
   }
 ]
 
-const PRESETS = {
-  KEYWORDS: {
-    DEFAULT: "The stars were born from the breath of the Father Sky in the beginning of all things."
-  },
-  GENRES: {
-    SONG: "We sing this song together, our voices full of longing and sorrow, as tears fall like rain in our hearts.",
-    PROVERB: "As the elders say, it is better to endure hardship than to lose your integrity, for a wise man always remembers this saying.",
-    RIDDLE: "What am I? I have no legs but I can travel far. Can you guess the answer to this riddle?",
-  },
-  THEMES: {
-    CREATION: "In the beginning, there was only darkness and water, until the great god Kadgayan shaped the earth from a handful of soil.",
-    COURTSHIP: "They danced together to celebrate the love and marriage of the young bride and groom at the wedding ceremony.",
-    HEROIC: "The brave chieftain led his warriors to defend the village, defeating the enemy and showing immense courage.",
-    AGRICULTURE: "During the planting season, the elders blessed the fields with prayers for a bountiful rice harvest.",
-    SPIRITS: "The local shaman invoked the ancestral spirits to heal the sick boy and cleanse the village of the unseen curse."
-  },
-  LOCATIONS: {
-    TRENTO: "This local custom has been practiced by the tribes in the municipality of Trento, Agusan del Sur, for generations.",
-    STA_MARIA: "The narrative of the great river guardians was collected from the elders residing in Barangay Sta. Maria.",
-    SITIO_DAM: "Sitio Dam in Barangay Tudela was the site of the historical gathering where the three clans negotiated peace.",
-    MT_MAGDIWATA: "We climbed the steep slopes of Mt. Magdiwata, the sacred mountain where the forest spirits are believed to dwell."
-  }
-}
+// Fallback text for the Logic Engine simulator when the archive has no
+// entries at all to default to (see initialEntry below).
+const DEFAULT_SIMULATOR_TEXT = "The stars were born from the breath of the Father Sky in the beginning of all things."
 
 function formatName(val: string): string {
   if (!val) return 'None'
@@ -117,22 +97,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   }
 
   const [selectedEntryId, setSelectedEntryId] = useState<string>(initialEntry?.id || 'fb-stars')
-  const [activeCategory, setActiveCategory] = useState<'KEYWORDS' | 'GENRES' | 'THEMES' | 'LOCATIONS'>('KEYWORDS')
-  const [activeSubCategory, setActiveSubCategory] = useState<string>('DEFAULT')
-  const [keywordInput, setKeywordInput] = useState('')
-  const [inputText, setInputText] = useState(initialEntry ? getEntryClassificationText(initialEntry) : PRESETS.KEYWORDS.DEFAULT)
+  const [inputText, setInputText] = useState(initialEntry ? getEntryClassificationText(initialEntry) : DEFAULT_SIMULATOR_TEXT)
   const [inputTranscription, setInputTranscription] = useState(initialEntry ? (initialEntry.transcription || '') : '')
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>('ALL')
-
-  // The sidebar drives the live simulator further down the page — jump the
-  // reader straight to the result whenever they pick a filter, instead of
-  // silently updating a panel they'd have to go hunting for.
-  const logicEngineRef = useRef<HTMLElement>(null)
-  const scrollToEngine = () => {
-    requestAnimationFrame(() => {
-      logicEngineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    })
-  }
 
   const classificationResult = classifyEntry(inputText, inputTranscription, selectedGenreFilter)
 
@@ -154,15 +121,6 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
       }
     }
   }, [selectedGenreFilter, entriesList, selectedEntryId, filteredEntriesList])
-
-  const handleKeywordSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (keywordInput.trim()) {
-      setInputText(keywordInput)
-      setInputTranscription('')
-      setSelectedEntryId('custom')
-    }
-  }
 
   const eugenioCards = [
     {
@@ -274,285 +232,6 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
         <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '32px 0 24px 0' }} />
 
         <div className="flex flex-col lg:flex-row gap-8">
-          
-          {/* LEFT SIDEBAR: FILTERS */}
-          <aside className="w-full lg:w-64 flex-shrink-0" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <div className="border-b border-[var(--border-color)] pb-4 mb-6">
-              <h2 
-                style={{ 
-                  margin: 0,
-                  fontSize: '28px', 
-                  fontWeight: 700, 
-                  color: 'var(--brand-accent)', 
-                  fontFamily: 'Cormorant Garamond, Georgia, serif' 
-                }}
-              >
-                Archive Filters
-              </h2>
-              <span className="text-xs text-[var(--text-muted)] tracking-wide">Scholarly Classification</span>
-            </div>
-
-            {/* Main Navigation Options inside the Filters */}
-            <div className="flex flex-col gap-2 mb-8">
-              
-
-
-              {/* Keywords Item */}
-              {activeCategory === 'KEYWORDS' ? (
-                <form onSubmit={(e) => { handleKeywordSearch(e); scrollToEngine() }} className="w-full">
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      background: 'var(--bg-surface)',
-                      borderLeft: '4px solid #8F000D',
-                      padding: '8px 12px',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                      gap: '10px'
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5">
-                      <circle cx="11" cy="11" r="8" />
-                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                    <input
-                      type="text"
-                      placeholder="Keywords"
-                      value={keywordInput}
-                      onChange={(e) => {
-                        setKeywordInput(e.target.value)
-                        setInputText(e.target.value)
-                        setInputTranscription('')
-                        setSelectedEntryId('custom')
-                        setSelectedGenreFilter('ALL')
-                        scrollToEngine()
-                      }}
-                      style={{
-                        border: 'none',
-                        outline: 'none',
-                        fontSize: '13px',
-                        fontWeight: 700,
-                        color: 'var(--brand-accent)',
-                        width: '100%',
-                        background: 'transparent'
-                      }}
-                    />
-                  </div>
-                </form>
-              ) : (
-                <button
-                  onClick={() => {
-                    setActiveCategory('KEYWORDS')
-                    setInputText(keywordInput || PRESETS.KEYWORDS.DEFAULT)
-                    setInputTranscription('')
-                    setSelectedEntryId('custom')
-                    setActiveSubCategory('DEFAULT')
-                    setSelectedGenreFilter('ALL')
-                    scrollToEngine()
-                  }}
-                  className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left text-slate-600 font-semibold"
-                  style={{ fontSize: '13px', borderLeft: '4px solid transparent', background: 'transparent' }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <span>Keywords</span>
-                </button>
-              )}
-
-              {/* Genres Item */}
-              <div className="flex flex-col w-full">
-                <button
-                  onClick={() => {
-                    setActiveCategory('GENRES')
-                    setInputText(PRESETS.GENRES.SONG)
-                    setInputTranscription('')
-                    setSelectedEntryId('custom')
-                    setActiveSubCategory('SONG')
-                    setSelectedGenreFilter('ALL')
-                    scrollToEngine()
-                  }}
-                  className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left font-semibold"
-                  style={{
-                    fontSize: '13px',
-                    borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent',
-                    background: activeCategory === 'GENRES' ? 'var(--bg-surface)' : 'transparent',
-                    color: activeCategory === 'GENRES' ? '#8F000D' : 'var(--text-secondary)',
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 11h2a2 2 0 0 1 2 2v3a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4v-1" />
-                    <path d="M16 14h.01M19 14h.01M16 17c.5-.5 1.5-.5 2 0" />
-                    <path d="M5 6a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V6z" />
-                    <path d="M8 5h.01M11 5h.01M8 8c.5.5 1.5.5 2 0" />
-                  </svg>
-                  <span>Genres</span>
-                </button>
-                {activeCategory === 'GENRES' && (
-                  <div className="flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-[var(--border-color)] ml-3 mt-1">
-                    {[
-                      { key: 'SONG', label: 'Folk Song' },
-                      { key: 'PROVERB', label: 'Proverb' },
-                      { key: 'RIDDLE', label: 'Riddle' },
-                    ].map(genreItem => {
-                      const isActive = activeSubCategory === genreItem.key
-                      return (
-                        <button
-                          key={genreItem.key}
-                          onClick={() => {
-                            setActiveSubCategory(genreItem.key)
-                            setInputText(PRESETS.GENRES[genreItem.key as keyof typeof PRESETS.GENRES])
-                            setInputTranscription('')
-                            setSelectedEntryId('custom')
-                            setSelectedGenreFilter('ALL')
-                            scrollToEngine()
-                          }}
-                          className="text-left text-xs py-1.5 px-2 hover:bg-slate-100 transition-colors"
-                          style={{
-                            color: isActive ? '#8F000D' : 'var(--text-muted)',
-                            fontWeight: isActive ? 700 : 500,
-                            background: isActive ? '#fee2e2' : 'transparent',
-                            borderRadius: '2px'
-                          }}
-                        >
-                          {genreItem.label}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Themes Item */}
-              <div className="flex flex-col w-full">
-                <button
-                  onClick={() => {
-                    setActiveCategory('THEMES')
-                    setInputText(PRESETS.THEMES.COURTSHIP)
-                    setInputTranscription('')
-                    setSelectedEntryId('custom')
-                    setActiveSubCategory('COURTSHIP')
-                    setSelectedGenreFilter('ALL')
-                    scrollToEngine()
-                  }}
-                  className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left font-semibold"
-                  style={{
-                    fontSize: '13px',
-                    borderLeft: activeCategory === 'THEMES' ? '4px solid #8F000D' : '4px solid transparent',
-                    background: activeCategory === 'THEMES' ? 'var(--bg-surface)' : 'transparent',
-                    color: activeCategory === 'THEMES' ? '#8F000D' : 'var(--text-secondary)',
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 3L7 11h10Z" />
-                    <rect x="3" y="13" width="7" height="7" rx="1" />
-                    <circle cx="17.5" cy="16.5" r="3.5" />
-                  </svg>
-                  <span>Themes</span>
-                </button>
-                {activeCategory === 'THEMES' && (
-                  <div className="flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-[var(--border-color)] ml-3 mt-1">
-                    {[
-                      { key: 'CREATION', label: 'Creation Myths' },
-                      { key: 'COURTSHIP', label: 'Courtship & Marriage' },
-                      { key: 'HEROIC', label: 'Heroic Deeds' },
-                      { key: 'AGRICULTURE', label: 'Agricultural Cycles' },
-                      { key: 'SPIRITS', label: 'Spirit World' }
-                    ].map(themeItem => {
-                      const isActive = activeSubCategory === themeItem.key
-                      return (
-                        <button
-                          key={themeItem.key}
-                          onClick={() => {
-                            setActiveSubCategory(themeItem.key)
-                            setInputText(PRESETS.THEMES[themeItem.key as keyof typeof PRESETS.THEMES])
-                            setInputTranscription('')
-                            setSelectedEntryId('custom')
-                            setSelectedGenreFilter('ALL')
-                            scrollToEngine()
-                          }}
-                          className="text-left text-xs py-1.5 px-2 hover:bg-slate-100 transition-colors"
-                          style={{
-                            color: isActive ? '#8F000D' : 'var(--text-muted)',
-                            fontWeight: isActive ? 700 : 500,
-                            background: isActive ? '#fee2e2' : 'transparent',
-                            borderRadius: '2px'
-                          }}
-                        >
-                          {themeItem.label}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Locations Item */}
-              <div className="flex flex-col w-full">
-                <button
-                  onClick={() => {
-                    setActiveCategory('LOCATIONS')
-                    setInputText(PRESETS.LOCATIONS.TRENTO)
-                    setInputTranscription('')
-                    setSelectedEntryId('custom')
-                    setActiveSubCategory('TRENTO')
-                    setSelectedGenreFilter('ALL')
-                    scrollToEngine()
-                  }}
-                  className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left font-semibold"
-                  style={{
-                    fontSize: '13px',
-                    borderLeft: activeCategory === 'LOCATIONS' ? '4px solid #8F000D' : '4px solid transparent',
-                    background: activeCategory === 'LOCATIONS' ? 'var(--bg-surface)' : 'transparent',
-                    color: activeCategory === 'LOCATIONS' ? '#8F000D' : 'var(--text-secondary)',
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                  <span>Locations</span>
-                </button>
-                {activeCategory === 'LOCATIONS' && (
-                  <div className="flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-[var(--border-color)] ml-3 mt-1">
-                    {[
-                      { key: 'TRENTO', label: 'Trento' },
-                      { key: 'STA_MARIA', label: 'Sta. Maria' },
-                      { key: 'SITIO_DAM', label: 'Sitio Dam / Tudela' },
-                      { key: 'MT_MAGDIWATA', label: 'Mt. Magdiwata' }
-                    ].map(locItem => {
-                      const isActive = activeSubCategory === locItem.key
-                      return (
-                        <button
-                          key={locItem.key}
-                          onClick={() => {
-                            setActiveSubCategory(locItem.key)
-                            setInputText(PRESETS.LOCATIONS[locItem.key as keyof typeof PRESETS.LOCATIONS])
-                            setInputTranscription('')
-                            setSelectedEntryId('custom')
-                            setSelectedGenreFilter('ALL')
-                            scrollToEngine()
-                          }}
-                          className="text-left text-xs py-1.5 px-2 hover:bg-slate-100 transition-colors"
-                          style={{
-                            color: isActive ? '#8F000D' : 'var(--text-muted)',
-                            fontWeight: isActive ? 700 : 500,
-                            background: isActive ? '#fee2e2' : 'transparent',
-                            borderRadius: '2px'
-                          }}
-                        >
-                          {locItem.label}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-
-          </aside>
-
           {/* RIGHT MAIN PANEL */}
           <main className="flex-1 pb-24">
             
@@ -762,7 +441,6 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
             {/* SECTION 3: THE LOGIC ENGINE */}
             <section
-              ref={logicEngineRef}
               style={{
                 background: '#18181b',
                 color: '#e2e8f0',
