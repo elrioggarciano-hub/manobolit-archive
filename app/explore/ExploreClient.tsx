@@ -152,6 +152,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
       playTrack({
         audioFile: entry.audioFile,
         title: entry.title,
+        entryId: entry.id,
         // Folk song recordings have no real credited vocalist, so this is
         // labeled honestly as "AI Generated" rather than implying a real
         // singer performed it. Oral literature narrations keep using the
