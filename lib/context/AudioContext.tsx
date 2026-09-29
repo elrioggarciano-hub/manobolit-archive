@@ -11,6 +11,7 @@ export interface Track {
   subtitle?: string | null
   duration?: number | null
   textToRecite?: string | null
+  entryId?: string | null
 }
 
 interface AudioContextType {

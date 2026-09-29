@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAudio } from '@/lib/context/AudioContext'
 import { useIsMobile } from '@/lib/hooks/useIsMobile'
@@ -141,52 +142,83 @@ export default function PersistentAudioPlayer() {
       >
         {/* Mobile row 1: icon, title, transcript & close — desktop: left column (icon + title) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px', minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              width: isMobile ? '32px' : '44px',
-              height: isMobile ? '32px' : '44px',
-              background: '#8F000D',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              borderRadius: '0px',
-            }}
-          >
-            <svg width={isMobile ? '14' : '20'} height={isMobile ? '14' : '20'} viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2v20M17 5v14M22 9v6M7 7v10M2 10v4" />
-            </svg>
-          </div>
+          {(() => {
+            const iconAndTitle = (
+              <>
+                <div
+                  style={{
+                    width: isMobile ? '32px' : '44px',
+                    height: isMobile ? '32px' : '44px',
+                    background: '#8F000D',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    borderRadius: '0px',
+                  }}
+                >
+                  <svg width={isMobile ? '14' : '20'} height={isMobile ? '14' : '20'} viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2v20M17 5v14M22 9v6M7 7v10M2 10v4" />
+                  </svg>
+                </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
-            {!isMobile && (
-              <span
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+                  {!isMobile && (
+                    <span
+                      style={{
+                        fontSize: '9px',
+                        fontWeight: 800,
+                        color: 'var(--brand-accent)',
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        marginBottom: '2px',
+                      }}
+                    >
+                      🎤 SINGER: {singerName}
+                    </span>
+                  )}
+                  <span
+                    style={{
+                      fontSize: isMobile ? '13px' : '15px',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      fontFamily: 'Cormorant Garamond, Georgia, serif',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {currentTrack.title}
+                  </span>
+                </div>
+              </>
+            )
+
+            if (!currentTrack.entryId) {
+              return iconAndTitle
+            }
+
+            return (
+              <Link
+                href={`/archive/${currentTrack.entryId}`}
+                className="btn-anim"
+                aria-label={`View archive details for ${currentTrack.title}`}
+                title="View entry details"
                 style={{
-                  fontSize: '9px',
-                  fontWeight: 800,
-                  color: 'var(--brand-accent)',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  marginBottom: '2px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: isMobile ? '8px' : '16px',
+                  minWidth: 0,
+                  flex: 1,
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  cursor: 'pointer',
                 }}
               >
-                🎤 SINGER: {singerName}
-              </span>
-            )}
-            <span
-              style={{
-                fontSize: isMobile ? '13px' : '15px',
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                fontFamily: 'Cormorant Garamond, Georgia, serif',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {currentTrack.title}
-            </span>
-          </div>
+                {iconAndTitle}
+              </Link>
+            )
+          })()}
 
           {/* Transcript & close ride along on mobile's first row so the
               second row can be dedicated entirely to play + progress. */}
