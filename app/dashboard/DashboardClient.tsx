@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import CountUp from '@/components/CountUp'
 
@@ -118,15 +116,7 @@ export default function DashboardClient({
   accuracyMetrics?: AccuracyMetrics
   exportRecords?: ExportRecord[]
 }) {
-  const router = useRouter()
-  const [activeCategory, setActiveCategory] = useState<'GENRES' | 'KEYWORDS' | 'THEMES' | 'LOCATIONS'>('GENRES')
-
   const topLocations = locationStats.slice(0, 5)
-
-  const handleSidebarClick = (category: 'GENRES' | 'KEYWORDS' | 'THEMES' | 'LOCATIONS') => {
-    setActiveCategory(category)
-    router.push(`/explore?category=${category}`)
-  }
 
   const downloadThemeDataset = () => {
     const header = 'theme,entries_tagged\n'
@@ -272,106 +262,6 @@ export default function DashboardClient({
         <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '32px 0 24px 0' }} />
 
         <div className="flex flex-col lg:flex-row gap-8">
-          
-          {/* LEFT SIDEBAR: FILTERS */}
-          <aside className="w-full lg:w-64 flex-shrink-0" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <div className="border-b border-[var(--border-color)] pb-4 mb-6">
-              <h2 
-                style={{ 
-                  margin: 0,
-                  fontSize: '28px', 
-                  fontWeight: 700, 
-                  color: 'var(--brand-accent)', 
-                  fontFamily: "'Playfair Display', Georgia, serif" 
-                }}
-              >
-                Archive Filters
-              </h2>
-              <span className="text-xs text-[var(--text-muted)] tracking-wide">Scholarly Classification</span>
-            </div>
-
-            {/* Sidebar navigation options */}
-            <div className="flex flex-col gap-1 mb-8">
-              {/* Keywords Item */}
-              <button
-                onClick={() => handleSidebarClick('KEYWORDS')}
-                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left btn-anim"
-                style={{ 
-                  fontSize: '13px', 
-                  borderLeft: activeCategory === 'KEYWORDS' ? '4px solid #8F000D' : '4px solid transparent', 
-                  background: activeCategory === 'KEYWORDS' ? 'var(--bg-surface)' : 'transparent',
-                  color: activeCategory === 'KEYWORDS' ? 'var(--brand-accent)' : 'var(--text-secondary)',
-                  fontWeight: activeCategory === 'KEYWORDS' ? 700 : 500
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <span>Keywords</span>
-              </button>
-
-              {/* Genres Item */}
-              <button
-                onClick={() => handleSidebarClick('GENRES')}
-                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left btn-anim"
-                style={{ 
-                  fontSize: '13px', 
-                  borderLeft: activeCategory === 'GENRES' ? '4px solid #8F000D' : '4px solid transparent', 
-                  background: activeCategory === 'GENRES' ? 'var(--bg-surface)' : 'transparent',
-                  color: activeCategory === 'GENRES' ? 'var(--brand-accent)' : 'var(--text-secondary)',
-                  fontWeight: activeCategory === 'GENRES' ? 700 : 500
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 11h2a2 2 0 0 1 2 2v3a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4v-1" />
-                  <path d="M16 14h.01M19 14h.01M16 17c.5-.5 1.5-.5 2 0" />
-                  <path d="M5 6a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V6z" />
-                  <path d="M8 5h.01M11 5h.01M8 8c.5.5 1.5.5 2 0" />
-                </svg>
-                <span>Genres</span>
-              </button>
-
-              {/* Themes Item */}
-              <button
-                onClick={() => handleSidebarClick('THEMES')}
-                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left btn-anim"
-                style={{ 
-                  fontSize: '13px', 
-                  borderLeft: activeCategory === 'THEMES' ? '4px solid #8F000D' : '4px solid transparent', 
-                  background: activeCategory === 'THEMES' ? 'var(--bg-surface)' : 'transparent',
-                  color: activeCategory === 'THEMES' ? 'var(--brand-accent)' : 'var(--text-secondary)',
-                  fontWeight: activeCategory === 'THEMES' ? 700 : 500
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 3L7 11h10Z" />
-                  <rect x="3" y="13" width="7" height="7" rx="1" />
-                  <circle cx="17.5" cy="16.5" r="3.5" />
-                </svg>
-                <span>Themes</span>
-              </button>
-
-              {/* Locations Item */}
-              <button
-                onClick={() => handleSidebarClick('LOCATIONS')}
-                className="w-full flex items-center gap-2.5 py-2.5 px-3 transition-colors text-left btn-anim"
-                style={{ 
-                  fontSize: '13px', 
-                  borderLeft: activeCategory === 'LOCATIONS' ? '4px solid #8F000D' : '4px solid transparent', 
-                  background: activeCategory === 'LOCATIONS' ? 'var(--bg-surface)' : 'transparent',
-                  color: activeCategory === 'LOCATIONS' ? 'var(--brand-accent)' : 'var(--text-secondary)',
-                  fontWeight: activeCategory === 'LOCATIONS' ? 700 : 500
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                <span>Locations</span>
-              </button>
-            </div>
-          </aside>
 
           {/* RIGHT MAIN PANEL: RESEARCH DASHBOARD CONTENT */}
           <main className="flex-1 flex flex-col gap-6">
