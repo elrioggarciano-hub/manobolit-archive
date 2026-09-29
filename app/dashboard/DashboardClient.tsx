@@ -62,6 +62,21 @@ function csvCell(value: string | number): string {
   return `"${str.replace(/"/g, '""')}"`
 }
 
+const TYPE_LABELS: Record<string, string> = {
+  ORAL_LITERATURE: 'Oral Literature',
+  FOLK_SONG: 'Folk Song',
+}
+
+// Singular, per-entry genre labels for the records export — GENRE_LABELS
+// below is aggregate/plural phrasing meant for dashboard chart legends
+// ("Riddles: 8"), which reads oddly on a single record's own row. Matches
+// the same Eugenio (1993) genre names already shown in Explore/Classification.
+const EXPORT_GENRE_LABELS: Record<string, string> = {
+  MYTH: 'Myth (Oggayam)', LEGEND: 'Legend (Tudtul)', EPIC: 'Epic (Ulaging)', FOLKTALE: 'Folktale',
+  RIDDLE: 'Riddle', PROVERB: 'Proverb', SONG: 'Folk Song', CHANT: 'Chant',
+  PRAYER: 'Prayer', INCANTATION: 'Incantation',
+}
+
 const GENRE_LABELS: Record<string, string> = {
   MYTH: 'Myths', LEGEND: 'Legends', FOLKTALE: 'Folktales', EPIC: 'Epics',
   RIDDLE: 'Riddles', PROVERB: 'Proverbs', SONG: 'Folk Songs', CHANT: 'Chants',
@@ -125,19 +140,50 @@ export default function DashboardClient({
     URL.revokeObjectURL(url)
   }
 
-  const EXPORT_COLUMNS: (keyof ExportRecord)[] = [
-    'id', 'title', 'manoboTitle', 'englishTitle', 'type', 'genre', 'themes', 'culturalElements',
-    'transcription', 'translation', 'bisayaTranslation', 'source', 'yearCollected', 'narrator',
-    'communityLocation', 'province', 'municipality', 'barangay', 'audioFile',
+  // Human-readable headers, in a logical reading order (identity →
+  // classification → content → provenance → location → media → internal
+  // reference last), rather than the raw camelCase field names.
+  const EXPORT_HEADERS = [
+    'No.', 'Title', 'Manobo Title', 'English Title', 'Type', 'Genre (Eugenio 1993)',
+    'Themes (Andress 1985)', 'Cultural Elements',
+    'Transcription (Manobo)', 'Translation (English)', 'Translation (Bisaya/Cebuano)',
+    'Source', 'Year Collected', 'Narrator',
+    'Community/Sitio', 'Barangay', 'Municipality', 'Province',
+    'Audio Recording URL', 'Record ID',
+  ]
+
+  const buildExportRow = (record: ExportRecord, index: number): (string | number)[] => [
+    index + 1,
+    record.title,
+    record.manoboTitle,
+    record.englishTitle,
+    TYPE_LABELS[record.type] || record.type,
+    EXPORT_GENRE_LABELS[record.genre] || formatGenreLabel(record.genre),
+    record.themes.split('; ').filter(Boolean).map(formatThemeLabel).join('; '),
+    record.culturalElements,
+    record.transcription,
+    record.translation,
+    record.bisayaTranslation,
+    record.source,
+    record.yearCollected,
+    record.narrator,
+    record.communityLocation,
+    record.barangay,
+    record.municipality,
+    record.province,
+    record.audioFile,
+    record.id,
   ]
 
   const downloadCulturalHeritageRecords = () => {
     if (exportRecords.length === 0) return
-    const header = EXPORT_COLUMNS.join(',') + '\n'
-    const rows = exportRecords
-      .map(record => EXPORT_COLUMNS.map(col => csvCell(record[col])).join(','))
-      .join('\n')
-    const blob = new Blob(['﻿' + header + rows], { type: 'text/csv;charset=utf-8;' })
+    // CRLF line endings + a UTF-8 BOM keep this opening cleanly (correct
+    // column alignment, no mojibake on Manobo/Bisaya diacritics) in Excel,
+    // not just in browsers/Sheets.
+    const header = EXPORT_HEADERS.map(csvCell).join(',')
+    const rows = exportRecords.map((record, i) => buildExportRow(record, i).map(csvCell).join(','))
+    const csv = [header, ...rows].join('\r\n')
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
