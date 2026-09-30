@@ -143,6 +143,7 @@ export default function Footer() {
           <div style={{ display: 'flex', gap: '16px' }}>
             <Link href="/privacy" className="btn-anim" style={{ color: '#64748b', textDecoration: 'none' }}>Privacy Policy</Link>
             <Link href="/terms" className="btn-anim" style={{ color: '#64748b', textDecoration: 'none' }}>Terms of Service</Link>
+            <Link href="/ethics" className="btn-anim" style={{ color: '#64748b', textDecoration: 'none' }}>Ethical Access Policy</Link>
           </div>
         </div>
       </div>
