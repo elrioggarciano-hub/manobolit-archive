@@ -1,11 +1,17 @@
+import { Suspense } from 'react'
+import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { classifyEntry } from '@/lib/classification'
 import ExploreClient from './ExploreClient'
 
-export const revalidate = 0 // Disable cache to get fresh entries
+// The page still renders per request (so a build never depends on a live DB
+// connection), but the query result itself is cached in Next's Data Cache and
+// reused across visits until an admin create/update/delete calls
+// revalidateTag('entries') — instead of hitting Supabase on every click.
+export const dynamic = 'force-dynamic'
 
-export default async function ExplorePage() {
-  const entries = await prisma.literatureEntry.findMany({
+const getEntriesWithClassifications = unstable_cache(
+  async () => prisma.literatureEntry.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
       classifications: {
@@ -13,7 +19,13 @@ export default async function ExplorePage() {
         take: 1,
       }
     }
-  })
+  }),
+  ['explore-entries'],
+  { tags: ['entries'] }
+)
+
+export default async function ExplorePage() {
+  const entries = await getEntriesWithClassifications()
 
   const parsed = entries.map(e => {
     // Older/seeded entries never had the rule engine run on insert, so there's
@@ -32,5 +44,9 @@ export default async function ExplorePage() {
     }
   })
 
-  return <ExploreClient initialEntries={parsed} />
+  return (
+    <Suspense fallback={null}>
+      <ExploreClient initialEntries={parsed} />
+    </Suspense>
+  )
 }

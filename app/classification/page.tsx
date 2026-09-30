@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import ClassificationClient from '@/app/classification/ClassificationClient'
 
@@ -6,12 +7,20 @@ export const metadata = {
   description: 'Methodology and taxonomies for classifying Agusan Manobo oral traditions and folk literature',
 }
 
-export const revalidate = 0 // Disable cache to get fresh entries
+// The page still renders per request (so a build never depends on a live DB
+// connection), but the query result itself is cached in Next's Data Cache and
+// reused across visits until an admin create/update/delete calls
+// revalidateTag('entries') — instead of hitting Supabase on every click.
+export const dynamic = 'force-dynamic'
+
+const getEntriesSortedByTitle = unstable_cache(
+  async () => prisma.literatureEntry.findMany({ orderBy: { title: 'asc' } }),
+  ['classification-entries'],
+  { tags: ['entries'] }
+)
 
 export default async function ClassificationPage() {
-  const entries = await prisma.literatureEntry.findMany({
-    orderBy: { title: 'asc' },
-  })
+  const entries = await getEntriesSortedByTitle()
 
   const parsed = entries.map(e => ({
     id: e.id,

@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { classifyEntry } from '@/lib/classification'
 import { translateText } from '@/lib/translation'
+
+// Home/Explore/Classification/Dashboard cache their entry queries under the
+// 'entries' tag, so every mutation must invalidate that tag; the entry detail
+// page is revalidated by its own specific path.
+function revalidateEntryPages(entryId: string) {
+  revalidateTag('entries')
+  revalidatePath(`/archive/${entryId}`)
+}
 
 // GET /api/entries/[id]
 export async function GET(
@@ -103,6 +112,8 @@ export async function PUT(
       },
     })
 
+    revalidateEntryPages(entry.id)
+
     return NextResponse.json({
       entry: {
         ...entry,
@@ -123,6 +134,7 @@ export async function DELETE(
 ) {
   try {
     await prisma.literatureEntry.delete({ where: { id: params.id } })
+    revalidateEntryPages(params.id)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('DELETE /api/entries/[id] error:', error)

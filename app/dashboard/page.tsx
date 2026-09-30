@@ -1,11 +1,16 @@
+import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { computeAccuracyMetrics } from '@/lib/classification'
 import DashboardClient from './DashboardClient'
 
-export const revalidate = 0 // Disable cache to get fresh stats
+// The page still renders per request (so a build never depends on a live DB
+// connection), but the query results themselves are cached in Next's Data
+// Cache and reused across visits until an admin create/update/delete calls
+// revalidateTag('entries') — instead of hitting Supabase on every click.
+export const dynamic = 'force-dynamic'
 
-export default async function DashboardPage() {
-  const [totalEntries, grouped, genreGrouped, themeRows, allEntries] = await Promise.all([
+const getDashboardData = unstable_cache(
+  async () => Promise.all([
     prisma.literatureEntry.count(),
     prisma.literatureEntry.groupBy({
       by: ['communityLocation', 'municipality', 'province'],
@@ -20,7 +25,13 @@ export default async function DashboardPage() {
     // the classifier against each entry's own curated genre) and the
     // "export cultural heritage records" download.
     prisma.literatureEntry.findMany({ orderBy: { createdAt: 'desc' } }),
-  ])
+  ]),
+  ['dashboard-data'],
+  { tags: ['entries'] }
+)
+
+export default async function DashboardPage() {
+  const [totalEntries, grouped, genreGrouped, themeRows, allEntries] = await getDashboardData()
 
   // Evaluate the rule-based classifier against the archive's own curated
   // genre labels, rather than showing a fixed placeholder accuracy figure.
