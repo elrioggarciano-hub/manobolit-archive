@@ -13,6 +13,7 @@ interface Entry {
   englishTitle?: string | null
   type: string // "ORAL_LITERATURE" | "FOLK_SONG"
   content: string
+  transcription?: string | null
   genre: string
   themes: string[]
   culturalElements: string[]
@@ -140,14 +141,17 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     e.preventDefault()
     e.stopPropagation()
 
-    if (!entry.audioFile) {
-      showToast('warning', 'No audio recording has been uploaded for this entry yet.')
+    if (!entry.audioFile && !entry.transcription) {
+      showToast('warning', 'No audio or transcription is available for this entry yet.')
       return
     }
 
-    if (currentTrack?.audioFile === entry.audioFile) {
+    if (currentTrack?.entryId === entry.id) {
       togglePlay()
-    } else {
+      return
+    }
+
+    if (entry.audioFile) {
       const isFolkSong = entry.type === 'FOLK_SONG'
       playTrack({
         audioFile: entry.audioFile,
@@ -161,6 +165,18 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
         narrator: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
         duration: 25,
         textToRecite: entry.content
+      })
+    } else {
+      // No recorded audio for this riddle/proverb/folktale — read the Manobo
+      // transcription aloud with the browser's speech synthesis instead,
+      // clearly labeled as AI-generated narration rather than a recording.
+      playTrack({
+        title: entry.title,
+        entryId: entry.id,
+        speechText: entry.transcription,
+        singer: 'AI Generated',
+        narrator: 'AI Generated',
+        textToRecite: entry.transcription,
       })
     }
   }
@@ -630,8 +646,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                             style={{
                               background: '#8F000D',
                               borderRadius: '0px',
-                              opacity: entry.audioFile ? 1 : 0.5,
-                              cursor: entry.audioFile ? 'pointer' : 'not-allowed',
+                              opacity: (entry.audioFile || entry.transcription) ? 1 : 0.5,
+                              cursor: (entry.audioFile || entry.transcription) ? 'pointer' : 'not-allowed',
                             }}
                           >
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
@@ -733,8 +749,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           border: 'none',
                           color: 'var(--brand-accent)',
                           padding: 0,
-                          opacity: entry.audioFile ? 1 : 0.5,
-                          cursor: entry.audioFile ? 'pointer' : 'not-allowed',
+                          opacity: (entry.audioFile || entry.transcription) ? 1 : 0.5,
+                          cursor: (entry.audioFile || entry.transcription) ? 'pointer' : 'not-allowed',
                         }}
                       >
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">

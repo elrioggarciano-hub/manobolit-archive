@@ -21,20 +21,34 @@ function formatTime(seconds: number): string {
 export default function AudioPlayer({ audioFile, title = 'Audio Recording', duration, transcription, narrator = 'AI Generated', entryId }: Props) {
   const { playTrack, currentTrack, isPlaying, togglePlay, currentTime, duration: globalDuration, progress, seek } = useAudio()
 
-  const isCurrent = currentTrack?.audioFile === audioFile
+  const isCurrent = entryId ? currentTrack?.entryId === entryId : currentTrack?.audioFile === audioFile
   const isThisPlaying = isCurrent && isPlaying
   const displayDuration = duration || globalDuration || 25
+  // No recorded audio for this entry — fall back to reading the Manobo
+  // transcription aloud with AI narration instead.
+  const isNarrationOnly = !audioFile && !!transcription
 
   const handleToggle = () => {
-    if (!audioFile) return
+    if (!audioFile && !transcription) return
     if (isCurrent) {
       togglePlay()
-    } else {
+      return
+    }
+
+    if (audioFile) {
       playTrack({
         audioFile,
         title,
         narrator,
         duration: displayDuration,
+        textToRecite: transcription,
+        entryId,
+      })
+    } else {
+      playTrack({
+        title,
+        speechText: transcription,
+        narrator: 'AI Generated',
         textToRecite: transcription,
         entryId,
       })
@@ -62,7 +76,7 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
     ? (title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 900) + 100 
     : 772
 
-  if (!audioFile) {
+  if (!audioFile && !transcription) {
     return (
       <div style={{
         background: 'var(--bg-surface)',
@@ -141,7 +155,9 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
             }}
           >
             <span>{formatTime(isCurrent ? currentTime : 0)} / {formatTime(displayDuration)}</span>
-            <span style={{ color: 'var(--text-secondary)' }}>AUDIO ARCHIVE #{archiveId}</span>
+            <span style={{ color: 'var(--text-secondary)' }}>
+              {isNarrationOnly ? 'AI NARRATION (MANOBO)' : `AUDIO ARCHIVE #${archiveId}`}
+            </span>
           </div>
 
           {/* Waveform Slider */}
