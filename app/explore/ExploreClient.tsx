@@ -403,51 +403,53 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               </div>
             )}
 
-            {/* ACTIVE GENRES Section - ALWAYS SHOWN to match screenshot! */}
-            <div className="mb-4">
-              <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">ACTIVE GENRES</div>
-              <div className="flex flex-col gap-1.5 pl-1">
-                {[
-                  { key: 'RIDDLE', label: 'Riddle' },
-                  { key: 'SONG', label: 'Folk Song' },
-                  { key: 'PROVERB', label: 'Proverb' },
-                  { key: 'FOLKTALE', label: 'Folktale' },
-                ].map(item => {
-                  const isChecked = selectedGenres.includes(item.key)
-                  return (
-                    <label key={item.key} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => toggleGenre(item.key)}
-                        className="sr-only"
-                      />
-                      <div
-                        style={{
-                          width: '14px',
-                          height: '14px',
-                          border: isChecked ? 'none' : '1px solid var(--border-hover)',
-                          background: isChecked ? '#8F000D' : 'transparent',
-                          borderRadius: '0px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                          transition: 'background-color 0.15s ease, border-color 0.15s ease',
-                        }}
-                      >
-                        {isChecked && (
-                          <svg className="check-pop" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        )}
-                      </div>
-                      <span>{item.label}</span>
-                    </label>
-                  )
-                })}
+            {/* ACTIVE GENRES Section (only shown if Genres is active) */}
+            {activeCategory === 'GENRES' && (
+              <div className="mb-4">
+                <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">ACTIVE GENRES</div>
+                <div className="flex flex-col gap-1.5 pl-1">
+                  {[
+                    { key: 'RIDDLE', label: 'Riddle' },
+                    { key: 'SONG', label: 'Folk Song' },
+                    { key: 'PROVERB', label: 'Proverb' },
+                    { key: 'FOLKTALE', label: 'Folktale' },
+                  ].map(item => {
+                    const isChecked = selectedGenres.includes(item.key)
+                    return (
+                      <label key={item.key} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none py-0.5">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => toggleGenre(item.key)}
+                          className="sr-only"
+                        />
+                        <div
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            border: isChecked ? 'none' : '1px solid var(--border-hover)',
+                            background: isChecked ? '#8F000D' : 'transparent',
+                            borderRadius: '0px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            transition: 'background-color 0.15s ease, border-color 0.15s ease',
+                          }}
+                        >
+                          {isChecked && (
+                            <svg className="check-pop" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </div>
+                        <span>{item.label}</span>
+                      </label>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* PRIMARY THEMES Section - ALWAYS SHOWN to match screenshot! */}
             <div className="mb-5">
