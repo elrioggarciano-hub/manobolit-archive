@@ -637,17 +637,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         </div>
                       </div>
                     )}
-                    {inputText && (
-                      <div>
-                        <div style={{ fontSize: '8px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em', marginBottom: '4px' }}>
-                          ENGLISH TRANSLATION / CONTENT
-                        </div>
-                        <div style={{ color: '#a1a1aa', fontFamily: 'sans-serif', whiteSpace: 'pre-wrap' }}>
-                          {inputText}
-                        </div>
-                      </div>
-                    )}
-                    {!inputText && !inputTranscription && (
+                    {!inputTranscription && (
                       <div style={{ color: '#71717a', fontStyle: 'italic', textAlign: 'center', marginTop: '30px' }}>
                         No text loaded
                       </div>
