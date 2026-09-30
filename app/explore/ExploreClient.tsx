@@ -639,20 +639,6 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                             </svg>
                             <span>PLAY RECORDING</span>
                           </button>
-
-                          <div className="flex items-center gap-3">
-                            {/* Custom progress line */}
-                            <div className="w-16 h-[2px] bg-slate-200 relative" style={{ minWidth: '64px' }}>
-                              <div
-                                className="absolute left-0 top-0 h-full bg-[#8F000D]"
-                                style={{ width: `${entry.confidence ?? 0}%` }}
-                              />
-                            </div>
-                            <div className="flex flex-col text-[9px] font-bold text-[var(--text-muted)] leading-none" style={{ letterSpacing: '0.05em' }}>
-                              <span style={{ fontSize: '10px', color: 'var(--text-primary)' }}>{entry.confidence ?? 0}%</span>
-                              <span style={{ fontSize: '8px', color: 'var(--text-muted)' }}>CONFIDENCE</span>
-                            </div>
-                          </div>
                         </div>
                       </div>
 
