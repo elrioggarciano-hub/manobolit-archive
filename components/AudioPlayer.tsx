@@ -24,31 +24,17 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
   const isCurrent = entryId ? currentTrack?.entryId === entryId : currentTrack?.audioFile === audioFile
   const isThisPlaying = isCurrent && isPlaying
   const displayDuration = duration || globalDuration || 25
-  // No recorded audio for this entry — fall back to reading the Manobo
-  // transcription aloud with AI narration instead.
-  const isNarrationOnly = !audioFile && !!transcription
 
   const handleToggle = () => {
-    if (!audioFile && !transcription) return
+    if (!audioFile) return
     if (isCurrent) {
       togglePlay()
-      return
-    }
-
-    if (audioFile) {
+    } else {
       playTrack({
         audioFile,
         title,
         narrator,
         duration: displayDuration,
-        textToRecite: transcription,
-        entryId,
-      })
-    } else {
-      playTrack({
-        title,
-        speechText: transcription,
-        narrator: 'AI Generated',
         textToRecite: transcription,
         entryId,
       })
@@ -72,11 +58,11 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
   })
 
   // Calculate unique 3-digit Archive ID based on title
-  const archiveId = title 
-    ? (title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 900) + 100 
+  const archiveId = title
+    ? (title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 900) + 100
     : 772
 
-  if (!audioFile && !transcription) {
+  if (!audioFile) {
     return (
       <div style={{
         background: 'var(--bg-surface)',
@@ -97,7 +83,7 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
   }
 
   return (
-    <div 
+    <div
       style={{
         background: 'var(--bg-surface)',
         border: '1px solid var(--border-color)',
@@ -107,7 +93,7 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
       }}
     >
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-        
+
         {/* Yellow Play/Pause Button */}
         <button
           onClick={handleToggle}
@@ -142,22 +128,20 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
 
         {/* Right Section: Time metadata & Waveform */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          
+
           {/* Metadata Row */}
-          <div 
-            style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              fontSize: '10px', 
-              fontWeight: 800, 
-              color: 'var(--text-muted)', 
-              letterSpacing: '0.05em' 
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '10px',
+              fontWeight: 800,
+              color: 'var(--text-muted)',
+              letterSpacing: '0.05em'
             }}
           >
             <span>{formatTime(isCurrent ? currentTime : 0)} / {formatTime(displayDuration)}</span>
-            <span style={{ color: 'var(--text-secondary)' }}>
-              {isNarrationOnly ? 'AI NARRATION (MANOBO)' : `AUDIO ARCHIVE #${archiveId}`}
-            </span>
+            <span style={{ color: 'var(--text-secondary)' }}>AUDIO ARCHIVE #{archiveId}</span>
           </div>
 
           {/* Waveform Slider */}
@@ -176,16 +160,16 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
               const barProgress = (i / bars.length) * 100
               const active = barProgress <= progress
               return (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   style={{
-                    flex: 1, 
-                    height: `${h}%`, 
+                    flex: 1,
+                    height: `${h}%`,
                     borderRadius: '1px',
                     background: active ? '#f1b80d' : '#fee2e2',
                     transition: 'background 0.1s',
                     minWidth: '2px',
-                  }} 
+                  }}
                 />
               )
             })}

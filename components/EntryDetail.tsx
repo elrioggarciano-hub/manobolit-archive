@@ -105,7 +105,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
       </div>
 
       {/* Audio Player Block */}
-      {(entry.audioFile || entry.transcription) && (
+      {entry.audioFile && (
         <div style={{ marginBottom: '24px' }}>
           <AudioPlayer
             audioFile={entry.audioFile}
