@@ -38,8 +38,12 @@ export default async function ExplorePage() {
       ...e,
       themes: JSON.parse(e.themes || '[]') as string[],
       culturalElements: JSON.parse(e.culturalElements || '[]') as string[],
-      createdAt: e.createdAt.toISOString(),
-      updatedAt: e.updatedAt.toISOString(),
+      // unstable_cache serializes its cached value, so a cache-hit returns
+      // createdAt/updatedAt as plain strings instead of Date instances — wrap
+      // in `new Date(...)` so both the cold-miss (real Date) and cache-hit
+      // (already-stringified) cases produce a valid ISO string.
+      createdAt: new Date(e.createdAt).toISOString(),
+      updatedAt: new Date(e.updatedAt).toISOString(),
       confidence,
     }
   })
