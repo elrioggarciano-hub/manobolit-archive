@@ -688,17 +688,45 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                         </div>
                       </div>
 
-                      {/* Right side weave graphic */}
-                      <div className="w-full sm:w-44 h-48 sm:h-auto flex-shrink-0 relative overflow-hidden bg-slate-900 border-t sm:border-t-0 sm:border-l border-[var(--border-color)]">
-                        <img 
-                          src="/weave.png" 
-                          alt="Agusan Manobo Weave" 
+                      {/* Right side: a line from the entry's own Manobo transcription,
+                          in place of a generic stock "weave" photo that had no real
+                          connection to this specific piece (or to Manobo culture at all). */}
+                      <div
+                        className="w-full sm:w-44 h-48 sm:h-auto flex-shrink-0 relative overflow-hidden border-t sm:border-t-0 sm:border-l border-[var(--border-color)]"
+                        style={{ background: '#18181b', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}
+                      >
+                        <span
+                          aria-hidden="true"
                           style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
+                            position: 'absolute',
+                            top: '-14px',
+                            left: '14px',
+                            fontSize: '80px',
+                            fontFamily: 'Cormorant Garamond, Georgia, serif',
+                            color: 'rgba(241, 184, 13, 0.14)',
+                            lineHeight: 1,
                           }}
-                        />
+                        >
+                          &ldquo;
+                        </span>
+                        <p
+                          style={{
+                            margin: 0,
+                            position: 'relative',
+                            zIndex: 1,
+                            fontFamily: 'Cormorant Garamond, Georgia, serif',
+                            fontStyle: 'italic',
+                            color: '#f1b80d',
+                            fontSize: '15px',
+                            lineHeight: 1.55,
+                            textAlign: 'center',
+                          }}
+                        >
+                          {(() => {
+                            const snippet = entry.transcription || entry.manoboTitle || entry.title
+                            return snippet.length > 130 ? `${snippet.slice(0, 130).trim()}…` : snippet
+                          })()}
+                        </p>
                       </div>
                     </div>
                   )
