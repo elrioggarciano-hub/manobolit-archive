@@ -141,8 +141,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     e.preventDefault()
     e.stopPropagation()
 
-    if (!entry.audioFile && !entry.transcription) {
-      showToast('warning', 'No audio or transcription is available for this entry yet.')
+    if (!entry.audioFile) {
+      showToast('warning', 'No audio recording has been uploaded for this entry yet.')
       return
     }
 
@@ -151,34 +151,36 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
       return
     }
 
-    if (entry.audioFile) {
-      const isFolkSong = entry.type === 'FOLK_SONG'
-      playTrack({
-        audioFile: entry.audioFile,
-        title: entry.title,
-        entryId: entry.id,
-        // Folk song recordings have no real credited vocalist, so this is
-        // labeled honestly as "AI Generated" rather than implying a real
-        // singer performed it. Oral literature narrations keep using the
-        // actual collected narrator when one is on record.
-        singer: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
-        narrator: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
-        duration: 25,
-        textToRecite: entry.content
-      })
-    } else {
-      // No recorded audio for this riddle/proverb/folktale — read the Manobo
-      // transcription aloud with the browser's speech synthesis instead,
-      // clearly labeled as AI-generated narration rather than a recording.
-      playTrack({
-        title: entry.title,
-        entryId: entry.id,
-        speechText: entry.transcription,
-        singer: 'AI Generated',
-        narrator: 'AI Generated',
-        textToRecite: entry.transcription,
-      })
-    }
+    const isFolkSong = entry.type === 'FOLK_SONG'
+    playTrack({
+      audioFile: entry.audioFile,
+      title: entry.title,
+      entryId: entry.id,
+      // Folk song recordings have no real credited vocalist, so this is
+      // labeled honestly as "AI Generated" rather than implying a real
+      // singer performed it. Oral literature narrations keep using the
+      // actual collected narrator when one is on record.
+      singer: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
+      narrator: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
+      duration: 25,
+      textToRecite: entry.content
+    })
+  }
+
+  // Riddles, proverbs, and folktales have no recorded audio, and text-to-speech
+  // can't reproduce authentic Agusan Manobo pronunciation — so instead of
+  // playing anything, these entries let the reader expand the card to read
+  // the real Manobo transcription directly.
+  const [expandedTranscriptIds, setExpandedTranscriptIds] = useState<Set<string>>(new Set())
+  const toggleTranscript = (e: React.MouseEvent, id: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setExpandedTranscriptIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   }
 
   const toggleGenre = (genreKey: string) => {
@@ -636,25 +638,51 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           <p className="text-[var(--text-secondary)] text-xs leading-relaxed mb-6" style={{ whiteSpace: 'pre-line' }}>
                             {entry.content}
                           </p>
+
+                          {/* Expanded Manobo transcription (no recorded audio) */}
+                          {!entry.audioFile && entry.transcription && expandedTranscriptIds.has(entry.id) && (
+                            <div style={{
+                              marginBottom: '20px',
+                              padding: '12px 14px',
+                              borderLeft: '3px solid #8F000D',
+                              background: 'var(--bg-main)',
+                            }}>
+                              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                                MANOBO TRANSCRIPTION
+                              </div>
+                              <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: 'var(--brand-accent)', fontStyle: 'italic', whiteSpace: 'pre-line' }}>
+                                {entry.transcription}
+                              </p>
+                            </div>
+                          )}
                         </div>
 
                         {/* Bottom Actions */}
                         <div className="flex items-center gap-6 mt-auto">
-                          <button
-                            onClick={(e) => handlePlayClick(e, entry)}
-                            className="flex items-center gap-2 text-white font-bold text-xs py-2.5 px-4 transition-colors btn-anim"
-                            style={{
-                              background: '#8F000D',
-                              borderRadius: '0px',
-                              opacity: (entry.audioFile || entry.transcription) ? 1 : 0.5,
-                              cursor: (entry.audioFile || entry.transcription) ? 'pointer' : 'not-allowed',
-                            }}
-                          >
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                            <span>PLAY RECORDING</span>
-                          </button>
+                          {entry.audioFile ? (
+                            <button
+                              onClick={(e) => handlePlayClick(e, entry)}
+                              className="flex items-center gap-2 text-white font-bold text-xs py-2.5 px-4 transition-colors btn-anim"
+                              style={{ background: '#8F000D', borderRadius: '0px' }}
+                            >
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                              <span>PLAY RECORDING</span>
+                            </button>
+                          ) : entry.transcription ? (
+                            <button
+                              onClick={(e) => toggleTranscript(e, entry.id)}
+                              className="flex items-center gap-2 text-white font-bold text-xs py-2.5 px-4 transition-colors btn-anim"
+                              style={{ background: '#8F000D', borderRadius: '0px' }}
+                            >
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                              </svg>
+                              <span>{expandedTranscriptIds.has(entry.id) ? 'HIDE TRANSCRIPTION' : 'READ TRANSCRIPTION'}</span>
+                            </button>
+                          ) : null}
                         </div>
                       </div>
 
@@ -737,27 +765,51 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                       <p className="text-[var(--text-secondary)] text-xs leading-relaxed mb-6" style={{ whiteSpace: 'pre-line' }}>
                         {entry.content}
                       </p>
+
+                      {/* Expanded Manobo transcription (no recorded audio) */}
+                      {!entry.audioFile && entry.transcription && expandedTranscriptIds.has(entry.id) && (
+                        <div style={{
+                          marginBottom: '20px',
+                          padding: '12px 14px',
+                          borderLeft: '3px solid #8F000D',
+                          background: 'var(--bg-main)',
+                        }}>
+                          <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                            MANOBO TRANSCRIPTION
+                          </div>
+                          <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: 'var(--brand-accent)', fontStyle: 'italic', whiteSpace: 'pre-line' }}>
+                            {entry.transcription}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Bottom Actions */}
                     <div className="flex items-center mt-auto pt-4 border-t border-[var(--border-color)]">
-                      <button
-                        onClick={(e) => handlePlayClick(e, entry)}
-                        className="flex items-center gap-1.5 font-bold text-xs transition-colors btn-anim"
-                        style={{
-                          background: 'transparent',
-                          border: 'none',
-                          color: 'var(--brand-accent)',
-                          padding: 0,
-                          opacity: (entry.audioFile || entry.transcription) ? 1 : 0.5,
-                          cursor: (entry.audioFile || entry.transcription) ? 'pointer' : 'not-allowed',
-                        }}
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                        <span>PLAY RECORDING</span>
-                      </button>
+                      {entry.audioFile ? (
+                        <button
+                          onClick={(e) => handlePlayClick(e, entry)}
+                          className="flex items-center gap-1.5 font-bold text-xs transition-colors btn-anim"
+                          style={{ background: 'transparent', border: 'none', color: 'var(--brand-accent)', padding: 0 }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                          <span>PLAY RECORDING</span>
+                        </button>
+                      ) : entry.transcription ? (
+                        <button
+                          onClick={(e) => toggleTranscript(e, entry.id)}
+                          className="flex items-center gap-1.5 font-bold text-xs transition-colors btn-anim"
+                          style={{ background: 'transparent', border: 'none', color: 'var(--brand-accent)', padding: 0 }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                          </svg>
+                          <span>{expandedTranscriptIds.has(entry.id) ? 'HIDE TRANSCRIPTION' : 'READ TRANSCRIPTION'}</span>
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                 )

@@ -4,13 +4,7 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { useToast } from '@/lib/context/ToastContext'
 
 export interface Track {
-  // Real recordings set audioFile. Entries with no recorded audio (riddles,
-  // proverbs, folktales) instead set speechText, which is read aloud with the
-  // browser's built-in speech synthesis rather than a recorded file — always
-  // surfaced to the listener as "AI Generated" narration, never presented as
-  // an authentic recording.
-  audioFile?: string | null
-  speechText?: string | null
+  audioFile: string
   title: string
   narrator?: string | null
   singer?: string | null
@@ -70,77 +64,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     // playing fine.
     let cancelled = false
 
-    // Pause and clean up whatever the previous track was using
+    // Pause and clean previous audio
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current.src = ''
-      audioRef.current = null
-    }
-    window.speechSynthesis.cancel()
-
-    // --- AI narration branch: no recorded audio, read the transcription aloud ---
-    if (!currentTrack.audioFile && currentTrack.speechText) {
-      const utterance = new SpeechSynthesisUtterance(currentTrack.speechText)
-      utterance.rate = speed
-
-      const totalChars = currentTrack.speechText.length
-      // ~2.5 words/sec at normal rate is a reasonable spoken-word estimate;
-      // corrected continuously below via onboundary once speech is underway.
-      const wordCount = currentTrack.speechText.trim().split(/\s+/).filter(Boolean).length
-      const estimatedDuration = Math.max(wordCount / (2.5 * speed), 1)
-      setDuration(estimatedDuration)
-
-      let tickInterval: ReturnType<typeof setInterval> | null = null
-      let startedAt: number | null = null
-
-      utterance.onstart = () => {
-        if (cancelled) return
-        startedAt = Date.now()
-        tickInterval = setInterval(() => {
-          if (cancelled || startedAt === null) return
-          const elapsed = (Date.now() - startedAt) / 1000
-          const clamped = Math.min(elapsed, estimatedDuration)
-          setCurrentTime(clamped)
-          setProgress((clamped / estimatedDuration) * 100)
-        }, 200)
-      }
-
-      utterance.onboundary = (e) => {
-        if (cancelled || !totalChars) return
-        const ratio = Math.min(e.charIndex / totalChars, 1)
-        setProgress(ratio * 100)
-        setCurrentTime(ratio * estimatedDuration)
-      }
-
-      utterance.onend = () => {
-        if (cancelled) return
-        if (tickInterval) clearInterval(tickInterval)
-        setIsPlaying(false)
-        setProgress(0)
-        setCurrentTime(0)
-      }
-
-      utterance.onerror = (e) => {
-        if (cancelled) return
-        if (tickInterval) clearInterval(tickInterval)
-        console.warn('Speech synthesis error:', e)
-        setIsPlaying(false)
-        showToast('error', 'This narration could not be played.')
-      }
-
-      if (isPlaying) {
-        window.speechSynthesis.speak(utterance)
-      }
-
-      return () => {
-        cancelled = true
-        if (tickInterval) clearInterval(tickInterval)
-        window.speechSynthesis.cancel()
-      }
     }
 
-    // --- Recorded audio branch ---
-    const audio = new Audio(currentTrack.audioFile || '')
+    const audio = new Audio(currentTrack.audioFile)
     audioRef.current = audio
     audio.playbackRate = speed
 
@@ -201,17 +131,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }
 
   const togglePlay = () => {
-    if (currentTrack && !currentTrack.audioFile && currentTrack.speechText) {
-      if (isPlaying) {
-        window.speechSynthesis.pause()
-        setIsPlaying(false)
-      } else {
-        window.speechSynthesis.resume()
-        setIsPlaying(true)
-      }
-      return
-    }
-
     const audio = audioRef.current
     if (!audio) return
 
@@ -228,14 +147,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }
 
   const pauseTrack = () => {
-    if (currentTrack && !currentTrack.audioFile && currentTrack.speechText) {
-      if (isPlaying) {
-        window.speechSynthesis.pause()
-        setIsPlaying(false)
-      }
-      return
-    }
-
     const audio = audioRef.current
     if (audio && isPlaying) {
       audio.pause()
@@ -248,7 +159,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audioRef.current.pause()
       audioRef.current.src = ''
     }
-    window.speechSynthesis.cancel()
     setCurrentTrack(null)
     setIsPlaying(false)
     setProgress(0)
@@ -261,15 +171,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (audioRef.current) {
       audioRef.current.playbackRate = newSpeed
     }
-    // Web Speech API utterances can't change rate mid-speech; the new speed
-    // takes effect the next time a narration track starts.
   }
 
   const seek = (ratio: number) => {
-    // AI narration doesn't support seeking — there's no reliable cross-browser
-    // way to jump speech synthesis to an arbitrary position.
-    if (currentTrack && !currentTrack.audioFile && currentTrack.speechText) return
-
     const audio = audioRef.current
     const dur = duration || (audio ? audio.duration : 0)
     if (!audio || !dur) return
