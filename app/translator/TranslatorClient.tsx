@@ -1,18 +1,12 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { translateText, TranslationLang, BIBLE_LEXICON } from '@/lib/translation'
+import { translateText, TranslationLang, BIBLE_LEXICON, BIBLE_PARALLEL_PHRASES } from '@/lib/translation'
 
 const LANG_LABELS: Record<TranslationLang, string> = {
   msm: 'Agusan Manobo',
   en: 'English',
   ceb: 'Bisaya (Cebuano)',
-}
-
-const LANG_PLACEHOLDER: Record<TranslationLang, string> = {
-  msm: 'e.g. amey ne langit, kahayag, marujow...',
-  en: 'e.g. father sky, light, good...',
-  ceb: 'e.g. amahan nga langit, kahayag, maayo...',
 }
 
 const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
@@ -74,6 +68,16 @@ export default function TranslatorClient() {
     if (!entry) return
     setInputText(entry[LANG_FIELD[sourceLang]])
     setHasTranslated(true)
+  }
+
+  const pickPhrase = (phrase: typeof BIBLE_PARALLEL_PHRASES[number]) => {
+    setInputText(phrase[LANG_FIELD[sourceLang]])
+    setHasTranslated(true)
+  }
+
+  const clearInput = () => {
+    setInputText('')
+    setHasTranslated(false)
   }
 
   return (
@@ -221,15 +225,29 @@ export default function TranslatorClient() {
             </div>
           </div>
 
-          {/* Input */}
+          {/* Input — read-only by design: free typing let visitors enter words that
+              were never in the corpus and would never match anything, which just
+              read as "the translator is broken." Text can only come from clicking
+              a word or phrase below, so everything in this box is guaranteed valid. */}
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', display: 'block', marginBottom: '6px' }}>
-              {LANG_LABELS[sourceLang].toUpperCase()} TEXT
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em' }}>
+                {LANG_LABELS[sourceLang].toUpperCase()} TEXT
+              </label>
+              {inputText && (
+                <button
+                  onClick={clearInput}
+                  className="btn-anim"
+                  style={{ background: 'none', border: 'none', color: '#71717a', fontSize: '9px', fontWeight: 800, letterSpacing: '0.05em', cursor: 'pointer', padding: 0 }}
+                >
+                  CLEAR ✕
+                </button>
+              )}
+            </div>
             <textarea
               value={inputText}
-              onChange={(e) => { setInputText(e.target.value); setHasTranslated(true) }}
-              placeholder={LANG_PLACEHOLDER[sourceLang]}
+              readOnly
+              placeholder="Click a word or phrase below to see its translation here."
               className="input-anim"
               style={{
                 width: '100%',
@@ -242,7 +260,8 @@ export default function TranslatorClient() {
                 outline: 'none',
                 borderRadius: '4px',
                 fontFamily: 'Inter, sans-serif',
-                resize: 'vertical',
+                resize: 'none',
+                cursor: 'default',
               }}
             />
           </div>
@@ -272,8 +291,8 @@ export default function TranslatorClient() {
                 lineHeight: 1.5,
               }}
             >
-              {inputText && hasTranslated ? (result.translatedText || <span style={{ color: '#71717a', fontStyle: 'italic', fontFamily: 'Inter, sans-serif', fontSize: '13px' }}>No match in the corpus for that word. Browse the available words below and click one to try it.</span>) : (
-                <span style={{ color: '#71717a', fontStyle: 'italic', fontFamily: 'Inter, sans-serif', fontSize: '13px' }}>Type a word above, or click any word in the list below to see its translation.</span>
+              {inputText && hasTranslated ? (result.translatedText || <span style={{ color: '#71717a', fontStyle: 'italic', fontFamily: 'Inter, sans-serif', fontSize: '13px' }}>No match found.</span>) : (
+                <span style={{ color: '#71717a', fontStyle: 'italic', fontFamily: 'Inter, sans-serif', fontSize: '13px' }}>Click any word or phrase in the list below to see its translation.</span>
               )}
             </div>
 
@@ -330,12 +349,45 @@ export default function TranslatorClient() {
             Browse Available Words
           </h2>
           <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            Every word the translator can recognize is listed below, shown in {LANG_LABELS[sourceLang]} since that is
-            your current &ldquo;Translate From&rdquo; language. Click any word to translate it instantly &mdash; anything
-            outside this list will not have a match.
+            Every word and phrase the translator can recognize is listed below, shown in {LANG_LABELS[sourceLang]} since
+            that is your current &ldquo;Translate From&rdquo; language. The text box above only accepts a click from
+            this list, so every translation you see is guaranteed to come from the real Agusan Manobo Bible corpus.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div>
+              <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.08em', marginBottom: '8px' }}>
+                PHRASES
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {BIBLE_PARALLEL_PHRASES.map((phrase, i) => {
+                  const text = phrase[LANG_FIELD[sourceLang]]
+                  const isActive = inputText.trim().toLowerCase() === text.toLowerCase()
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => pickPhrase(phrase)}
+                      className="btn-anim"
+                      title={phrase.verseRef}
+                      style={{
+                        background: isActive ? '#8F000D' : 'var(--bg-surface)',
+                        color: isActive ? '#ffffff' : 'var(--text-primary)',
+                        border: `1px solid ${isActive ? '#8F000D' : 'var(--border-color)'}`,
+                        borderRadius: '4px',
+                        padding: '6px 12px',
+                        fontSize: '12.5px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        fontFamily: 'Inter, sans-serif',
+                      }}
+                    >
+                      {text}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
             {VOCAB_GROUPS.map(group => (
               <div key={group.label}>
                 <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.08em', marginBottom: '8px' }}>
