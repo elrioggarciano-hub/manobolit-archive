@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { translateText, TranslationLang } from '@/lib/translation'
+import { translateText, TranslationLang, BIBLE_LEXICON } from '@/lib/translation'
 
 const LANG_LABELS: Record<TranslationLang, string> = {
   msm: 'Agusan Manobo',
@@ -14,6 +14,26 @@ const LANG_PLACEHOLDER: Record<TranslationLang, string> = {
   en: 'e.g. father sky, light, good...',
   ceb: 'e.g. amahan nga langit, kahayag, maayo...',
 }
+
+const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
+  en: 'english',
+  msm: 'manobo',
+  ceb: 'bisaya',
+}
+
+// The translator only knows the words in this corpus — grouping them here by
+// topic (mirroring how they're organized in bibleCorpus.ts) lets a visitor
+// browse and click what's actually available, instead of guessing random
+// words that will never match.
+const VOCAB_GROUPS: { label: string; words: string[] }[] = [
+  { label: 'Theological', words: ['god', 'lord', 'creator', 'spirit', 'blessing', 'grace', 'prayer', 'faith', 'heaven'] },
+  { label: 'Nature & Universe', words: ['earth', 'land', 'world', 'sky', 'mountain', 'mountains', 'water', 'stream', 'river', 'tree', 'trees', 'forest', 'star', 'stars', 'sun', 'night', 'light', 'fish', 'animal', 'bird', 'tiger'] },
+  { label: 'People & Community', words: ['people', 'person', 'man', 'woman', 'child', 'children', 'father', 'mother', 'family', 'tribe', 'native', 'village'] },
+  { label: 'Qualities', words: ['good', 'great', 'hard', 'bitter', 'beautiful', 'bare', 'holy', 'small', 'many', 'first', 'ancient'] },
+  { label: 'Actions', words: ['create', 'created', 'made', 'make', 'give', 'gave', 'listen', 'heard', 'see', 'saw', 'walk', 'come', 'came', 'remember', 'weep', 'cry', 'protect', 'help'] },
+  { label: 'Feelings & Concepts', words: ['love', 'peace', 'loneliness', 'sorrow', 'history', 'proverb', 'story'] },
+  { label: 'Grammar', words: ['the', 'of', 'in', 'to', 'and', 'we', 'you', 'they', 'he', 'she', 'my'] },
+]
 
 export default function TranslatorClient() {
   const [sourceLang, setSourceLang] = useState<TranslationLang>('msm')
@@ -29,6 +49,19 @@ export default function TranslatorClient() {
   }
 
   const langOptions: TranslationLang[] = ['msm', 'en', 'ceb']
+
+  const lexiconByEnglish = useMemo(() => {
+    const map = new Map<string, typeof BIBLE_LEXICON[number]>()
+    for (const entry of BIBLE_LEXICON) map.set(entry.english, entry)
+    return map
+  }, [])
+
+  const pickWord = (englishKey: string) => {
+    const entry = lexiconByEnglish.get(englishKey)
+    if (!entry) return
+    setInputText(entry[LANG_FIELD[sourceLang]])
+    setHasTranslated(true)
+  }
 
   return (
     <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
@@ -226,8 +259,8 @@ export default function TranslatorClient() {
                 lineHeight: 1.5,
               }}
             >
-              {inputText && hasTranslated ? (result.translatedText || <span style={{ color: '#71717a', fontStyle: 'italic', fontFamily: 'Inter, sans-serif', fontSize: '13px' }}>No matching word or phrase found in the corpus yet.</span>) : (
-                <span style={{ color: '#71717a', fontStyle: 'italic', fontFamily: 'Inter, sans-serif', fontSize: '13px' }}>Type a word or phrase above to see its translation.</span>
+              {inputText && hasTranslated ? (result.translatedText || <span style={{ color: '#71717a', fontStyle: 'italic', fontFamily: 'Inter, sans-serif', fontSize: '13px' }}>No match in the corpus for that word. Browse the available words below and click one to try it.</span>) : (
+                <span style={{ color: '#71717a', fontStyle: 'italic', fontFamily: 'Inter, sans-serif', fontSize: '13px' }}>Type a word above, or click any word in the list below to see its translation.</span>
               )}
             </div>
 
@@ -267,6 +300,63 @@ export default function TranslatorClient() {
                 {result.matchedWordsCount} of {result.totalWordsCount} word{result.totalWordsCount === 1 ? '' : 's'} matched &middot; Source: {result.corpusSource}
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Browse Available Words */}
+        <section style={{ maxWidth: '900px', marginTop: '32px' }}>
+          <h2
+            style={{
+              margin: '0 0 6px 0',
+              fontSize: '22px',
+              fontWeight: 700,
+              fontFamily: 'Cormorant Garamond, Georgia, serif',
+              color: 'var(--text-primary)',
+            }}
+          >
+            Browse Available Words
+          </h2>
+          <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            Every word the translator can recognize is listed below, shown in {LANG_LABELS[sourceLang]} since that is
+            your current &ldquo;Translate From&rdquo; language. Click any word to translate it instantly &mdash; anything
+            outside this list will not have a match.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {VOCAB_GROUPS.map(group => (
+              <div key={group.label}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.08em', marginBottom: '8px' }}>
+                  {group.label.toUpperCase()}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {group.words.map(w => {
+                    const entry = lexiconByEnglish.get(w)
+                    if (!entry) return null
+                    const isActive = inputText.trim().toLowerCase() === entry[LANG_FIELD[sourceLang]].toLowerCase()
+                    return (
+                      <button
+                        key={w}
+                        onClick={() => pickWord(w)}
+                        className="btn-anim"
+                        style={{
+                          background: isActive ? '#8F000D' : 'var(--bg-surface)',
+                          color: isActive ? '#ffffff' : 'var(--text-primary)',
+                          border: `1px solid ${isActive ? '#8F000D' : 'var(--border-color)'}`,
+                          borderRadius: '4px',
+                          padding: '6px 12px',
+                          fontSize: '12.5px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          fontFamily: 'Inter, sans-serif',
+                        }}
+                      >
+                        {entry[LANG_FIELD[sourceLang]]}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
