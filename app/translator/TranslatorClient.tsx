@@ -43,9 +43,22 @@ export default function TranslatorClient() {
 
   const result = useMemo(() => translateText(inputText, sourceLang, targetLang), [inputText, sourceLang, targetLang])
 
+  // Changing which language the input box is "in" has to clear whatever text
+  // was typed under the old language — otherwise leftover Manobo text sits in
+  // a box now labeled English (or vice versa) and silently fails to match
+  // anything, which reads as the translator being broken rather than as a
+  // language mismatch.
+  const changeSourceLang = (lang: TranslationLang) => {
+    setSourceLang(lang)
+    setInputText('')
+    setHasTranslated(false)
+  }
+
   const swapLanguages = () => {
     setSourceLang(targetLang)
     setTargetLang(sourceLang)
+    setInputText('')
+    setHasTranslated(false)
   }
 
   const langOptions: TranslationLang[] = ['msm', 'en', 'ceb']
@@ -131,7 +144,7 @@ export default function TranslatorClient() {
               </label>
               <select
                 value={sourceLang}
-                onChange={(e) => setSourceLang(e.target.value as TranslationLang)}
+                onChange={(e) => changeSourceLang(e.target.value as TranslationLang)}
                 className="input-anim"
                 style={{
                   width: '100%',
