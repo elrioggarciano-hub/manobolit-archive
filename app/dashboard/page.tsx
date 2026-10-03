@@ -11,7 +11,6 @@ export const dynamic = 'force-dynamic'
 
 const getDashboardData = unstable_cache(
   async () => Promise.all([
-    prisma.literatureEntry.count(),
     prisma.literatureEntry.groupBy({
       by: ['communityLocation', 'municipality', 'province'],
       _count: { _all: true },
@@ -21,17 +20,22 @@ const getDashboardData = unstable_cache(
       _count: { _all: true },
     }),
     prisma.literatureEntry.findMany({ select: { themes: true } }),
-    // Full records power two things below: the accuracy metrics (re-running
-    // the classifier against each entry's own curated genre) and the
-    // "export cultural heritage records" download.
+    // Full records power three things below: the total entry count,
+    // the accuracy metrics (re-running the classifier against each entry's
+    // own curated genre), and the "export cultural heritage records" download.
+    // (Deriving the count from this array instead of a separate
+    // prisma.literatureEntry.count() call sidesteps an unstable_cache quirk
+    // that was silently zeroing out a lone cached primitive number while the
+    // cached arrays came through intact.)
     prisma.literatureEntry.findMany({ orderBy: { createdAt: 'desc' } }),
   ]),
-  ['dashboard-data-v2'],
+  ['dashboard-data-v3'],
   { tags: ['entries'] }
 )
 
 export default async function DashboardPage() {
-  const [totalEntries, grouped, genreGrouped, themeRows, allEntries] = await getDashboardData()
+  const [grouped, genreGrouped, themeRows, allEntries] = await getDashboardData()
+  const totalEntries = allEntries.length
 
   // Evaluate the rule-based classifier against the archive's own curated
   // genre labels, rather than showing a fixed placeholder accuracy figure.
