@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 const getEntries = unstable_cache(
   async () => prisma.literatureEntry.findMany({ orderBy: { createdAt: 'desc' } }),
-  ['home-entries'],
+  ['home-entries-v2'],
   { tags: ['entries'] }
 )
 
