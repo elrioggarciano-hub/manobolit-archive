@@ -20,7 +20,7 @@ const getEntriesWithClassifications = unstable_cache(
       }
     }
   }),
-  ['explore-entries'],
+  ['explore-entries-v2'],
   { tags: ['entries'] }
 )
 

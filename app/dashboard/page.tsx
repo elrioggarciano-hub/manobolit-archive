@@ -26,7 +26,7 @@ const getDashboardData = unstable_cache(
     // "export cultural heritage records" download.
     prisma.literatureEntry.findMany({ orderBy: { createdAt: 'desc' } }),
   ]),
-  ['dashboard-data'],
+  ['dashboard-data-v2'],
   { tags: ['entries'] }
 )
 
