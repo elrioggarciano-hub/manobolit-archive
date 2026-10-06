@@ -45,7 +45,7 @@ export async function GET(
   }
 }
 
-// PUT /api/entries/[id] — update entry with Agusan Manobo Bible auto-translation
+// PUT /api/entries/[id] — update entry with ManoboLit Lexicon auto-translation
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }

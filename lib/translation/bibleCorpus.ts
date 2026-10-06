@@ -1,10 +1,14 @@
 /**
- * Agusan Manobo Bible Corpus & Parallel Lexicon (Kasuyatan to Diyus)
+ * ManoboLit Reference Lexicon & Phrasebook
  * Language: Agusan Manobo (ISO 639-3: msm)
- * Publisher/Source: Wycliffe Bible Translators / SIL International
+ *
+ * A curated word-and-phrase list compiled for the Translator feature.
+ * Word choices are informed by common Agusan Manobo usage, not a verified
+ * transcription of any specific published text — no verse-level source is
+ * claimed for any entry.
  *
  * Bisaya (Cebuano) glosses are added alongside the English ones so the
- * same corpus can validate Manobo <-> Bisaya word-level translation, not
+ * same lexicon can support Manobo <-> Bisaya word-level translation, not
  * only Manobo <-> English.
  */
 
@@ -13,7 +17,6 @@ export interface ParallelPhrase {
   manobo: string
   bisaya: string
   context?: string
-  verseRef?: string
 }
 
 export interface LexiconEntry {
@@ -25,39 +28,39 @@ export interface LexiconEntry {
 }
 
 export const BIBLE_PARALLEL_PHRASES: ParallelPhrase[] = [
-  { english: 'in the beginning', manobo: 'duun tu pikag-una', bisaya: 'sa sinugdanan', verseRef: 'Genesis 1:1' },
-  { english: 'the god created', manobo: 'pig-himo tu Diyus', bisaya: 'gibuhat sa Dios', verseRef: 'Genesis 1:1' },
-  { english: 'god created the heavens and the earth', manobo: 'pig-himo tu Diyus ka langit duw ka tano', bisaya: 'gibuhat sa Dios ang langit ug ang yuta', verseRef: 'Genesis 1:1' },
-  { english: 'father sky', manobo: 'amey ne langit', bisaya: 'amahan nga langit', verseRef: 'Genesis 1:2' },
-  { english: 'creation of the stars', manobo: 'kagnat ne mga bituen', bisaya: 'paghimo sa mga bituon', verseRef: 'Genesis 1:16' },
-  { english: 'let there be light', manobo: 'kahayag man diya', bisaya: 'unta adunay kahayag', verseRef: 'Genesis 1:3' },
-  { english: 'great spirit', manobo: 'maaslag ne Espiritu tu Diyus', bisaya: 'gamhanan nga espiritu', verseRef: 'Genesis 1:2' },
-  { english: 'peace be with you', manobo: 'kalinuw diya te inyo', bisaya: 'ang kalinaw magauban kaninyo', verseRef: 'John 20:19' },
-  { english: 'light of the world', manobo: 'kahayag te kalibutan', bisaya: 'kahayag sa kalibutan', verseRef: 'John 8:12' },
-  { english: 'love one another', manobo: 'mag-ihangay ki te pag-gugma', bisaya: 'paghigugmaay kamo sa usag usa', verseRef: 'John 13:34' },
-  { english: 'listen to the word of god', manobo: 'paminug te kagi te Diyus', bisaya: 'paminawa ang pulong sa Dios', verseRef: 'Luke 11:28' },
-  { english: 'word of god', manobo: 'kagi te Diyus', bisaya: 'pulong sa Dios', verseRef: 'Hebrews 4:12' },
-  { english: 'blessing and grace', manobo: 'panalangin duw kaga-atan', bisaya: 'panalangin ug grasya', verseRef: 'Ephesians 1:3' },
-  { english: 'the hard situation', manobo: 'kapait te kahimtang', bisaya: 'ang lisod nga kahimtang', verseRef: 'Psalms 34:19' },
-  { english: 'give thanks to nature', manobo: 'mapasalamaton te guyangan', bisaya: 'pagpasalamat sa kinaiyahan', verseRef: 'Psalms 104:24' },
-  { english: 'child of god', manobo: 'bata te Diyus', bisaya: 'anak sa Dios', verseRef: '1 John 3:1' },
-  { english: 'holy spirit', manobo: 'Madiyow ne Espiritu', bisaya: 'balaang espiritu', verseRef: 'Acts 2:4' },
-  { english: 'lord of lords', manobo: 'Ginoo te mga Ginoo', bisaya: 'Ginoo sa mga ginoo', verseRef: 'Revelation 19:16' },
-  { english: 'kingdom of heaven', manobo: 'Ginhawaan te Langit', bisaya: 'gingharian sa langit', verseRef: 'Matthew 3:2' },
-  { english: 'eternal life', manobo: 'buhi ne wada katapusan', bisaya: 'kinabuhing walay kataposan', verseRef: 'John 3:16' },
-  { english: 'history of the tribe', manobo: 'kasaysayan tu katribuhan', bisaya: 'kasaysayan sa tribo', verseRef: 'Acts 17:26' },
-  { english: 'the mountains are bare', manobo: 'opaw on tu kabubunganan', bisaya: 'hubo ang kabukiran', verseRef: 'Isaiah 42:15' },
-  { english: 'the night has come', manobo: 'kadikiluman mig-abot', bisaya: 'miabot na ang kagabhion', verseRef: 'John 9:4' },
-  { english: 'trust in the lord', manobo: 'salig diya te Ginoo', bisaya: 'salig sa Ginoo', verseRef: 'Proverbs 3:5' },
-  { english: 'do good to others', manobo: 'himo te marujow te duma', bisaya: 'pagbuhat og maayo sa uban', verseRef: 'Galatians 6:10' },
-  { english: 'fish in the stream', manobo: 'isda diya tu sapa', bisaya: 'isda sa sapa', verseRef: 'Luke 5:6' },
-  { english: 'fairy of the stream', manobo: 'diwata duun tu wuhig', bisaya: 'diwata sa sapa', verseRef: 'Psalms 23:2' },
-  { english: 'mountain native', manobo: 'yumad diya tu bubungan', bisaya: 'lumad sa bukid', verseRef: 'Psalms 121:1' }
+  { english: 'in the beginning', manobo: 'duun tu pikag-una', bisaya: 'sa sinugdanan' },
+  { english: 'the god created', manobo: 'pig-himo tu Diyus', bisaya: 'gibuhat sa Dios' },
+  { english: 'god created the heavens and the earth', manobo: 'pig-himo tu Diyus ka langit duw ka tano', bisaya: 'gibuhat sa Dios ang langit ug ang yuta' },
+  { english: 'father sky', manobo: 'amey ne langit', bisaya: 'amahan nga langit' },
+  { english: 'creation of the stars', manobo: 'kagnat ne mga bituen', bisaya: 'paghimo sa mga bituon' },
+  { english: 'let there be light', manobo: 'kahayag man diya', bisaya: 'unta adunay kahayag' },
+  { english: 'great spirit', manobo: 'maaslag ne Espiritu tu Diyus', bisaya: 'gamhanan nga espiritu' },
+  { english: 'peace be with you', manobo: 'kalinuw diya te inyo', bisaya: 'ang kalinaw magauban kaninyo' },
+  { english: 'light of the world', manobo: 'kahayag te kalibutan', bisaya: 'kahayag sa kalibutan' },
+  { english: 'love one another', manobo: 'mag-ihangay ki te pag-gugma', bisaya: 'paghigugmaay kamo sa usag usa' },
+  { english: 'listen to the word of god', manobo: 'paminug te kagi te Diyus', bisaya: 'paminawa ang pulong sa Dios' },
+  { english: 'word of god', manobo: 'kagi te Diyus', bisaya: 'pulong sa Dios' },
+  { english: 'blessing and grace', manobo: 'panalangin duw kaga-atan', bisaya: 'panalangin ug grasya' },
+  { english: 'the hard situation', manobo: 'kapait te kahimtang', bisaya: 'ang lisod nga kahimtang' },
+  { english: 'give thanks to nature', manobo: 'mapasalamaton te guyangan', bisaya: 'pagpasalamat sa kinaiyahan' },
+  { english: 'child of god', manobo: 'bata te Diyus', bisaya: 'anak sa Dios' },
+  { english: 'holy spirit', manobo: 'Madiyow ne Espiritu', bisaya: 'balaang espiritu' },
+  { english: 'lord of lords', manobo: 'Ginoo te mga Ginoo', bisaya: 'Ginoo sa mga ginoo' },
+  { english: 'kingdom of heaven', manobo: 'Ginhawaan te Langit', bisaya: 'gingharian sa langit' },
+  { english: 'eternal life', manobo: 'buhi ne wada katapusan', bisaya: 'kinabuhing walay kataposan' },
+  { english: 'history of the tribe', manobo: 'kasaysayan tu katribuhan', bisaya: 'kasaysayan sa tribo' },
+  { english: 'the mountains are bare', manobo: 'opaw on tu kabubunganan', bisaya: 'hubo ang kabukiran' },
+  { english: 'the night has come', manobo: 'kadikiluman mig-abot', bisaya: 'miabot na ang kagabhion' },
+  { english: 'trust in the lord', manobo: 'salig diya te Ginoo', bisaya: 'salig sa Ginoo' },
+  { english: 'do good to others', manobo: 'himo te marujow te duma', bisaya: 'pagbuhat og maayo sa uban' },
+  { english: 'fish in the stream', manobo: 'isda diya tu sapa', bisaya: 'isda sa sapa' },
+  { english: 'fairy of the stream', manobo: 'diwata duun tu wuhig', bisaya: 'diwata sa sapa' },
+  { english: 'mountain native', manobo: 'yumad diya tu bubungan', bisaya: 'lumad sa bukid' }
 ]
 
 export const BIBLE_LEXICON: LexiconEntry[] = [
   // Theological & Spiritual
-  { english: 'god', manobo: 'Diyus', bisaya: 'Dios', category: 'THEOLOGICAL', notes: 'Kasuyatan to Diyus standard' },
+  { english: 'god', manobo: 'Diyus', bisaya: 'Dios', category: 'THEOLOGICAL' },
   { english: 'lord', manobo: 'Ginoo', bisaya: 'Ginoo', category: 'THEOLOGICAL' },
   { english: 'creator', manobo: 'Tig-himo', bisaya: 'Maglalalang', category: 'THEOLOGICAL' },
   { english: 'spirit', manobo: 'Espiritu', bisaya: 'Espiritu', category: 'THEOLOGICAL' },

@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/entries — create a new entry with Agusan Manobo Bible auto-translation
+// POST /api/entries — create a new entry with ManoboLit Lexicon auto-translation
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     let transcription = body.transcription || null
     let translation = body.translation || null
 
-    // Auto-translate missing Manobo title from title using Agusan Manobo Bible corpus
+    // Auto-translate missing Manobo title from title using ManoboLit Reference Lexicon
     if (!manoboTitle && (body.title || englishTitle)) {
       const res = translateText(body.title || englishTitle, 'en', 'msm')
       manoboTitle = res.translatedText

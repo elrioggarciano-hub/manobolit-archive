@@ -143,7 +143,7 @@ export default function DashboardClient({
   // reference last), rather than the raw camelCase field names.
   const EXPORT_HEADERS = [
     'No.', 'Title', 'Manobo Title', 'English Title', 'Type', 'Genre (Eugenio 1993)',
-    'Themes (Andress 1985)', 'Cultural Elements',
+    'Themes (ManoboLit Framework)', 'Cultural Elements',
     'Transcription (Manobo)', 'Translation (English)', 'Translation (Bisaya/Cebuano)',
     'Source', 'Year Collected', 'Narrator',
     'Community/Sitio', 'Barangay', 'Municipality', 'Province',
@@ -520,7 +520,7 @@ export default function DashboardClient({
                       Theme Frequency
                     </h3>
                     <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
-                      Taxonomy based on Andress (1985)
+                      ManoboLit Thematic Framework
                     </span>
                   </div>
 

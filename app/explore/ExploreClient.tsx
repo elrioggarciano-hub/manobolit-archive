@@ -451,15 +451,16 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               </div>
             )}
 
-            {/* PRIMARY THEMES Section - ALWAYS SHOWN to match screenshot! */}
+            {/* PRIMARY THEMES Section — the four most frequent themes actually
+                present in the archive, so every chip here returns real results. */}
             <div className="mb-5">
               <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">PRIMARY THEMES</div>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { key: 'CREATION', label: 'CREATION' },
+                  { key: 'NATURE', label: 'NATURE & ENVIRONMENT' },
+                  { key: 'MORAL', label: 'MORAL LESSONS' },
                   { key: 'HEROIC', label: 'HEROIC JOURNEY' },
-                  { key: 'COURTSHIP', label: 'COURTSHIP' },
-                  { key: 'ANCESTRY', label: 'ANCESTRY' }
+                  { key: 'COURTSHIP', label: 'COURTSHIP' }
                 ].map(item => {
                   const isChecked = selectedThemes.includes(item.key)
                   return (

@@ -157,7 +157,7 @@ export default function EntryForm({ initialData, mode }: Props) {
       const data = await res.json()
       if (data.result?.translatedText) {
         set(field, data.result.translatedText)
-        setTranslationNotice(`✓ Auto-translated using Agusan Manobo Bible corpus (Confidence: ${Math.round(data.result.confidence * 100)}%)`)
+        setTranslationNotice(`✓ Auto-translated using ManoboLit Reference Lexicon (Confidence: ${Math.round(data.result.confidence * 100)}%)`)
       } else {
         throw new Error('No translation returned')
       }
@@ -301,7 +301,7 @@ export default function EntryForm({ initialData, mode }: Props) {
                     background: 'transparent', border: 'none', color: '#38bdf8', fontSize: '11px', fontWeight: 700, cursor: 'pointer', padding: 0
                   }}
                 >
-                  {translatingField === 'manoboTitle' ? '⏳ Translating...' : '🌐 Auto-Translate (Bible Corpus)'}
+                  {translatingField === 'manoboTitle' ? '⏳ Translating...' : '🌐 Auto-Translate (ManoboLit Lexicon)'}
                 </button>
               </div>
               <input className="input-anim" style={inputStyle} value={form.manoboTitle} onChange={e => set('manoboTitle', e.target.value)} placeholder="Title in Manobo language" />

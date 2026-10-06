@@ -91,7 +91,7 @@ export default function ClassificationViewer({ result, onAccept, onClose }: Prop
             🧠 Classification Results
           </h3>
           <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#64748b' }}>
-            Rule-Based Engine · Eugenio (1993) + Andress (1985)
+            Rule-Based Engine · Eugenio (1993) + ManoboLit Thematic Framework
           </p>
         </div>
         <div style={{

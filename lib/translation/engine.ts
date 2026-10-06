@@ -7,7 +7,7 @@ export interface TranslationResult {
   confidence: number
   sourceLang: TranslationLang
   targetLang: TranslationLang
-  matchedPhrases: Array<{ original: string; translated: string; verseRef?: string }>
+  matchedPhrases: Array<{ original: string; translated: string }>
   matchedWordsCount: number
   totalWordsCount: number
   corpusSource: string
@@ -25,9 +25,9 @@ function cleanText(text: string): string {
 
 /**
  * Translates text between English, Agusan Manobo (ISO: msm), and Bisaya
- * (Cebuano, ISO: ceb), strictly grounded in the Agusan Manobo Bible corpus
- * (Kasuyatan to Diyus), which carries parallel English/Manobo/Bisaya glosses
- * for the same verses and vocabulary.
+ * (Cebuano, ISO: ceb), grounded in ManoboLit's curated reference lexicon,
+ * which carries parallel English/Manobo/Bisaya glosses for the same
+ * phrases and vocabulary.
  */
 export function translateText(
   text: string,
@@ -35,7 +35,7 @@ export function translateText(
   targetLang: TranslationLang = 'msm'
 ): TranslationResult {
   const cleanedInput = cleanText(text)
-  const corpusSource = 'Agusan Manobo Bible (Kasuyatan to Diyus)'
+  const corpusSource = 'ManoboLit Reference Lexicon'
 
   if (!cleanedInput) {
     return {
@@ -53,12 +53,12 @@ export function translateText(
   const sourceField = LANG_FIELD[sourceLang]
   const targetField = LANG_FIELD[targetLang]
 
-  const matchedPhrases: Array<{ original: string; translated: string; verseRef?: string }> = []
+  const matchedPhrases: Array<{ original: string; translated: string }> = []
   const words = cleanedInput.split(/\s+/)
   let matchedCount = 0
   let textToProcess = cleanedInput
 
-  // Step 1: High-priority N-gram / phrase matching against Bible parallel passages
+  // Step 1: High-priority N-gram / phrase matching against reference phrase list
   for (const phrase of BIBLE_PARALLEL_PHRASES) {
     const sourcePhrase = phrase[sourceField]
     const targetPhrase = phrase[targetField]
@@ -69,14 +69,13 @@ export function translateText(
       matchedPhrases.push({
         original: sourcePhrase,
         translated: targetPhrase,
-        verseRef: phrase.verseRef,
       })
       textToProcess = textToProcess.replace(regex, targetPhrase)
       matchedCount += sourcePhrase.split(' ').length
     }
   }
 
-  // Step 2: Word-by-word translation using the Agusan Manobo Bible lexicon
+  // Step 2: Word-by-word translation using the ManoboLit reference lexicon
   const lexiconMap = new Map<string, string>()
   for (const entry of BIBLE_LEXICON) {
     const sourceWord = entry[sourceField]
@@ -103,7 +102,7 @@ export function translateText(
 
   const translatedText = processedTokens.join('')
 
-  // Calculate confidence score based on Bible corpus match ratio
+  // Calculate confidence score based on reference lexicon match ratio
   const ratio = words.length > 0 ? Math.min(matchedCount / words.length, 1.0) : 0
   const confidence = Math.round((0.55 + ratio * 0.43) * 100) / 100
 
