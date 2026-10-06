@@ -103,6 +103,7 @@ export default function DashboardClient({
   totalEntries = 0,
   locationStats = [],
   mostCommonGenre = null,
+  genreDistribution = [],
   mostFrequentTheme = null,
   themeFrequency = [],
   accuracyMetrics = { accuracy: 0, precision: 0, recall: 0, f1: 0, sampleSize: 0 },
@@ -111,11 +112,25 @@ export default function DashboardClient({
   totalEntries?: number
   locationStats?: LocationStat[]
   mostCommonGenre?: GenreStat | null
+  genreDistribution?: GenreStat[]
   mostFrequentTheme?: ThemeStat | null
   themeFrequency?: ThemeStat[]
   accuracyMetrics?: AccuracyMetrics
   exportRecords?: ExportRecord[]
 }) {
+  // Same brand palette as the rest of the dashboard, cycled if there are ever
+  // more genres archived than colors — never a hardcoded set of genres/shares.
+  const GENRE_COLORS = ['#8F000D', '#f1b80d', '#18181b', '#7f7370', '#0ea5e9', '#16a34a']
+  const genreConicGradient = (() => {
+    if (genreDistribution.length === 0) return 'conic-gradient(#e5e7eb 0% 100%)'
+    let cursor = 0
+    const stops = genreDistribution.map((g, i) => {
+      const start = cursor
+      cursor += g.percent
+      return `${GENRE_COLORS[i % GENRE_COLORS.length]} ${start}% ${i === genreDistribution.length - 1 ? 100 : cursor}%`
+    })
+    return `conic-gradient(${stops.join(', ')})`
+  })()
   const topLocations = locationStats.slice(0, 5)
 
   const downloadThemeDataset = () => {
@@ -393,84 +408,59 @@ export default function DashboardClient({
                   </span>
                 </div>
 
-                {/* Donut Chart and Legend */}
+                {/* Donut Chart and Legend — built from the real per-genre counts
+                    passed in as genreDistribution, not a fixed set of shares */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '20px' }}>
-                  {/* Centered Rounded Square Donut Chart */}
+                  {/* Donut built with a CSS conic-gradient so its slices always
+                      match genreDistribution exactly, however many genres exist */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '130px', position: 'relative' }}>
-                    <svg width="130" height="130" viewBox="0 0 100 100">
-                      {/* Segment 1: Folk Songs (38%) - Burgundy #8F000D */}
-                      <path 
-                        d="M 77.66 77.66 L 95.31 95.31 A 16 16 0 0 0 100 84 L 100 16 A 16 16 0 0 0 84 0 L 50 0 L 50 20 L 72 20 A 8 8 0 0 1 80 28 L 80 72 A 8 8 0 0 1 77.66 77.66 Z"
-                        fill="var(--brand-accent)"
-                      />
-                      {/* Segment 2: Proverbs (27%) - Yellow #f1b80d */}
-                      <path 
-                        d="M 22.34 77.66 L 4.69 95.31 A 16 16 0 0 0 16 100 L 84 100 A 16 16 0 0 0 95.31 95.31 L 77.66 77.66 A 8 8 0 0 1 72 80 L 28 80 A 8 8 0 0 1 22.34 77.66 Z"
-                        fill="#f1b80d"
-                      />
-                      {/* Segment 3: Myths & Legends (20%) - Black #18181b */}
-                      <path 
-                        d="M 22.34 22.34 L 4.69 4.69 A 16 16 0 0 0 0 16 L 0 84 A 16 16 0 0 0 4.69 95.31 L 22.34 77.66 A 8 8 0 0 1 20 72 L 20 28 A 8 8 0 0 1 22.34 22.34 Z"
-                        fill="#18181b"
-                      />
-                      {/* Segment 4: Other Genres (15%) - Grey #7f7370 */}
-                      <path 
-                        d="M 50 20 L 50 0 L 16 0 A 16 16 0 0 0 4.69 4.69 L 22.34 22.34 A 8 8 0 0 1 28 20 L 50 20 Z"
-                        fill="#7f7370"
-                      />
-                      
-                      {/* Center text overlay */}
-                      <text 
-                        x="50" 
-                        y="50" 
-                        textAnchor="middle" 
-                        dominantBaseline="central"
-                        fill="#18181b"
+                    <div
+                      style={{
+                        width: '130px',
+                        height: '130px',
+                        borderRadius: '28px',
+                        background: genreConicGradient,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <div
                         style={{
+                          width: '66px',
+                          height: '66px',
+                          borderRadius: '16px',
+                          background: 'var(--bg-surface)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                           fontSize: '8px',
                           fontWeight: 800,
                           letterSpacing: '0.08em',
-                          fontFamily: 'Inter, sans-serif'
+                          color: '#18181b',
+                          fontFamily: 'Inter, sans-serif',
                         }}
                       >
                         GENRES
-                      </text>
-                    </svg>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Vertical Legend aligned like in mockup */}
+                  {/* Vertical Legend — one row per genre actually present in the archive */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '10px', height: '10px', background: '#8F000D' }} />
-                        <span style={{ color: 'var(--text-secondary)' }}>Folk Songs</span>
-                      </div>
-                      <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>38%</span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '10px', height: '10px', background: '#f1b80d' }} />
-                        <span style={{ color: 'var(--text-secondary)' }}>Proverbs</span>
-                      </div>
-                      <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>27%</span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '10px', height: '10px', background: '#18181b' }} />
-                        <span style={{ color: 'var(--text-secondary)' }}>Myths & Legends</span>
-                      </div>
-                      <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>20%</span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '10px', height: '10px', background: '#7f7370' }} />
-                        <span style={{ color: 'var(--text-secondary)' }}>Other Genres</span>
-                      </div>
-                      <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>15%</span>
-                    </div>
+                    {genreDistribution.length > 0 ? (
+                      genreDistribution.map((g, i) => (
+                        <div key={g.genre} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '10px', height: '10px', background: GENRE_COLORS[i % GENRE_COLORS.length] }} />
+                            <span style={{ color: 'var(--text-secondary)' }}>{formatGenreLabel(g.genre)}</span>
+                          </div>
+                          <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{g.percent}% ({g.count})</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>No entries classified yet.</div>
+                    )}
                   </div>
                 </div>
               </div>
