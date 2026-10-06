@@ -83,6 +83,17 @@ export default async function DashboardPage() {
       }
     : null
 
+  // Real per-genre counts for the "Genre Distribution" donut, instead of a
+  // fixed set of percentages that don't reflect which genres are actually
+  // archived.
+  const genreDistribution = [...genreGrouped]
+    .sort((a, b) => b._count._all - a._count._all)
+    .map(g => ({
+      genre: g.genre,
+      count: g._count._all,
+      percent: totalEntries > 0 ? Math.round((g._count._all / totalEntries) * 100) : 0,
+    }))
+
   // `themes` is stored as a JSON-stringified array per entry, so tally it in JS
   // rather than via a SQL group-by.
   const themeCounts: Record<string, number> = {}
@@ -106,6 +117,7 @@ export default async function DashboardPage() {
       totalEntries={totalEntries}
       locationStats={locationStats}
       mostCommonGenre={mostCommonGenre}
+      genreDistribution={genreDistribution}
       mostFrequentTheme={mostFrequentTheme}
       themeFrequency={themeFrequency}
       accuracyMetrics={accuracyMetrics}
