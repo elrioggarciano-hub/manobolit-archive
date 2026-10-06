@@ -151,7 +151,7 @@ export default function ClassificationViewer({ result, onAccept, onClose }: Prop
           padding: '16px',
         }}>
           <div style={{ fontSize: '11px', letterSpacing: '0.1em', color: '#64748b', fontWeight: 600, marginBottom: '10px' }}>
-            THEMES · ANDRESS (1985)
+            THEMES · MANOBOLIT FRAMEWORK
           </div>
           {topThemes.length === 0 ? (
             <p style={{ fontSize: '13px', color: '#64748b' }}>No themes detected above threshold.</p>

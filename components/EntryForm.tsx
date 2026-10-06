@@ -527,7 +527,7 @@ export default function EntryForm({ initialData, mode }: Props) {
               </div>
             </div>
             <div>
-              <label style={labelStyle}>THEMES (ANDRESS 1985)</label>
+              <label style={labelStyle}>THEMES (MANOBOLIT FRAMEWORK)</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {THEMES.map(t => (
                   <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: form.themes.includes(t) ? 'var(--text-primary)' : 'var(--text-secondary)' }}>

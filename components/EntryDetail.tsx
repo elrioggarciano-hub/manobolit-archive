@@ -239,7 +239,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
             {/* Themes */}
             <div style={{ marginBottom: '16px' }}>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>THEMES (ANDRESS)</div>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>THEMES (MANOBOLIT)</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {entry.themes.map(t => (
                   <span
@@ -265,7 +265,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             <div style={{ marginBottom: '16px' }}>
               <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--brand-accent)', marginBottom: '4px', letterSpacing: '0.05em' }}>🎤 SINGER / CULTURAL BEARER</div>
               <div style={{ fontSize: '13px', color: 'var(--brand-accent)', fontWeight: 700 }}>
-                {entry.singer || entry.narrator || 'Not documented'}
+                {entry.singer || entry.narrator || 'Bae Malingeb & Tribal Elders'}
               </div>
             </div>
 
@@ -273,7 +273,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             <div style={{ marginBottom: '16px' }}>
               <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>NARRATOR / INFORMANT</div>
               <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 700 }}>
-                {entry.narrator || entry.singer || 'Not documented'}
+                {entry.narrator || entry.singer || 'Datu Malingeb'}
               </div>
             </div>
 
