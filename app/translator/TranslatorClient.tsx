@@ -122,8 +122,8 @@ export default function TranslatorClient() {
             }}
           >
             Translate individual words and short phrases between Agusan Manobo, English, and Bisaya (Cebuano).
-            Every match is validated against the Agusan Manobo Bible corpus (<em style={{ fontStyle: 'italic' }}>Kasuyatan to Diyus</em>),
-            the same trusted parallel-language reference used to cross-check the archive&apos;s own transcriptions.
+            Every match comes from ManoboLit&apos;s curated Agusan Manobo-English-Bisaya reference lexicon,
+            compiled for this archive and cross-checked against its own transcriptions.
           </p>
         </div>
 
@@ -299,7 +299,7 @@ export default function TranslatorClient() {
             {inputText && result.matchedPhrases.length > 0 && (
               <div style={{ marginTop: '14px' }}>
                 <div style={{ fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', marginBottom: '8px' }}>
-                  MATCHED FROM SCRIPTURE
+                  MATCHED FROM LEXICON
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   {result.matchedPhrases.map((m, i) => (
@@ -318,9 +318,6 @@ export default function TranslatorClient() {
                       <span style={{ color: '#a1a1aa' }}>
                         &ldquo;{m.original}&rdquo; &rarr; &ldquo;{m.translated}&rdquo;
                       </span>
-                      {m.verseRef && (
-                        <span style={{ color: '#52525b', fontStyle: 'italic', flexShrink: 0 }}>{m.verseRef}</span>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -351,7 +348,7 @@ export default function TranslatorClient() {
           <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
             Every word and phrase the translator can recognize is listed below, shown in {LANG_LABELS[sourceLang]} since
             that is your current &ldquo;Translate From&rdquo; language. The text box above only accepts a click from
-            this list, so every translation you see is guaranteed to come from the real Agusan Manobo Bible corpus.
+            this list, so every translation you see comes straight from ManoboLit&apos;s curated reference lexicon.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -368,7 +365,6 @@ export default function TranslatorClient() {
                       key={i}
                       onClick={() => pickPhrase(phrase)}
                       className="btn-anim"
-                      title={phrase.verseRef}
                       style={{
                         background: isActive ? '#8F000D' : 'var(--bg-surface)',
                         color: isActive ? '#ffffff' : 'var(--text-primary)',
