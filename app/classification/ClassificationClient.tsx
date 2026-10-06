@@ -370,7 +370,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               </div>
             </section>
 
-            {/* SECTION 2: ANDRESS THEMATIC GRID */}
+            {/* SECTION 2: MANOBOLIT THEMATIC FRAMEWORK GRID */}
             <section style={{ marginBottom: '60px' }}>
               
               {/* Header with Horizontal Lines */}
