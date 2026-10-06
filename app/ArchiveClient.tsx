@@ -240,7 +240,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Oral Literature Pieces</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
-              Classified myths, legends, and epics from Agusan regions.
+              Riddles, proverbs, and folktales documented from Agusan del Sur communities.
             </p>
           </div>
 
@@ -278,7 +278,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Folk Songs</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
-              Authentic rhythmic recordings with melodic annotations.
+              AI-generated narrations preserving each song&apos;s lyrical content.
             </p>
           </div>
 
@@ -312,10 +312,10 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             </div>
             <div style={{ marginTop: '28px' }}>
               <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={totalEntries} /></div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Audio Transcriptions</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Manobo Transcriptions</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
-              High-fidelity linguistic records with morphological tagging.
+              Original Manobo text with English and Bisaya translations, rule-based classified.
             </p>
           </div>
         </div>
@@ -391,7 +391,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                   <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Andress (1985)</h3>
                 </div>
                 <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
-                  The foundational linguistic framework for Agusan Manobo, offering deep phonological and morphological rules essential for accurate transcription.
+                  Identifies 12 thematic clusters specific to Agusan Manobo tradition &mdash; from creation myths to courtship and displacement &mdash; derived from the Agusan Manobo Bible corpus.
                 </p>
               </div>
             </div>
