@@ -7,7 +7,7 @@ export interface TranslationResult {
   confidence: number
   sourceLang: TranslationLang
   targetLang: TranslationLang
-  matchedPhrases: Array<{ original: string; translated: string }>
+  matchedPhrases: Array<{ original: string; translated: string; verseRef?: string }>
   matchedWordsCount: number
   totalWordsCount: number
   corpusSource: string
@@ -25,9 +25,9 @@ function cleanText(text: string): string {
 
 /**
  * Translates text between English, Agusan Manobo (ISO: msm), and Bisaya
- * (Cebuano, ISO: ceb), grounded in ManoboLit's curated reference lexicon,
- * which carries parallel English/Manobo/Bisaya glosses for the same
- * phrases and vocabulary.
+ * (Cebuano, ISO: ceb). Phrase matches are checked against real verses from
+ * the Agusan Manobo Bible (Kasuyatan to Diyus, 1999); word matches come
+ * from ManoboLit's curated reference lexicon.
  */
 export function translateText(
   text: string,
@@ -35,7 +35,7 @@ export function translateText(
   targetLang: TranslationLang = 'msm'
 ): TranslationResult {
   const cleanedInput = cleanText(text)
-  const corpusSource = 'ManoboLit Reference Lexicon'
+  const corpusSource = 'Agusan Manobo Bible (Kasuyatan to Diyus) + ManoboLit Reference Lexicon'
 
   if (!cleanedInput) {
     return {
@@ -53,7 +53,7 @@ export function translateText(
   const sourceField = LANG_FIELD[sourceLang]
   const targetField = LANG_FIELD[targetLang]
 
-  const matchedPhrases: Array<{ original: string; translated: string }> = []
+  const matchedPhrases: Array<{ original: string; translated: string; verseRef?: string }> = []
   const words = cleanedInput.split(/\s+/)
   let matchedCount = 0
   let textToProcess = cleanedInput
@@ -69,6 +69,7 @@ export function translateText(
       matchedPhrases.push({
         original: sourcePhrase,
         translated: targetPhrase,
+        verseRef: phrase.verseRef,
       })
       textToProcess = textToProcess.replace(regex, targetPhrase)
       matchedCount += sourcePhrase.split(' ').length
