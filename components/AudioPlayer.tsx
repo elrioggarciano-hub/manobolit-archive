@@ -26,7 +26,7 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
   const displayDuration = duration || globalDuration || 25
 
   const handleToggle = () => {
-    if (!audioFile) return
+    if (!audioFile && !transcription) return
     if (isCurrent) {
       togglePlay()
     } else {
@@ -34,7 +34,7 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
         audioFile,
         title,
         narrator,
-        duration: displayDuration,
+        duration: audioFile ? displayDuration : undefined,
         textToRecite: transcription,
         entryId,
       })
@@ -62,7 +62,7 @@ export default function AudioPlayer({ audioFile, title = 'Audio Recording', dura
     ? (title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 900) + 100
     : 772
 
-  if (!audioFile) {
+  if (!audioFile && !transcription) {
     return (
       <div style={{
         background: 'var(--bg-surface)',

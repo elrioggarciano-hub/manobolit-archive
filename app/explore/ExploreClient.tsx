@@ -141,8 +141,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     e.preventDefault()
     e.stopPropagation()
 
-    if (!entry.audioFile) {
-      showToast('warning', 'No audio recording has been uploaded for this entry yet.')
+    if (!entry.audioFile && !entry.transcription) {
+      showToast('warning', 'No audio or transcription is available for this entry yet.')
       return
     }
 
@@ -151,26 +151,26 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
       return
     }
 
-    const isFolkSong = entry.type === 'FOLK_SONG'
     playTrack({
       audioFile: entry.audioFile,
       title: entry.title,
       entryId: entry.id,
-      // Folk song recordings have no real credited vocalist, so this is
-      // labeled honestly as "AI Generated" rather than implying a real
-      // singer performed it. Oral literature narrations keep using the
-      // actual collected narrator when one is on record.
-      singer: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
-      narrator: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
-      duration: 25,
-      textToRecite: entry.content
+      // Whether it's a folk song recording or a spoken-aloud riddle/proverb/
+      // folktale, the voice actually heard is synthesized — never the
+      // credited narrator/informant's real voice — so this is always
+      // labeled honestly as "AI Generated" rather than their real name.
+      singer: 'AI Generated',
+      narrator: 'AI Generated',
+      duration: entry.audioFile ? 25 : undefined,
+      // Riddles, proverbs, and folktales have no recorded audio, so these
+      // are read aloud via the browser's speech synthesis instead. The
+      // Manobo transcription is used (not the English content summary) —
+      // pronunciation won't be authentic, but the narration is honestly
+      // labeled "AI Generated" either way.
+      textToRecite: entry.audioFile ? entry.content : (entry.transcription || entry.content)
     })
   }
 
-  // Riddles, proverbs, and folktales have no recorded audio, and text-to-speech
-  // can't reproduce authentic Agusan Manobo pronunciation — so instead of
-  // playing anything, these entries let the reader expand the card to read
-  // the real Manobo transcription directly.
   const [expandedTranscriptIds, setExpandedTranscriptIds] = useState<Set<string>>(new Set())
   const toggleTranscript = (e: React.MouseEvent, id: string) => {
     e.preventDefault()
@@ -662,7 +662,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                         {/* Bottom Actions */}
                         <div className="flex items-center gap-6 mt-auto">
-                          {entry.audioFile ? (
+                          {(entry.audioFile || entry.transcription) ? (
                             <button
                               onClick={(e) => handlePlayClick(e, entry)}
                               className="flex items-center gap-2 text-white font-bold text-xs py-2.5 px-4 transition-colors btn-anim"
@@ -671,13 +671,14 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                               <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                                 <path d="M8 5v14l11-7z" />
                               </svg>
-                              <span>PLAY RECORDING</span>
+                              <span>{entry.audioFile ? 'PLAY RECORDING' : 'PLAY AI NARRATION'}</span>
                             </button>
-                          ) : entry.transcription ? (
+                          ) : null}
+                          {!entry.audioFile && entry.transcription ? (
                             <button
                               onClick={(e) => toggleTranscript(e, entry.id)}
-                              className="flex items-center gap-2 text-white font-bold text-xs py-2.5 px-4 transition-colors btn-anim"
-                              style={{ background: '#8F000D', borderRadius: '0px' }}
+                              className="flex items-center gap-2 font-bold text-xs py-2.5 px-4 transition-colors btn-anim"
+                              style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', borderRadius: '0px' }}
                             >
                               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
@@ -816,8 +817,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                     </div>
 
                     {/* Bottom Actions */}
-                    <div className="flex items-center mt-auto pt-4 border-t border-[var(--border-color)]">
-                      {entry.audioFile ? (
+                    <div className="flex items-center gap-4 mt-auto pt-4 border-t border-[var(--border-color)]">
+                      {(entry.audioFile || entry.transcription) ? (
                         <button
                           onClick={(e) => handlePlayClick(e, entry)}
                           className="flex items-center gap-1.5 font-bold text-xs transition-colors btn-anim"
@@ -826,13 +827,14 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                             <path d="M8 5v14l11-7z" />
                           </svg>
-                          <span>PLAY RECORDING</span>
+                          <span>{entry.audioFile ? 'PLAY RECORDING' : 'PLAY AI NARRATION'}</span>
                         </button>
-                      ) : entry.transcription ? (
+                      ) : null}
+                      {!entry.audioFile && entry.transcription ? (
                         <button
                           onClick={(e) => toggleTranscript(e, entry.id)}
                           className="flex items-center gap-1.5 font-bold text-xs transition-colors btn-anim"
-                          style={{ background: 'transparent', border: 'none', color: 'var(--brand-accent)', padding: 0 }}
+                          style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', padding: 0 }}
                         >
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />

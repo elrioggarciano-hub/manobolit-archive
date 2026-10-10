@@ -104,15 +104,19 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
         )}
       </div>
 
-      {/* Audio Player Block */}
-      {entry.audioFile && (
+      {/* Audio Player Block — plays the real recording when one exists, or
+          reads the Manobo transcription aloud via speech synthesis
+          otherwise. Either way the voice heard is synthesized, not the
+          person credited as narrator/informant, so it's always labeled
+          honestly as "AI Generated" rather than their real name. */}
+      {(entry.audioFile || entry.transcription) && (
         <div style={{ marginBottom: '24px' }}>
           <AudioPlayer
             audioFile={entry.audioFile}
             title={entry.title}
             duration={entry.audioDuration}
             transcription={entry.transcription}
-            narrator={entry.type === 'FOLK_SONG' ? 'AI Generated' : (entry.narrator || entry.singer || 'AI Generated')}
+            narrator="AI Generated"
             entryId={entry.id}
           />
         </div>
