@@ -328,7 +328,7 @@ export default function AboutClient() {
         </div>
       </section>
 
-      {/* ── SECTION 3: RESEARCH & PRESERVATION PARTNERS ── */}
+      {/* ── SECTION 3: SOURCE RESEARCH & ACKNOWLEDGMENTS ── */}
       <section className="scroll-reveal" style={{
         borderTop: '1px solid var(--border-color)',
         borderBottom: '1px solid var(--border-color)',
@@ -344,15 +344,25 @@ export default function AboutClient() {
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
             }}>
-              RESEARCH &amp; PRESERVATION PARTNERS
+              SOURCE RESEARCH &amp; ACKNOWLEDGMENTS
             </span>
+            <p style={{
+              fontSize: '12px',
+              color: 'var(--text-secondary)',
+              maxWidth: '620px',
+              margin: '12px auto 0',
+              lineHeight: 1.6,
+            }}>
+              Every riddle, proverb, folktale, and folk song in this archive is drawn directly from two undergraduate
+              theses, collected through real fieldwork and community interviews.
+            </p>
           </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '16px',
-            alignItems: 'center',
+            alignItems: 'start',
           }}>
             {[
               {
@@ -362,7 +372,8 @@ export default function AboutClient() {
                     <path d="M6 12v5c3 3 9 3 12 0v-5" />
                   </svg>
                 ),
-                label: 'ACADEMIC RESEARCH COUNCIL',
+                label: 'AGUSAN DEL SUR STATE COLLEGE OF AGRICULTURE AND TECHNOLOGY',
+                sub: 'College of Teacher Education — Bunawan, Agusan del Sur',
               },
               {
                 icon: (
@@ -374,7 +385,8 @@ export default function AboutClient() {
                     <polyline points="10 9 9 9 8 9" />
                   </svg>
                 ),
-                label: 'MANOBO CULTURAL OFFICE',
+                label: 'CATIPAY & CURATO (2024)',
+                sub: '"Documenting Manobo Oral Literature for Future Generations at San Andres, Bunawan, Agusan del Sur" — source of all riddles, proverbs, and folktales',
               },
               {
                 icon: (
@@ -384,7 +396,8 @@ export default function AboutClient() {
                     <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
                   </svg>
                 ),
-                label: 'DIGITAL ARCHIVAL INSTITUTE',
+                label: 'MARAVILLA (2024)',
+                sub: '"Preserving Heritage: Documenting Agusan Manobo Folk Songs in Sta. Maria, Trento, Agusan del Sur" — source of all folk songs',
               },
               {
                 icon: (
@@ -395,7 +408,8 @@ export default function AboutClient() {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
                 ),
-                label: 'COMMUNITY ELDERS BOARD',
+                label: 'DR. ROXAN RUBIC-REMOROSA',
+                sub: 'Thesis adviser for both source studies',
               },
             ].map((partner) => (
               <div
@@ -405,7 +419,7 @@ export default function AboutClient() {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '14px',
+                  gap: '10px',
                   textAlign: 'center',
                   padding: '20px',
                 }}
@@ -419,6 +433,13 @@ export default function AboutClient() {
                   lineHeight: 1.5,
                 }}>
                   {partner.label}
+                </span>
+                <span style={{
+                  fontSize: '11px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5,
+                }}>
+                  {partner.sub}
                 </span>
               </div>
             ))}
