@@ -60,7 +60,7 @@ export default function TermsOfServicePage() {
           <h2 style={h2Style}>1. Purpose of the Archive</h2>
           <p style={pStyle}>
             The Archive exists to document, classify, and make accessible the oral traditions of the Agusan Manobo people for research,
-            education, and cultural continuity, drawing on Eugenio&apos;s (1993) taxonomy and the ManoboLit Thematic Framework.
+            education, and cultural continuity, drawing on the taxonomic frameworks of Eugenio (1993) and Andress (1985).
           </p>
         </section>
 

@@ -1,5 +1,5 @@
 // Rule-Based Classification Rules
-// Genre: Eugenio (1993) | Theme: ManoboLit Thematic Framework
+// Genre: Eugenio (1993) | Theme: Andress (1985)
 
 export interface ClassificationRule {
   id: string

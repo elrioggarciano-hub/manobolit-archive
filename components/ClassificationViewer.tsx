@@ -91,7 +91,7 @@ export default function ClassificationViewer({ result, onAccept, onClose }: Prop
             🧠 Classification Results
           </h3>
           <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#64748b' }}>
-            Rule-Based Engine · Eugenio (1993) + ManoboLit Thematic Framework
+            Rule-Based Engine · Eugenio (1993) + Andress (1985)
           </p>
         </div>
         <div style={{
@@ -151,7 +151,7 @@ export default function ClassificationViewer({ result, onAccept, onClose }: Prop
           padding: '16px',
         }}>
           <div style={{ fontSize: '11px', letterSpacing: '0.1em', color: '#64748b', fontWeight: 600, marginBottom: '10px' }}>
-            THEMES · MANOBOLIT FRAMEWORK
+            THEMES · ANDRESS (1985)
           </div>
           {topThemes.length === 0 ? (
             <p style={{ fontSize: '13px', color: '#64748b' }}>No themes detected above threshold.</p>

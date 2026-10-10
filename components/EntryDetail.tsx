@@ -239,7 +239,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
             {/* Themes */}
             <div style={{ marginBottom: '16px' }}>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>THEMES (MANOBOLIT)</div>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>THEMES (ANDRESS)</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {entry.themes.map(t => (
                   <span
