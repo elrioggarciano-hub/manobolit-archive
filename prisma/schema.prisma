@@ -25,6 +25,7 @@ model LiteratureEntry {
   source            String
   yearCollected     Int?
   narrator          String?
+  singer            String?
   communityLocation String
   province          String
   municipality      String
