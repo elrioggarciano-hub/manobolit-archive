@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { useToast } from '@/lib/context/ToastContext'
 
 export interface Track {
-  audioFile?: string | null
+  audioFile: string
   title: string
   narrator?: string | null
   singer?: string | null
@@ -41,10 +41,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [speed, setSpeed] = useState(1)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  // True while the current track is being read aloud via the browser's
-  // speech synthesis (entries with no real recording), rather than played
-  // from an audio file. Lets togglePlay/pauseTrack/seek branch correctly.
-  const ttsActiveRef = useRef(false)
 
   // Clean up audio on unmount
   useEffect(() => {
@@ -53,13 +49,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         audioRef.current.pause()
         audioRef.current.src = ''
       }
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel()
-      }
     }
   }, [])
 
-  // Manage Audio element / speech synthesis lifecycle based on currentTrack
+  // Manage Audio element lifecycle based on currentTrack
   useEffect(() => {
     if (!currentTrack) return
 
@@ -71,74 +64,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     // playing fine.
     let cancelled = false
 
-    // Pause and clean whatever was previously playing (audio or speech)
+    // Pause and clean previous audio
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current.src = ''
-      audioRef.current = null
-    }
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
     }
 
-    // Entries with no uploaded recording (riddles, proverbs, folktales) are
-    // read aloud via the browser's built-in speech synthesis instead.
-    if (!currentTrack.audioFile) {
-      ttsActiveRef.current = true
-
-      if (!currentTrack.textToRecite || typeof window === 'undefined' || !window.speechSynthesis) {
-        setIsPlaying(false)
-        return
-      }
-
-      const text = currentTrack.textToRecite
-      // Rough pace estimate (~13 characters/second of speech) so the
-      // progress bar has something reasonable to animate against — the
-      // Web Speech API doesn't expose fine-grained playback position.
-      const estimatedDuration = Math.max(2, text.length / 13)
-      setDuration(currentTrack.duration || estimatedDuration)
-      setCurrentTime(0)
-      setProgress(0)
-
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.rate = speed
-
-      let elapsedTimer: ReturnType<typeof setInterval> | null = null
-      const startedAt = Date.now()
-
-      utterance.onstart = () => {
-        if (cancelled) return
-        setIsPlaying(true)
-        elapsedTimer = setInterval(() => {
-          const elapsed = (Date.now() - startedAt) / 1000
-          setCurrentTime(elapsed)
-          setProgress(Math.min(100, (elapsed / estimatedDuration) * 100))
-        }, 200)
-      }
-      utterance.onend = () => {
-        if (cancelled) return
-        if (elapsedTimer) clearInterval(elapsedTimer)
-        setIsPlaying(false)
-        setProgress(0)
-        setCurrentTime(0)
-      }
-      utterance.onerror = () => {
-        if (cancelled) return
-        if (elapsedTimer) clearInterval(elapsedTimer)
-        setIsPlaying(false)
-        showToast('error', 'This narration could not be played.')
-      }
-
-      window.speechSynthesis.speak(utterance)
-
-      return () => {
-        cancelled = true
-        if (elapsedTimer) clearInterval(elapsedTimer)
-        window.speechSynthesis.cancel()
-      }
-    }
-
-    ttsActiveRef.current = false
     const audio = new Audio(currentTrack.audioFile)
     audioRef.current = audio
     audio.playbackRate = speed
@@ -200,18 +131,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }
 
   const togglePlay = () => {
-    if (ttsActiveRef.current) {
-      if (typeof window === 'undefined' || !window.speechSynthesis) return
-      if (isPlaying) {
-        window.speechSynthesis.pause()
-        setIsPlaying(false)
-      } else {
-        window.speechSynthesis.resume()
-        setIsPlaying(true)
-      }
-      return
-    }
-
     const audio = audioRef.current
     if (!audio) return
 
@@ -228,13 +147,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }
 
   const pauseTrack = () => {
-    if (ttsActiveRef.current) {
-      if (isPlaying && typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.pause()
-        setIsPlaying(false)
-      }
-      return
-    }
     const audio = audioRef.current
     if (audio && isPlaying) {
       audio.pause()
@@ -247,10 +159,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audioRef.current.pause()
       audioRef.current.src = ''
     }
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
-    }
-    ttsActiveRef.current = false
     setCurrentTrack(null)
     setIsPlaying(false)
     setProgress(0)
@@ -266,9 +174,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }
 
   const seek = (ratio: number) => {
-    // The Web Speech API has no seek capability, so scrubbing is a no-op
-    // for narrated (non-recorded) entries.
-    if (ttsActiveRef.current) return
     const audio = audioRef.current
     const dur = duration || (audio ? audio.duration : 0)
     if (!audio || !dur) return

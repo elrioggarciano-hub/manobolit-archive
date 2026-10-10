@@ -141,8 +141,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     e.preventDefault()
     e.stopPropagation()
 
-    if (!entry.audioFile && !entry.transcription) {
-      showToast('warning', 'No audio or transcription is available for this entry yet.')
+    if (!entry.audioFile) {
+      showToast('warning', 'No audio recording has been uploaded for this entry yet.')
       return
     }
 
@@ -151,23 +151,19 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
       return
     }
 
+    const isFolkSong = entry.type === 'FOLK_SONG'
     playTrack({
       audioFile: entry.audioFile,
       title: entry.title,
       entryId: entry.id,
-      // Whether it's a folk song recording or a spoken-aloud riddle/proverb/
-      // folktale, the voice actually heard is synthesized — never the
-      // credited narrator/informant's real voice — so this is always
-      // labeled honestly as "AI Generated" rather than their real name.
-      singer: 'AI Generated',
-      narrator: 'AI Generated',
-      duration: entry.audioFile ? 25 : undefined,
-      // Riddles, proverbs, and folktales have no recorded audio, so these
-      // are read aloud via the browser's speech synthesis instead. The
-      // Manobo transcription is used (not the English content summary) —
-      // pronunciation won't be authentic, but the narration is honestly
-      // labeled "AI Generated" either way.
-      textToRecite: entry.audioFile ? entry.content : (entry.transcription || entry.content)
+      // Folk song recordings have no real credited vocalist, so this is
+      // labeled honestly as "AI Generated" rather than implying a real
+      // singer performed it. Oral literature narrations keep using the
+      // actual collected narrator when one is on record.
+      singer: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
+      narrator: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
+      duration: 25,
+      textToRecite: entry.content
     })
   }
 
@@ -634,7 +630,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                         {/* Bottom Actions */}
                         <div className="flex items-center gap-6 mt-auto">
-                          {(entry.audioFile || entry.transcription) ? (
+                          {entry.audioFile ? (
                             <button
                               onClick={(e) => handlePlayClick(e, entry)}
                               className="flex items-center gap-2 text-white font-bold text-xs py-2.5 px-4 transition-colors btn-anim"
@@ -643,7 +639,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                               <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                                 <path d="M8 5v14l11-7z" />
                               </svg>
-                              <span>{entry.audioFile ? 'PLAY RECORDING' : 'PLAY AI NARRATION'}</span>
+                              <span>PLAY RECORDING</span>
                             </button>
                           ) : null}
                         </div>
@@ -761,7 +757,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                     {/* Bottom Actions */}
                     <div className="flex items-center gap-4 mt-auto pt-4 border-t border-[var(--border-color)]">
-                      {(entry.audioFile || entry.transcription) ? (
+                      {entry.audioFile ? (
                         <button
                           onClick={(e) => handlePlayClick(e, entry)}
                           className="flex items-center gap-1.5 font-bold text-xs transition-colors btn-anim"
@@ -770,7 +766,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                             <path d="M8 5v14l11-7z" />
                           </svg>
-                          <span>{entry.audioFile ? 'PLAY RECORDING' : 'PLAY AI NARRATION'}</span>
+                          <span>PLAY RECORDING</span>
                         </button>
                       ) : null}
                     </div>
