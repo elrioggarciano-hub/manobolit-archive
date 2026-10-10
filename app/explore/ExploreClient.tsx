@@ -171,18 +171,6 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     })
   }
 
-  const [expandedTranscriptIds, setExpandedTranscriptIds] = useState<Set<string>>(new Set())
-  const toggleTranscript = (e: React.MouseEvent, id: string) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setExpandedTranscriptIds(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
-
   const toggleGenre = (genreKey: string) => {
     setSelectedGenres(prev => {
       const next = prev.includes(genreKey) ? prev.filter(g => g !== genreKey) : [...prev, genreKey]
@@ -642,22 +630,6 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                             {entry.content}
                           </p>
 
-                          {/* Expanded Manobo transcription (no recorded audio) */}
-                          {!entry.audioFile && entry.transcription && expandedTranscriptIds.has(entry.id) && (
-                            <div style={{
-                              marginBottom: '20px',
-                              padding: '12px 14px',
-                              borderLeft: '3px solid #8F000D',
-                              background: 'var(--bg-main)',
-                            }}>
-                              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '6px' }}>
-                                MANOBO TRANSCRIPTION
-                              </div>
-                              <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: 'var(--brand-accent)', fontStyle: 'italic', whiteSpace: 'pre-line' }}>
-                                {entry.transcription}
-                              </p>
-                            </div>
-                          )}
                         </div>
 
                         {/* Bottom Actions */}
@@ -672,19 +644,6 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                                 <path d="M8 5v14l11-7z" />
                               </svg>
                               <span>{entry.audioFile ? 'PLAY RECORDING' : 'PLAY AI NARRATION'}</span>
-                            </button>
-                          ) : null}
-                          {!entry.audioFile && entry.transcription ? (
-                            <button
-                              onClick={(e) => toggleTranscript(e, entry.id)}
-                              className="flex items-center gap-2 font-bold text-xs py-2.5 px-4 transition-colors btn-anim"
-                              style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', borderRadius: '0px' }}
-                            >
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                              </svg>
-                              <span>{expandedTranscriptIds.has(entry.id) ? 'HIDE TRANSCRIPTION' : 'READ TRANSCRIPTION'}</span>
                             </button>
                           ) : null}
                         </div>
@@ -798,22 +757,6 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                         {entry.content}
                       </p>
 
-                      {/* Expanded Manobo transcription (no recorded audio) */}
-                      {!entry.audioFile && entry.transcription && expandedTranscriptIds.has(entry.id) && (
-                        <div style={{
-                          marginBottom: '20px',
-                          padding: '12px 14px',
-                          borderLeft: '3px solid #8F000D',
-                          background: 'var(--bg-main)',
-                        }}>
-                          <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '6px' }}>
-                            MANOBO TRANSCRIPTION
-                          </div>
-                          <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: 'var(--brand-accent)', fontStyle: 'italic', whiteSpace: 'pre-line' }}>
-                            {entry.transcription}
-                          </p>
-                        </div>
-                      )}
                     </div>
 
                     {/* Bottom Actions */}
@@ -828,19 +771,6 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                             <path d="M8 5v14l11-7z" />
                           </svg>
                           <span>{entry.audioFile ? 'PLAY RECORDING' : 'PLAY AI NARRATION'}</span>
-                        </button>
-                      ) : null}
-                      {!entry.audioFile && entry.transcription ? (
-                        <button
-                          onClick={(e) => toggleTranscript(e, entry.id)}
-                          className="flex items-center gap-1.5 font-bold text-xs transition-colors btn-anim"
-                          style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', padding: 0 }}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                          </svg>
-                          <span>{expandedTranscriptIds.has(entry.id) ? 'HIDE TRANSCRIPTION' : 'READ TRANSCRIPTION'}</span>
                         </button>
                       ) : null}
                     </div>
