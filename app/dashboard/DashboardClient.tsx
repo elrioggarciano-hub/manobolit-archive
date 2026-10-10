@@ -1,7 +1,6 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import * as XLSX from 'xlsx-js-style'
 import CountUp from '@/components/CountUp'
 
 export interface LocationStat {
@@ -51,6 +50,14 @@ export interface ExportRecord {
   municipality: string
   barangay: string
   audioFile: string
+}
+
+// Wraps a CSV cell in quotes and escapes embedded quotes, so titles,
+// transcriptions, and translations containing commas or line breaks don't
+// corrupt the column structure.
+function csvCell(value: string | number): string {
+  const str = String(value ?? '')
+  return `"${str.replace(/"/g, '""')}"`
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -173,57 +180,19 @@ export default function DashboardClient({
     record.id,
   ]
 
-  // Column widths tuned per field — narrow for short codes/dates, wide for
-  // free text (transcription/translation), in character-width units.
-  const EXPORT_COLUMN_WIDTHS = [5, 26, 16, 18, 14, 16, 26, 28, 38, 38, 38, 20, 10, 16, 16, 14, 14, 16, 30, 24]
-
-  const thinBorder = { style: 'thin', color: { rgb: 'D9D9D9' } } as const
-  const allBorders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder }
-
-  // A plain CSV can't carry any formatting, so a 20-column sheet with long
-  // transcription/translation text reads as a wall of raw text in Excel. A
-  // real .xlsx with a styled header, sized columns, wrapped long cells, and
-  // borders is what actually renders as a clean, presentable spreadsheet.
   const downloadCulturalHeritageRecords = () => {
     if (exportRecords.length === 0) return
-
-    const aoa = [EXPORT_HEADERS, ...exportRecords.map((record, i) => buildExportRow(record, i))]
-    const worksheet = XLSX.utils.aoa_to_sheet(aoa)
-
-    worksheet['!cols'] = EXPORT_COLUMN_WIDTHS.map(wch => ({ wch }))
-    worksheet['!rows'] = [{ hpt: 24 }, ...exportRecords.map(() => ({ hpt: 60 }))]
-
-    const range = XLSX.utils.decode_range(worksheet['!ref']!)
-    for (let r = range.s.r; r <= range.e.r; r++) {
-      const isHeader = r === 0
-      for (let c = range.s.c; c <= range.e.c; c++) {
-        const addr = XLSX.utils.encode_cell({ r, c })
-        const cell = worksheet[addr]
-        if (!cell) continue
-        cell.s = isHeader
-          ? {
-              font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 },
-              fill: { fgColor: { rgb: '8F000D' } },
-              alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
-              border: allBorders,
-            }
-          : {
-              font: { sz: 10 },
-              fill: { fgColor: { rgb: r % 2 === 0 ? 'FFF5F5' : 'FFFFFF' } },
-              alignment: { horizontal: 'left', vertical: 'top', wrapText: true },
-              border: allBorders,
-            }
-      }
-    }
-
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Cultural Heritage Records')
-    const wbout: ArrayBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
-    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    // CRLF line endings + a UTF-8 BOM keep this opening cleanly (correct
+    // column alignment, no mojibake on Manobo/Bisaya diacritics) in Excel,
+    // not just in browsers/Sheets.
+    const header = EXPORT_HEADERS.map(csvCell).join(',')
+    const rows = exportRecords.map((record, i) => buildExportRow(record, i).map(csvCell).join(','))
+    const csv = [header, ...rows].join('\r\n')
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `manobolit-cultural-heritage-records-${new Date().toISOString().slice(0, 10)}.xlsx`
+    link.download = `manobolit-cultural-heritage-records-${new Date().toISOString().slice(0, 10)}.csv`
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -292,7 +261,7 @@ export default function DashboardClient({
                 cursor: exportRecords.length === 0 ? 'not-allowed' : 'pointer',
                 opacity: exportRecords.length === 0 ? 0.5 : 1,
               }}
-              title="Export the full archive as a formatted Excel workbook of cultural heritage records"
+              title="Export the full archive as a CSV of cultural heritage records"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
