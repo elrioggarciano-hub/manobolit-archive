@@ -231,7 +231,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               margin: '0'
             }}
           >
-            The ManoboLit Archive employs a dual-framework approach to ensure academic rigor<br className="hidden md:inline" /> and cultural fidelity. We synthesize the pan-Philippine taxonomy of Damiana Eugenio with<br className="hidden md:inline" /> the ManoboLit Thematic Framework, a set of thematic categories developed<br className="hidden md:inline" /> internally for Agusan Manobo tradition.
+            The ManoboLit Archive employs a dual-framework approach to ensure academic rigor<br className="hidden md:inline" /> and cultural fidelity. We synthesize the pan-Philippine taxonomy of Damiana Eugenio with<br className="hidden md:inline" /> the specific thematic categories of Agusan Manobo tradition documented by Thomas<br className="hidden md:inline" /> Andress.
           </p>
         </div>
 
@@ -370,7 +370,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               </div>
             </section>
 
-            {/* SECTION 2: MANOBOLIT THEMATIC FRAMEWORK GRID */}
+            {/* SECTION 2: ANDRESS THEMATIC GRID */}
             <section style={{ marginBottom: '60px' }}>
               
               {/* Header with Horizontal Lines */}
@@ -386,7 +386,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     textAlign: 'center'
                   }}
                 >
-                  ManoboLit Thematic Framework
+                  Andress (1985) Thematic Grid
                 </h2>
                 <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
               </div>
@@ -400,10 +400,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   textAlign: 'center'
                 }}
               >
-                Twelve thematic clusters developed internally by the ManoboLit research team to classify recurring motifs across Agusan Manobo oral tradition and folk song.
+                Derived from the <em style={{ fontStyle: 'italic' }}>Agusan Manobo Bible Corpus</em>, Thomas Andress identified 12 specific thematic clusters that define the<br className="hidden md:inline" /> Manobo cognitive and cultural universe.
               </p>
 
-              {/* Grid of thematic framework cards */}
+              {/* Grid of Andress Cards */}
               <div 
                 className="grid grid-cols-1 md:grid-cols-3 gap-6"
               >
@@ -466,7 +466,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   color: '#ffffff'
                 }}
               >
-                The Logic Engine (Eugenio Rules + ManoboLit Themes)
+                The Logic Engine (Eugenio & Andress Rules)
               </h2>
               <p
                 style={{
@@ -477,7 +477,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   margin: '0 0 32px 0'
                 }}
               >
-                Our system runs a Rule-Based Classification Engine built on Eugenio&apos;s genre taxonomy and the ManoboLit Thematic Framework, which performs a real-time semantic scan of Manobo transcriptions, identifying structural markers to assign genre and theme with verifiable accuracy.
+                Our system runs the Eugenio & Andress Rule-Based Classification Engine, which performs a real-time semantic scan of Manobo transcriptions, identifying structural markers to assign genre and theme with verifiable accuracy.
               </p>
 
               {/* Diagram Flow Container */}

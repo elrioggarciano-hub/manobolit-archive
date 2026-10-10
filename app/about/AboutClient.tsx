@@ -195,8 +195,8 @@ export default function AboutClient() {
                       <circle cx="12" cy="5" r="1.5" fill="#f1b80d" />
                     </svg>
                   ),
-                  label: 'ManoboLit Thematic Framework',
-                  desc: 'Internally developed thematic categories for Agusan Manobo oral tradition.',
+                  label: 'Andress (1985)',
+                  desc: 'Linguistic and structural taxonomies of oral tradition.',
                 },
               ].map(item => (
                 <div key={item.label} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: '16px' }}>

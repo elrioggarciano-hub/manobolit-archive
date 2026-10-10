@@ -388,10 +388,10 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <div style={{ width: '32px', height: '32px', border: '1.5px solid #8F000D', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-accent)', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}>2</div>
-                  <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>ManoboLit Thematic Framework</h3>
+                  <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Andress (1985)</h3>
                 </div>
                 <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
-                  Twelve thematic clusters developed internally for Agusan Manobo tradition &mdash; from creation myths to courtship and displacement.
+                  Identifies 12 thematic clusters specific to Agusan Manobo tradition &mdash; from creation myths to courtship and displacement &mdash; derived from the Agusan Manobo Bible corpus.
                 </p>
               </div>
             </div>
