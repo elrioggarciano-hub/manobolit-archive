@@ -15,18 +15,16 @@ const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
   ceb: 'bisaya',
 }
 
-// The translator only knows the words in this corpus — grouping them here by
-// topic (mirroring how they're organized in bibleCorpus.ts) lets a visitor
-// browse and click what's actually available, instead of guessing random
-// words that will never match.
+// The translator vocabulary is 100% extracted from the 22 Agusan Manobo literature entries
+// from Trento (Maravilla 2024) and Bunawan (Catipay & Curato 2024).
 const VOCAB_GROUPS: { label: string; words: string[] }[] = [
-  { label: 'Theological', words: ['god', 'lord', 'creator', 'spirit', 'blessing', 'grace', 'prayer', 'faith', 'heaven'] },
-  { label: 'Nature & Universe', words: ['earth', 'land', 'world', 'sky', 'mountain', 'mountains', 'water', 'stream', 'river', 'tree', 'trees', 'forest', 'star', 'stars', 'sun', 'night', 'light', 'fish', 'animal', 'bird', 'tiger'] },
-  { label: 'People & Community', words: ['people', 'person', 'man', 'woman', 'child', 'children', 'father', 'mother', 'family', 'tribe', 'native', 'village'] },
-  { label: 'Qualities', words: ['good', 'great', 'hard', 'bitter', 'beautiful', 'bare', 'holy', 'small', 'many', 'first', 'ancient'] },
-  { label: 'Actions', words: ['create', 'created', 'made', 'make', 'give', 'gave', 'listen', 'heard', 'see', 'saw', 'walk', 'come', 'came', 'remember', 'weep', 'cry', 'protect', 'help'] },
-  { label: 'Feelings & Concepts', words: ['love', 'peace', 'loneliness', 'sorrow', 'history', 'proverb', 'story'] },
-  { label: 'Grammar', words: ['the', 'of', 'in', 'to', 'and', 'we', 'you', 'they', 'he', 'she', 'my'] },
+  { label: 'Nature & Land', words: ['mountain', 'mountains', 'water', 'stream', 'river', 'land', 'tree', 'trees', 'forest', 'night', 'light', 'sun', 'star', 'stars', 'waves', 'fish', 'tiger', 'bird', 'beans', 'sugarcane', 'charcoal', 'plants'] },
+  { label: 'People & Tribe', words: ['tribe', 'people', 'person', 'native', 'child', 'children', 'mother', 'father', 'family', 'neighbors', 'outsiders', 'husband', 'companion'] },
+  { label: 'Cultural Lore & Spirits', words: ['spirit', 'guardian', 'blessing', 'proverb', 'story', 'riddle', 'song', 'history', 'gold', 'wealth'] },
+  { label: 'Feelings & Struggle', words: ['hardship', 'loneliness', 'sorrow', 'love', 'peace', 'tears', 'fear', 'resilient', 'bare', 'hunger'] },
+  { label: 'Actions', words: ['weep', 'listen', 'walk', 'look', 'remember', 'protect', 'help', 'clean', 'arrive', 'return', 'plant', 'hide', 'dwell', 'make', 'give', 'dream'] },
+  { label: 'Qualities', words: ['good', 'beautiful', 'hard', 'great', 'small', 'many', 'ancient', 'true', 'white', 'black'] },
+  { label: 'Grammar', words: ['the', 'to', 'in', 'of', 'and', 'my', 'your', 'we', 'they', 'he', 'she', 'you'] },
 ]
 
 export default function TranslatorClient() {
@@ -300,7 +298,7 @@ export default function TranslatorClient() {
             {inputText && result.matchedPhrases.length > 0 && (
               <div style={{ marginTop: '14px' }}>
                 <div style={{ fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', marginBottom: '8px' }}>
-                  MATCHED FROM SCRIPTURE
+                  MATCHED FROM MANOBOLIT LITERATURE ARCHIVE
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   {result.matchedPhrases.map((m, i) => (
@@ -320,7 +318,9 @@ export default function TranslatorClient() {
                         &ldquo;{m.original}&rdquo; &rarr; &ldquo;{m.translated}&rdquo;
                       </span>
                       {m.verseRef && (
-                        <span style={{ color: '#52525b', fontStyle: 'italic', flexShrink: 0 }}>{m.verseRef}</span>
+                        <span style={{ color: 'var(--brand-accent)', fontStyle: 'italic', fontWeight: 600, flexShrink: 0 }}>
+                          {m.verseRef}
+                        </span>
                       )}
                     </div>
                   ))}
@@ -351,9 +351,9 @@ export default function TranslatorClient() {
           </h2>
           <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
             Every word and phrase the translator can recognize is listed below, shown in {LANG_LABELS[sourceLang]} since
-            that is your current &ldquo;Translate From&rdquo; language. The text box above only accepts a click from
-            this list — phrases are verified against real Agusan Manobo Bible verses, and single words come from
-            ManoboLit&apos;s curated reference lexicon.
+            that is your current &ldquo;Translate From&rdquo; language. All phrases and vocabulary words are verified and
+            extracted 100% directly from the 22 archived Agusan Manobo literature entries in Trento and Bunawan
+            (Maravilla 2024; Catipay &amp; Curato 2024).
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
