@@ -74,7 +74,7 @@ export default function PersistentAudioPlayer() {
     closeTrack()
   }
 
-  const singerName = currentTrack.singer || currentTrack.narrator || 'AI Generated'
+  const singerName = currentTrack.singer || currentTrack.narrator || 'Manobo Cultural Bearer'
 
   return (
     <>

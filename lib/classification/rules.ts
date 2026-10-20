@@ -372,6 +372,76 @@ export const themeRules: ClassificationRule[] = [
     contextClues: ['mythical being', 'folklore creature', 'supernatural entity'],
     baseConfidence: 0.88,
   },
+  {
+    id: 'T013',
+    name: 'Identity & Self-Discovery Theme',
+    type: 'THEME',
+    framework: 'ANDRESS_1985',
+    value: 'IDENTITY_AND_SELF_DISCOVERY',
+    keywords: [
+      'identity', 'self-discovery', 'transformation', 'life cycle', 'growth',
+      'intangible', 'shadow', 'perception', 'light', 'self-care', 'soul', 'becoming'
+    ],
+    phrases: ['search for identity', 'stages of growth', 'transformation of self', 'understanding oneself'],
+    contextClues: ['personal growth', 'self-reflection', 'life transformation'],
+    baseConfidence: 0.85,
+  },
+  {
+    id: 'T014',
+    name: 'Conflict & Resolution Theme',
+    type: 'THEME',
+    framework: 'ANDRESS_1985',
+    value: 'CONFLICT_AND_RESOLUTION',
+    keywords: [
+      'conflict', 'resolution', 'balance', 'patience', 'trust', 'struggle',
+      'dispute', 'peace', 'harmony', 'compromise', 'settle'
+    ],
+    phrases: ['peace and harmony', 'resolve conflict', 'finding balance', 'settling disputes'],
+    contextClues: ['conflict resolution', 'communal balance', 'peace-making'],
+    baseConfidence: 0.84,
+  },
+  {
+    id: 'T015',
+    name: 'Love & Relationships Theme',
+    type: 'THEME',
+    framework: 'ANDRESS_1985',
+    value: 'LOVE_AND_RELATIONSHIPS',
+    keywords: [
+      'love', 'relationship', 'relationships', 'communication', 'listening', 'family',
+      'friendship', 'reciprocity', 'affection', 'sustenance', 'abundance', 'caring'
+    ],
+    phrases: ['fostering love', 'deep connections', 'mutual care', 'listening to one another'],
+    contextClues: ['family relationships', 'communal care', 'interpersonal bonds'],
+    baseConfidence: 0.86,
+  },
+  {
+    id: 'T016',
+    name: 'Social Justice & Inequality Theme',
+    type: 'THEME',
+    framework: 'ANDRESS_1985',
+    value: 'SOCIAL_JUSTICE_AND_INEQUALITY',
+    keywords: [
+      'social justice', 'inequality', 'shared resources', 'resource sharing', 'character',
+      'inner beauty', 'integrity', 'oppression', 'fairness', 'equity', 'rights'
+    ],
+    phrases: ['shared for everyone', 'character over appearance', 'social justice', 'equality and fairness'],
+    contextClues: ['social equity', 'resource distribution', 'moral justice'],
+    baseConfidence: 0.85,
+  },
+  {
+    id: 'T017',
+    name: 'Courage & Resilience Theme',
+    type: 'THEME',
+    framework: 'ANDRESS_1985',
+    value: 'COURAGE_AND_RESILIENCE',
+    keywords: [
+      'courage', 'resilience', 'perseverance', 'bravery', 'endure', 'hunger',
+      'overcoming', 'fearless', 'tiger', 'facing danger', 'integrity in hardship'
+    ],
+    phrases: ['standing strong', 'facing danger', 'enduring hardship', 'courage to overcome'],
+    contextClues: ['resilience against odds', 'moral courage', 'perseverance'],
+    baseConfidence: 0.86,
+  },
 ]
 
 export const locationRules: ClassificationRule[] = [
@@ -418,5 +488,27 @@ export const locationRules: ClassificationRule[] = [
     phrases: ['mt magdiwata', 'mt. magdiwata', 'sacred mountain', 'mountain of magdiwata'],
     contextClues: ['trento', 'agusan del sur'],
     baseConfidence: 0.92,
+  },
+  {
+    id: 'L005',
+    name: 'Bunawan Detection',
+    type: 'LOCATION',
+    framework: 'PROVENANCE',
+    value: 'BUNAWAN',
+    keywords: ['bunawan', 'san andres'],
+    phrases: ['in bunawan', 'municipality of bunawan', 'san andres, bunawan', 'bunawan, agusan del sur'],
+    contextClues: ['agusan del sur', 'communityLocation', 'provincial'],
+    baseConfidence: 0.92,
+  },
+  {
+    id: 'L006',
+    name: 'San Andres Detection',
+    type: 'LOCATION',
+    framework: 'PROVENANCE',
+    value: 'SAN_ANDRES',
+    keywords: ['san andres', 'andres'],
+    phrases: ['in san andres', 'brgy san andres', 'brgy. san andres', 'san andres bunawan'],
+    contextClues: ['bunawan', 'agusan del sur'],
+    baseConfidence: 0.95,
   },
 ]

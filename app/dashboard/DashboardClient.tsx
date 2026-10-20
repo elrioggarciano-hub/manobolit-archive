@@ -539,7 +539,7 @@ export default function DashboardClient({
                 style={{
                   border: '1px solid var(--border-color)',
                   borderRadius: '0px',
-                  minHeight: '260px',
+                  minHeight: '290px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
                 }}
               >
@@ -565,7 +565,7 @@ export default function DashboardClient({
                   {/* Real interactive map (Leaflet + OpenStreetMap) — markers plot verified coordinates only */}
                   <div
                     style={{
-                      height: '180px',
+                      height: '220px',
                       marginTop: '12px',
                       position: 'relative',
                       isolation: 'isolate',

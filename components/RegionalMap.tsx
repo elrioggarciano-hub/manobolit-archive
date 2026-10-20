@@ -1,18 +1,20 @@
 'use client'
 
 import { useEffect } from 'react'
+import L from 'leaflet'
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from 'react-leaflet'
 
-// Leaflet computes tile/control positions from the container's size at mount
-// time. If this card's layout hasn't fully settled yet (web fonts swapping in,
-// sibling cards still resizing), that snapshot can be stale — invalidateSize()
-// forces Leaflet to re-measure once the surrounding layout has stabilized.
-function MapResizeFix() {
+function MapAutoFit({ coords }: { coords: [number, number][] }) {
   const map = useMap()
   useEffect(() => {
-    const t = setTimeout(() => map.invalidateSize(), 250)
-    return () => clearTimeout(t)
-  }, [map])
+    if (coords.length === 0) return
+    const timer = setTimeout(() => {
+      map.invalidateSize()
+      const bounds = L.latLngBounds(coords)
+      map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 })
+    }, 200)
+    return () => clearTimeout(timer)
+  }, [coords, map])
   return null
 }
 
@@ -25,17 +27,24 @@ export interface LocationStat {
 
 // Real coordinates (source: PhilAtlas / Wikipedia barangay profiles), keyed by
 // the exact `communityLocation` strings used in the archive's data entry.
-// Only locations we could verify against an actual source are plotted —
-// anything else is left out of the map rather than guessed.
 const KNOWN_COORDS: Record<string, [number, number]> = {
   'trento': [8.0500, 126.0667],
   'sta maria': [8.0211, 126.1614],
   'sitio dam, brgy. tudela': [8.0684, 126.1032],
   'tudela': [8.0684, 126.1032],
+  'san andres, bunawan': [8.2742, 125.9961],
+  'san andres': [8.2742, 125.9961],
+  'bunawan': [8.2833, 125.9833],
 }
 
 function resolveCoords(location: string): [number, number] | null {
-  return KNOWN_COORDS[location.trim().toLowerCase()] || null
+  const norm = (location || '').trim().toLowerCase()
+  if (KNOWN_COORDS[norm]) return KNOWN_COORDS[norm]
+  if (norm.includes('bunawan') || norm.includes('san andres')) return [8.2742, 125.9961]
+  if (norm.includes('sta maria') || norm.includes('santa maria')) return [8.0211, 126.1614]
+  if (norm.includes('dam') || norm.includes('tudela')) return [8.0684, 126.1032]
+  if (norm.includes('trento')) return [8.0500, 126.0667]
+  return null
 }
 
 export default function RegionalMap({ locationStats }: { locationStats: LocationStat[] }) {
@@ -44,17 +53,19 @@ export default function RegionalMap({ locationStats }: { locationStats: Location
     .map(l => ({ ...l, coords: resolveCoords(l.location) }))
     .filter((l): l is LocationStat & { coords: [number, number] } => l.coords !== null)
 
+  const allCoords = plotted.map(l => l.coords)
+
   return (
     <MapContainer
-      center={[8.055, 126.09]}
-      zoom={11}
+      center={[8.16, 126.05]}
+      zoom={9}
       scrollWheelZoom={false}
-      dragging={false}
-      touchZoom={false}
-      doubleClickZoom={false}
+      dragging={true}
+      touchZoom={true}
+      doubleClickZoom={true}
       style={{ width: '100%', height: '100%', position: 'relative', isolation: 'isolate', zIndex: 0 }}
     >
-      <MapResizeFix />
+      <MapAutoFit coords={allCoords} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

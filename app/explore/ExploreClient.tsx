@@ -120,6 +120,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
           if (loc === 'TRENTO') return mNorm.includes('TRENTO')
           if (loc === 'STA_MARIA') return bNorm.includes('MARIA') || cNorm.includes('MARIA')
           if (loc === 'SITIO_DAM') return cNorm.includes('DAM')
+          if (loc === 'BUNAWAN') return mNorm.includes('BUNAWAN') || cNorm.includes('BUNAWAN')
+          if (loc === 'SAN_ANDRES') return bNorm.includes('ANDRES') || cNorm.includes('ANDRES')
           return false
         })
         if (!matchLocation) return false
@@ -350,6 +352,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   { key: 'TRENTO', label: 'Trento' },
                   { key: 'STA_MARIA', label: 'Sta. Maria' },
                   { key: 'SITIO_DAM', label: 'Sitio Dam' },
+                  { key: 'BUNAWAN', label: 'Bunawan' },
+                  { key: 'SAN_ANDRES', label: 'San Andres' },
                 ].map(item => {
                   const isChecked = selectedLocations.includes(item.key)
                   return (
