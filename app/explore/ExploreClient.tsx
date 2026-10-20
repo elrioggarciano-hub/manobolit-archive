@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAudio } from '@/lib/context/AudioContext'
@@ -54,19 +54,140 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
   const search = searchParams.get('search') || ''
   const [searchInput, setSearchInput] = useState(search)
 
+  // Sync state helper to update URL (via replaceState) and sessionStorage so
+  // navigating back to Explorer immediately restores the user's exact state.
+  const syncStateToUrlAndStorage = useCallback((
+    nextGenres: string[],
+    nextThemes: string[],
+    nextLocations: string[],
+    nextCategory: string,
+    nextSearch: string,
+    nextPage: number
+  ) => {
+    if (typeof window === 'undefined') return
+
+    const params = new URLSearchParams()
+    if (nextGenres.length > 0) params.set('genres', nextGenres.join(','))
+    if (nextThemes.length > 0) params.set('themes', nextThemes.join(','))
+    if (nextLocations.length > 0) params.set('locations', nextLocations.join(','))
+    if (nextCategory && nextCategory !== 'GENRES') params.set('category', nextCategory)
+    if (nextSearch) params.set('search', nextSearch)
+    if (nextPage > 1) params.set('page', String(nextPage))
+
+    const newQuery = params.toString()
+    const newRelativeUrl = newQuery ? `/explore?${newQuery}` : '/explore'
+    window.history.replaceState(null, '', newRelativeUrl)
+
+    try {
+      sessionStorage.setItem('manobolit_last_explore_url', newRelativeUrl)
+      sessionStorage.setItem(
+        'manobolit_explore_state',
+        JSON.stringify({
+          appliedGenres: nextGenres,
+          appliedThemes: nextThemes,
+          appliedLocations: nextLocations,
+          activeCategory: nextCategory,
+          search: nextSearch,
+          page: nextPage,
+        })
+      )
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, [])
+
+  // Hydrate filters from URL search params on mount or param change
   useEffect(() => {
-    setSearchInput(search)
-  }, [search])
+    const genresParam = searchParams.get('genres') || searchParams.get('genre')
+    const themesParam = searchParams.get('themes') || searchParams.get('theme')
+    const locsParam = searchParams.get('locations') || searchParams.get('location')
+    const catParam = searchParams.get('category')
+    const searchParam = searchParams.get('search')
+    const pageParam = searchParams.get('page')
+
+    const hasAnyParam = Boolean(genresParam || themesParam || locsParam || catParam || (searchParam !== null && searchParam !== '') || pageParam)
+
+    if (hasAnyParam) {
+      if (genresParam) {
+        const gList = genresParam.split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
+        setSelectedGenres(gList)
+        setAppliedGenres(gList)
+      } else {
+        setSelectedGenres([])
+        setAppliedGenres([])
+      }
+
+      if (themesParam) {
+        const tList = themesParam.split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
+        setSelectedThemes(tList)
+        setAppliedThemes(tList)
+      } else {
+        setSelectedThemes([])
+        setAppliedThemes([])
+      }
+
+      if (locsParam) {
+        const lList = locsParam.split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
+        setSelectedLocations(lList)
+        setAppliedLocations(lList)
+      } else {
+        setSelectedLocations([])
+        setAppliedLocations([])
+      }
+
+      if (catParam) {
+        const upperCat = catParam.toUpperCase()
+        if (['GENRES', 'KEYWORDS', 'THEMES', 'LOCATIONS'].includes(upperCat)) {
+          setActiveCategory(upperCat as any)
+        }
+      }
+
+      if (searchParam !== null) {
+        setSearchInput(searchParam)
+      }
+
+      if (pageParam) {
+        const p = parseInt(pageParam, 10)
+        if (!isNaN(p) && p > 0) setPage(p)
+      }
+    } else {
+      // Restore from sessionStorage if user clicked Back from another page
+      try {
+        const saved = sessionStorage.getItem('manobolit_explore_state')
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          if (parsed.appliedGenres?.length) {
+            setSelectedGenres(parsed.appliedGenres)
+            setAppliedGenres(parsed.appliedGenres)
+          }
+          if (parsed.appliedThemes?.length) {
+            setSelectedThemes(parsed.appliedThemes)
+            setAppliedThemes(parsed.appliedThemes)
+          }
+          if (parsed.appliedLocations?.length) {
+            setSelectedLocations(parsed.appliedLocations)
+            setAppliedLocations(parsed.appliedLocations)
+          }
+          if (parsed.activeCategory) {
+            setActiveCategory(parsed.activeCategory)
+          }
+          if (parsed.search) {
+            setSearchInput(parsed.search)
+          }
+          if (parsed.page) {
+            setPage(parsed.page)
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [searchParams])
 
   const handleSearchChange = (value: string) => {
     setSearchInput(value)
-    const params = new URLSearchParams(window.location.search)
-    if (value) {
-      params.set('search', value)
-    } else {
-      params.delete('search')
-    }
-    router.push(`/explore?${params.toString()}`, { scroll: false })
+    setPage(1)
+    syncStateToUrlAndStorage(appliedGenres, appliedThemes, appliedLocations, activeCategory, value, 1)
   }
 
   // Filter entries
@@ -173,44 +294,49 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     setSelectedGenres(prev => {
       const next = prev.includes(genreKey) ? prev.filter(g => g !== genreKey) : [...prev, genreKey]
       setAppliedGenres(next)
+      setPage(1)
+      syncStateToUrlAndStorage(next, appliedThemes, appliedLocations, activeCategory, searchInput, 1)
       return next
     })
-    setPage(1)
   }
 
   const toggleTheme = (themeKey: string) => {
     setSelectedThemes(prev => {
       const next = prev.includes(themeKey) ? prev.filter(t => t !== themeKey) : [...prev, themeKey]
       setAppliedThemes(next)
+      setPage(1)
+      syncStateToUrlAndStorage(appliedGenres, next, appliedLocations, activeCategory, searchInput, 1)
       return next
     })
-    setPage(1)
   }
 
   const toggleLocation = (locKey: string) => {
     setSelectedLocations(prev => {
       const next = prev.includes(locKey) ? prev.filter(l => l !== locKey) : [...prev, locKey]
       setAppliedLocations(next)
+      setPage(1)
+      syncStateToUrlAndStorage(appliedGenres, appliedThemes, next, activeCategory, searchInput, 1)
       return next
     })
-    setPage(1)
   }
 
-  // Pre-seed search from global URL input updates if any
-  useEffect(() => {
-    setPage(1)
-  }, [search])
+  const handleCategorySelect = (cat: 'GENRES' | 'KEYWORDS' | 'THEMES' | 'LOCATIONS') => {
+    setActiveCategory(cat)
+    syncStateToUrlAndStorage(appliedGenres, appliedThemes, appliedLocations, cat, searchInput, page)
+  }
 
-  // Sync activeCategory with URL search parameters
-  const categoryParam = searchParams.get('category')
-  useEffect(() => {
-    if (categoryParam) {
-      const upper = categoryParam.toUpperCase()
-      if (upper === 'GENRES' || upper === 'KEYWORDS' || upper === 'THEMES' || upper === 'LOCATIONS') {
-        setActiveCategory(upper as any)
-      }
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+    syncStateToUrlAndStorage(appliedGenres, appliedThemes, appliedLocations, activeCategory, searchInput, newPage)
+  }
+
+  const getEntryHref = (id: string) => {
+    if (typeof window !== 'undefined') {
+      const currentUrl = window.location.pathname + window.location.search
+      return `/archive/${id}?from=${encodeURIComponent(currentUrl)}`
     }
-  }, [categoryParam])
+    return `/archive/${id}`
+  }
 
   return (
     <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
@@ -240,7 +366,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               <div className="flex flex-col gap-1">
                 {/* Genres Item */}
                 <button
-                  onClick={() => setActiveCategory('GENRES')}
+                  onClick={() => handleCategorySelect('GENRES')}
                   className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
@@ -264,7 +390,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                 {/* Keywords Item */}
                 <button
-                  onClick={() => setActiveCategory('KEYWORDS')}
+                  onClick={() => handleCategorySelect('KEYWORDS')}
                   className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
@@ -286,7 +412,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                 {/* Themes Item */}
                 <button
-                  onClick={() => setActiveCategory('THEMES')}
+                  onClick={() => handleCategorySelect('THEMES')}
                   className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
@@ -309,7 +435,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                 {/* Locations Item */}
                 <button
-                  onClick={() => setActiveCategory('LOCATIONS')}
+                  onClick={() => handleCategorySelect('LOCATIONS')}
                   className="w-full flex items-center justify-between py-2 px-3 transition-colors text-left btn-anim"
                   style={{
                     borderRadius: '0px',
@@ -478,6 +604,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 setAppliedThemes(selectedThemes)
                 setAppliedLocations(selectedLocations)
                 setPage(1)
+                syncStateToUrlAndStorage(selectedGenres, selectedThemes, selectedLocations, activeCategory, searchInput, 1)
               }}
               className="w-full text-center text-white py-2.5 font-bold text-xs transition-colors btn-anim"
               style={{
@@ -593,7 +720,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           </div>
 
                           {/* Title */}
-                          <Link href={`/archive/${entry.id}`} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
+                          <Link href={getEntryHref(entry.id)} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
                             <h3 
                               style={{ 
                                 margin: 0,
@@ -720,7 +847,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                       </div>
 
                       {/* Title */}
-                      <Link href={`/archive/${entry.id}`} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
+                      <Link href={getEntryHref(entry.id)} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
                         <h3 
                           style={{ 
                             margin: 0,
@@ -784,7 +911,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               <div className="flex justify-center items-center gap-2">
                 {/* Prev page button */}
                 <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  onClick={() => handlePageChange(Math.max(1, page - 1))}
                   disabled={page === 1}
                   className="w-8 h-8 flex items-center justify-center border border-[var(--border-color)] text-[var(--text-secondary)] transition-colors disabled:opacity-50 btn-anim"
                   style={{ borderRadius: '0px', background: 'var(--bg-input)' }}
@@ -800,7 +927,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   return (
                     <button
                       key={pageNum}
-                      onClick={() => setPage(pageNum)}
+                      onClick={() => handlePageChange(pageNum)}
                       className="h-8 flex items-center justify-center font-bold text-xs transition-colors px-3 btn-anim"
                       style={{
                         background: 'transparent',
@@ -817,7 +944,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                 {/* Next page button */}
                 <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
                   className="w-8 h-8 flex items-center justify-center border border-[var(--border-color)] text-[var(--text-secondary)] transition-colors disabled:opacity-50 btn-anim"
                   style={{ borderRadius: '0px', background: 'var(--bg-input)' }}

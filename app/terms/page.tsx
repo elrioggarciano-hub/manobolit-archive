@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export const metadata = {
   title: 'Terms of Service — ManoboLit Archive',
@@ -37,6 +38,9 @@ export default function TermsOfServicePage() {
   return (
     <main className="anim-fade-in" style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-primary)', fontFamily: 'Inter, sans-serif' }}>
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '64px 24px 96px' }}>
+        <div style={{ marginBottom: '24px' }}>
+          <BackButton fallbackHref="/" defaultLabel="Back" />
+        </div>
 
         <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-accent)', letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: '14px' }}>
           Legal
