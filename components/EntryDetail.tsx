@@ -261,19 +261,21 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               </div>
             </div>
 
-            {/* Singer / Cultural Bearer */}
-            <div style={{ marginBottom: '16px' }}>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--brand-accent)', marginBottom: '4px', letterSpacing: '0.05em' }}>🎤 SINGER / CULTURAL BEARER</div>
-              <div style={{ fontSize: '13px', color: 'var(--brand-accent)', fontWeight: 700 }}>
-                {entry.singer || entry.narrator || 'Bae Malingeb & Tribal Elders'}
+            {/* Singer / Cultural Bearer (Only shown for folk songs or when a singer is recorded) */}
+            {(entry.type === 'FOLK_SONG' || entry.singer) && (
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--brand-accent)', marginBottom: '4px', letterSpacing: '0.05em' }}>🎤 SINGER / CULTURAL BEARER</div>
+                <div style={{ fontSize: '13px', color: 'var(--brand-accent)', fontWeight: 700 }}>
+                  {entry.singer || 'Manobo Folk Singer (Elder)'}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Narrator */}
             <div style={{ marginBottom: '16px' }}>
               <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>NARRATOR / INFORMANT</div>
               <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 700 }}>
-                {entry.narrator || entry.singer || 'Datu Malingeb'}
+                {entry.narrator || 'Manobo Elder (Informant - Anonymous)'}
               </div>
             </div>
 
