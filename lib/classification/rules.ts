@@ -70,7 +70,8 @@ export const genreRules: ClassificationRule[] = [
       'animal', 'trickster', 'moral', 'lesson', 'clever', 'foolish', 'monkey', 'crocodile',
       'bird', 'fish', 'deer', 'turtle', 'rabbit', 'outwit', 'trick', 'deceive', 'cunning',
       'fairy', 'diwata', 'goddess', 'river goddess', 'native', 'tiger', 'horse',
-      'folktale', 'stream', 'enchanted', 'magical', 'creature', 'spirit creature'
+      'folktale', 'stream', 'enchanted', 'magical', 'creature', 'spirit creature',
+      'tagbanwa', 'sigulanon', 'sugilanon', 'tala', 'marty', 'mango', 'misfortune'
     ],
     phrases: [
       'once upon a time', 'long ago in a village', 'there lived a', 'in a faraway place',
@@ -81,7 +82,7 @@ export const genreRules: ClassificationRule[] = [
       'entertainment', 'moral lesson', 'talking animals', 'human-like animals',
       'trickster character', 'wisdom tale', 'fable'
     ],
-    baseConfidence: 0.80,
+    baseConfidence: 0.88,
   },
   {
     id: 'G004',
@@ -114,7 +115,8 @@ export const genreRules: ClassificationRule[] = [
     value: 'RIDDLE',
     keywords: [
       'riddle', 'what am i', 'guess', 'puzzle', 'answer', 'question', 'solve',
-      'mystery', 'brain teaser', 'what is it'
+      'mystery', 'brain teaser', 'what is it',
+      'batong', 'uling', 'tubo', 'lubi', 'kahayag', 'damgo', 'anino', 'tabako', 'tigmo'
     ],
     phrases: [
       'what has', 'i have no', 'i am always', 'you can see me but',
@@ -380,7 +382,9 @@ export const themeRules: ClassificationRule[] = [
     value: 'IDENTITY_AND_SELF_DISCOVERY',
     keywords: [
       'identity', 'self-discovery', 'transformation', 'life cycle', 'growth',
-      'intangible', 'shadow', 'perception', 'light', 'self-care', 'soul', 'becoming'
+      'intangible', 'shadow', 'perception', 'light', 'self-care', 'soul', 'becoming',
+      'tobacco', 'gitanom', 'plant', 'transcendence', 'transcend', 'boundary',
+      'coal', 'fire', 'butterfly', 'worm', 'nurture', 'batong', 'kahayag', 'pultahan'
     ],
     phrases: ['search for identity', 'stages of growth', 'transformation of self', 'understanding oneself'],
     contextClues: ['personal growth', 'self-reflection', 'life transformation'],
@@ -462,10 +466,10 @@ export const locationRules: ClassificationRule[] = [
     type: 'LOCATION',
     framework: 'PROVENANCE',
     value: 'STA_MARIA',
-    keywords: ['maria', 'santa maria', 'sta maria'],
+    keywords: ['maria', 'santa maria', 'sta maria', 'sta. maria'],
     phrases: ['in sta maria', 'in sta. maria', 'in santa maria', 'brgy. sta maria'],
     contextClues: ['agusan del sur', 'communityLocation'],
-    baseConfidence: 0.90,
+    baseConfidence: 0.95,
   },
   {
     id: 'L003',
@@ -484,7 +488,7 @@ export const locationRules: ClassificationRule[] = [
     type: 'LOCATION',
     framework: 'PROVENANCE',
     value: 'MT_MAGDIWATA',
-    keywords: ['magdiwata', 'mountain'],
+    keywords: ['magdiwata', 'mt magdiwata', 'mount magdiwata'],
     phrases: ['mt magdiwata', 'mt. magdiwata', 'sacred mountain', 'mountain of magdiwata'],
     contextClues: ['trento', 'agusan del sur'],
     baseConfidence: 0.92,

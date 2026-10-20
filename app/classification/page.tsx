@@ -35,6 +35,9 @@ export default async function ClassificationPage() {
     genre: e.genre,
     themes: JSON.parse(e.themes || '[]') as string[],
     culturalElements: JSON.parse(e.culturalElements || '[]') as string[],
+    communityLocation: e.communityLocation || '',
+    municipality: e.municipality || '',
+    barangay: e.barangay || '',
   }))
 
   return <ClassificationClient dbEntries={parsed} />

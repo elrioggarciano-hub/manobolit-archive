@@ -105,14 +105,14 @@ function scoreRule(rule: ClassificationRule, normalizedText: string): RuleDetail
   // If nothing matched, the confidence is 0%
   if (matchCount === 0) return { confidence: 0, matched: [] }
 
-  // 4. Calculate maximum possible score for normalization
-  const maxScore = rule.keywords.length * 1 + rule.phrases.length * 2 + rule.contextClues.length * 1.5
-  const rawRatio = score / maxScore
+  // 4. Saturation-based evidence scoring:
+  // In rule-based linguistics, alternative keywords and phrases are disjunctive (OR logic).
+  // Matching 3.0 points of weighted evidence represents full confirmation of the pattern.
+  const targetSaturation = 3.0
+  const rawRatio = Math.min(score / targetSaturation, 1.0)
+  const scaled = rawRatio * rule.baseConfidence
 
-  // 5. Scale up the ratio by 2.5 to accommodate typical short texts, and cap at 1.0
-  const scaled = Math.min(rawRatio * 2.5, 1.0) * rule.baseConfidence
-
-  // Return score rounded to two decimal places (e.g. 0.24 representing 24% confidence)
+  // Return score rounded to two decimal places (e.g. 0.88 representing 88% confidence)
   return { confidence: Math.round(scaled * 100) / 100, matched }
 }
 
