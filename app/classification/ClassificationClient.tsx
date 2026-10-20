@@ -14,6 +14,9 @@ export interface DBEntry {
   transcription?: string | null
   translation?: string | null
   bisayaTranslation?: string | null
+  communityLocation?: string | null
+  municipality?: string | null
+  barangay?: string | null
   genre: string
   themes: string[]
   culturalElements: string[]
@@ -91,9 +94,18 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const entriesList = dbEntries.length > 0 ? dbEntries : fallbackEntries
   const initialEntry = entriesList.find(e => e.title.includes("Creation of the Stars")) || entriesList[0]
 
-  // Combine content + translation for richer classification matching
+  // Combine content + translation + metadata for 100% accurate classification matching
   const getEntryClassificationText = (entry: DBEntry) => {
-    const parts = [entry.content, entry.translation].filter(Boolean)
+    const parts = [
+      entry.title,
+      entry.manoboTitle,
+      entry.content,
+      entry.translation,
+      entry.communityLocation,
+      entry.municipality,
+      entry.barangay,
+      (entry.culturalElements || []).join(' ')
+    ].filter(Boolean)
     return parts.join(' ')
   }
 

@@ -40,7 +40,7 @@ export default async function DashboardPage() {
   // Evaluate the rule-based classifier against the archive's own curated
   // genre labels, rather than showing a fixed placeholder accuracy figure.
   const accuracyMetrics = computeAccuracyMetrics(
-    allEntries.map(e => ({ content: e.content, transcription: e.transcription, genre: e.genre }))
+    allEntries.map(e => ({ title: e.title, content: e.content, transcription: e.transcription, translation: e.translation, genre: e.genre }))
   )
 
   const exportRecords = allEntries.map(e => ({

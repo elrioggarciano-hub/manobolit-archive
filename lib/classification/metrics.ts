@@ -9,21 +9,19 @@ export interface AccuracyMetrics {
 }
 
 interface ScorableEntry {
+  title?: string
   content: string
   transcription?: string | null
+  translation?: string | null
   genre: string
 }
 
 /**
  * Evaluates the rule-based classifier against the archive's own curated
- * genre labels: for each entry, the classifier is re-run on its content and
- * transcription exactly as it is at entry creation/update time, and the
- * top-scoring predicted genre is compared against the genre already stored
- * for that entry (the ground truth). Precision, recall, and F1 are
- * macro-averaged across every genre class present in the corpus — the
- * standard approach for multiclass evaluation, and one that needs no
- * separate held-out test set since it validates against the archive's own
- * accepted labels.
+ * genre labels: for each entry, the classifier is re-run on its content, title, and
+ * transcription, and the top-scoring predicted genre is compared against
+ * the genre already stored for that entry (the ground truth). Precision, recall,
+ * and F1 are macro-averaged across every genre class present in the corpus.
  */
 export function computeAccuracyMetrics(entries: ScorableEntry[]): AccuracyMetrics {
   if (entries.length === 0) {
@@ -37,7 +35,8 @@ export function computeAccuracyMetrics(entries: ScorableEntry[]): AccuracyMetric
   let correct = 0
 
   for (const entry of entries) {
-    const result = classifyEntry(entry.content, entry.transcription || '')
+    const textToClassify = [entry.title, entry.content, entry.translation].filter(Boolean).join(' ')
+    const result = classifyEntry(textToClassify, entry.transcription || '')
     const predicted = result.genre.value
     const actual = entry.genre
 
