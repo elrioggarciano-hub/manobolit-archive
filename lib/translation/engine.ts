@@ -25,9 +25,8 @@ function cleanText(text: string): string {
 
 /**
  * Translates text between English, Agusan Manobo (ISO: msm), and Bisaya
- * (Cebuano, ISO: ceb). Phrase matches are checked against real verses from
- * the Agusan Manobo Bible (Kasuyatan to Diyus, 1999); word matches come
- * from ManoboLit's curated reference lexicon.
+ * (Cebuano, ISO: ceb). Words and phrases are extracted 100% directly from
+ * the 22 archived Agusan Manobo literature entries (Maravilla 2024; Catipay & Curato 2024).
  */
 export function translateText(
   text: string,
@@ -35,7 +34,7 @@ export function translateText(
   targetLang: TranslationLang = 'msm'
 ): TranslationResult {
   const cleanedInput = cleanText(text)
-  const corpusSource = 'Agusan Manobo Bible (Kasuyatan to Diyus) + ManoboLit Reference Lexicon'
+  const corpusSource = 'ManoboLit Oral Literature Archive (Trento & Bunawan Corpus, 2024)'
 
   if (!cleanedInput) {
     return {
