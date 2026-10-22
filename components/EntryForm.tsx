@@ -133,27 +133,45 @@ export default function EntryForm({ initialData, mode }: Props) {
     set('audioDuration', '')
   }
 
-  const handleAutoTranslate = async (field: 'manoboTitle' | 'transcription' | 'translation') => {
+  const handleAutoTranslate = async (
+    field: 'manoboTitle' | 'transcription' | 'translation' | 'bisayaTranslation'
+  ) => {
     let sourceText = ''
-    let sourceLang: 'en' | 'msm' = 'en'
-    let targetLang: 'msm' | 'en' = 'msm'
+    let sourceLang: 'en' | 'msm' | 'ceb' = 'en'
+    let targetLang: 'msm' | 'en' | 'ceb' = 'msm'
 
     if (field === 'manoboTitle') {
-      sourceText = form.title || form.englishTitle
-      sourceLang = 'en'
+      sourceText = form.title || form.englishTitle || form.bisayaTranslation
+      sourceLang = form.title || form.englishTitle ? 'en' : 'ceb'
       targetLang = 'msm'
     } else if (field === 'transcription') {
-      sourceText = form.content || form.translation
-      sourceLang = 'en'
+      sourceText = form.content || form.translation || form.bisayaTranslation
+      sourceLang = form.content || form.translation ? 'en' : 'ceb'
       targetLang = 'msm'
     } else if (field === 'translation') {
-      sourceText = form.transcription
-      sourceLang = 'msm'
+      sourceText = form.transcription || form.bisayaTranslation
+      sourceLang = form.transcription ? 'msm' : 'ceb'
       targetLang = 'en'
+    } else if (field === 'bisayaTranslation') {
+      if (form.transcription) {
+        sourceText = form.transcription
+        sourceLang = 'msm'
+        targetLang = 'ceb'
+      } else if (form.content || form.translation) {
+        sourceText = form.content || form.translation
+        sourceLang = 'en'
+        targetLang = 'ceb'
+      }
     }
 
     if (!sourceText) {
-      raiseError(`Please fill the source text before auto-translating to ${field}.`)
+      const msg =
+        field === 'bisayaTranslation'
+          ? 'Please enter Manobo original text or English translation first before auto-translating to Bisaya.'
+          : field === 'translation'
+          ? 'Please enter Manobo transcription or Bisaya text first before auto-translating to English.'
+          : `Please fill the source text before auto-translating to ${field}.`
+      raiseError(msg)
       return
     }
 
@@ -170,7 +188,17 @@ export default function EntryForm({ initialData, mode }: Props) {
       const data = await res.json()
       if (data.result?.translatedText) {
         set(field, data.result.translatedText)
-        setTranslationNotice(`✓ Auto-translated using ManoboLit Reference Lexicon (Confidence: ${Math.round(data.result.confidence * 100)}%)`)
+        const targetLabel =
+          field === 'bisayaTranslation'
+            ? 'Bisaya (Cebuano)'
+            : field === 'translation'
+            ? 'English'
+            : 'Agusan Manobo'
+        setTranslationNotice(
+          `✓ Auto-translated to ${targetLabel} using ManoboLit Reference Lexicon (Confidence: ${Math.round(
+            data.result.confidence * 100
+          )}%)`
+        )
       } else {
         throw new Error('No translation returned')
       }
@@ -432,10 +460,11 @@ export default function EntryForm({ initialData, mode }: Props) {
                 <button
                   type="button"
                   onClick={() => handleAutoTranslate('transcription')}
-                  disabled={translatingField === 'transcription' || (!form.content && !form.translation)}
+                  disabled={translatingField === 'transcription' || (!form.content && !form.translation && !form.bisayaTranslation)}
                   style={{
-                    background: 'transparent', border: 'none', color: '#38bdf8', fontSize: '11px', fontWeight: 700, cursor: 'pointer', padding: 0
+                    background: 'transparent', border: 'none', color: '#38bdf8', fontSize: '11px', fontWeight: 700, cursor: (!form.content && !form.translation && !form.bisayaTranslation) ? 'default' : 'pointer', padding: 0
                   }}
+                  title="Auto-translate to Agusan Manobo using ManoboLit Reference Lexicon"
                 >
                   {translatingField === 'transcription' ? '⏳ Translating...' : '🌐 Auto-Translate (Manobo)'}
                 </button>
@@ -448,10 +477,11 @@ export default function EntryForm({ initialData, mode }: Props) {
                 <button
                   type="button"
                   onClick={() => handleAutoTranslate('translation')}
-                  disabled={translatingField === 'translation' || !form.transcription}
+                  disabled={translatingField === 'translation' || (!form.transcription && !form.bisayaTranslation)}
                   style={{
-                    background: 'transparent', border: 'none', color: '#38bdf8', fontSize: '11px', fontWeight: 700, cursor: 'pointer', padding: 0
+                    background: 'transparent', border: 'none', color: '#38bdf8', fontSize: '11px', fontWeight: 700, cursor: (!form.transcription && !form.bisayaTranslation) ? 'default' : 'pointer', padding: 0
                   }}
+                  title="Auto-translate to English using ManoboLit Reference Lexicon"
                 >
                   {translatingField === 'translation' ? '⏳ Translating...' : '🌐 Auto-Translate (English)'}
                 </button>
@@ -459,7 +489,26 @@ export default function EntryForm({ initialData, mode }: Props) {
               <textarea className="input-anim" style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={form.translation} onChange={e => set('translation', e.target.value)} placeholder="Enter the English translation..." />
             </div>
             <div>
-              <label style={labelStyle}>BISAYA (CEBUANO) TRANSLATION</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ ...labelStyle, marginBottom: 0 }}>BISAYA (CEBUANO) TRANSLATION</label>
+                <button
+                  type="button"
+                  onClick={() => handleAutoTranslate('bisayaTranslation')}
+                  disabled={translatingField === 'bisayaTranslation' || (!form.transcription && !form.content && !form.translation)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#38bdf8',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: (!form.transcription && !form.content && !form.translation) ? 'default' : 'pointer',
+                    padding: 0,
+                  }}
+                  title="Auto-translate to Bisaya (Cebuano) using ManoboLit Reference Lexicon"
+                >
+                  {translatingField === 'bisayaTranslation' ? '⏳ Translating...' : '🌐 Auto-Translate (Bisaya / Cebuano)'}
+                </button>
+              </div>
               <textarea className="input-anim" style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={form.bisayaTranslation} onChange={e => set('bisayaTranslation', e.target.value)} placeholder="Enter the Bisaya (Cebuano) translation..." />
             </div>
             <div>
