@@ -703,12 +703,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     {isAnalyzing ? (
                       <>
                         <span>⏳</span>
-                        <span>Synthesizing Rules...</span>
-                      </>
-                    ) : hasExecuted ? (
-                      <>
-                        <span>🔄</span>
-                        <span>Re-run Classification</span>
+                        <span>Classifying...</span>
                       </>
                     ) : (
                       <>
