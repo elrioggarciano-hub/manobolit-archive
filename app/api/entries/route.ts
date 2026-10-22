@@ -88,6 +88,17 @@ export async function POST(request: NextRequest) {
       translation = res.translatedText
     }
 
+    let bisayaTranslation = body.bisayaTranslation || null
+
+    // Auto-translate missing Bisaya (Cebuano) translation from transcription or content
+    if (!bisayaTranslation && transcription) {
+      const res = translateText(transcription, 'msm', 'ceb')
+      bisayaTranslation = res.translatedText
+    } else if (!bisayaTranslation && (body.content || translation)) {
+      const res = translateText(body.content || translation, 'en', 'ceb')
+      bisayaTranslation = res.translatedText
+    }
+
     const entry = await prisma.literatureEntry.create({
       data: {
         title: body.title,
@@ -97,7 +108,7 @@ export async function POST(request: NextRequest) {
         content: body.content,
         transcription,
         translation,
-        bisayaTranslation: body.bisayaTranslation || null,
+        bisayaTranslation: bisayaTranslation || null,
         audioFile: body.audioFile || null,
         audioDuration: body.audioDuration ? Number(body.audioDuration) : null,
         source: body.source,
