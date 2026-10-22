@@ -30,9 +30,10 @@ export default async function ExplorePage() {
   const parsed = entries.map(e => {
     // Older/seeded entries never had the rule engine run on insert, so there's
     // no persisted Classification row — compute it live instead of faking a number.
-    const confidence = e.classifications[0]?.confidenceScore !== undefined
-      ? Math.round(e.classifications[0].confidenceScore * 100)
-      : Math.round(classifyEntry(e.content, e.transcription || '').overallConfidence * 100)
+    const persistedScore = e.classifications[0]?.confidenceScore
+    const confidence = (persistedScore !== undefined && persistedScore >= 0.50)
+      ? Math.round(persistedScore * 100)
+      : Math.round(classifyEntry(e).overallConfidence * 100)
 
     return {
       ...e,

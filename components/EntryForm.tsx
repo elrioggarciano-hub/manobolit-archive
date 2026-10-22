@@ -94,6 +94,19 @@ export default function EntryForm({ initialData, mode }: Props) {
         .from(AUDIO_BUCKET)
         .upload(path, file, { contentType: file.type || 'audio/mpeg', upsert: false })
 
+      // Also mirror the upload to the server's local storage directory
+      try {
+        const serverForm = new FormData()
+        serverForm.append('file', file)
+        serverForm.append('subfolder', 'audio')
+        await fetch('/api/admin/storage', {
+          method: 'POST',
+          body: serverForm,
+        })
+      } catch (mirrorErr) {
+        console.warn('Local storage mirror notice:', mirrorErr)
+      }
+
       if (uploadError) throw new Error(uploadError.message || 'Upload failed.')
 
       const { data } = supabase.storage.from(AUDIO_BUCKET).getPublicUrl(path)

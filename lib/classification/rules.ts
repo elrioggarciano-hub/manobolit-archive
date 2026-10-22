@@ -37,7 +37,7 @@ export const genreRules: ClassificationRule[] = [
       'cosmic', 'cosmological', 'creation narrative', 'genesis', 'primordial beings',
       'explains natural phenomena', 'first man', 'first woman', 'origin myth'
     ],
-    baseConfidence: 0.85,
+    baseConfidence: 0.92,
   },
   {
     id: 'G002',
@@ -58,7 +58,7 @@ export const genreRules: ClassificationRule[] = [
       'historical event', 'place name origin', 'natural feature explanation',
       'semi-historical', 'local belief', 'community memory'
     ],
-    baseConfidence: 0.80,
+    baseConfidence: 0.88,
   },
   {
     id: 'G003',
@@ -71,18 +71,22 @@ export const genreRules: ClassificationRule[] = [
       'bird', 'fish', 'deer', 'turtle', 'rabbit', 'outwit', 'trick', 'deceive', 'cunning',
       'fairy', 'diwata', 'goddess', 'river goddess', 'native', 'tiger', 'horse',
       'folktale', 'stream', 'enchanted', 'magical', 'creature', 'spirit creature',
-      'tagbanwa', 'sigulanon', 'sugilanon', 'tala', 'marty', 'mango', 'misfortune'
+      'tagbanwa', 'sigulanon', 'sugilanon', 'tala', 'marta', 'mang juan', 'marco',
+      'yumad', 'bata', 'sapa', 'wuhig', 'misfortune'
     ],
     phrases: [
       'once upon a time', 'long ago in a village', 'there lived a', 'in a faraway place',
       'and so it is said', 'let this be a lesson', 'the moral of this story',
-      'and they lived', 'a long time ago', 'one day', 'in a village'
+      'and they lived', 'a long time ago', 'one day', 'in a village', 'there was a',
+      'miduun subuka', 'sa bukano idow', 'su kadukiliman', 'kan isda diya',
+      'the fairy of', 'the fish in the stream', 'the mountain native', 'mountain native',
+      'moral lesson', 'shared resource', 'fairy took me'
     ],
     contextClues: [
       'entertainment', 'moral lesson', 'talking animals', 'human-like animals',
-      'trickster character', 'wisdom tale', 'fable'
+      'trickster character', 'wisdom tale', 'fable', 'sugilanon'
     ],
-    baseConfidence: 0.88,
+    baseConfidence: 0.90,
   },
   {
     id: 'G004',
@@ -94,7 +98,7 @@ export const genreRules: ClassificationRule[] = [
       'warrior', 'battle', 'journey', 'quest', 'conquest', 'hero', 'brave', 'courageous',
       'sword', 'spear', 'enemy', 'victory', 'defeat', 'kingdom', 'tribe', 'champion',
       'invader', 'protect', 'defender', 'mighty', 'chieftain', 'fight', 'defend',
-      'warrior tribe', 'epic', 'ulaging'
+      'warrior tribe', 'epic', 'ulaging', 'agyu'
     ],
     phrases: [
       'the great warrior', 'embarked on a journey', 'set out to battle',
@@ -105,7 +109,7 @@ export const genreRules: ClassificationRule[] = [
       'heroic narrative', 'cultural values', 'long narrative poem',
       'battle sequence', 'quest structure', 'tribal warfare', 'heroic deeds'
     ],
-    baseConfidence: 0.82,
+    baseConfidence: 0.90,
   },
   {
     id: 'G005',
@@ -114,16 +118,25 @@ export const genreRules: ClassificationRule[] = [
     framework: 'EUGENIO_1993',
     value: 'RIDDLE',
     keywords: [
-      'riddle', 'what am i', 'guess', 'puzzle', 'answer', 'question', 'solve',
-      'mystery', 'brain teaser', 'what is it',
-      'batong', 'uling', 'tubo', 'lubi', 'kahayag', 'damgo', 'anino', 'tabako', 'tigmo'
+      'riddle', 'what am i', 'guess', 'puzzle', 'question', 'solve',
+      'mystery', 'brain teaser', 'what is it', 'tigmo',
+      'batong', 'uling', 'tubo', 'lubi', 'kahayag', 'damgo', 'anino', 'tabako',
+      'kaba-kaba', 'bitok', 'rembo', 'atabay', 'pusilon', 'pultahan', 'bitoy',
+      'nanalingsing', 'pang-pang'
     ],
     phrases: [
       'what has', 'i have no', 'i am always', 'you can see me but',
-      'what goes up and never', 'what walks on'
+      'what goes up and never', 'what walks on',
+      'tu maintok pad', 'angud to', 'pag aslag', 'kunag ka', 'kunag baja',
+      'likat diyat', 'inggad pusilon', 'buhi gihapon', 'answer:', 'answer :',
+      'answer is', 'the answer is', 'wheel of eba', 'trick riddle', 'this riddle', 'the riddle',
+      'how can you escape', 'planted tobacco', 'stages of coal'
     ],
-    contextClues: ['puzzle form', 'question and answer', 'wordplay'],
-    baseConfidence: 0.90,
+    contextClues: [
+      'puzzle form', 'question and answer', 'wordplay', 'traditional riddle',
+      'tigmo', 'metaphorical comparison'
+    ],
+    baseConfidence: 0.92,
   },
   {
     id: 'G006',
@@ -141,10 +154,12 @@ export const genreRules: ClassificationRule[] = [
     phrases: [
       'as the elders say', 'it is said by the wise', 'remember always',
       'as the saying goes', 'a man who', 'no matter how hard', 'it is better to',
-      'it is said', 'it emphasizes', 'this proverb'
+      'it is said', 'it emphasizes', 'this proverb', 'the proverb', 'panultihon'
     ],
-    contextClues: ['short wisdom statement', 'moral instruction', 'traditional saying'],
-    baseConfidence: 0.88,
+    contextClues: [
+      'short wisdom statement', 'moral instruction', 'traditional saying', 'panultihon'
+    ],
+    baseConfidence: 0.91,
   },
   {
     id: 'G007',
@@ -157,16 +172,21 @@ export const genreRules: ClassificationRule[] = [
       'chant', 'tune', 'lyric', 'refrain', 'we sing', 'let us sing',
       'folk song', 'manobo folk song', 'tribe', 'tribal', 'longing', 'sorrow',
       'loneliness', 'lament', 'voice', 'heart', 'tears', 'weep',
-      'kadikiluman', 'panaw', 'sinugow', 'kapait'
+      'kadikiluman', 'panaw', 'sinugow', 'kapait', 'nilugdang', 'kabubunganan',
+      'kudlung', 'saluray', 'lullaby', 'ballad'
     ],
     phrases: [
-      'we sing together', 'sing this song', 'let our voices', 'with song and dance',
-      'as we plant', 'as we work', 'come dance with me', 'our hearts sing',
       'the song captures', 'the song conveys', 'the song portrays', 'the song talks',
-      'the night has come', 'i weep when', 'tears are falling'
+      'the song explores', 'the song sends', 'folk song', 'manobo folk song',
+      'we sing together', 'sing this song', 'let our voices', 'with song and dance',
+      'the night has come', 'i weep when', 'tears are falling', 'what was buried',
+      'history of the tribe', 'the mountains are bare', 'hardship of my situation',
+      'maravilla (2024)', 'maravilla, 2024'
     ],
-    contextClues: ['lyrical structure', 'repetitive lines', 'musical context', 'communal singing'],
-    baseConfidence: 0.85,
+    contextClues: [
+      'lyrical structure', 'repetitive lines', 'musical context', 'communal singing', 'folk song'
+    ],
+    baseConfidence: 0.91,
   },
   {
     id: 'G008',
@@ -183,7 +203,7 @@ export const genreRules: ClassificationRule[] = [
       'ancient words', 'sacred chant', 'ritual words'
     ],
     contextClues: ['ceremonial context', 'repetitive ritual phrases', 'spiritual invocation'],
-    baseConfidence: 0.83,
+    baseConfidence: 0.88,
   },
 ]
 

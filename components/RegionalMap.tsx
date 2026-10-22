@@ -10,8 +10,12 @@ function MapAutoFit({ coords }: { coords: [number, number][] }) {
     if (coords.length === 0) return
     const timer = setTimeout(() => {
       map.invalidateSize()
-      const bounds = L.latLngBounds(coords)
-      map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 })
+      if (coords.length === 1) {
+        map.setView(coords[0], 12)
+      } else {
+        const bounds = L.latLngBounds(coords)
+        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 11 })
+      }
     }, 200)
     return () => clearTimeout(timer)
   }, [coords, map])
@@ -25,22 +29,23 @@ export interface LocationStat {
   count: number
 }
 
-// Real coordinates (source: PhilAtlas / Wikipedia barangay profiles), keyed by
+// Real coordinates (source: PhilAtlas official barangay profiles), keyed by
 // the exact `communityLocation` strings used in the archive's data entry.
 const KNOWN_COORDS: Record<string, [number, number]> = {
   'trento': [8.0500, 126.0667],
   'sta maria': [8.0211, 126.1614],
   'sitio dam, brgy. tudela': [8.0684, 126.1032],
   'tudela': [8.0684, 126.1032],
-  'san andres, bunawan': [8.2742, 125.9961],
-  'san andres': [8.2742, 125.9961],
-  'bunawan': [8.2833, 125.9833],
+  'san andres, bunawan': [8.2066, 125.9944],
+  'san andres': [8.2066, 125.9944],
+  'bunawan': [8.1633, 125.9902],
 }
 
 function resolveCoords(location: string): [number, number] | null {
   const norm = (location || '').trim().toLowerCase()
   if (KNOWN_COORDS[norm]) return KNOWN_COORDS[norm]
-  if (norm.includes('bunawan') || norm.includes('san andres')) return [8.2742, 125.9961]
+  if (norm.includes('san andres')) return [8.2066, 125.9944]
+  if (norm.includes('bunawan')) return [8.1633, 125.9902]
   if (norm.includes('sta maria') || norm.includes('santa maria')) return [8.0211, 126.1614]
   if (norm.includes('dam') || norm.includes('tudela')) return [8.0684, 126.1032]
   if (norm.includes('trento')) return [8.0500, 126.0667]
