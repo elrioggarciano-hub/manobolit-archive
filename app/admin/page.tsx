@@ -14,13 +14,18 @@ const GENRE_COLORS: Record<string, string> = {
 
 export default async function AdminPage() {
   const entries = await prisma.literatureEntry.findMany({
+    select: {
+      id: true,
+      title: true,
+      type: true,
+      genre: true,
+      municipality: true,
+      province: true,
+      yearCollected: true,
+      createdAt: true,
+    },
     orderBy: { createdAt: 'desc' },
   })
-
-  const parsed = entries.map(e => ({
-    ...e,
-    themes: JSON.parse(e.themes || '[]') as string[],
-  }))
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--bg-main)', paddingTop: '80px', fontFamily: 'Inter, sans-serif', color: 'var(--text-primary)' }}>
@@ -67,7 +72,7 @@ export default async function AdminPage() {
         </div>
 
         {/* Entry List */}
-        {parsed.length === 0 ? (
+        {entries.length === 0 ? (
           <div style={{
             background: 'var(--bg-surface)', border: '1px dashed var(--border-color)', borderRadius: '16px',
             padding: '60px', textAlign: 'center', color: 'var(--text-muted)',
@@ -84,7 +89,7 @@ export default async function AdminPage() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {parsed.map(entry => {
+            {entries.map(entry => {
               const color = GENRE_COLORS[entry.genre] || '#6366f1'
               return (
                 <div key={entry.id} className="flex flex-col sm:flex-row gap-4 p-4 sm:p-5 justify-between sm:items-center row-anim card-hover" style={{
