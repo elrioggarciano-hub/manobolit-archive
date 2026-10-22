@@ -114,8 +114,8 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Auto-classify and persist classification results for the new entry
-    const result = classifyEntry(entry.content, entry.transcription || '')
+    // Auto-classify and persist classification results for the new entry using full contextual metadata
+    const result = classifyEntry(entry)
     await prisma.classification.create({
       data: {
         entryId: entry.id,

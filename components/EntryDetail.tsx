@@ -3,6 +3,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 import AudioPlayer from './AudioPlayer'
+import { classifyEntry } from '@/lib/classification'
 
 const RegionalMap = dynamic(() => import('./RegionalMap'), {
   ssr: false,
@@ -46,18 +47,27 @@ interface Entry {
 
 const getAnalysisText = (entry: Entry) => {
   if (entry.genre === 'MYTH') {
-    return 'System classified as Origin Myth based on lexical frequency of "Father Sky" and "Birth" within the introductory markers.'
+    return 'System classified as Origin Myth based on lexical frequency of "Father Sky" and "Birth" within the introductory markers under Eugenio (1993).'
   } else if (entry.genre === 'SONG') {
-    return 'System classified as Courtship Folk Song based on lyrical patterns of "Kudlung" and "Serenade" matches in the corpus.'
+    return 'System classified as Manobo Folk Song based on lyrical verse stanzas, communal/emotional markers ("kapait", "sinugow", "kadikiluman"), and oral rhythm preservation (Maravilla, 2024).'
   } else if (entry.genre === 'EPIC') {
-    return 'System classified as Heroic Epic based on presence of warrior narrative frames and "Agyu" reference clusters.'
+    return 'System classified as Heroic Epic based on presence of warrior narrative frames, tribal defenders, and heroic deeds reference clusters.'
+  } else if (entry.genre === 'RIDDLE') {
+    return 'System classified as Riddle (Tigmo) based on formulaic question-answer structure, metaphorical comparison ("angud to", "tu maintok pad"), and traditional riddle subjects (Catipay & Curato, 2024).'
+  } else if (entry.genre === 'PROVERB') {
+    return 'System classified as Proverb (Panultihon) based on prescriptive moral aphorisms, didactic wisdom rules, and traditional ethical instruction in Eugenio\'s taxonomy.'
+  } else if (entry.genre === 'FOLKTALE') {
+    return 'System classified as Folktale (Sugilanon) based on narrative story markers ("miduun subuka", "one day"), character interactions, and didactic cultural lessons.'
   }
-  return `System classified as ${entry.genre} based on matching keyword heuristics in Eugenio's taxonomy rules.`
+  return `System classified as ${entry.genre} based on matching rule-based keyword heuristics in Eugenio's taxonomy rules.`
 }
 
 export default function EntryDetail({ entry }: { entry: Entry }) {
   const latestClassification = entry.classifications?.[0]
-  const confidence = latestClassification ? Math.round(latestClassification.confidenceScore * 100) : 84
+  const liveClassification = classifyEntry(entry)
+  const confidence = (latestClassification && latestClassification.confidenceScore >= 0.50)
+    ? Math.round(latestClassification.confidenceScore * 100)
+    : Math.round(liveClassification.overallConfidence * 100)
   
   return (
     <div className="anim-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 80px', fontFamily: 'Inter, sans-serif' }}>

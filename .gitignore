@@ -36,3 +36,13 @@ pnpm-debug.log*
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Temporary & lab deliverables
+/scratch/
+/lab-evidence/
+/lab5-deliverables/
+/uploads/
+*.pdf
+*.docx
+ITPC118*.md
+~$*

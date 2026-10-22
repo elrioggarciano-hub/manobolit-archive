@@ -107,17 +107,53 @@ function scoreRule(rule: ClassificationRule, normalizedText: string): RuleDetail
 
   // 4. Saturation-based evidence scoring:
   // In rule-based linguistics, alternative keywords and phrases are disjunctive (OR logic).
-  // Matching 3.0 points of weighted evidence represents full confirmation of the pattern.
-  const targetSaturation = 3.0
+  // Matching 2.5 points of weighted evidence (e.g. 1 phrase + 1 keyword, or 3 keywords) represents full confirmation.
+  const targetSaturation = 2.5
   const rawRatio = Math.min(score / targetSaturation, 1.0)
   const scaled = rawRatio * rule.baseConfidence
 
-  // Return score rounded to two decimal places (e.g. 0.88 representing 88% confidence)
+  // Return score rounded to two decimal places (e.g. 0.92 representing 92% confidence)
   return { confidence: Math.round(scaled * 100) / 100, matched }
 }
 
-export function classifyEntry(text: string, additionalContext: string = '', genreFilter: string = 'ALL'): ClassificationResult {
-  const fullText = normalizeText(`${text} ${additionalContext}`)
+export interface EntryLike {
+  title?: string
+  englishTitle?: string | null
+  manoboTitle?: string | null
+  content: string
+  transcription?: string | null
+  translation?: string | null
+  culturalElements?: string | string[] | null
+  type?: string | null
+}
+
+export function classifyEntry(
+  input: string | EntryLike,
+  additionalContext: string = '',
+  genreFilter: string = 'ALL'
+): ClassificationResult {
+  let fullText: string
+  if (typeof input === 'object' && input !== null) {
+    const parts = [
+      input.title,
+      input.englishTitle,
+      input.manoboTitle,
+      input.content,
+      input.transcription,
+      input.translation,
+      typeof input.culturalElements === 'string'
+        ? input.culturalElements
+        : Array.isArray(input.culturalElements)
+          ? input.culturalElements.join(' ')
+          : '',
+      input.type === 'FOLK_SONG' ? 'folk song maravilla' : '',
+      additionalContext,
+    ]
+    fullText = normalizeText(parts.filter(Boolean).join(' '))
+  } else {
+    fullText = normalizeText(`${input} ${additionalContext}`)
+  }
+
   const ruleDetails: Record<string, RuleDetail> = {}
 
   // --- Genre Classification ---
@@ -184,10 +220,8 @@ export function classifyEntry(text: string, additionalContext: string = '', genr
     ...(topLocation ? [topLocation.ruleId] : []),
   ]
 
-  const overallConfidence =
-    topThemes.length > 0
-      ? Math.round(((topGenre.confidence + topThemes[0].confidence) / 2) * 100) / 100
-      : topGenre.confidence
+  // Overall confidence represents the primary taxonomy genre classification confidence
+  const overallConfidence = topGenre.confidence
 
   return {
     genre: {

@@ -101,7 +101,7 @@ export async function PUT(
 
     // Delete old classifications and create a new one matching the updated content
     await prisma.classification.deleteMany({ where: { entryId: params.id } })
-    const result = classifyEntry(entry.content, entry.transcription || '')
+    const result = classifyEntry(entry)
     await prisma.classification.create({
       data: {
         entryId: entry.id,
