@@ -14,8 +14,7 @@ export default function LogoutButton() {
       onClick={async () => {
         setLoading(true)
         await fetch('/api/auth/logout', { method: 'POST' })
-        router.push('/admin/login')
-        router.refresh()
+        window.location.href = '/admin/login'
       }}
       className="btn-anim"
       style={{

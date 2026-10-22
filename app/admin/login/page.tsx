@@ -102,6 +102,7 @@ function LoginForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (loading) return
     setError('')
     setLoading(true)
     try {
@@ -112,12 +113,12 @@ function LoginForm() {
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setError(data.error || 'Login failed')
+        setError(data.error || 'Incorrect password')
         setLoading(false)
         return
       }
-      router.push(searchParams.get('next') || '/admin')
-      router.refresh()
+      const target = searchParams.get('next') || '/admin'
+      window.location.href = target
     } catch {
       setError('Could not reach the server. Please try again.')
       setLoading(false)
