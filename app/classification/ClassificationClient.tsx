@@ -84,8 +84,8 @@ type ConfidenceTier = 'weak' | 'moderate' | 'strong'
 
 function getConfidenceTier(pct: number): { tier: ConfidenceTier; color: string; label: string } {
   if (pct < 30) return { tier: 'weak', color: '#ef4444', label: 'Needs Review' }
-  if (pct < 65) return { tier: 'moderate', color: '#f59e0b', label: 'Moderate' }
-  return { tier: 'strong', color: '#f1b80d', label: 'Confirmed' }
+  if (pct < 70) return { tier: 'moderate', color: '#f59e0b', label: 'Moderate' }
+  return { tier: 'strong', color: '#10b981', label: 'Confirmed' } // Green for Confirmed!
 }
 
 export default function ClassificationClient({ dbEntries = [] }: ClassificationClientProps) {
@@ -116,6 +116,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [selectedBisayaTranslation, setSelectedBisayaTranslation] = useState(initialEntry?.bisayaTranslation || '')
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>('ALL')
 
+  // Execution state: do not automatically display results when user selects an entry
+  const [hasExecuted, setHasExecuted] = useState(false)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+
   const classificationResult = classifyEntry(inputText, inputTranscription, selectedGenreFilter)
 
   const filteredEntriesList = selectedGenreFilter === 'ALL'
@@ -124,6 +128,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
   useEffect(() => {
     if (selectedEntryId !== 'custom' && !filteredEntriesList.some(e => e.id === selectedEntryId)) {
+      setHasExecuted(false)
       if (filteredEntriesList.length > 0) {
         const nextEntry = filteredEntriesList[0]
         setSelectedEntryId(nextEntry.id)
@@ -551,7 +556,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     </label>
                     <select
                       value={selectedGenreFilter}
-                      onChange={(e) => setSelectedGenreFilter(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedGenreFilter(e.target.value)
+                        setHasExecuted(false)
+                      }}
                       className="input-anim"
                       style={{
                         width: '100%',
@@ -588,6 +596,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       onChange={(e) => {
                         const entryId = e.target.value
                         setSelectedEntryId(entryId)
+                        setHasExecuted(false)
                         if (entryId === 'custom') {
                           // Keep current text or reset
                         } else {
@@ -656,6 +665,59 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     )}
                   </div>
 
+                  {/* Action Button: Run Rule Classification */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAnalyzing(true)
+                      setTimeout(() => {
+                        setHasExecuted(true)
+                        setIsAnalyzing(false)
+                      }, 250)
+                    }}
+                    disabled={isAnalyzing || (!inputText && !inputTranscription)}
+                    className="btn-anim"
+                    style={{
+                      width: '100%',
+                      maxWidth: '220px',
+                      padding: '10px 14px',
+                      background: isAnalyzing
+                        ? '#27272a'
+                        : 'linear-gradient(135deg, var(--primary-red, #8F000D), var(--primary-red-dark, #5c000a))',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontWeight: 700,
+                      fontSize: '11px',
+                      letterSpacing: '0.04em',
+                      cursor: isAnalyzing ? 'wait' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      boxShadow: isAnalyzing ? 'none' : '0 4px 12px rgba(143, 0, 13, 0.35)',
+                      transition: 'all 0.2s ease',
+                      marginTop: '4px',
+                    }}
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <span>⏳</span>
+                        <span>Synthesizing Rules...</span>
+                      </>
+                    ) : hasExecuted ? (
+                      <>
+                        <span>🔄</span>
+                        <span>Re-run Classification</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>⚡</span>
+                        <span>Run Classification</span>
+                      </>
+                    )}
+                  </button>
+
                 </div>
 
                 {/* Arrow */}
@@ -701,7 +763,30 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
                   {/* Rules list with confidence-tiered indicators + matched evidence */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', maxWidth: '220px', minHeight: '80px', justifyContent: 'center' }}>
-                    {classificationResult.rulesApplied.length > 0 ? (
+                    {!hasExecuted ? (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '100%',
+                          minHeight: '140px',
+                          background: '#09090b',
+                          border: '1px dashed #27272a',
+                          borderRadius: '6px',
+                          padding: '18px 14px',
+                          textAlign: 'center',
+                          gap: '6px',
+                        }}
+                      >
+                        <span style={{ fontSize: '20px' }}>⚙️</span>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#e4e4e7' }}>Awaiting Execution</div>
+                        <p style={{ fontSize: '9.5px', color: '#71717a', margin: 0, lineHeight: 1.4 }}>
+                          Click &ldquo;Run Classification&rdquo; to synthesize rules and match keywords.
+                        </p>
+                      </div>
+                    ) : classificationResult.rulesApplied.length > 0 ? (
                       classificationResult.rulesApplied.map(ruleId => {
                         const rule = [...genreRules, ...themeRules, ...locationRules].find(r => r.id === ruleId)
                         const detail = classificationResult.ruleDetails[ruleId]
@@ -775,102 +860,129 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     minWidth: '220px'
                   }}
                 >
-                  {/* Genre Identified — always shown, since a top genre always exists */}
-                  {(() => {
-                    const pct = Math.round(classificationResult.genre.confidence * 100)
-                    const { color, label } = getConfidenceTier(pct)
-                    return (
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
-                          <span>→</span>
-                          <span>GENRE IDENTIFIED</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
-                          <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
-                            {formatName(classificationResult.genre.value)}
-                          </span>
-                          <span style={{ fontSize: '15px', fontWeight: 700, color }}>
-                            {pct}%
-                          </span>
-                        </div>
-                        <div style={{ height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' }}>
-                          <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
-                        </div>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color, letterSpacing: '0.04em' }}>{label.toUpperCase()}</span>
-                      </div>
-                    )
-                  })()}
-
-                  {/* Theme Identified — collapses to a muted state when nothing confidently matched */}
-                  {classificationResult.themes.length > 0 ? (() => {
-                    const pct = Math.round(classificationResult.themes[0].confidence * 100)
-                    const { color, label } = getConfidenceTier(pct)
-                    return (
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
-                          <span>→</span>
-                          <span>THEME IDENTIFIED</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
-                          <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
-                            {formatName(classificationResult.themes[0].value)}
-                          </span>
-                          <span style={{ fontSize: '15px', fontWeight: 700, color }}>
-                            {pct}%
-                          </span>
-                        </div>
-                        <div style={{ height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' }}>
-                          <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
-                        </div>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color, letterSpacing: '0.04em' }}>{label.toUpperCase()}</span>
-                      </div>
-                    )
-                  })() : (
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
-                        <span>→</span>
-                        <span>THEME IDENTIFIED</span>
-                      </div>
-                      <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>
-                        No confident theme match
-                      </div>
+                  {!hasExecuted ? (
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        minHeight: '200px',
+                        background: '#09090b',
+                        border: '1px dashed #27272a',
+                        borderRadius: '6px',
+                        padding: '24px 16px',
+                        textAlign: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      <span style={{ fontSize: '24px' }}>📊</span>
+                      <div style={{ fontSize: '12px', fontWeight: 700, color: '#e4e4e7' }}>Results Pending</div>
+                      <p style={{ fontSize: '10px', color: '#71717a', margin: 0, maxWidth: '210px', lineHeight: 1.5 }}>
+                        Choose an archive entry and click &ldquo;Run Classification&rdquo; to identify genre, themes, and location.
+                      </p>
                     </div>
-                  )}
+                  ) : (
+                    <>
+                      {/* Genre Identified — always shown, since a top genre always exists */}
+                      {(() => {
+                        const pct = Math.round(classificationResult.genre.confidence * 100)
+                        const { color, label } = getConfidenceTier(pct)
+                        return (
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
+                              <span>→</span>
+                              <span>GENRE IDENTIFIED</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                              <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
+                                {formatName(classificationResult.genre.value)}
+                              </span>
+                              <span style={{ fontSize: '15px', fontWeight: 700, color }}>
+                                {pct}%
+                              </span>
+                            </div>
+                            <div style={{ height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' }}>
+                              <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
+                            </div>
+                            <span style={{ fontSize: '9px', fontWeight: 700, color, letterSpacing: '0.04em' }}>{label.toUpperCase()}</span>
+                          </div>
+                        )
+                      })()}
 
-                  {/* Location Identified — collapses to a muted state when nothing confidently matched */}
-                  {classificationResult.location ? (() => {
-                    const pct = Math.round(classificationResult.location!.confidence * 100)
-                    const { color, label } = getConfidenceTier(pct)
-                    return (
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
-                          <span>→</span>
-                          <span>LOCATION IDENTIFIED</span>
+                      {/* Theme Identified */}
+                      {classificationResult.themes.length > 0 ? (() => {
+                        const pct = Math.round(classificationResult.themes[0].confidence * 100)
+                        const { color, label } = getConfidenceTier(pct)
+                        return (
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
+                              <span>→</span>
+                              <span>THEME IDENTIFIED</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                              <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
+                                {formatName(classificationResult.themes[0].value)}
+                              </span>
+                              <span style={{ fontSize: '15px', fontWeight: 700, color }}>
+                                {pct}%
+                              </span>
+                            </div>
+                            <div style={{ height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' }}>
+                              <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
+                            </div>
+                            <span style={{ fontSize: '9px', fontWeight: 700, color, letterSpacing: '0.04em' }}>{label.toUpperCase()}</span>
+                          </div>
+                        )
+                      })() : (
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
+                            <span>→</span>
+                            <span>THEME IDENTIFIED</span>
+                          </div>
+                          <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>
+                            No confident theme match
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
-                          <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
-                            {formatName(classificationResult.location!.value)}
-                          </span>
-                          <span style={{ fontSize: '15px', fontWeight: 700, color }}>
-                            {pct}%
-                          </span>
+                      )}
+
+                      {/* Location Identified */}
+                      {classificationResult.location ? (() => {
+                        const pct = Math.round(classificationResult.location!.confidence * 100)
+                        const { color, label } = getConfidenceTier(pct)
+                        return (
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
+                              <span>→</span>
+                              <span>LOCATION IDENTIFIED</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                              <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
+                                {formatName(classificationResult.location!.value)}
+                              </span>
+                              <span style={{ fontSize: '15px', fontWeight: 700, color }}>
+                                {pct}%
+                              </span>
+                            </div>
+                            <div style={{ height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' }}>
+                              <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
+                            </div>
+                            <span style={{ fontSize: '9px', fontWeight: 700, color, letterSpacing: '0.04em' }}>{label.toUpperCase()}</span>
+                          </div>
+                        )
+                      })() : (
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
+                            <span>→</span>
+                            <span>LOCATION IDENTIFIED</span>
+                          </div>
+                          <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>
+                            No location markers detected
+                          </div>
                         </div>
-                        <div style={{ height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' }}>
-                          <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
-                        </div>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color, letterSpacing: '0.04em' }}>{label.toUpperCase()}</span>
-                      </div>
-                    )
-                  })() : (
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
-                        <span>→</span>
-                        <span>LOCATION IDENTIFIED</span>
-                      </div>
-                      <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>
-                        No location markers detected
-                      </div>
-                    </div>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -879,7 +991,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
             </section>
 
             {/* SECTION 4: ENTRY TRANSLATIONS */}
-            {selectedEntryId !== 'custom' && (selectedTranslation || selectedBisayaTranslation) && (
+            {hasExecuted && selectedEntryId !== 'custom' && (selectedTranslation || selectedBisayaTranslation) && (
               <section style={{ marginBottom: '40px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', margin: '0 0 24px 0' }}>
                   <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
