@@ -289,11 +289,11 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               </div>
             </div>
 
-            {/* Source Code */}
+            {/* Academic Source / Reference */}
             <div>
-              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>SOURCE CODE</div>
+              <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>SOURCE / REFERENCE</div>
               <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 700 }}>
-                {entry.source || 'ML-ADS-1992-04'}
+                {entry.source || 'Catipay & Curato (2024)'}
               </div>
             </div>
 
