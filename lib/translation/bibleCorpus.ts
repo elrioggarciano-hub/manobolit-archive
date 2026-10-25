@@ -28,7 +28,7 @@ export interface LexiconEntry {
 export const BIBLE_PARALLEL_PHRASES: ParallelPhrase[] = [
   {
     english: 'what was buried has surfaced again',
-    manobo: 'kan pig lugdang nu wohig iyan op isab ug pa ibabow',
+    manobo: 'kan pig lugdang nu wohig iyan on isab ug pa ibabow',
     bisaya: 'ang nalubong sa tubig maoy mikawas pag-usab',
     verseRef: 'Ka nilugdang iyan on usab paibabow (Folk Song)',
     entryTitle: 'Ka nilugdang iyan on usab paibabow',
