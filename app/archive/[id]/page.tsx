@@ -3,6 +3,9 @@ import { prisma } from '@/lib/database/prisma'
 import EntryDetail from '@/components/EntryDetail'
 import BackButton from '@/components/BackButton'
 
+// Always load live entry data on demand so updates appear immediately without stale cache.
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: { id: string }
 }
