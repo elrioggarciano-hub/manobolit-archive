@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
 
 const getEntriesSortedByTitle = unstable_cache(
   async () => prisma.literatureEntry.findMany({ orderBy: { title: 'asc' } }),
-  ['classification-entries-v4'],
+  ['classification-entries-v5'],
   { tags: ['entries'] }
 )
 

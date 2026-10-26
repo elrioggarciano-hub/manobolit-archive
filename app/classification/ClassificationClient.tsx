@@ -36,6 +36,7 @@ const fallbackEntries: DBEntry[] = [
     content: "System classified as Origin Myth based on lexical frequency of \"Father Sky\" and \"Birth\" within the introductory markers.",
     transcription: "d-anak te meogingon so mga bituen te amay\nhe langit. Su kagi te meembon, amey ne\nlangit ne og-ilaan ne kandin ne mga bata.\n\nNe so kani ne timpu, wadad pa bituen te\nlangit. Madalumon pa so kapa-an te tano. Ne\nmig-iling so amey ne langit, \"Og-paka-anak\nki te mga bituen.\"",
     translation: "The stars were born from the breath of the\nFather Sky. According to the elders, the Sky\nFather wanted to give light to his children.\n\nIn those ancient times, there were no stars in\nthe heavens. The surface of the earth was\nstill in deep darkness. Then Father Sky said,\n\"We shall give birth to the stars.\"",
+    bisayaTranslation: "Ang mga bituon natawo gikan sa ginhawa sa Amahang Langit. Sumala sa mga katigulangan, ang Amahang Langit buot mohatag og kahayag sa iyang mga anak.",
     genre: "MYTH",
     themes: ["COSMOGONY","ORIGINS"],
     culturalElements: ["Stars","Cosmogony","Origins","Myth"]
@@ -49,6 +50,7 @@ const fallbackEntries: DBEntry[] = [
     content: "The song captures the journey of the Manobo tribe, who have long felt invisible and neglected, burdened by a heavy sense of abandonment.",
     transcription: "Lantawod diya lawod nig duma kan bayod soe tribu ko no daog-daog mahawig no katuigan, niglubong on tu kamingaw kunag pakabarog so wara ka silungan musombong sa kagamhanan Kuna intawon ug paminugon pasahan to resolution kandan gayod pag palisudlisuron Kuna nog paluapon kandan pagyud palugoylugoyuntribu mapailubon paubus nalang intawon uhaw tu pag mahal kuwang tu pag pangga uhaw tu pagtabang tu katribuhan wara lamang dahuma tu mgo katuigan presidente Ramos ka Ipra Law kandin pig amidahan tuig 1997 Gloria Arroyo kandin Tig segundahan buyan tu of October 29. Kandin soe Tig permahan.  Tig maduan tu INCP tu Ipra Law panalipdan 8371 kinahanglan dudusunan Aron matabangan mga katribuhan Kay duon tu kalisdanan lantawa ka duma now tu kabus tu pag aha- aha Kun wuhig pad lamang malubog matin ow wara lamang dahuma nu mgo katuigan kan pig lugdang nu wohig iyan on isab ug pa ibabow.",
     translation: "What Was Buried Has Surfaced Again",
+    bisayaTranslation: "Ang nalubong sa tubig maoy mikawas pag-usab. Tan-awa didto sa lawod, kauban ang mga balod sa akong tribo nga dinaog-daog sa daghang katuigan. Nalubong sa kamingaw, dili makatindog kay walay kapasilongan.",
     genre: "SONG",
     themes: ["NATURE_AND_ENVIRONMENT","HEROIC_DEEDS"],
     culturalElements: ["Tribal Recognition","Cultural Identity","Resilience","Manobo Folk Song"]
@@ -62,6 +64,7 @@ const fallbackEntries: DBEntry[] = [
     content: "The song conveys a profound sense of emotional struggle, loneliness, and longing. The mountains symbolize the burdens and hardships faced by the narrator, reinforcing their feelings of being trapped in a difficult situation.",
     transcription: "Kapait soe Kanak kahimtang bubungan SI Kanak pig ugpaan ug sinugow a Man usahay tug paka dumdum a tu kanay inoy, labi on tu mgo silingan Kay Kandan amana tamayan sinugow a tug kadumduman tu kandan pagtamay.Oh a dios on lang iyo tibu Kay kani a man tu tikang, ug Tambo duon tu bintana Dahun tu misitas na Puno on tu mgo luha.",
     translation: "How hardship my situation is, For the mountains are my home. I weep when I remember my mother. But, because of these neighbors, For they have scorned me. I sometimes cry when I recall your disdain. Oh, farewell to all of you, For I am about to leave. I will look out the window, Leaves of the misitas, Full of tears. Here I am, far away, Facing the great waves. I sometimes cry when I remember your disdain. I sometimes cry when I think of my mother.",
+    bisayaTranslation: "Kalisod sa akong kahimtang, ang bukid maoy akong gipuy-an. Muhilak ko usahay kon mahinumdom ko sa akong inahan, ilabina sa mga silingan kay ako ilang gitamay. Muhilak ko kon mahinumdoman nako ang ilang pagtamay.",
     genre: "SONG",
     themes: ["SOCIAL_CUSTOMS","DEATH_AND_AFTERLIFE"],
     culturalElements: ["Family Life","Social Isolation","Grief and Loss","Manobo Folk Song"]

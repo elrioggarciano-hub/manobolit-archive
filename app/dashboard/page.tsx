@@ -29,7 +29,7 @@ const getDashboardData = unstable_cache(
     // cached arrays came through intact.)
     prisma.literatureEntry.findMany({ orderBy: { createdAt: 'desc' } }),
   ]),
-  ['dashboard-data-v4'],
+  ['dashboard-data-v5'],
   { tags: ['entries'] }
 )
 
