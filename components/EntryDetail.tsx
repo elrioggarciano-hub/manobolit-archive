@@ -147,7 +147,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                 paddingBottom: '8px'
               }}
             >
-              TRANSCRIPIAN (MANOBO)
+              TRANSCRIPTION (MANOBO)
             </h3>
             <p
               style={{

@@ -69,10 +69,10 @@ export default function Footer() {
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
-                { label: 'Archive Explorer', href: '/' },
-                { label: 'Taxonomy Rules', href: '/dashboard' },
-                { label: 'Research Papers', href: '/admin' },
-                { label: 'Cultural Ethics', href: '/' },
+                { label: 'Archive Explorer', href: '/explore' },
+                { label: 'Taxonomy Rules', href: '/classification' },
+                { label: 'About Archive', href: '/about' },
+                { label: 'Cultural Ethics', href: '/ethics' },
               ].map(link => (
                 <Link 
                   key={link.label} 
