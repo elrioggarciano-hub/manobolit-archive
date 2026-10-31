@@ -93,9 +93,9 @@ function formatName(val: string): string {
 type ConfidenceTier = 'weak' | 'moderate' | 'strong'
 
 function getConfidenceTier(pct: number): { tier: ConfidenceTier; color: string; label: string } {
-  if (pct < 30) return { tier: 'weak', color: '#ef4444', label: 'Needs Review' }
-  if (pct < 70) return { tier: 'moderate', color: '#f59e0b', label: 'Moderate' }
-  return { tier: 'strong', color: '#10b981', label: 'Confirmed' } // Green for Confirmed!
+  if (pct < 30) return { tier: 'weak', color: '#ef4444', label: 'Kailangan ng Pagsusuri (Needs Review)' }
+  if (pct < 70) return { tier: 'moderate', color: '#f59e0b', label: 'Katamtaman (Moderate)' }
+  return { tier: 'strong', color: '#10b981', label: 'Kumpirmado (Confirmed)' } // Green for Confirmed!
 }
 
 export default function ClassificationClient({ dbEntries = [] }: ClassificationClientProps) {
@@ -127,6 +127,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>('ALL')
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<AlgorithmMode>('HYBRID_ENSEMBLE')
   const [showBenchmarkModal, setShowBenchmarkModal] = useState<boolean>(false)
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState<boolean>(false)
 
   // Execution state: do not automatically display results when user selects an entry
   const [hasExecuted, setHasExecuted] = useState(false)
@@ -496,14 +497,14 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '12px' }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                     <span style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                      Hybrid Neuro-Symbolic Architecture
+                      Rule-Based Machine Learning
                     </span>
-                    <span style={{ fontSize: '9px', background: '#27272a', color: '#a1a1aa', padding: '2px 8px', borderRadius: '4px', border: '1px solid #3f3f46' }}>
-                      NLP & Information Retrieval
+                    <span style={{ fontSize: '9px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                      Matalinong Pag-uuri
                     </span>
                   </div>
                   <h2 
@@ -515,11 +516,11 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       color: '#ffffff'
                     }}
                   >
-                    Classification Engine & Algorithmic Models
+                    Awtomatikong Pag-uuri (Literature Classification)
                   </h2>
                 </div>
 
-                {/* Benchmark Trigger Button */}
+                {/* Benchmark Trigger Button for Panel Defense */}
                 <button
                   type="button"
                   onClick={() => setShowBenchmarkModal(true)}
@@ -529,19 +530,20 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     background: '#27272a',
                     border: '1px solid #3f3f46',
                     borderRadius: '6px',
-                    color: '#f1b80d',
+                    color: '#a1a1aa',
                     fontSize: '11px',
-                    fontWeight: 700,
-                    letterSpacing: '0.04em',
+                    fontWeight: 600,
+                    letterSpacing: '0.02em',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
                     transition: 'all 0.2s ease',
                   }}
+                  title="Tingnan ang Evaluation Metrics at Benchmark Data para sa Panel"
                 >
                   <span>📊</span>
-                  <span>Comparative Algorithm Benchmark (Ch. 4)</span>
+                  <span>Teknikal na Ebalwasyon (Para sa Panel)</span>
                 </button>
               </div>
 
@@ -551,142 +553,11 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   color: '#a1a1aa',
                   lineHeight: 1.6,
                   maxWidth: '780px',
-                  margin: '0 0 24px 0'
+                  margin: '0 0 28px 0'
                 }}
               >
-                The archive classifies literature entries using a multi-model pipeline: combining statistical <strong>TF-IDF Vector Space Models</strong>, <strong>Dialectal Orthographic Fuzzy Matching (Levenshtein & Dice)</strong>, and <strong>Eugenio (1993) & Andress (1985) Domain Ontologies</strong>.
+                Gamit ang <strong>Rule-Based Machine Learning</strong>, awtomatikong sinusuri ng system ang mga kwento at awiting Manobo. Binabasa nito ang mga katutubong salita at estruktura ng salaysay upang matukoy ang kanilang <strong>Anyo (Genre)</strong>, <strong>Pangunahing Tema</strong>, at <strong>Lugar ng Pinagmulan</strong>.
               </p>
-
-              {/* Algorithm Switcher Bar */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '8px',
-                  marginBottom: '28px',
-                  padding: '12px 16px',
-                  background: '#121214',
-                  borderRadius: '6px',
-                  border: '1px solid #27272a',
-                }}
-              >
-                <span style={{ fontSize: '10px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', marginRight: '6px' }}>
-                  ACTIVE ALGORITHM MODEL:
-                </span>
-
-                {/* 1. Hybrid Quad-Model Ensemble */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedAlgorithm('HYBRID_ENSEMBLE')}
-                  style={{
-                    padding: '6px 12px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    border: selectedAlgorithm === 'HYBRID_ENSEMBLE' ? '1px solid #10b981' : '1px solid #27272a',
-                    background: selectedAlgorithm === 'HYBRID_ENSEMBLE' ? 'rgba(16, 185, 129, 0.15)' : '#18181b',
-                    color: selectedAlgorithm === 'HYBRID_ENSEMBLE' ? '#10b981' : '#a1a1aa',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  <span>⚡</span>
-                  <span>Hybrid Quad-Model (ML + Neural + VSM + Rules)</span>
-                  <span style={{ fontSize: '9px', background: '#10b981', color: '#000', padding: '1px 5px', borderRadius: '3px', fontWeight: 800 }}>PROPOSED</span>
-                </button>
-
-                {/* 2. Supervised Machine Learning: Multinomial Naive Bayes */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedAlgorithm('NAIVE_BAYES_ML')}
-                  style={{
-                    padding: '6px 12px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    border: selectedAlgorithm === 'NAIVE_BAYES_ML' ? '1px solid #a855f7' : '1px solid #27272a',
-                    background: selectedAlgorithm === 'NAIVE_BAYES_ML' ? 'rgba(168, 85, 247, 0.15)' : '#18181b',
-                    color: selectedAlgorithm === 'NAIVE_BAYES_ML' ? '#c084fc' : '#a1a1aa',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  <span>🤖</span>
-                  <span>Multinomial Naive Bayes (Supervised ML)</span>
-                  <span style={{ fontSize: '9px', background: '#a855f7', color: '#fff', padding: '1px 5px', borderRadius: '3px', fontWeight: 800 }}>100% ML</span>
-                </button>
-
-                {/* 3. Deep Learning: Neural Semantic Embeddings */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedAlgorithm('NEURAL_SEMANTIC')}
-                  style={{
-                    padding: '6px 12px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    border: selectedAlgorithm === 'NEURAL_SEMANTIC' ? '1px solid #ec4899' : '1px solid #27272a',
-                    background: selectedAlgorithm === 'NEURAL_SEMANTIC' ? 'rgba(236, 72, 153, 0.15)' : '#18181b',
-                    color: selectedAlgorithm === 'NEURAL_SEMANTIC' ? '#f472b6' : '#a1a1aa',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  <span>🧠</span>
-                  <span>Neural Latent Embeddings (Deep Learning 64-D)</span>
-                </button>
-
-                {/* 4. Statistical IR: TF-IDF VSM */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedAlgorithm('TF_IDF_VSM')}
-                  style={{
-                    padding: '6px 12px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    border: selectedAlgorithm === 'TF_IDF_VSM' ? '1px solid #38bdf8' : '1px solid #27272a',
-                    background: selectedAlgorithm === 'TF_IDF_VSM' ? 'rgba(56, 189, 248, 0.15)' : '#18181b',
-                    color: selectedAlgorithm === 'TF_IDF_VSM' ? '#38bdf8' : '#a1a1aa',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  <span>📐</span>
-                  <span>TF-IDF Vector Space Model (VSM)</span>
-                </button>
-
-                {/* 5. Heuristic Expert Baseline */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedAlgorithm('RULE_BASED')}
-                  style={{
-                    padding: '6px 12px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    border: selectedAlgorithm === 'RULE_BASED' ? '1px solid #f59e0b' : '1px solid #27272a',
-                    background: selectedAlgorithm === 'RULE_BASED' ? 'rgba(245, 158, 11, 0.15)' : '#18181b',
-                    color: selectedAlgorithm === 'RULE_BASED' ? '#f59e0b' : '#a1a1aa',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  <span>📜</span>
-                  <span>Rule-Based Baseline (Legacy)</span>
-                </button>
-              </div>
 
               {/* Diagram Flow Container */}
               <div 
@@ -736,14 +607,14 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   </div>
                   
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Raw Input</div>
-                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>ORAL TRANSCRIPTION ML-421</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Hakbang 1: Pagpili ng Akda</div>
+                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>PUMILI NG KWENTO O AWIT</div>
                   </div>
 
                   {/* Choose Genre to Classify Dropdown */}
                   <div style={{ width: '100%', maxWidth: '220px', textAlign: 'left' }}>
                     <label style={{ fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                      CLASSIFICATION GENRE TARGET
+                      SALAIN AYON SA ANYO (GENRE FILTER)
                     </label>
                     <select
                       value={selectedGenreFilter}
@@ -765,22 +636,22 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         cursor: 'pointer'
                       }}
                     >
-                      <option value="ALL">All Genres (Auto-Detect)</option>
-                      {entriesList.some(e => e.genre === 'MYTH') && <option value="MYTH">Myth (Oggayam)</option>}
-                      {entriesList.some(e => e.genre === 'LEGEND') && <option value="LEGEND">Legend (Tudtul)</option>}
-                      {entriesList.some(e => e.genre === 'FOLKTALE') && <option value="FOLKTALE">Folktale</option>}
-                      {entriesList.some(e => e.genre === 'EPIC') && <option value="EPIC">Epic (Ulaging)</option>}
-                      {entriesList.some(e => e.genre === 'RIDDLE') && <option value="RIDDLE">Riddle</option>}
-                      {entriesList.some(e => e.genre === 'PROVERB') && <option value="PROVERB">Proverb</option>}
-                      {entriesList.some(e => e.genre === 'SONG') && <option value="SONG">Song</option>}
-                      {entriesList.some(e => e.genre === 'CHANT') && <option value="CHANT">Chant</option>}
+                      <option value="ALL">Lahat ng Anyo (All Genres)</option>
+                      {entriesList.some(e => e.genre === 'MYTH') && <option value="MYTH">Mito / Oggayam (Myth)</option>}
+                      {entriesList.some(e => e.genre === 'LEGEND') && <option value="LEGEND">Alamat / Tudtul (Legend)</option>}
+                      {entriesList.some(e => e.genre === 'FOLKTALE') && <option value="FOLKTALE">Kwentong-bayan (Folktale)</option>}
+                      {entriesList.some(e => e.genre === 'EPIC') && <option value="EPIC">Epiko / Ulaging (Epic)</option>}
+                      {entriesList.some(e => e.genre === 'RIDDLE') && <option value="RIDDLE">Bugtong (Riddle)</option>}
+                      {entriesList.some(e => e.genre === 'PROVERB') && <option value="PROVERB">Kasabihan (Proverb)</option>}
+                      {entriesList.some(e => e.genre === 'SONG') && <option value="SONG">Awit (Folk Song)</option>}
+                      {entriesList.some(e => e.genre === 'CHANT') && <option value="CHANT">Ritwal / Chant</option>}
                     </select>
                   </div>
                   
                   {/* Select Narrative Entry Dropdown */}
                   <div style={{ width: '100%', maxWidth: '220px', textAlign: 'left' }}>
                     <label style={{ fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                      SELECT ARCHIVE DATA ENTRY
+                      PUMILI MULA SA ARCHIVE
                     </label>
                     <select
                       value={selectedEntryId}
@@ -813,7 +684,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         cursor: 'pointer'
                       }}
                     >
-                      <option value="custom">-- Custom / Sidebar Preset --</option>
+                      <option value="custom">-- Sariling Teksto / Custom --</option>
                       {filteredEntriesList.map(entry => (
                         <option key={entry.id} value={entry.id}>
                           {entry.title}
@@ -842,7 +713,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     {inputTranscription && (
                       <div style={{ marginBottom: '10px' }}>
                         <div style={{ fontSize: '8px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em', marginBottom: '4px' }}>
-                          MANOBO TRANSCRIPTION
+                          KATUTUBONG SALAYSAY (MANOBO)
                         </div>
                         <div style={{ color: '#f1b80d', fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
                           {inputTranscription}
@@ -851,7 +722,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     )}
                     {!inputTranscription && (
                       <div style={{ color: '#71717a', fontStyle: 'italic', textAlign: 'center', marginTop: '30px' }}>
-                        No text loaded
+                        Walang nakakargang teksto
                       </div>
                     )}
                   </div>
@@ -894,12 +765,12 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     {isAnalyzing ? (
                       <>
                         <span>⏳</span>
-                        <span>Classifying...</span>
+                        <span>Sinusuri ang Akda...</span>
                       </>
                     ) : (
                       <>
                         <span>⚡</span>
-                        <span>Run Classification</span>
+                        <span>Suriin at I-classify</span>
                       </>
                     )}
                   </button>
@@ -943,8 +814,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   </div>
 
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Rule Matcher</div>
-                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>FRAMEWORK SYNTHESIS</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Hakbang 2: Pagsusuri ng Alituntunin</div>
+                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>RULE-BASED ML ENGINE</div>
                   </div>
 
                   {/* Rules list with confidence-tiered indicators + matched evidence */}
@@ -966,10 +837,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           gap: '6px',
                         }}
                       >
-                        <span style={{ fontSize: '20px' }}>⚙️</span>
-                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#e4e4e7' }}>Awaiting Execution</div>
+                        <span style={{ fontSize: '20px' }}>📖</span>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#e4e4e7' }}>Naghihintay ng Pagsusuri</div>
                         <p style={{ fontSize: '9.5px', color: '#71717a', margin: 0, lineHeight: 1.4 }}>
-                          Click &ldquo;Run Classification&rdquo; to synthesize rules and match keywords.
+                          Pindutin ang &ldquo;Suriin at I-classify&rdquo; upang basahin ang mga katutubong salita at ilapat ang mga alituntunin.
                         </p>
                       </div>
                     ) : classificationResult.rulesApplied.length > 0 ? (
@@ -995,7 +866,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                 {rule ? rule.name : ruleId}
                               </span>
                               <div
-                                title={`${pct}% confidence`}
+                                title={`${pct}% katiyakan`}
                                 style={{
                                   width: '14px',
                                   height: '14px',
@@ -1016,8 +887,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                               </div>
                             </div>
                             {evidence && (
-                              <div style={{ marginTop: '4px', fontSize: '9.5px', color: '#52525b', textAlign: 'left', fontStyle: 'italic' }}>
-                                matched: &ldquo;{evidence}&rdquo;
+                              <div style={{ marginTop: '4px', fontSize: '9.5px', color: '#a1a1aa', textAlign: 'left', fontStyle: 'italic' }}>
+                                natukoy: &ldquo;{evidence}&rdquo;
                               </div>
                             )}
                           </div>
@@ -1025,7 +896,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       })
                     ) : (
                       <div style={{ fontSize: '11px', color: '#71717a', fontStyle: 'italic', textAlign: 'center' }}>
-                        No matching rules applied
+                        Walang alituntuning tumugma
                       </div>
                     )}
                   </div>
@@ -1064,9 +935,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       }}
                     >
                       <span style={{ fontSize: '24px' }}>📊</span>
-                      <div style={{ fontSize: '12px', fontWeight: 700, color: '#e4e4e7' }}>Results Pending</div>
+                      <div style={{ fontSize: '12px', fontWeight: 700, color: '#e4e4e7' }}>Handa nang Suriin</div>
                       <p style={{ fontSize: '10px', color: '#71717a', margin: 0, maxWidth: '210px', lineHeight: 1.5 }}>
-                        Choose an archive entry and click &ldquo;Run Classification&rdquo; to identify genre, themes, and location.
+                        Pumili ng kwento o awit at pindutin ang &ldquo;Suriin at I-classify&rdquo; upang makita ang Anyo, Tema, at Lugar.
                       </p>
                     </div>
                   ) : (
@@ -1079,7 +950,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                               <span>→</span>
-                              <span>GENRE IDENTIFIED</span>
+                              <span>ANYO NG PANITIKAN (GENRE)</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                               <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
@@ -1105,7 +976,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                               <span>→</span>
-                              <span>THEME IDENTIFIED</span>
+                              <span>PANGUNAHING TEMA (THEME)</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                               <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
@@ -1125,10 +996,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                             <span>→</span>
-                            <span>THEME IDENTIFIED</span>
+                            <span>PANGUNAHING TEMA (THEME)</span>
                           </div>
                           <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>
-                            No confident theme match
+                            Walang tiyak na temang naitugma
                           </div>
                         </div>
                       )}
@@ -1141,7 +1012,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                               <span>→</span>
-                              <span>LOCATION IDENTIFIED</span>
+                              <span>LUGAR NG PINAGMULAN (LOCATION)</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                               <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
@@ -1161,10 +1032,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                             <span>→</span>
-                            <span>LOCATION IDENTIFIED</span>
+                            <span>LUGAR NG PINAGMULAN (LOCATION)</span>
                           </div>
                           <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>
-                            No location markers detected
+                            Walang natukoy na pahiwatig ng lokasyon
                           </div>
                         </div>
                       )}
@@ -1175,7 +1046,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
               </div>
 
-              {/* ALGORITHMIC RIGOR & VECTOR DERIVATION PANEL */}
+              {/* RESPONDENT-FRIENDLY EXPLANATION & COLLAPSIBLE TECHNICAL PANEL */}
               {hasExecuted && classificationResult.algorithmicBreakdown && (
                 <div
                   style={{
@@ -1186,164 +1057,292 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     padding: '24px',
                   }}
                 >
-                  {/* Section Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #27272a', paddingBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '18px' }}>🔬</span>
+                  {/* Section Header: Friendly for Respondents */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', borderBottom: '1px solid #27272a', paddingBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '22px' }}>💡</span>
                       <div>
-                        <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>
-                          Algorithmic Rigor & Mathematical Breakdown
+                        <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>
+                          Paliwanag ng Pag-uuri (Bakit Ito Na-classify?)
                         </h4>
-                        <span style={{ fontSize: '10px', color: '#71717a' }}>
-                          Empirical computations powering the {selectedAlgorithm === 'HYBRID_ENSEMBLE' ? 'Hybrid Ensemble' : selectedAlgorithm === 'TF_IDF_VSM' ? 'Vector Space Model' : 'Rule-Based Engine'}
+                        <span style={{ fontSize: '11px', color: '#a1a1aa' }}>
+                          Matalinong pagsusuri batay sa mga katutubong salita, nilalaman, at alituntunin ng panitikan
                         </span>
                       </div>
                     </div>
                     <div style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
-                      XAI: Explainable Artificial Intelligence
+                      Rule-Based Machine Learning
                     </div>
                   </div>
 
-                  {/* Live Formula Display */}
-                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: '6px', padding: '12px 16px', marginBottom: '20px' }}>
-                    <div style={{ fontSize: '9px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.06em', marginBottom: '4px' }}>
-                      MATHEMATICAL DERIVATION:
-                    </div>
-                    <div style={{ fontFamily: 'monospace', fontSize: '12px', color: '#e2e8f0', lineHeight: 1.5 }}>
-                      {classificationResult.algorithmicBreakdown.mathematicalExplanation}
-                    </div>
-                  </div>
-
-                  {/* Multi-Tier Component Contribution Cards */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '20px' }}>
-                    {/* 1. Supervised Machine Learning (Naive Bayes) */}
-                    <div style={{ background: '#18181b', border: '1px solid #3b204e', borderRadius: '6px', padding: '12px' }}>
-                      <div style={{ fontSize: '9px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span>🤖</span>
-                        <span>1. SUPERVISED ML</span>
+                  {/* 3 Respondent-Friendly Cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', marginBottom: '20px' }}>
+                    {/* Card 1: Katutubong Patunay (Detected Words) */}
+                    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '16px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.04em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>🌿</span>
+                        <span>1. MGA KATUTUBONG PATUNAY</span>
                       </div>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
-                        {(classificationResult.algorithmicBreakdown.scoreBreakdown.naiveBayesProbability * 100).toFixed(1)}%
-                      </div>
-                      <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
-                        Multinomial Naive Bayes posterior probability (Laplace α=1.0)
-                      </div>
-                    </div>
-
-                    {/* 2. Deep Learning Neural Latent Embeddings */}
-                    <div style={{ background: '#18181b', border: '1px solid #4a1935', borderRadius: '6px', padding: '12px' }}>
-                      <div style={{ fontSize: '9px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span>🧠</span>
-                        <span>2. DEEP LEARNING</span>
-                      </div>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
-                        {(classificationResult.algorithmicBreakdown.scoreBreakdown.neuralSemanticSimilarity * 100).toFixed(1)}%
-                      </div>
-                      <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
-                        64-D continuous latent semantic alignment
+                      <p style={{ fontSize: '11px', color: '#a1a1aa', lineHeight: 1.5, margin: '0 0 10px 0' }}>
+                        Mga natukoy na salitang Manobo na nagpapatunay sa tema at anyo ng akda:
+                      </p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {classificationResult.algorithmicBreakdown.topFeatures.slice(0, 5).map((f, i) => (
+                          <span
+                            key={i}
+                            style={{
+                              fontSize: '11px',
+                              background: '#27272a',
+                              border: '1px solid #3f3f46',
+                              padding: '3px 8px',
+                              borderRadius: '4px',
+                              color: '#fef08a',
+                              fontWeight: 600,
+                            }}
+                          >
+                            &ldquo;{f.term}&rdquo;
+                          </span>
+                        ))}
                       </div>
                     </div>
 
-                    {/* 3. Statistical IR (VSM TF-IDF) */}
-                    <div style={{ background: '#18181b', border: '1px solid #1e3a5f', borderRadius: '6px', padding: '12px' }}>
-                      <div style={{ fontSize: '9px', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span>📐</span>
-                        <span>3. STATISTICAL IR</span>
-                      </div>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
-                        {(classificationResult.algorithmicBreakdown.scoreBreakdown.vsmCosineSimilarity * 100).toFixed(1)}%
-                      </div>
-                      <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
-                        TF-IDF Cosine Similarity angle cos(θ)
-                      </div>
-                    </div>
-
-                    {/* 4. Domain Ontology & Dialect Rules */}
-                    <div style={{ background: '#18181b', border: '1px solid #422006', borderRadius: '6px', padding: '12px' }}>
-                      <div style={{ fontSize: '9px', fontWeight: 800, color: '#f59e0b', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {/* Card 2: Alituntunin ng Anyo at Tema (Rule-Based Reasoning) */}
+                    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '16px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.04em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span>📜</span>
-                        <span>4. DOMAIN & DIALECT</span>
+                        <span>2. ALITUNTUNIN NG PAG-UURI</span>
                       </div>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
-                        {(classificationResult.algorithmicBreakdown.scoreBreakdown.ruleConfidence * 100).toFixed(1)}%
-                      </div>
-                      <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
-                        Eugenio (1993) rules + Levenshtein fuzzy match
+                      <p style={{ fontSize: '11px', color: '#a1a1aa', lineHeight: 1.5, margin: '0 0 8px 0' }}>
+                        Inuri bilang <strong>{formatName(classificationResult.genre.value)}</strong> batay sa pamantayang akademiko nina Dr. Damiana Eugenio (1993) at Richard Andress (1985).
+                      </p>
+                      <div style={{ fontSize: '10.5px', color: '#94a3b8', lineHeight: 1.4 }}>
+                        {classificationResult.genre.value === 'MYTH' && 'Naglalaman ng mga salaysay tungkol sa paglikha ng mundo, mga bituin, at mga banal na espiritu (Oggayam).'}
+                        {classificationResult.genre.value === 'LEGEND' && 'Nagpapaliwanag sa pinagmulan ng mga hayop, bundok, lawa, o komunidad sa Agusan (Tudtul).'}
+                        {classificationResult.genre.value === 'EPIC' && 'Naglalaman ng kabayanihan, mahabang paglalakbay, at pakikidigma ng mga ninuno (Ulaging).'}
+                        {classificationResult.genre.value === 'FOLKTALE' && 'Kwentong-bayan na nagbibigay ng aral at nagpapakita ng pang-araw-araw na pamumuhay.'}
+                        {classificationResult.genre.value === 'SONG' && 'Tradisyonal na awit na naglalarawan ng pag-ibig, ritwal, o pamumuhay sa komunidad.'}
+                        {classificationResult.genre.value === 'CHANT' && 'Banal na panalangin at ritwal na iniaalay sa mga diwata at ninuno.'}
+                        {classificationResult.genre.value === 'RIDDLE' && 'Bugtong o talinghaga ng matalinong kaisipan ng mga katutubo.'}
+                        {classificationResult.genre.value === 'PROVERB' && 'Kasabihan o salawikain na nagsisilbing gabay sa moralidad at pag-uugali.'}
                       </div>
                     </div>
-                  </div>
 
-                  {/* Two-Column Details: ML / NLP Feature Derivations & Neural Latent Space */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                    {/* Column 1: Naive Bayes Most Predictive Words & TF-IDF Features */}
-                    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
-                      <div style={{ fontSize: '10px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>ML PREDICTIVE WORDS (LOG-ODDS)</span>
-                        <span style={{ color: '#71717a' }}>NAIVE BAYES INFERENCE</span>
+                    {/* Card 3: Toleransya sa Katutubong Baybay (Dialect & Spelling Variations) */}
+                    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '16px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 800, color: '#10b981', letterSpacing: '0.04em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>🗣️</span>
+                        <span>3. TOLERANSYA SA DIALEKTO AT BAYBAY</span>
                       </div>
-                      {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.length > 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                          {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.map((feat, idx) => (
-                            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', background: '#121214', padding: '5px 8px', borderRadius: '4px' }}>
-                              <span style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 700 }}>&ldquo;{feat.word}&rdquo;</span>
-                              <span style={{ fontSize: '9.5px', color: '#a1a1aa' }}>
-                                Likelihood: {feat.classLikelihood} | <strong style={{ color: '#10b981' }}>+{feat.logOddsRatio} log-odds</strong>
-                              </span>
+                      <p style={{ fontSize: '11px', color: '#a1a1aa', lineHeight: 1.5, margin: '0 0 8px 0' }}>
+                        Pagkilala sa iba&apos;t ibang bigkas at baybay ng mga tagapagsalaysay sa Agusan del Sur:
+                      </p>
+                      {classificationResult.algorithmicBreakdown.fuzzyMatches.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          {classificationResult.algorithmicBreakdown.fuzzyMatches.slice(0, 2).map((fuz, idx) => (
+                            <div key={idx} style={{ fontSize: '10.5px', color: '#d4d4d8' }}>
+                              ✓ Naintindihan ang &ldquo;<strong>{fuz.token}</strong>&rdquo; bilang katumbas ng <strong>{fuz.matchedCanonical}</strong> ({fuz.gloss}).
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div style={{ fontSize: '11px', color: '#71717a', fontStyle: 'italic' }}>Vocabulary words match training priors.</div>
+                        <div style={{ fontSize: '10.5px', color: '#71717a', fontStyle: 'italic' }}>
+                          ✓ Pamantayang baybay ng Agusan Manobo ang ginamit sa salaysay; wasto ang pagbasa ng system.
+                        </div>
                       )}
-
-                      <div style={{ marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #27272a' }}>
-                        <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#f1b80d', marginBottom: '6px' }}>
-                          TOP TF-IDF TERM WEIGHTS:
-                        </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                          {classificationResult.algorithmicBreakdown.topFeatures.slice(0, 4).map((f, i) => (
-                            <span key={i} style={{ fontSize: '9.5px', background: '#09090b', border: '1px solid #27272a', padding: '2px 6px', borderRadius: '3px', color: '#e2e8f0' }}>
-                              {f.term} (w={f.tfidf.toFixed(1)})
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Column 2: Neural Latent Vector Sample & Dialect Matches */}
-                    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
-                      <div style={{ fontSize: '10px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>DEEP LEARNING LATENT VECTOR (64-D)</span>
-                        <span style={{ color: '#71717a' }}>SEMANTIC EMBEDDINGS</span>
-                      </div>
-                      <div style={{ fontSize: '10px', color: '#a1a1aa', marginBottom: '8px' }}>
-                        Cluster: <strong style={{ color: '#ffffff' }}>{classificationResult.algorithmicBreakdown.neuralSemantic.semanticClusterName}</strong>
-                      </div>
-                      {/* Latent Vector Visualization */}
-                      <div style={{ background: '#09090b', padding: '8px', borderRadius: '4px', fontFamily: 'monospace', fontSize: '9px', color: '#38bdf8', marginBottom: '12px', wordBreak: 'break-all' }}>
-                        z_sample = [{classificationResult.algorithmicBreakdown.neuralSemantic.latentVectorSample.join(', ')}...]
-                      </div>
-
-                      <div style={{ paddingTop: '8px', borderTop: '1px solid #27272a' }}>
-                        <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#10b981', marginBottom: '6px' }}>
-                          DIALECTAL ORTHOGRAPHIC TOLERANCE (LEVENSHTEIN + DICE):
-                        </div>
-                        {classificationResult.algorithmicBreakdown.fuzzyMatches.length > 0 ? (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            {classificationResult.algorithmicBreakdown.fuzzyMatches.slice(0, 3).map((fuz, idx) => (
-                              <div key={idx} style={{ fontSize: '10px', color: '#d4d4d8' }}>
-                                • &ldquo;{fuz.token}&rdquo; → canonical <strong>{fuz.matchedCanonical}</strong> ({Math.round(fuz.similarity * 100)}% match, {fuz.gloss})
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div style={{ fontSize: '10px', color: '#71717a', fontStyle: 'italic' }}>
-                            Standard orthography detected; no non-standard phoneme variants.
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </div>
+
+                  {/* Toggle Button for Panel Defense Technical Rigor */}
+                  <div style={{ borderTop: '1px dashed #27272a', paddingTop: '16px', display: 'flex', justifyContent: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+                      className="btn-anim"
+                      style={{
+                        padding: '9px 18px',
+                        background: showTechnicalDetails ? '#27272a' : '#1e1e24',
+                        border: '1px solid #3f3f46',
+                        borderRadius: '6px',
+                        color: showTechnicalDetails ? '#f1b80d' : '#a1a1aa',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <span>{showTechnicalDetails ? '▲' : '🔬'}</span>
+                      <span>
+                        {showTechnicalDetails
+                          ? 'Itago ang Teknikal na Detalye'
+                          : 'Ipakita ang Detalyadong Machine Learning at Matematika (Para sa Panel Defense)'}
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* COLLAPSIBLE TECHNICAL PANEL FOR CAPSTONE DEFENSE */}
+                  {showTechnicalDetails && (
+                    <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #27272a' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                        <div>
+                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                            Technical Proof for Panel Defense
+                          </div>
+                          <h5 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>
+                            Multi-Tier Machine Learning & Mathematical Derivations
+                          </h5>
+                        </div>
+                        <span style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                          Explainable AI (XAI)
+                        </span>
+                      </div>
+
+                      {/* Live Formula Display */}
+                      <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: '6px', padding: '12px 16px', marginBottom: '18px' }}>
+                        <div style={{ fontSize: '9px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.06em', marginBottom: '4px' }}>
+                          MATHEMATICAL DERIVATION:
+                        </div>
+                        <div style={{ fontFamily: 'monospace', fontSize: '11.5px', color: '#e2e8f0', lineHeight: 1.5 }}>
+                          {classificationResult.algorithmicBreakdown.mathematicalExplanation}
+                        </div>
+                      </div>
+
+                      {/* Multi-Tier Component Contribution Cards */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '18px' }}>
+                        {/* 1. Supervised Machine Learning (Naive Bayes) */}
+                        <div style={{ background: '#18181b', border: '1px solid #3b204e', borderRadius: '6px', padding: '12px' }}>
+                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span>🤖</span>
+                            <span>1. SUPERVISED ML</span>
+                          </div>
+                          <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                            {(classificationResult.algorithmicBreakdown.scoreBreakdown.naiveBayesProbability * 100).toFixed(1)}%
+                          </div>
+                          <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                            Multinomial Naive Bayes posterior probability (Laplace α=1.0)
+                          </div>
+                        </div>
+
+                        {/* 2. Deep Learning Neural Latent Embeddings */}
+                        <div style={{ background: '#18181b', border: '1px solid #4a1935', borderRadius: '6px', padding: '12px' }}>
+                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span>🧠</span>
+                            <span>2. DEEP LEARNING</span>
+                          </div>
+                          <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                            {(classificationResult.algorithmicBreakdown.scoreBreakdown.neuralSemanticSimilarity * 100).toFixed(1)}%
+                          </div>
+                          <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                            64-D continuous latent semantic alignment
+                          </div>
+                        </div>
+
+                        {/* 3. Statistical IR (VSM TF-IDF) */}
+                        <div style={{ background: '#18181b', border: '1px solid #1e3a5f', borderRadius: '6px', padding: '12px' }}>
+                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span>📐</span>
+                            <span>3. STATISTICAL IR</span>
+                          </div>
+                          <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                            {(classificationResult.algorithmicBreakdown.scoreBreakdown.vsmCosineSimilarity * 100).toFixed(1)}%
+                          </div>
+                          <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                            TF-IDF Cosine Similarity angle cos(θ)
+                          </div>
+                        </div>
+
+                        {/* 4. Domain Ontology & Dialect Rules */}
+                        <div style={{ background: '#18181b', border: '1px solid #422006', borderRadius: '6px', padding: '12px' }}>
+                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#f59e0b', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span>📜</span>
+                            <span>4. DOMAIN & DIALECT</span>
+                          </div>
+                          <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                            {(classificationResult.algorithmicBreakdown.scoreBreakdown.ruleConfidence * 100).toFixed(1)}%
+                          </div>
+                          <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                            Eugenio (1993) rules + Levenshtein fuzzy match
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Two-Column Details: ML / NLP Feature Derivations & Neural Latent Space */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                        {/* Column 1: Naive Bayes Most Predictive Words & TF-IDF Features */}
+                        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
+                          <div style={{ fontSize: '10px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                            <span>ML PREDICTIVE WORDS (LOG-ODDS)</span>
+                            <span style={{ color: '#71717a' }}>NAIVE BAYES INFERENCE</span>
+                          </div>
+                          {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.map((feat, idx) => (
+                                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', background: '#121214', padding: '5px 8px', borderRadius: '4px' }}>
+                                  <span style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 700 }}>&ldquo;{feat.word}&rdquo;</span>
+                                  <span style={{ fontSize: '9.5px', color: '#a1a1aa' }}>
+                                    Likelihood: {feat.classLikelihood} | <strong style={{ color: '#10b981' }}>+{feat.logOddsRatio} log-odds</strong>
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div style={{ fontSize: '11px', color: '#71717a', fontStyle: 'italic' }}>Vocabulary words match training priors.</div>
+                          )}
+
+                          <div style={{ marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #27272a' }}>
+                            <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#f1b80d', marginBottom: '6px' }}>
+                              TOP TF-IDF TERM WEIGHTS:
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                              {classificationResult.algorithmicBreakdown.topFeatures.slice(0, 4).map((f, i) => (
+                                <span key={i} style={{ fontSize: '9.5px', background: '#09090b', border: '1px solid #27272a', padding: '2px 6px', borderRadius: '3px', color: '#e2e8f0' }}>
+                                  {f.term} (w={f.tfidf.toFixed(1)})
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Column 2: Neural Latent Vector Sample & Dialect Matches */}
+                        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
+                          <div style={{ fontSize: '10px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                            <span>DEEP LEARNING LATENT VECTOR (64-D)</span>
+                            <span style={{ color: '#71717a' }}>SEMANTIC EMBEDDINGS</span>
+                          </div>
+                          <div style={{ fontSize: '10px', color: '#a1a1aa', marginBottom: '8px' }}>
+                            Cluster: <strong style={{ color: '#ffffff' }}>{classificationResult.algorithmicBreakdown.neuralSemantic.semanticClusterName}</strong>
+                          </div>
+                          {/* Latent Vector Visualization */}
+                          <div style={{ background: '#09090b', padding: '8px', borderRadius: '4px', fontFamily: 'monospace', fontSize: '9px', color: '#38bdf8', marginBottom: '12px', wordBreak: 'break-all' }}>
+                            z_sample = [{classificationResult.algorithmicBreakdown.neuralSemantic.latentVectorSample.join(', ')}...]
+                          </div>
+
+                          <div style={{ paddingTop: '8px', borderTop: '1px solid #27272a' }}>
+                            <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#10b981', marginBottom: '6px' }}>
+                              DIALECTAL ORTHOGRAPHIC TOLERANCE (LEVENSHTEIN + DICE):
+                            </div>
+                            {classificationResult.algorithmicBreakdown.fuzzyMatches.length > 0 ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {classificationResult.algorithmicBreakdown.fuzzyMatches.slice(0, 3).map((fuz, idx) => (
+                                  <div key={idx} style={{ fontSize: '10px', color: '#d4d4d8' }}>
+                                    • &ldquo;{fuz.token}&rdquo; → canonical <strong>{fuz.matchedCanonical}</strong> ({Math.round(fuz.similarity * 100)}% match, {fuz.gloss})
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div style={{ fontSize: '10px', color: '#71717a', fontStyle: 'italic' }}>
+                                Standard orthography detected; no non-standard phoneme variants.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+
                 </div>
               )}
             </section>
@@ -1493,7 +1492,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   Chapter 4: Results & Discussion
                 </div>
                 <h3 style={{ margin: 0, fontSize: '26px', fontWeight: 700, color: '#ffffff', fontFamily: 'Cormorant Garamond, serif' }}>
-                  Comparative Algorithm Evaluation Matrix
+                  Comparative Evaluation Matrix (Panel Defense)
                 </h3>
               </div>
               <button
@@ -1518,7 +1517,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
             </div>
 
             <p style={{ fontSize: '12px', color: '#a1a1aa', lineHeight: 1.6, marginBottom: '20px' }}>
-              Empirical multi-tier benchmark comparing the legacy Rule-Based baseline, Statistical Vector Space Model, Supervised Machine Learning (Multinomial Naive Bayes), and Deep Learning Neural Semantic Embeddings against the proposed Hybrid Quad-Model Ensemble across all {comparativeReport.hybridEnsemble.sampleSize} archived oral literature records.
+              Empirical multi-tier benchmark na nagpapatunay ng kahusayan ng proposed Hybrid Rule-Based Machine Learning laban sa baseline models sa lahat ng {comparativeReport.hybridEnsemble.sampleSize} na mga akdang pampanitikan ng Agusan Manobo.
             </p>
 
             {/* Benchmark Table */}
@@ -1526,7 +1525,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
                 <thead>
                   <tr style={{ background: '#121214', borderBottom: '2px solid #27272a' }}>
-                    <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>ALGORITHM MODEL</th>
+                    <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>MODEL NG PAG-UURI</th>
                     <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>ACCURACY</th>
                     <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>PRECISION (MACRO)</th>
                     <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>RECALL (MACRO)</th>
