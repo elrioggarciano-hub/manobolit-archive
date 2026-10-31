@@ -658,7 +658,7 @@ export default function DashboardClient({
                     System Accuracy
                   </h3>
                   <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, letterSpacing: '0.02em' }}>
-                    Rule-Based Classifier Metrics
+                    Hybrid NLP &amp; Domain Classifier Metrics
                   </span>
                 </div>
 

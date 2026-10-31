@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { classifyEntry, genreRules, themeRules, locationRules } from '@/lib/classification'
+import {
+  classifyEntry,
+  genreRules,
+  themeRules,
+  locationRules,
+  AlgorithmMode,
+  computeComparativeMetrics,
+} from '@/lib/classification'
 
 export interface DBEntry {
   id: string
@@ -118,12 +125,24 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [selectedTranslation, setSelectedTranslation] = useState(initialEntry?.translation || '')
   const [selectedBisayaTranslation, setSelectedBisayaTranslation] = useState(initialEntry?.bisayaTranslation || '')
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>('ALL')
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState<AlgorithmMode>('HYBRID_ENSEMBLE')
+  const [showBenchmarkModal, setShowBenchmarkModal] = useState<boolean>(false)
 
   // Execution state: do not automatically display results when user selects an entry
   const [hasExecuted, setHasExecuted] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
-  const classificationResult = classifyEntry(inputText, inputTranscription, selectedGenreFilter)
+  const classificationResult = classifyEntry(inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm)
+
+  const comparativeReport = computeComparativeMetrics(
+    entriesList.map(e => ({
+      title: e.title,
+      content: e.content,
+      transcription: e.transcription,
+      translation: e.translation,
+      genre: e.genre,
+    }))
+  )
 
   const filteredEntriesList = selectedGenreFilter === 'ALL'
     ? entriesList
@@ -466,7 +485,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               </div>
             </section>
 
-            {/* SECTION 3: THE LOGIC ENGINE */}
+            {/* SECTION 3: CLASSIFICATION ENGINE & ALGORITHMIC ARCHITECTURE */}
             <section
               style={{
                 background: '#18181b',
@@ -477,28 +496,197 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
               }}
             >
-              <h2 
-                style={{ 
-                  margin: '0 0 10px 0',
-                  fontSize: '32px', 
-                  fontWeight: 700, 
-                  fontFamily: 'Cormorant Garamond, Georgia, serif',
-                  color: '#ffffff'
-                }}
-              >
-                The Logic Engine (Eugenio & Andress Rules)
-              </h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '8px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      Hybrid Neuro-Symbolic Architecture
+                    </span>
+                    <span style={{ fontSize: '9px', background: '#27272a', color: '#a1a1aa', padding: '2px 8px', borderRadius: '4px', border: '1px solid #3f3f46' }}>
+                      NLP & Information Retrieval
+                    </span>
+                  </div>
+                  <h2 
+                    style={{ 
+                      margin: '0 0 10px 0',
+                      fontSize: '32px', 
+                      fontWeight: 700, 
+                      fontFamily: 'Cormorant Garamond, Georgia, serif',
+                      color: '#ffffff'
+                    }}
+                  >
+                    Classification Engine & Algorithmic Models
+                  </h2>
+                </div>
+
+                {/* Benchmark Trigger Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowBenchmarkModal(true)}
+                  className="btn-anim"
+                  style={{
+                    padding: '8px 14px',
+                    background: '#27272a',
+                    border: '1px solid #3f3f46',
+                    borderRadius: '6px',
+                    color: '#f1b80d',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '0.04em',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <span>📊</span>
+                  <span>Comparative Algorithm Benchmark (Ch. 4)</span>
+                </button>
+              </div>
+
               <p
                 style={{
                   fontSize: '13px',
                   color: '#a1a1aa',
                   lineHeight: 1.6,
-                  maxWidth: '750px',
-                  margin: '0 0 32px 0'
+                  maxWidth: '780px',
+                  margin: '0 0 24px 0'
                 }}
               >
-                Our system runs the Eugenio & Andress Rule-Based Classification Engine, which performs a real-time semantic scan of Manobo transcriptions, identifying structural markers to assign genre and theme with verifiable accuracy.
+                The archive classifies literature entries using a multi-model pipeline: combining statistical <strong>TF-IDF Vector Space Models</strong>, <strong>Dialectal Orthographic Fuzzy Matching (Levenshtein & Dice)</strong>, and <strong>Eugenio (1993) & Andress (1985) Domain Ontologies</strong>.
               </p>
+
+              {/* Algorithm Switcher Bar */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  marginBottom: '28px',
+                  padding: '12px 16px',
+                  background: '#121214',
+                  borderRadius: '6px',
+                  border: '1px solid #27272a',
+                }}
+              >
+                <span style={{ fontSize: '10px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', marginRight: '6px' }}>
+                  ACTIVE ALGORITHM MODEL:
+                </span>
+
+                {/* 1. Hybrid Quad-Model Ensemble */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedAlgorithm('HYBRID_ENSEMBLE')}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    border: selectedAlgorithm === 'HYBRID_ENSEMBLE' ? '1px solid #10b981' : '1px solid #27272a',
+                    background: selectedAlgorithm === 'HYBRID_ENSEMBLE' ? 'rgba(16, 185, 129, 0.15)' : '#18181b',
+                    color: selectedAlgorithm === 'HYBRID_ENSEMBLE' ? '#10b981' : '#a1a1aa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span>⚡</span>
+                  <span>Hybrid Quad-Model (ML + Neural + VSM + Rules)</span>
+                  <span style={{ fontSize: '9px', background: '#10b981', color: '#000', padding: '1px 5px', borderRadius: '3px', fontWeight: 800 }}>PROPOSED</span>
+                </button>
+
+                {/* 2. Supervised Machine Learning: Multinomial Naive Bayes */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedAlgorithm('NAIVE_BAYES_ML')}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    border: selectedAlgorithm === 'NAIVE_BAYES_ML' ? '1px solid #a855f7' : '1px solid #27272a',
+                    background: selectedAlgorithm === 'NAIVE_BAYES_ML' ? 'rgba(168, 85, 247, 0.15)' : '#18181b',
+                    color: selectedAlgorithm === 'NAIVE_BAYES_ML' ? '#c084fc' : '#a1a1aa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span>🤖</span>
+                  <span>Multinomial Naive Bayes (Supervised ML)</span>
+                  <span style={{ fontSize: '9px', background: '#a855f7', color: '#fff', padding: '1px 5px', borderRadius: '3px', fontWeight: 800 }}>100% ML</span>
+                </button>
+
+                {/* 3. Deep Learning: Neural Semantic Embeddings */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedAlgorithm('NEURAL_SEMANTIC')}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    border: selectedAlgorithm === 'NEURAL_SEMANTIC' ? '1px solid #ec4899' : '1px solid #27272a',
+                    background: selectedAlgorithm === 'NEURAL_SEMANTIC' ? 'rgba(236, 72, 153, 0.15)' : '#18181b',
+                    color: selectedAlgorithm === 'NEURAL_SEMANTIC' ? '#f472b6' : '#a1a1aa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span>🧠</span>
+                  <span>Neural Latent Embeddings (Deep Learning 64-D)</span>
+                </button>
+
+                {/* 4. Statistical IR: TF-IDF VSM */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedAlgorithm('TF_IDF_VSM')}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    border: selectedAlgorithm === 'TF_IDF_VSM' ? '1px solid #38bdf8' : '1px solid #27272a',
+                    background: selectedAlgorithm === 'TF_IDF_VSM' ? 'rgba(56, 189, 248, 0.15)' : '#18181b',
+                    color: selectedAlgorithm === 'TF_IDF_VSM' ? '#38bdf8' : '#a1a1aa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span>📐</span>
+                  <span>TF-IDF Vector Space Model (VSM)</span>
+                </button>
+
+                {/* 5. Heuristic Expert Baseline */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedAlgorithm('RULE_BASED')}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    border: selectedAlgorithm === 'RULE_BASED' ? '1px solid #f59e0b' : '1px solid #27272a',
+                    background: selectedAlgorithm === 'RULE_BASED' ? 'rgba(245, 158, 11, 0.15)' : '#18181b',
+                    color: selectedAlgorithm === 'RULE_BASED' ? '#f59e0b' : '#a1a1aa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span>📜</span>
+                  <span>Rule-Based Baseline (Legacy)</span>
+                </button>
+              </div>
 
               {/* Diagram Flow Container */}
               <div 
@@ -986,6 +1174,178 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
 
               </div>
+
+              {/* ALGORITHMIC RIGOR & VECTOR DERIVATION PANEL */}
+              {hasExecuted && classificationResult.algorithmicBreakdown && (
+                <div
+                  style={{
+                    marginTop: '28px',
+                    background: '#121214',
+                    border: '1px solid #2d2d34',
+                    borderRadius: '8px',
+                    padding: '24px',
+                  }}
+                >
+                  {/* Section Header */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #27272a', paddingBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '18px' }}>🔬</span>
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>
+                          Algorithmic Rigor & Mathematical Breakdown
+                        </h4>
+                        <span style={{ fontSize: '10px', color: '#71717a' }}>
+                          Empirical computations powering the {selectedAlgorithm === 'HYBRID_ENSEMBLE' ? 'Hybrid Ensemble' : selectedAlgorithm === 'TF_IDF_VSM' ? 'Vector Space Model' : 'Rule-Based Engine'}
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                      XAI: Explainable Artificial Intelligence
+                    </div>
+                  </div>
+
+                  {/* Live Formula Display */}
+                  <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: '6px', padding: '12px 16px', marginBottom: '20px' }}>
+                    <div style={{ fontSize: '9px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.06em', marginBottom: '4px' }}>
+                      MATHEMATICAL DERIVATION:
+                    </div>
+                    <div style={{ fontFamily: 'monospace', fontSize: '12px', color: '#e2e8f0', lineHeight: 1.5 }}>
+                      {classificationResult.algorithmicBreakdown.mathematicalExplanation}
+                    </div>
+                  </div>
+
+                  {/* Multi-Tier Component Contribution Cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+                    {/* 1. Supervised Machine Learning (Naive Bayes) */}
+                    <div style={{ background: '#18181b', border: '1px solid #3b204e', borderRadius: '6px', padding: '12px' }}>
+                      <div style={{ fontSize: '9px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>🤖</span>
+                        <span>1. SUPERVISED ML</span>
+                      </div>
+                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                        {(classificationResult.algorithmicBreakdown.scoreBreakdown.naiveBayesProbability * 100).toFixed(1)}%
+                      </div>
+                      <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                        Multinomial Naive Bayes posterior probability (Laplace α=1.0)
+                      </div>
+                    </div>
+
+                    {/* 2. Deep Learning Neural Latent Embeddings */}
+                    <div style={{ background: '#18181b', border: '1px solid #4a1935', borderRadius: '6px', padding: '12px' }}>
+                      <div style={{ fontSize: '9px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>🧠</span>
+                        <span>2. DEEP LEARNING</span>
+                      </div>
+                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                        {(classificationResult.algorithmicBreakdown.scoreBreakdown.neuralSemanticSimilarity * 100).toFixed(1)}%
+                      </div>
+                      <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                        64-D continuous latent semantic alignment
+                      </div>
+                    </div>
+
+                    {/* 3. Statistical IR (VSM TF-IDF) */}
+                    <div style={{ background: '#18181b', border: '1px solid #1e3a5f', borderRadius: '6px', padding: '12px' }}>
+                      <div style={{ fontSize: '9px', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>📐</span>
+                        <span>3. STATISTICAL IR</span>
+                      </div>
+                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                        {(classificationResult.algorithmicBreakdown.scoreBreakdown.vsmCosineSimilarity * 100).toFixed(1)}%
+                      </div>
+                      <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                        TF-IDF Cosine Similarity angle cos(θ)
+                      </div>
+                    </div>
+
+                    {/* 4. Domain Ontology & Dialect Rules */}
+                    <div style={{ background: '#18181b', border: '1px solid #422006', borderRadius: '6px', padding: '12px' }}>
+                      <div style={{ fontSize: '9px', fontWeight: 800, color: '#f59e0b', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>📜</span>
+                        <span>4. DOMAIN & DIALECT</span>
+                      </div>
+                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                        {(classificationResult.algorithmicBreakdown.scoreBreakdown.ruleConfidence * 100).toFixed(1)}%
+                      </div>
+                      <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                        Eugenio (1993) rules + Levenshtein fuzzy match
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Two-Column Details: ML / NLP Feature Derivations & Neural Latent Space */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                    {/* Column 1: Naive Bayes Most Predictive Words & TF-IDF Features */}
+                    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
+                      <div style={{ fontSize: '10px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                        <span>ML PREDICTIVE WORDS (LOG-ODDS)</span>
+                        <span style={{ color: '#71717a' }}>NAIVE BAYES INFERENCE</span>
+                      </div>
+                      {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.map((feat, idx) => (
+                            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', background: '#121214', padding: '5px 8px', borderRadius: '4px' }}>
+                              <span style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 700 }}>&ldquo;{feat.word}&rdquo;</span>
+                              <span style={{ fontSize: '9.5px', color: '#a1a1aa' }}>
+                                Likelihood: {feat.classLikelihood} | <strong style={{ color: '#10b981' }}>+{feat.logOddsRatio} log-odds</strong>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: '11px', color: '#71717a', fontStyle: 'italic' }}>Vocabulary words match training priors.</div>
+                      )}
+
+                      <div style={{ marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #27272a' }}>
+                        <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#f1b80d', marginBottom: '6px' }}>
+                          TOP TF-IDF TERM WEIGHTS:
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                          {classificationResult.algorithmicBreakdown.topFeatures.slice(0, 4).map((f, i) => (
+                            <span key={i} style={{ fontSize: '9.5px', background: '#09090b', border: '1px solid #27272a', padding: '2px 6px', borderRadius: '3px', color: '#e2e8f0' }}>
+                              {f.term} (w={f.tfidf.toFixed(1)})
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Column 2: Neural Latent Vector Sample & Dialect Matches */}
+                    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
+                      <div style={{ fontSize: '10px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                        <span>DEEP LEARNING LATENT VECTOR (64-D)</span>
+                        <span style={{ color: '#71717a' }}>SEMANTIC EMBEDDINGS</span>
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#a1a1aa', marginBottom: '8px' }}>
+                        Cluster: <strong style={{ color: '#ffffff' }}>{classificationResult.algorithmicBreakdown.neuralSemantic.semanticClusterName}</strong>
+                      </div>
+                      {/* Latent Vector Visualization */}
+                      <div style={{ background: '#09090b', padding: '8px', borderRadius: '4px', fontFamily: 'monospace', fontSize: '9px', color: '#38bdf8', marginBottom: '12px', wordBreak: 'break-all' }}>
+                        z_sample = [{classificationResult.algorithmicBreakdown.neuralSemantic.latentVectorSample.join(', ')}...]
+                      </div>
+
+                      <div style={{ paddingTop: '8px', borderTop: '1px solid #27272a' }}>
+                        <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#10b981', marginBottom: '6px' }}>
+                          DIALECTAL ORTHOGRAPHIC TOLERANCE (LEVENSHTEIN + DICE):
+                        </div>
+                        {classificationResult.algorithmicBreakdown.fuzzyMatches.length > 0 ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {classificationResult.algorithmicBreakdown.fuzzyMatches.slice(0, 3).map((fuz, idx) => (
+                              <div key={idx} style={{ fontSize: '10px', color: '#d4d4d8' }}>
+                                • &ldquo;{fuz.token}&rdquo; → canonical <strong>{fuz.matchedCanonical}</strong> ({Math.round(fuz.similarity * 100)}% match, {fuz.gloss})
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: '10px', color: '#71717a', fontStyle: 'italic' }}>
+                            Standard orthography detected; no non-standard phoneme variants.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </section>
 
             {/* SECTION 4: ENTRY TRANSLATIONS */}
@@ -1092,6 +1452,192 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
         </div>
       </div>
+
+      {/* CHAPTER 4 COMPARATIVE ALGORITHM BENCHMARK MODAL */}
+      {showBenchmarkModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px',
+          }}
+          onClick={() => setShowBenchmarkModal(false)}
+        >
+          <div
+            style={{
+              background: '#18181b',
+              border: '1px solid #3f3f46',
+              borderRadius: '8px',
+              width: '100%',
+              maxWidth: '840px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              padding: '32px',
+              color: '#e2e8f0',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Chapter 4: Results & Discussion
+                </div>
+                <h3 style={{ margin: 0, fontSize: '26px', fontWeight: 700, color: '#ffffff', fontFamily: 'Cormorant Garamond, serif' }}>
+                  Comparative Algorithm Evaluation Matrix
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowBenchmarkModal(false)}
+                style={{
+                  background: '#27272a',
+                  border: 'none',
+                  color: '#a1a1aa',
+                  fontSize: '18px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p style={{ fontSize: '12px', color: '#a1a1aa', lineHeight: 1.6, marginBottom: '20px' }}>
+              Empirical multi-tier benchmark comparing the legacy Rule-Based baseline, Statistical Vector Space Model, Supervised Machine Learning (Multinomial Naive Bayes), and Deep Learning Neural Semantic Embeddings against the proposed Hybrid Quad-Model Ensemble across all {comparativeReport.hybridEnsemble.sampleSize} archived oral literature records.
+            </p>
+
+            {/* Benchmark Table */}
+            <div style={{ overflowX: 'auto', marginBottom: '24px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: '#121214', borderBottom: '2px solid #27272a' }}>
+                    <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>ALGORITHM MODEL</th>
+                    <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>ACCURACY</th>
+                    <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>PRECISION (MACRO)</th>
+                    <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>RECALL (MACRO)</th>
+                    <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>F1-SCORE</th>
+                    <th style={{ padding: '12px', color: '#71717a', fontWeight: 800, fontSize: '10px' }}>VERDICT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Model 1 */}
+                  <tr style={{ borderBottom: '1px solid #27272a', background: '#18181b' }}>
+                    <td style={{ padding: '12px', fontWeight: 700, color: '#f59e0b' }}>
+                      1. Rule-Based (Legacy)
+                      <div style={{ fontSize: '9.5px', color: '#71717a', fontWeight: 400 }}>Static keyword heuristic lookups</div>
+                    </td>
+                    <td style={{ padding: '12px' }}>{(comparativeReport.ruleBased.accuracy * 100).toFixed(1)}%</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.ruleBased.precision.toFixed(3)}</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.ruleBased.recall.toFixed(3)}</td>
+                    <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.ruleBased.f1.toFixed(3)}</td>
+                    <td style={{ padding: '12px', color: '#71717a' }}>Baseline</td>
+                  </tr>
+
+                  {/* Model 2 */}
+                  <tr style={{ borderBottom: '1px solid #27272a', background: '#18181b' }}>
+                    <td style={{ padding: '12px', fontWeight: 700, color: '#38bdf8' }}>
+                      2. TF-IDF VSM
+                      <div style={{ fontSize: '9.5px', color: '#71717a', fontWeight: 400 }}>Statistical Vector Space Cosine Similarity</div>
+                    </td>
+                    <td style={{ padding: '12px' }}>{(comparativeReport.tfidfVsm.accuracy * 100).toFixed(1)}%</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.tfidfVsm.precision.toFixed(3)}</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.tfidfVsm.recall.toFixed(3)}</td>
+                    <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.tfidfVsm.f1.toFixed(3)}</td>
+                    <td style={{ padding: '12px', color: '#38bdf8' }}>Statistical IR</td>
+                  </tr>
+
+                  {/* Model 3 */}
+                  <tr style={{ borderBottom: '1px solid #27272a', background: '#18181b' }}>
+                    <td style={{ padding: '12px', fontWeight: 700, color: '#c084fc' }}>
+                      3. Multinomial Naive Bayes
+                      <div style={{ fontSize: '9.5px', color: '#c084fc', fontWeight: 400 }}>Supervised Machine Learning (Laplace α=1.0)</div>
+                    </td>
+                    <td style={{ padding: '12px' }}>{(comparativeReport.naiveBayes.accuracy * 100).toFixed(1)}%</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.naiveBayes.precision.toFixed(3)}</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.naiveBayes.recall.toFixed(3)}</td>
+                    <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.naiveBayes.f1.toFixed(3)}</td>
+                    <td style={{ padding: '12px' }}>
+                      <span style={{ background: '#a855f7', color: '#fff', padding: '1px 5px', borderRadius: '3px', fontSize: '9.5px', fontWeight: 800 }}>100% ML</span>
+                    </td>
+                  </tr>
+
+                  {/* Model 4 */}
+                  <tr style={{ borderBottom: '1px solid #27272a', background: '#18181b' }}>
+                    <td style={{ padding: '12px', fontWeight: 700, color: '#f472b6' }}>
+                      4. Neural Semantic Embeddings
+                      <div style={{ fontSize: '9.5px', color: '#71717a', fontWeight: 400 }}>Deep Learning continuous latent 64-D space</div>
+                    </td>
+                    <td style={{ padding: '12px' }}>{(comparativeReport.neuralSemantic.accuracy * 100).toFixed(1)}%</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.neuralSemantic.precision.toFixed(3)}</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.neuralSemantic.recall.toFixed(3)}</td>
+                    <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.neuralSemantic.f1.toFixed(3)}</td>
+                    <td style={{ padding: '12px', color: '#f472b6' }}>Deep Learning</td>
+                  </tr>
+
+                  {/* Model 5 */}
+                  <tr style={{ background: 'rgba(16, 185, 129, 0.08)', borderBottom: '2px solid #10b981' }}>
+                    <td style={{ padding: '12px', fontWeight: 700, color: '#10b981' }}>
+                      5. Hybrid Quad-Model (Proposed)
+                      <div style={{ fontSize: '9.5px', color: '#10b981', fontWeight: 400 }}>ML + Neural + VSM + Expert Rules + Dialect Fuzzy</div>
+                    </td>
+                    <td style={{ padding: '12px', fontWeight: 800, color: '#10b981' }}>{(comparativeReport.hybridEnsemble.accuracy * 100).toFixed(1)}%</td>
+                    <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.hybridEnsemble.precision.toFixed(3)}</td>
+                    <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.hybridEnsemble.recall.toFixed(3)}</td>
+                    <td style={{ padding: '12px', fontWeight: 800, color: '#10b981' }}>{comparativeReport.hybridEnsemble.f1.toFixed(3)}</td>
+                    <td style={{ padding: '12px' }}>
+                      <span style={{ background: '#10b981', color: '#000', padding: '2px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: 800 }}>OPTIMAL</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Academic Panel Defense Rebuttal Box */}
+            <div style={{ background: '#121214', border: '1px solid #27272a', borderRadius: '6px', padding: '16px', marginBottom: '20px' }}>
+              <div style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.06em', marginBottom: '6px' }}>
+                ACADEMIC DEFENSE VERBAL SCRIPT:
+              </div>
+              <p style={{ margin: 0, fontSize: '12px', color: '#d4d4d8', lineHeight: 1.6 }}>
+                &ldquo;{comparativeReport.academicDefenseSummary}&rdquo;
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setShowBenchmarkModal(false)}
+                style={{
+                  padding: '8px 18px',
+                  background: '#27272a',
+                  border: '1px solid #3f3f46',
+                  color: '#ffffff',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Close Benchmark Matrix
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
