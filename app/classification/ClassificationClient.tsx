@@ -128,6 +128,25 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<AlgorithmMode>('HYBRID_ENSEMBLE')
   const [showBenchmarkModal, setShowBenchmarkModal] = useState<boolean>(false)
   const [showTechnicalDetails, setShowTechnicalDetails] = useState<boolean>(false)
+  const [isDefenseMode, setIsDefenseMode] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.has('defense') || params.has('panel')) {
+        setIsDefenseMode(true)
+      }
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
+          e.preventDefault()
+          setIsDefenseMode(prev => !prev)
+        }
+      }
+      window.addEventListener('keydown', handleKeyDown)
+      return () => window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   // Execution state: do not automatically display results when user selects an entry
   const [hasExecuted, setHasExecuted] = useState(false)
@@ -503,7 +522,11 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     <span style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                       Rule-Based Machine Learning
                     </span>
-                    <span style={{ fontSize: '9px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                    <span 
+                      onClick={() => setIsDefenseMode(prev => !prev)}
+                      style={{ fontSize: '9px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, cursor: 'pointer', userSelect: 'none' }}
+                      title="Matalinong Pag-uuri"
+                    >
                       Matalinong Pag-uuri
                     </span>
                   </div>
@@ -520,31 +543,33 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   </h2>
                 </div>
 
-                {/* Benchmark Trigger Button for Panel Defense */}
-                <button
-                  type="button"
-                  onClick={() => setShowBenchmarkModal(true)}
-                  className="btn-anim"
-                  style={{
-                    padding: '8px 14px',
-                    background: '#27272a',
-                    border: '1px solid #3f3f46',
-                    borderRadius: '6px',
-                    color: '#a1a1aa',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    letterSpacing: '0.02em',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    transition: 'all 0.2s ease',
-                  }}
-                  title="Tingnan ang Evaluation Metrics at Benchmark Data para sa Panel"
-                >
-                  <span>📊</span>
-                  <span>Teknikal na Ebalwasyon (Para sa Panel)</span>
-                </button>
+                {/* Benchmark Trigger Button for Panel Defense (Only shown in defense mode) */}
+                {isDefenseMode && (
+                  <button
+                    type="button"
+                    onClick={() => setShowBenchmarkModal(true)}
+                    className="btn-anim"
+                    style={{
+                      padding: '8px 14px',
+                      background: '#27272a',
+                      border: '1px solid #3f3f46',
+                      borderRadius: '6px',
+                      color: '#a1a1aa',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      letterSpacing: '0.02em',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.2s ease',
+                    }}
+                    title="Tingnan ang Evaluation Metrics at Benchmark Data para sa Panel"
+                  >
+                    <span>📊</span>
+                    <span>Teknikal na Ebalwasyon (Para sa Panel)</span>
+                  </button>
+                )}
               </div>
 
               <p
@@ -1152,195 +1177,199 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     </div>
                   </div>
 
-                  {/* Toggle Button for Panel Defense Technical Rigor */}
-                  <div style={{ borderTop: '1px dashed #27272a', paddingTop: '16px', display: 'flex', justifyContent: 'center' }}>
-                    <button
-                      type="button"
-                      onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
-                      className="btn-anim"
-                      style={{
-                        padding: '9px 18px',
-                        background: showTechnicalDetails ? '#27272a' : '#1e1e24',
-                        border: '1px solid #3f3f46',
-                        borderRadius: '6px',
-                        color: showTechnicalDetails ? '#f1b80d' : '#a1a1aa',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      <span>{showTechnicalDetails ? '▲' : '🔬'}</span>
-                      <span>
-                        {showTechnicalDetails
-                          ? 'Itago ang Teknikal na Detalye'
-                          : 'Ipakita ang Detalyadong Machine Learning at Matematika (Para sa Panel Defense)'}
-                      </span>
-                    </button>
-                  </div>
-
-                  {/* COLLAPSIBLE TECHNICAL PANEL FOR CAPSTONE DEFENSE */}
-                  {showTechnicalDetails && (
-                    <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #27272a' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
-                        <div>
-                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                            Technical Proof for Panel Defense
-                          </div>
-                          <h5 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>
-                            Multi-Tier Machine Learning & Mathematical Derivations
-                          </h5>
-                        </div>
-                        <span style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
-                          Explainable AI (XAI)
-                        </span>
+                  {/* Toggle Button & Panel for Panel Defense Technical Rigor (Only rendered when defense mode is enabled) */}
+                  {isDefenseMode && (
+                    <>
+                      <div style={{ borderTop: '1px dashed #27272a', paddingTop: '16px', display: 'flex', justifyContent: 'center' }}>
+                        <button
+                          type="button"
+                          onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+                          className="btn-anim"
+                          style={{
+                            padding: '9px 18px',
+                            background: showTechnicalDetails ? '#27272a' : '#1e1e24',
+                            border: '1px solid #3f3f46',
+                            borderRadius: '6px',
+                            color: showTechnicalDetails ? '#f1b80d' : '#a1a1aa',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          <span>{showTechnicalDetails ? '▲' : '🔬'}</span>
+                          <span>
+                            {showTechnicalDetails
+                              ? 'Itago ang Teknikal na Detalye'
+                              : 'Ipakita ang Detalyadong Machine Learning at Matematika (Para sa Panel Defense)'}
+                          </span>
+                        </button>
                       </div>
 
-                      {/* Live Formula Display */}
-                      <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: '6px', padding: '12px 16px', marginBottom: '18px' }}>
-                        <div style={{ fontSize: '9px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.06em', marginBottom: '4px' }}>
-                          MATHEMATICAL DERIVATION:
-                        </div>
-                        <div style={{ fontFamily: 'monospace', fontSize: '11.5px', color: '#e2e8f0', lineHeight: 1.5 }}>
-                          {classificationResult.algorithmicBreakdown.mathematicalExplanation}
-                        </div>
-                      </div>
+                      {/* COLLAPSIBLE TECHNICAL PANEL FOR CAPSTONE DEFENSE */}
+                      {showTechnicalDetails && (
+                        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #27272a' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                            <div>
+                              <div style={{ fontSize: '9px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                                Technical Proof for Panel Defense
+                              </div>
+                              <h5 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>
+                                Multi-Tier Machine Learning & Mathematical Derivations
+                              </h5>
+                            </div>
+                            <span style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                              Explainable AI (XAI)
+                            </span>
+                          </div>
 
-                      {/* Multi-Tier Component Contribution Cards */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '18px' }}>
-                        {/* 1. Supervised Machine Learning (Naive Bayes) */}
-                        <div style={{ background: '#18181b', border: '1px solid #3b204e', borderRadius: '6px', padding: '12px' }}>
-                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span>🤖</span>
-                            <span>1. SUPERVISED ML</span>
+                          {/* Live Formula Display */}
+                          <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: '6px', padding: '12px 16px', marginBottom: '18px' }}>
+                            <div style={{ fontSize: '9px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.06em', marginBottom: '4px' }}>
+                              MATHEMATICAL DERIVATION:
+                            </div>
+                            <div style={{ fontFamily: 'monospace', fontSize: '11.5px', color: '#e2e8f0', lineHeight: 1.5 }}>
+                              {classificationResult.algorithmicBreakdown.mathematicalExplanation}
+                            </div>
                           </div>
-                          <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
-                            {(classificationResult.algorithmicBreakdown.scoreBreakdown.naiveBayesProbability * 100).toFixed(1)}%
-                          </div>
-                          <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
-                            Multinomial Naive Bayes posterior probability (Laplace α=1.0)
-                          </div>
-                        </div>
 
-                        {/* 2. Deep Learning Neural Latent Embeddings */}
-                        <div style={{ background: '#18181b', border: '1px solid #4a1935', borderRadius: '6px', padding: '12px' }}>
-                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span>🧠</span>
-                            <span>2. DEEP LEARNING</span>
-                          </div>
-                          <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
-                            {(classificationResult.algorithmicBreakdown.scoreBreakdown.neuralSemanticSimilarity * 100).toFixed(1)}%
-                          </div>
-                          <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
-                            64-D continuous latent semantic alignment
-                          </div>
-                        </div>
+                          {/* Multi-Tier Component Contribution Cards */}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '18px' }}>
+                            {/* 1. Supervised Machine Learning (Naive Bayes) */}
+                            <div style={{ background: '#18181b', border: '1px solid #3b204e', borderRadius: '6px', padding: '12px' }}>
+                              <div style={{ fontSize: '9px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span>🤖</span>
+                                <span>1. SUPERVISED ML</span>
+                              </div>
+                              <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                                {(classificationResult.algorithmicBreakdown.scoreBreakdown.naiveBayesProbability * 100).toFixed(1)}%
+                              </div>
+                              <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                                Multinomial Naive Bayes posterior probability (Laplace α=1.0)
+                              </div>
+                            </div>
 
-                        {/* 3. Statistical IR (VSM TF-IDF) */}
-                        <div style={{ background: '#18181b', border: '1px solid #1e3a5f', borderRadius: '6px', padding: '12px' }}>
-                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span>📐</span>
-                            <span>3. STATISTICAL IR</span>
-                          </div>
-                          <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
-                            {(classificationResult.algorithmicBreakdown.scoreBreakdown.vsmCosineSimilarity * 100).toFixed(1)}%
-                          </div>
-                          <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
-                            TF-IDF Cosine Similarity angle cos(θ)
-                          </div>
-                        </div>
+                            {/* 2. Deep Learning Neural Latent Embeddings */}
+                            <div style={{ background: '#18181b', border: '1px solid #4a1935', borderRadius: '6px', padding: '12px' }}>
+                              <div style={{ fontSize: '9px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span>🧠</span>
+                                <span>2. DEEP LEARNING</span>
+                              </div>
+                              <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                                {(classificationResult.algorithmicBreakdown.scoreBreakdown.neuralSemanticSimilarity * 100).toFixed(1)}%
+                              </div>
+                              <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                                64-D continuous latent semantic alignment
+                              </div>
+                            </div>
 
-                        {/* 4. Domain Ontology & Dialect Rules */}
-                        <div style={{ background: '#18181b', border: '1px solid #422006', borderRadius: '6px', padding: '12px' }}>
-                          <div style={{ fontSize: '9px', fontWeight: 800, color: '#f59e0b', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span>📜</span>
-                            <span>4. DOMAIN & DIALECT</span>
-                          </div>
-                          <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
-                            {(classificationResult.algorithmicBreakdown.scoreBreakdown.ruleConfidence * 100).toFixed(1)}%
-                          </div>
-                          <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
-                            Eugenio (1993) rules + Levenshtein fuzzy match
-                          </div>
-                        </div>
-                      </div>
+                            {/* 3. Statistical IR (VSM TF-IDF) */}
+                            <div style={{ background: '#18181b', border: '1px solid #1e3a5f', borderRadius: '6px', padding: '12px' }}>
+                              <div style={{ fontSize: '9px', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span>📐</span>
+                                <span>3. STATISTICAL IR</span>
+                              </div>
+                              <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                                {(classificationResult.algorithmicBreakdown.scoreBreakdown.vsmCosineSimilarity * 100).toFixed(1)}%
+                              </div>
+                              <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                                TF-IDF Cosine Similarity angle cos(θ)
+                              </div>
+                            </div>
 
-                      {/* Two-Column Details: ML / NLP Feature Derivations & Neural Latent Space */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                        {/* Column 1: Naive Bayes Most Predictive Words & TF-IDF Features */}
-                        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
-                          <div style={{ fontSize: '10px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
-                            <span>ML PREDICTIVE WORDS (LOG-ODDS)</span>
-                            <span style={{ color: '#71717a' }}>NAIVE BAYES INFERENCE</span>
+                            {/* 4. Domain Ontology & Dialect Rules */}
+                            <div style={{ background: '#18181b', border: '1px solid #422006', borderRadius: '6px', padding: '12px' }}>
+                              <div style={{ fontSize: '9px', fontWeight: 800, color: '#f59e0b', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span>📜</span>
+                                <span>4. DOMAIN & DIALECT</span>
+                              </div>
+                              <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
+                                {(classificationResult.algorithmicBreakdown.scoreBreakdown.ruleConfidence * 100).toFixed(1)}%
+                              </div>
+                              <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
+                                Eugenio (1993) rules + Levenshtein fuzzy match
+                              </div>
+                            </div>
                           </div>
-                          {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.length > 0 ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.map((feat, idx) => (
-                                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', background: '#121214', padding: '5px 8px', borderRadius: '4px' }}>
-                                  <span style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 700 }}>&ldquo;{feat.word}&rdquo;</span>
-                                  <span style={{ fontSize: '9.5px', color: '#a1a1aa' }}>
-                                    Likelihood: {feat.classLikelihood} | <strong style={{ color: '#10b981' }}>+{feat.logOddsRatio} log-odds</strong>
-                                  </span>
+
+                          {/* Two-Column Details: ML / NLP Feature Derivations & Neural Latent Space */}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                            {/* Column 1: Naive Bayes Most Predictive Words & TF-IDF Features */}
+                            <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
+                              <div style={{ fontSize: '10px', fontWeight: 800, color: '#c084fc', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                                <span>ML PREDICTIVE WORDS (LOG-ODDS)</span>
+                                <span style={{ color: '#71717a' }}>NAIVE BAYES INFERENCE</span>
+                              </div>
+                              {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                  {classificationResult.algorithmicBreakdown.naiveBayes.topPredictiveFeatures.map((feat, idx) => (
+                                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', background: '#121214', padding: '5px 8px', borderRadius: '4px' }}>
+                                      <span style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 700 }}>&ldquo;{feat.word}&rdquo;</span>
+                                      <span style={{ fontSize: '9.5px', color: '#a1a1aa' }}>
+                                        Likelihood: {feat.classLikelihood} | <strong style={{ color: '#10b981' }}>+{feat.logOddsRatio} log-odds</strong>
+                                      </span>
+                                    </div>
+                                  ))}
                                 </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div style={{ fontSize: '11px', color: '#71717a', fontStyle: 'italic' }}>Vocabulary words match training priors.</div>
-                          )}
+                              ) : (
+                                <div style={{ fontSize: '11px', color: '#71717a', fontStyle: 'italic' }}>Vocabulary words match training priors.</div>
+                              )}
 
-                          <div style={{ marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #27272a' }}>
-                            <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#f1b80d', marginBottom: '6px' }}>
-                              TOP TF-IDF TERM WEIGHTS:
+                              <div style={{ marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #27272a' }}>
+                                <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#f1b80d', marginBottom: '6px' }}>
+                                  TOP TF-IDF TERM WEIGHTS:
+                                </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                  {classificationResult.algorithmicBreakdown.topFeatures.slice(0, 4).map((f, i) => (
+                                    <span key={i} style={{ fontSize: '9.5px', background: '#09090b', border: '1px solid #27272a', padding: '2px 6px', borderRadius: '3px', color: '#e2e8f0' }}>
+                                      {f.term} (w={f.tfidf.toFixed(1)})
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
                             </div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                              {classificationResult.algorithmicBreakdown.topFeatures.slice(0, 4).map((f, i) => (
-                                <span key={i} style={{ fontSize: '9.5px', background: '#09090b', border: '1px solid #27272a', padding: '2px 6px', borderRadius: '3px', color: '#e2e8f0' }}>
-                                  {f.term} (w={f.tfidf.toFixed(1)})
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
 
-                        {/* Column 2: Neural Latent Vector Sample & Dialect Matches */}
-                        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
-                          <div style={{ fontSize: '10px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
-                            <span>DEEP LEARNING LATENT VECTOR (64-D)</span>
-                            <span style={{ color: '#71717a' }}>SEMANTIC EMBEDDINGS</span>
-                          </div>
-                          <div style={{ fontSize: '10px', color: '#a1a1aa', marginBottom: '8px' }}>
-                            Cluster: <strong style={{ color: '#ffffff' }}>{classificationResult.algorithmicBreakdown.neuralSemantic.semanticClusterName}</strong>
-                          </div>
-                          {/* Latent Vector Visualization */}
-                          <div style={{ background: '#09090b', padding: '8px', borderRadius: '4px', fontFamily: 'monospace', fontSize: '9px', color: '#38bdf8', marginBottom: '12px', wordBreak: 'break-all' }}>
-                            z_sample = [{classificationResult.algorithmicBreakdown.neuralSemantic.latentVectorSample.join(', ')}...]
-                          </div>
+                            {/* Column 2: Neural Latent Vector Sample & Dialect Matches */}
+                            <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
+                              <div style={{ fontSize: '10px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                                <span>DEEP LEARNING LATENT VECTOR (64-D)</span>
+                                <span style={{ color: '#71717a' }}>SEMANTIC EMBEDDINGS</span>
+                              </div>
+                              <div style={{ fontSize: '10px', color: '#a1a1aa', marginBottom: '8px' }}>
+                                Cluster: <strong style={{ color: '#ffffff' }}>{classificationResult.algorithmicBreakdown.neuralSemantic.semanticClusterName}</strong>
+                              </div>
+                              {/* Latent Vector Visualization */}
+                              <div style={{ background: '#09090b', padding: '8px', borderRadius: '4px', fontFamily: 'monospace', fontSize: '9px', color: '#38bdf8', marginBottom: '12px', wordBreak: 'break-all' }}>
+                                z_sample = [{classificationResult.algorithmicBreakdown.neuralSemantic.latentVectorSample.join(', ')}...]
+                              </div>
 
-                          <div style={{ paddingTop: '8px', borderTop: '1px solid #27272a' }}>
-                            <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#10b981', marginBottom: '6px' }}>
-                              DIALECTAL ORTHOGRAPHIC TOLERANCE (LEVENSHTEIN + DICE):
-                            </div>
-                            {classificationResult.algorithmicBreakdown.fuzzyMatches.length > 0 ? (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                {classificationResult.algorithmicBreakdown.fuzzyMatches.slice(0, 3).map((fuz, idx) => (
-                                  <div key={idx} style={{ fontSize: '10px', color: '#d4d4d8' }}>
-                                    • &ldquo;{fuz.token}&rdquo; → canonical <strong>{fuz.matchedCanonical}</strong> ({Math.round(fuz.similarity * 100)}% match, {fuz.gloss})
+                              <div style={{ paddingTop: '8px', borderTop: '1px solid #27272a' }}>
+                                <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#10b981', marginBottom: '6px' }}>
+                                  DIALECTAL ORTHOGRAPHIC TOLERANCE (LEVENSHTEIN + DICE):
+                                </div>
+                                {classificationResult.algorithmicBreakdown.fuzzyMatches.length > 0 ? (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    {classificationResult.algorithmicBreakdown.fuzzyMatches.slice(0, 3).map((fuz, idx) => (
+                                      <div key={idx} style={{ fontSize: '10px', color: '#d4d4d8' }}>
+                                        • &ldquo;{fuz.token}&rdquo; → canonical <strong>{fuz.matchedCanonical}</strong> ({Math.round(fuz.similarity * 100)}% match, {fuz.gloss})
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
+                                ) : (
+                                  <div style={{ fontSize: '10px', color: '#71717a', fontStyle: 'italic' }}>
+                                    Standard orthography detected; no non-standard phoneme variants.
+                                  </div>
+                                )}
                               </div>
-                            ) : (
-                              <div style={{ fontSize: '10px', color: '#71717a', fontStyle: 'italic' }}>
-                                Standard orthography detected; no non-standard phoneme variants.
-                              </div>
-                            )}
+                            </div>
                           </div>
-                        </div>
-                      </div>
 
-                    </div>
+                        </div>
+                      )}
+                    </>
                   )}
 
                 </div>
