@@ -31,10 +31,20 @@ model LiteratureEntry {
   municipality      String
   barangay          String?
 
-  // Classification fields
+  // Classification fields (Suggested / Active)
   genre             String
   themes            String   // JSON array stored as string
   culturalElements  String   // JSON array stored as string
+
+  // Human Verification Workflow fields
+  reviewStatus        String    @default("PENDING") // "PENDING" | "VERIFIED" | "UNCERTAIN"
+  verifiedGenre       String?
+  verifiedThemes      String?   // JSON array stored as string
+  reviewerId          String?
+  reviewedAt          DateTime?
+  reviewNotes         String?
+  contentHash         String?   // SHA-256 hash of title, content, transcription, translation
+  verifiedContentHash String?   // Hash when verification was confirmed
 
   // Metadata
   createdAt         DateTime @default(now())
@@ -42,6 +52,7 @@ model LiteratureEntry {
   createdBy         String?
 
   classifications   Classification[]
+  reviews           ClassificationReview[]
 }
 
 model Classification {
@@ -53,5 +64,71 @@ model Classification {
   classifiedThemes String          // JSON array stored as string
   confidenceScore  Float
   rulesApplied     String          // JSON array stored as string
+  predictionSource String          @default("RULE_BASED") // "RULE_BASED" | "ML_PIPELINE" | "HYBRID"
+  modelVersion     String?
+  probabilities    String?         // JSON map of class probabilities
+  reviewStatus     String?
   timestamp        DateTime        @default(now())
+}
+
+model ClassificationReview {
+  id               String          @id @default(cuid())
+  entryId          String
+  entry            LiteratureEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  suggestedGenre   String
+  suggestedThemes  String?         // JSON array stored as string
+  predictionSource String          @default("RULE_BASED")
+  modelVersion     String?
+  decision         String          // "CONFIRMED" | "CORRECTED" | "UNCERTAIN"
+  approvedGenre    String?
+  approvedThemes   String?         // JSON array stored as string
+  reviewerId       String
+  notes            String?
+  contentHash      String
+  createdAt        DateTime        @default(now())
+}
+
+model CategoryDefinition {
+  id          String    @id @default(cuid())
+  code        String    @unique // e.g. "MYTH", "LEGEND", "FOLKTALE", "EPIC", etc.
+  type        String    // "GENRE" | "THEME"
+  title       String
+  framework   String    // "EUGENIO_1993" | "ANDRESS_1985"
+  description String
+  isDraft     Boolean   @default(false)
+  approvedBy  String?
+  approvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model MLModelRegistry {
+  id              String    @id @default(cuid())
+  version         String    @unique // e.g. "v1.0.0", "v1.1.0", "rules-fallback"
+  algorithm       String    // "LogisticRegression" | "LinearSVC" | "MultinomialNB" | "RuleBasedBaseline"
+  status          String    @default("CANDIDATE") // "ACTIVE" | "ARCHIVED" | "REJECTED" | "CANDIDATE"
+  metrics         String    // JSON string containing macroF1, perClass metrics, confusionMatrix
+  macroF1         Float?
+  accuracy        Float?
+  datasetSize     Int       @default(0)
+  verifiedCounts  String    @default("{}") // JSON record counts per category
+  pipelinePath    String?   // Path to serialized scikit-learn artifact
+  promotionReason String?
+  activatedAt     DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model MLTrainingJob {
+  id                 String    @id @default(cuid())
+  status             String    @default("PENDING") // "PENDING" | "RUNNING" | "COMPLETED" | "FAILED" | "SKIPPED"
+  trigger            String    @default("MANUAL")  // "MANUAL" | "AUTO_THRESHOLD" | "SCHEDULED"
+  datasetSize        Int       @default(0)
+  newRecordsCount    Int       @default(0)
+  candidateVersion   String?
+  evaluationResults  String?   // JSON
+  promotionDecision  String?   // "ACTIVATED" | "REJECTED_INFERIOR" | "REJECTED_INSUFFICIENT_DATA" | "SKIPPED_UNCHANGED"
+  errorMessage       String?
+  startedAt          DateTime  @default(now())
+  completedAt        DateTime?
 }

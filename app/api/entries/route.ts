@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { classifyEntry } from '@/lib/classification'
+import { predictWithML } from '@/lib/classification/mlClient'
+import { computeContentHash } from '@/lib/classification/contentHash'
 import { translateText } from '@/lib/translation'
 
 // Home/Explore/Classification/Dashboard cache their entry queries under the
@@ -99,6 +101,13 @@ export async function POST(request: NextRequest) {
       bisayaTranslation = res.translatedText
     }
 
+    const contentHash = computeContentHash({
+      title: body.title,
+      transcription,
+      translation,
+      content: body.content,
+    })
+
     const entry = await prisma.literatureEntry.create({
       data: {
         title: body.title,
@@ -122,18 +131,25 @@ export async function POST(request: NextRequest) {
         themes: JSON.stringify(body.themes || []),
         culturalElements: JSON.stringify(body.culturalElements || []),
         createdBy: body.createdBy || null,
+        reviewStatus: 'PENDING',
+        contentHash,
       },
     })
 
-    // Auto-classify and persist classification results for the new entry using full contextual metadata
-    const result = classifyEntry(entry)
+    // Classify using real ML pipeline with rule-based fallback
+    const mlResult = await predictWithML(entry)
+    const ruleFallback = classifyEntry(entry)
+
     await prisma.classification.create({
       data: {
         entryId: entry.id,
-        classifiedGenre: result.genre.value,
-        classifiedThemes: JSON.stringify(result.themes.map(t => t.value)),
-        confidenceScore: result.overallConfidence,
-        rulesApplied: JSON.stringify(result.rulesApplied),
+        classifiedGenre: mlResult.predictedGenre,
+        classifiedThemes: JSON.stringify(ruleFallback.themes.map(t => t.value)),
+        confidenceScore: mlResult.confidence,
+        rulesApplied: JSON.stringify(ruleFallback.rulesApplied),
+        predictionSource: mlResult.predictionSource,
+        modelVersion: mlResult.modelVersion,
+        probabilities: JSON.stringify(mlResult.probabilities),
       },
     })
 

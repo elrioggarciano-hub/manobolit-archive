@@ -4,6 +4,9 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import DeleteButton from '@/components/DeleteButton'
 import LogoutButton from '@/components/LogoutButton'
+import ReviewQueue from '@/components/admin/ReviewQueue'
+import MLMonitoring from '@/components/admin/MLMonitoring'
+import DatasetManagement from '@/components/admin/DatasetManagement'
 
 export interface AdminEntry {
   id: string
@@ -34,6 +37,7 @@ interface Props {
 }
 
 export default function AdminClient({ initialEntries }: Props) {
+  const [adminTab, setAdminTab] = useState<'entries' | 'review' | 'ml' | 'dataset'>('entries')
   const [filterType, setFilterType] = useState<'ALL' | 'ORAL_LITERATURE' | 'FOLK_SONG'>('ALL')
   const [filterGenre, setFilterGenre] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
@@ -148,8 +152,53 @@ export default function AdminClient({ initialEntries }: Props) {
           </div>
         </div>
 
-        {/* Interactive Stats Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5" style={{ marginBottom: '24px' }}>
+        {/* Admin Navigation Tabs */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '8px',
+            marginBottom: '28px',
+            borderBottom: '1px solid var(--border-color)',
+            paddingBottom: '12px',
+            overflowX: 'auto',
+          }}
+        >
+          {[
+            { id: 'entries', label: `📚 Archive Entries (${initialEntries.length})` },
+            { id: 'review', label: '📋 Review Queue (Human Verification)' },
+            { id: 'ml', label: '⚡ ML Pipeline & Retraining' },
+            { id: 'dataset', label: '📦 Dataset & Taxonomies' },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setAdminTab(tab.id as any)}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '8px',
+                border: adminTab === tab.id ? '1px solid var(--primary-red, #8F000D)' : '1px solid var(--border-color)',
+                background: adminTab === tab.id ? 'var(--primary-red, #8F000D)' : 'var(--bg-surface)',
+                color: adminTab === tab.id ? '#fff' : 'var(--text-secondary)',
+                fontWeight: 700,
+                fontSize: '13px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {adminTab === 'review' && <ReviewQueue />}
+        {adminTab === 'ml' && <MLMonitoring />}
+        {adminTab === 'dataset' && <DatasetManagement />}
+
+        {adminTab === 'entries' && (
+          <>
+            {/* Interactive Stats Bar */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5" style={{ marginBottom: '24px' }}>
           {/* Card 1: Total Entries */}
           <button
             type="button"
@@ -698,7 +747,10 @@ export default function AdminClient({ initialEntries }: Props) {
             })}
           </div>
         )}
+          </>
+        )}
       </div>
     </main>
   )
 }
+

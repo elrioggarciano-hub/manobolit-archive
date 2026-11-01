@@ -151,6 +151,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   // Execution state: do not automatically display results when user selects an entry
   const [hasExecuted, setHasExecuted] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [serverResult, setServerResult] = useState<any>(null)
 
   const classificationResult = classifyEntry(inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm)
 
@@ -520,7 +521,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                     <span style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                      Rule-Based Machine Learning
+                      Rule-Based Classification
                     </span>
                     <span 
                       onClick={() => setIsDefenseMode(prev => !prev)}
@@ -581,7 +582,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   margin: '0 0 28px 0'
                 }}
               >
-                Gamit ang <strong>Rule-Based Machine Learning</strong>, awtomatikong sinusuri ng system ang mga kwento at awiting Manobo. Binabasa nito ang mga katutubong salita at estruktura ng salaysay upang matukoy ang kanilang <strong>Anyo (Genre)</strong>, <strong>Pangunahing Tema</strong>, at <strong>Lugar ng Pinagmulan</strong>.
+                Gamit ang <strong>Rule-Based Classification</strong>, awtomatikong sinusuri ng system ang mga kwento at awiting Manobo. Binabasa nito ang mga katutubong salita at estruktura ng salaysay upang matukoy ang kanilang <strong>Anyo (Genre)</strong>, <strong>Pangunahing Tema</strong>, at <strong>Lugar ng Pinagmulan</strong>.
               </p>
 
               {/* Diagram Flow Container */}
@@ -752,15 +753,32 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     )}
                   </div>
 
-                  {/* Action Button: Run Rule Classification */}
+                  {/* Action Button: Run Rule & Machine Learning Classification */}
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
                       setIsAnalyzing(true)
-                      setTimeout(() => {
+                      try {
+                        const res = await fetch('/api/classify', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            text: inputText,
+                            additionalContext: inputTranscription,
+                            content: inputText,
+                            transcription: inputTranscription,
+                          }),
+                        })
+                        if (res.ok) {
+                          const data = await res.json()
+                          setServerResult(data.result)
+                        }
+                      } catch (err) {
+                        console.error('Classification API error:', err)
+                      } finally {
                         setHasExecuted(true)
                         setIsAnalyzing(false)
-                      }, 250)
+                      }
                     }}
                     disabled={isAnalyzing || (!inputText && !inputTranscription)}
                     className="btn-anim"
@@ -840,7 +858,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
                   <div>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Hakbang 2: Pagsusuri ng Alituntunin</div>
-                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>RULE-BASED ML ENGINE</div>
+                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>RULE-BASED CLASSIFICATION ENGINE</div>
                   </div>
 
                   {/* Rules list with confidence-tiered indicators + matched evidence */}
@@ -979,12 +997,33 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                               <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
-                                {formatName(classificationResult.genre.value)}
+                                {formatName(serverResult?.genre?.value || classificationResult.genre.value)}
                               </span>
                               <span style={{ fontSize: '15px', fontWeight: 700, color }}>
-                                {pct}%
+                                {serverResult ? Math.round(serverResult.overallConfidence * 100) : pct}%
                               </span>
                             </div>
+                            {serverResult && (
+                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                <span
+                                  style={{
+                                    fontSize: '9px',
+                                    fontWeight: 700,
+                                    padding: '2px 6px',
+                                    borderRadius: '4px',
+                                    background: serverResult.predictionSource === 'ML_PIPELINE' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                                    color: serverResult.predictionSource === 'ML_PIPELINE' ? '#10b981' : '#f59e0b',
+                                  }}
+                                >
+                                  {serverResult.predictionSource} ({serverResult.modelVersion})
+                                </span>
+                                {serverResult.isUncertain && (
+                                  <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' }}>
+                                    ⚠️ Flagged for Review
+                                  </span>
+                                )}
+                              </div>
+                            )}
                             <div style={{ height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' }}>
                               <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
                             </div>
@@ -1096,7 +1135,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       </div>
                     </div>
                     <div style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
-                      Rule-Based Machine Learning
+                      Rule-Based Classification
                     </div>
                   </div>
 

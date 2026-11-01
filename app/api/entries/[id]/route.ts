@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { classifyEntry } from '@/lib/classification'
+import { predictWithML } from '@/lib/classification/mlClient'
+import { computeContentHash } from '@/lib/classification/contentHash'
 import { translateText } from '@/lib/translation'
 
 // Home/Explore/Classification/Dashboard cache their entry queries under the
@@ -83,6 +85,22 @@ export async function PUT(
       bisayaTranslation = res.translatedText
     }
 
+    const existing = await prisma.literatureEntry.findUnique({ where: { id: params.id } })
+    if (!existing) {
+      return NextResponse.json({ error: 'Entry not found' }, { status: 404 })
+    }
+
+    const newContentHash = computeContentHash({
+      title: body.title,
+      transcription,
+      translation,
+      content: body.content,
+    })
+
+    // If text changed after verification, require review again and exclude from verified training data!
+    const textHasChanged = Boolean(existing.contentHash && existing.contentHash !== newContentHash)
+    const shouldInvalidateVerification = textHasChanged && existing.reviewStatus === 'VERIFIED'
+
     const entry = await prisma.literatureEntry.update({
       where: { id: params.id },
       data: {
@@ -106,19 +124,27 @@ export async function PUT(
         genre: body.genre,
         themes: JSON.stringify(body.themes || []),
         culturalElements: JSON.stringify(body.culturalElements || []),
+        contentHash: newContentHash,
+        reviewStatus: shouldInvalidateVerification ? 'PENDING' : existing.reviewStatus,
+        verifiedContentHash: shouldInvalidateVerification ? null : existing.verifiedContentHash,
       },
     })
 
-    // Delete old classifications and create a new one matching the updated content
+    // Delete old classifications and create a new suggested classification using real ML with rule fallback
     await prisma.classification.deleteMany({ where: { entryId: params.id } })
-    const result = classifyEntry(entry)
+    const mlResult = await predictWithML(entry)
+    const ruleFallback = classifyEntry(entry)
+
     await prisma.classification.create({
       data: {
         entryId: entry.id,
-        classifiedGenre: result.genre.value,
-        classifiedThemes: JSON.stringify(result.themes.map(t => t.value)),
-        confidenceScore: result.overallConfidence,
-        rulesApplied: JSON.stringify(result.rulesApplied),
+        classifiedGenre: mlResult.predictedGenre,
+        classifiedThemes: JSON.stringify(ruleFallback.themes.map(t => t.value)),
+        confidenceScore: mlResult.confidence,
+        rulesApplied: JSON.stringify(ruleFallback.rulesApplied),
+        predictionSource: mlResult.predictionSource,
+        modelVersion: mlResult.modelVersion,
+        probabilities: JSON.stringify(mlResult.probabilities),
       },
     })
 
@@ -129,6 +155,7 @@ export async function PUT(
         ...entry,
         themes: JSON.parse(entry.themes),
         culturalElements: JSON.parse(entry.culturalElements),
+        verificationInvalidated: shouldInvalidateVerification,
       },
     })
   } catch (error) {
