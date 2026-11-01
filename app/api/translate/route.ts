@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { translateText, TranslationLang } from '@/lib/translation'
+import { translateTextDynamic, TranslationLang } from '@/lib/translation/engine'
 
 const VALID_LANGS: TranslationLang[] = ['en', 'msm', 'ceb']
 
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Text is required for translation' }, { status: 400 })
     }
 
-    const result = translateText(text, sourceLang, targetLang)
+    const result = await translateTextDynamic(text, sourceLang, targetLang)
 
     return NextResponse.json({ result })
   } catch (error) {

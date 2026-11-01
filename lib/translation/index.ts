@@ -1,2 +1,3 @@
+export * from './types'
 export * from './bibleCorpus'
-export * from './engine'
+export * from './fallback'

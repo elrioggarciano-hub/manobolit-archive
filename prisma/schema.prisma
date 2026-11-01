@@ -132,3 +132,21 @@ model MLTrainingJob {
   startedAt          DateTime  @default(now())
   completedAt        DateTime?
 }
+
+model ParallelTranslation {
+  id           String   @id @default(cuid())
+  english      String
+  manobo       String
+  bisaya       String
+  category     String   @default("PHRASE") // "PHRASE" | "LEXICON" | "SENTENCE" | "CULTURAL"
+  context      String?
+  sourceRef    String?  // Reference to entry title or academic literature source
+  literatureId String?
+  isVerified   Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([english])
+  @@index([manobo])
+  @@index([bisaya])
+}

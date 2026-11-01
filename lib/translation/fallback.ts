@@ -1,0 +1,99 @@
+import { BIBLE_PARALLEL_PHRASES, BIBLE_LEXICON } from './bibleCorpus'
+import { TranslationLang, TranslationResult } from './types'
+
+const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
+  en: 'english',
+  msm: 'manobo',
+  ceb: 'bisaya',
+}
+
+function cleanText(text: string): string {
+  return text.trim().replace(/\s+/g, ' ')
+}
+
+export function translateText(
+  text: string,
+  sourceLang: TranslationLang = 'en',
+  targetLang: TranslationLang = 'msm'
+): TranslationResult {
+  const cleanedInput = cleanText(text)
+  const corpusSource = 'ManoboLit Oral Literature Archive (Trento & Bunawan Corpus, 2024)'
+
+  if (!cleanedInput) {
+    return {
+      translatedText: '',
+      confidence: 1.0,
+      sourceLang,
+      targetLang,
+      matchedPhrases: [],
+      matchedWordsCount: 0,
+      totalWordsCount: 0,
+      corpusSource,
+      engineType: 'CORPUS_FALLBACK',
+    }
+  }
+
+  const sourceField = LANG_FIELD[sourceLang]
+  const targetField = LANG_FIELD[targetLang]
+
+  const matchedPhrases: Array<{ original: string; translated: string; verseRef?: string }> = []
+  const words = cleanedInput.split(/\s+/)
+  let matchedCount = 0
+  let textToProcess = cleanedInput
+
+  for (const phrase of BIBLE_PARALLEL_PHRASES) {
+    const sourcePhrase = phrase[sourceField]
+    const targetPhrase = phrase[targetField]
+    if (!sourcePhrase || !targetPhrase) continue
+
+    const regex = new RegExp(`\\b${sourcePhrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')
+    if (regex.test(textToProcess)) {
+      matchedPhrases.push({
+        original: sourcePhrase,
+        translated: targetPhrase,
+        verseRef: phrase.verseRef,
+      })
+      textToProcess = textToProcess.replace(regex, targetPhrase)
+      matchedCount += sourcePhrase.split(' ').length
+    }
+  }
+
+  const lexiconMap = new Map<string, string>()
+  for (const entry of BIBLE_LEXICON) {
+    const sourceWord = entry[sourceField]
+    const targetWord = entry[targetField]
+    if (!sourceWord || !targetWord) continue
+    lexiconMap.set(sourceWord.toLowerCase(), targetWord)
+  }
+
+  const processedTokens = textToProcess.split(/(\s+|[.,!?;:]+)/).map((token) => {
+    const cleanToken = token.toLowerCase().replace(/[^a-z0-9-]/g, '')
+    if (!cleanToken) return token
+
+    if (lexiconMap.has(cleanToken)) {
+      matchedCount++
+      const matched = lexiconMap.get(cleanToken)!
+      if (token[0] === token[0].toUpperCase()) {
+        return matched.charAt(0).toUpperCase() + matched.slice(1)
+      }
+      return matched
+    }
+    return token
+  })
+
+  const translatedText = processedTokens.join('')
+  const ratio = words.length > 0 ? Math.min(matchedCount / words.length, 1.0) : 0
+  const confidence = Math.round((0.55 + ratio * 0.43) * 100) / 100
+
+  return {
+    translatedText,
+    confidence,
+    sourceLang,
+    targetLang,
+    matchedPhrases,
+    matchedWordsCount: matchedCount,
+    totalWordsCount: words.length,
+    corpusSource,
+    engineType: 'CORPUS_FALLBACK',
+  }
+}
