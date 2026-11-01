@@ -203,6 +203,105 @@ export default function DatasetManagement() {
         )}
       </div>
 
+      {/* Google Colab & NMT Parallel Translation Pipeline (Admin Only) */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(143,0,13,0.12) 0%, rgba(24,24,27,0.85) 100%)',
+          border: '1px solid rgba(143,0,13,0.35)',
+          borderRadius: '14px',
+          padding: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div
+            style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '50%',
+              background: '#8F000D',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              color: '#fff',
+              fontWeight: 800,
+              fontSize: '15px',
+            }}
+          >
+            NMT
+          </div>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#f4f4f5' }}>
+              Google Colab NMT &amp; Dynamic Parallel Corpus
+            </h3>
+            <p style={{ margin: '3px 0 0', fontSize: '12px', color: '#a1a1aa' }}>
+              Train Meta NLLB-200 translation models on GPU or export the live Agusan Manobo parallel corpus.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <a
+            href="https://colab.research.google.com/github/elrioggarciano-hub/manobolit-archive/blob/main/notebooks/ManoboLit_Translation_Trainer.ipynb"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: '#f1b80d',
+              color: '#09090b',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              fontSize: '12px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <span>⚡ Open in Colab</span>
+          </a>
+
+          <a
+            href="/api/translate/dataset?format=json"
+            target="_blank"
+            style={{
+              background: '#27272a',
+              color: '#e4e4e7',
+              border: '1px solid #3f3f46',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              fontSize: '12px',
+              fontWeight: 600,
+              textDecoration: 'none',
+            }}
+          >
+            Export JSON
+          </a>
+
+          <a
+            href="/api/translate/dataset?format=csv"
+            target="_blank"
+            style={{
+              background: '#27272a',
+              color: '#e4e4e7',
+              border: '1px solid #3f3f46',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              fontSize: '12px',
+              fontWeight: 600,
+              textDecoration: 'none',
+            }}
+          >
+            Export CSV
+          </a>
+        </div>
+      </div>
+
       {/* Dataset Health and Representation */}
       <div
         style={{
