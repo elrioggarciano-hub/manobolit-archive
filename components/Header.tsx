@@ -4,10 +4,13 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import ThemeToggle from '@/components/ThemeToggle'
+import LanguageSelector from '@/components/LanguageSelector'
+import { useLanguage } from '@/lib/context/LanguageContext'
 
 export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
+  const { t } = useLanguage()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -41,11 +44,11 @@ export default function Header() {
   }, [pathname])
 
   const navItems = [
-    { href: '/explore', label: 'EXPLORER' },
-    { href: '/classification', label: 'CLASSIFICATION' },
-    { href: '/translator', label: 'TRANSLATOR' },
-    { href: '/dashboard', label: 'DASHBOARD' },
-    { href: '/about', label: 'ABOUT' },
+    { href: '/explore', label: t('nav_explorer') },
+    { href: '/classification', label: t('nav_classification') },
+    { href: '/translator', label: t('nav_translator') },
+    { href: '/dashboard', label: t('nav_dashboard') },
+    { href: '/about', label: t('nav_about') },
   ]
 
   return (
@@ -82,7 +85,7 @@ export default function Header() {
               const isActive = pathname === item.href || (item.href === '/explore' && pathname.startsWith('/explore')) || (item.href === '/about' && pathname === '/about')
               return (
                 <Link
-                  key={item.label}
+                  key={item.href}
                   href={item.href}
                   className="relative py-2 text-xs font-bold tracking-wider"
                   style={{
@@ -101,11 +104,11 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Desktop Right Action (Search & User Circle Icon) & Mobile Toggle */}
-          <div className="flex items-center gap-4">
+          {/* Desktop Right Action (Search, Language, Theme, & User Circle Icon) & Mobile Toggle */}
+          <div className="flex items-center gap-3">
             {/* Search Input Box */}
             {pathname !== '/' && (
-              <div className="relative hidden sm:flex items-center">
+              <div className="relative hidden lg:flex items-center">
                 <span className="absolute left-3 flex items-center text-slate-400">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="11" cy="11" r="8" />
@@ -114,12 +117,12 @@ export default function Header() {
                 </span>
                 <input
                   type="text"
-                  placeholder="Search archive..."
+                  placeholder={t('search_placeholder')}
                   className="pl-9 pr-4 py-2 text-xs border-0 placeholder-slate-500 focus:outline-none input-anim"
                   style={{
                     borderRadius: '4px',
                     height: '36px',
-                    width: '220px',
+                    width: '200px',
                     background: 'var(--bg-input)',
                     color: 'var(--text-primary)',
                   }}
@@ -132,6 +135,11 @@ export default function Header() {
               </div>
             )}
 
+            {/* Language Selector */}
+            <div className="hidden sm:block">
+              <LanguageSelector compact />
+            </div>
+
             {/* Theme Toggle */}
             <ThemeToggle />
 
@@ -139,7 +147,7 @@ export default function Header() {
             <Link
               href="/admin"
               className="hidden sm:flex items-center justify-center transition-colors"
-              title="Admin Panel"
+              title={t('admin_dashboard')}
               style={{
                 width: '30px',
                 height: '30px',
@@ -186,16 +194,19 @@ export default function Header() {
         >
           <div className="flex items-center justify-between mb-4 stagger-item">
             <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
-              APPEARANCE
+              {t('appearance')}
             </span>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <LanguageSelector compact />
+              <ThemeToggle />
+            </div>
           </div>
           <nav className="flex flex-col gap-4">
             {navItems.map((item, i) => {
               const isActive = pathname === item.href
               return (
                 <Link
-                  key={item.label}
+                  key={item.href}
                   href={item.href}
                   className="py-1 text-sm font-semibold tracking-wider transition-colors duration-200 stagger-item"
                   style={{
@@ -219,7 +230,7 @@ export default function Header() {
                 animationDelay: `${navItems.length * 40}ms`,
               }}
             >
-              Admin Dashboard
+              {t('admin_dashboard')}
             </Link>
           </nav>
         </div>

@@ -8,6 +8,7 @@ import PageTransition from "@/components/PageTransition"
 import { AudioProvider } from "@/lib/context/AudioContext"
 import { ToastProvider } from "@/lib/context/ToastContext"
 import { ThemeProvider } from "@/lib/context/ThemeContext"
+import { LanguageProvider } from "@/lib/context/LanguageContext"
 
 export const metadata: Metadata = {
   title: "ManoboLit Archive",
@@ -38,15 +39,17 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <ThemeProvider>
-          <ToastProvider>
-            <AudioProvider>
-              <ClickRipple />
-              <Header />
-              <PageTransition>{children}</PageTransition>
-              <Footer />
-              <PersistentAudioPlayer />
-            </AudioProvider>
-          </ToastProvider>
+          <LanguageProvider>
+            <ToastProvider>
+              <AudioProvider>
+                <ClickRipple />
+                <Header />
+                <PageTransition>{children}</PageTransition>
+                <Footer />
+                <PersistentAudioPlayer />
+              </AudioProvider>
+            </ToastProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>
