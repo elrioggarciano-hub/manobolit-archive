@@ -11,7 +11,7 @@ export default function Footer() {
   if (pathname === '/explore') return null
 
   return (
-    <footer 
+    <footer
       style={{
         background: '#18181b',
         color: '#f8fafc',
@@ -21,18 +21,18 @@ export default function Footer() {
       }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div 
-          style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '40px',
-            marginBottom: '40px' 
+            marginBottom: '40px'
           }}
         >
           {/* Column 1: Logo & Tagline */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 
-              style={{ 
+            <h2
+              style={{
                 margin: 0,
                 fontSize: '30px',
                 fontWeight: 700,
@@ -44,11 +44,11 @@ export default function Footer() {
             >
               ManoboLit Archive
             </h2>
-            <p 
-              style={{ 
-                margin: 0, 
-                fontSize: '13px', 
-                color: '#94a3b8', 
+            <p
+              style={{
+                margin: 0,
+                fontSize: '13px',
+                color: '#94a3b8',
                 lineHeight: 1.6,
                 maxWidth: '320px',
               }}
@@ -59,10 +59,10 @@ export default function Footer() {
 
           {/* Column 2: Navigation Links */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <span 
-              style={{ 
-                fontSize: '11px', 
-                fontWeight: 700, 
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
                 color: '#ffffff', // White label
                 letterSpacing: '0.1em',
               }}
@@ -76,8 +76,8 @@ export default function Footer() {
                 { label: t('footer_nav_about'), href: '/about' },
                 { label: t('footer_nav_ethics'), href: '/ethics' },
               ].map(link => (
-                <Link 
-                  key={link.href} 
+                <Link
+                  key={link.href}
                   href={link.href}
                   style={{
                     fontSize: '13px',
@@ -96,10 +96,10 @@ export default function Footer() {
 
           {/* Column 3: Language Selector */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <span 
-              style={{ 
-                fontSize: '11px', 
-                fontWeight: 700, 
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
                 color: '#ffffff', // White label
                 letterSpacing: '0.1em',
               }}
@@ -161,10 +161,10 @@ export default function Footer() {
 
           {/* Column 4: Contact */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <span 
-              style={{ 
-                fontSize: '11px', 
-                fontWeight: 700, 
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
                 color: '#ffffff', // White label
                 letterSpacing: '0.1em',
               }}
@@ -172,7 +172,7 @@ export default function Footer() {
               {t('footer_contact_heading')}
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <a 
+              <a
                 href="mailto:preservation@manobolit.org"
                 style={{
                   fontSize: '13px',
@@ -193,11 +193,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom Credits Line */}
-        <div 
-          style={{ 
-            borderTop: '1px solid #27272a', 
-            paddingTop: '20px', 
-            display: 'flex', 
+        <div
+          style={{
+            borderTop: '1px solid #27272a',
+            paddingTop: '20px',
+            display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexWrap: 'wrap',

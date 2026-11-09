@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useLanguage } from '@/lib/context/LanguageContext'
 import {
   classifyEntry,
   genreRules,
@@ -119,6 +120,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
     return parts.join(' ')
   }
 
+  const { t } = useLanguage()
   const [selectedEntryId, setSelectedEntryId] = useState<string>(initialEntry?.id || 'fb-stars')
   const [inputText, setInputText] = useState(initialEntry ? getEntryClassificationText(initialEntry) : DEFAULT_SIMULATOR_TEXT)
   const [inputTranscription, setInputTranscription] = useState(initialEntry ? (initialEntry.transcription || '') : '')
@@ -280,7 +282,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               color: 'var(--text-primary)'
             }}
           >
-            Classification Frameworks
+            {t('classification_rules_heading')}
           </h1>
 
           <p 
@@ -291,7 +293,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               margin: '0'
             }}
           >
-            The ManoboLit Archive employs a dual-framework approach to ensure academic rigor<br className="hidden md:inline" /> and cultural fidelity. We synthesize the pan-Philippine taxonomy of Damiana Eugenio with<br className="hidden md:inline" /> the specific thematic categories of Agusan Manobo tradition documented by Thomas<br className="hidden md:inline" /> Andress.
+            {t('classification_subtitle')}
           </p>
         </div>
 

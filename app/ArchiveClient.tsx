@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import CountUp from '@/components/CountUp'
+import { useLanguage } from '@/lib/context/LanguageContext'
 
 interface Entry {
   id: string
@@ -41,6 +42,7 @@ const ALL_TYPES = ['ORAL_LITERATURE', 'FOLK_SONG']
 
 export default function ArchiveClient({ entries }: { entries: Entry[] }) {
   const router = useRouter()
+  const { t } = useLanguage()
   const [search, setSearch] = useState('')
 
   const totalEntries = entries.length
@@ -75,7 +77,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               textTransform: 'uppercase',
             }}
           >
-            SCHOLARLY PRESERVATION
+            {t('hero_badge')}
           </div>
           
           <h1 
@@ -88,7 +90,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               fontFamily: 'Cormorant Garamond, Georgia, serif',
             }}
           >
-            Preserving the Agusan Manobo<br />Voice
+            {t('hero_title_1')}<br />{t('hero_title_2')}
           </h1>
 
           <p 
@@ -101,7 +103,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               fontFamily: 'Inter, sans-serif'
             }}
           >
-            A rule-based classification and retrieval system for oral literature and folk<br />songs, maintaining cultural integrity through scientific precision.
+            {t('hero_desc')}
           </p>
 
           {/* Search container */}
@@ -129,7 +131,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Explore the Archive..."
+                placeholder={t('hero_search_placeholder')}
                 style={{
                   width: '100%',
                   border: 'none',
@@ -159,7 +161,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               onMouseEnter={e => e.currentTarget.style.backgroundColor = '#70000a'}
               onMouseLeave={e => e.currentTarget.style.backgroundColor = '#8F000D'}
             >
-              SEARCH
+              {t('btn_browse_archive')}
             </button>
           </form>
         </div>
@@ -187,7 +189,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                 fontFamily: 'Cormorant Garamond, Georgia, serif' 
               }}
             >
-              Archive at a Glance
+              {t('stat_preserved_entries')}
             </h2>
             <div style={{ position: 'absolute', bottom: '-9px', left: 0, width: '90px', height: '4px', background: '#8F000D' }} />
           </div>
@@ -237,7 +239,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             </div>
             <div style={{ marginTop: '28px' }}>
               <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={oralLit} /></div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Oral Literature Pieces</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>{t('stat_oral_literature')}</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
               Riddles, proverbs, and folktales documented from Agusan del Sur communities.
@@ -275,7 +277,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             </div>
             <div style={{ marginTop: '28px' }}>
               <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={folkSongs} /></div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Folk Songs</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>{t('stat_folk_songs')}</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
               AI-generated narrations preserving each song&apos;s lyrical content.
@@ -424,10 +426,10 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           }}
         >
           <h2 style={{ margin: 0, fontSize: '42px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
-            Experience the Living Heritage
+            {t('section_featured_title')}
           </h2>
           <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, maxWidth: '650px' }}>
-            Dive into the rich tapestry of the Agusan Manobo. Use our rule-based search<br />to find specific themes, genres, or locations.
+            {t('section_featured_subtitle')}
           </p>
           <button 
             onClick={() => router.push('/explore')}
@@ -448,7 +450,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#d4a007'; e.currentTarget.style.transform = 'translateY(-2px)' }}
             onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#f1b80d'; e.currentTarget.style.transform = 'translateY(0)' }}
           >
-            START EXPLORING &rarr;
+            {t('btn_browse_archive')} &rarr;
           </button>
         </div>
       </section>

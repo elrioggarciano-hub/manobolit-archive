@@ -192,3 +192,4 @@ export default function LanguageSelector({ compact = false, className = '' }: La
     </div>
   )
 }
+

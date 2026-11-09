@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useLanguage } from '@/lib/context/LanguageContext'
 import {
   translateText,
   TranslationLang,
@@ -13,12 +14,14 @@ const LANG_LABELS: Record<TranslationLang, string> = {
   msm: 'Agusan Manobo',
   en: 'English',
   ceb: 'Bisaya (Cebuano)',
+  fil: 'Tagalog',
 }
 
-const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
+const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya' | 'tagalog'> = {
   en: 'english',
   msm: 'manobo',
   ceb: 'bisaya',
+  fil: 'tagalog',
 }
 
 const VOCAB_GROUPS: { label: string; words: string[] }[] = [
@@ -140,6 +143,7 @@ const VOCAB_GROUPS: { label: string; words: string[] }[] = [
 ]
 
 export default function TranslatorClient() {
+  const { t } = useLanguage()
   const [sourceLang, setSourceLang] = useState<TranslationLang>('msm')
   const [targetLang, setTargetLang] = useState<TranslationLang>('en')
   const [inputText, setInputText] = useState('')
@@ -221,7 +225,7 @@ export default function TranslatorClient() {
     setLiveResult(null)
   }
 
-  const langOptions: TranslationLang[] = ['msm', 'en', 'ceb']
+  const langOptions: TranslationLang[] = ['msm', 'en', 'ceb', 'fil']
 
   const lexiconByEnglish = useMemo(() => {
     const map = new Map<string, (typeof BIBLE_LEXICON)[number]>()
@@ -279,7 +283,7 @@ export default function TranslatorClient() {
               color: 'var(--text-primary)',
             }}
           >
-            Manobo Translator
+            {t('translator_title')}
           </h1>
 
           <p
@@ -291,8 +295,7 @@ export default function TranslatorClient() {
               maxWidth: '820px',
             }}
           >
-            Translate free-form text, sentences, or phrases between Agusan Manobo, English, and Bisaya (Cebuano).
-            Translations are dynamically queried from verified literary entries and cultural lexicons.
+            {t('translator_subtitle')}
           </p>
         </div>
 
@@ -329,7 +332,7 @@ export default function TranslatorClient() {
                   marginBottom: '6px',
                 }}
               >
-                TRANSLATE FROM
+                {t('translator_source_label')}
               </label>
               <select
                 value={sourceLang}
@@ -359,8 +362,8 @@ export default function TranslatorClient() {
             <button
               onClick={swapLanguages}
               className="btn-anim"
-              aria-label="Swap languages"
-              title="Swap languages"
+              aria-label={t('translator_swap')}
+              title={t('translator_swap')}
               style={{
                 width: '38px',
                 height: '38px',
@@ -404,7 +407,7 @@ export default function TranslatorClient() {
                   marginBottom: '6px',
                 }}
               >
-                TRANSLATE TO
+                {t('translator_target_label')}
               </label>
               <select
                 value={targetLang}
@@ -472,7 +475,7 @@ export default function TranslatorClient() {
                     padding: 0,
                   }}
                 >
-                  CLEAR ✕
+                  {t('translator_clear')} ✕
                 </button>
               )}
             </div>
@@ -685,7 +688,7 @@ export default function TranslatorClient() {
               color: 'var(--text-primary)',
             }}
           >
-            Quick Reference Vocabulary &amp; Phrases
+            {t('translator_lexicon_title')}
           </h2>
           <p
             style={{
@@ -695,8 +698,7 @@ export default function TranslatorClient() {
               lineHeight: 1.6,
             }}
           >
-            Click any phrase or vocabulary item below to quickly insert and translate in{' '}
-            {LANG_LABELS[sourceLang]}.
+            {t('translator_lexicon_desc')}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAudio } from '@/lib/context/AudioContext'
 import { useToast } from '@/lib/context/ToastContext'
+import { useLanguage } from '@/lib/context/LanguageContext'
 
 interface Entry {
   id: string
@@ -29,6 +30,7 @@ interface Entry {
 export default function ExploreClient({ initialEntries }: { initialEntries: Entry[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { t } = useLanguage()
   
   const { playTrack, currentTrack, isPlaying, togglePlay } = useAudio()
   const { showToast } = useToast()
@@ -643,7 +645,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   color: 'var(--text-primary)'
                 }}
               >
-                Archive Explorer
+                {t('explorer_title')}
               </h1>
               <p className="text-xs text-[var(--text-muted)] mt-2 max-w-xl leading-relaxed" style={{ whiteSpace: 'pre-line' }}>
                 Navigating the digital weave of Agusan Manobo oral literature. Currently{"\n"}displaying {filteredEntries.length} entries from the scholarly collection.
@@ -662,7 +664,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 type="text"
                 value={searchInput}
                 onChange={e => handleSearchChange(e.target.value)}
-                placeholder="Search entries by title, content, themes, keywords..."
+                placeholder={t('explorer_search_placeholder')}
                 className="w-full pl-12 pr-10 py-3 bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-slate-400 focus:outline-none focus:border-[#8F000D] input-anim shadow-sm"
                 style={{
                   borderRadius: '0px',
