@@ -1,0 +1,418 @@
+[
+  {
+    "manobo": "diwata",
+    "english": "supernatural deity, nature spirit",
+    "bisaya": "diwata, espiritu",
+    "pos": "noun",
+    "semantic_domain": "SPIRIT_WORLD",
+    "genre": "MYTH"
+  },
+  {
+    "manobo": "tagbanwa",
+    "english": "guardian spirit of the forest, river, or territory",
+    "bisaya": "tag-iya sa lasang, bantay",
+    "pos": "noun",
+    "semantic_domain": "SPIRIT_WORLD",
+    "genre": "LEGEND"
+  },
+  {
+    "manobo": "babaylan",
+    "english": "indigenous shaman, spiritual healer, chanter",
+    "bisaya": "babaylan, tambalan",
+    "pos": "noun",
+    "semantic_domain": "RITUAL",
+    "genre": "CHANT"
+  },
+  {
+    "manobo": "kagnat",
+    "english": "origin, beginning, creation point",
+    "bisaya": "sinugdanan, gigikanan",
+    "pos": "noun",
+    "semantic_domain": "COSMOGONY",
+    "genre": "MYTH"
+  },
+  {
+    "manobo": "amay ne langit",
+    "english": "Father Sky, celestial creator deity",
+    "bisaya": "Amahang Langit",
+    "pos": "noun",
+    "semantic_domain": "COSMOGONY",
+    "genre": "MYTH"
+  },
+  {
+    "manobo": "bituen",
+    "english": "star, celestial body",
+    "bisaya": "bituon",
+    "pos": "noun",
+    "semantic_domain": "COSMOS",
+    "genre": "MYTH"
+  },
+  {
+    "manobo": "tano",
+    "english": "earth, soil, world",
+    "bisaya": "yuta, kalibutan",
+    "pos": "noun",
+    "semantic_domain": "NATURE",
+    "genre": "MYTH"
+  },
+  {
+    "manobo": "langit",
+    "english": "sky, heavens",
+    "bisaya": "langit",
+    "pos": "noun",
+    "semantic_domain": "COSMOS",
+    "genre": "MYTH"
+  },
+  {
+    "manobo": "primordial",
+    "english": "ancient beginning of time before mortals",
+    "bisaya": "karaang panahon",
+    "pos": "adjective",
+    "semantic_domain": "COSMOGONY",
+    "genre": "MYTH"
+  },
+  {
+    "manobo": "bubungan",
+    "english": "mountain, high peak",
+    "bisaya": "bukid",
+    "pos": "noun",
+    "semantic_domain": "LANDMARK",
+    "genre": "LEGEND"
+  },
+  {
+    "manobo": "kabubunganan",
+    "english": "mountain range, highland ridges",
+    "bisaya": "kabukiran",
+    "pos": "noun",
+    "semantic_domain": "LANDMARK",
+    "genre": "LEGEND"
+  },
+  {
+    "manobo": "magdiwata",
+    "english": "sacred sacred mountain dwelling of spirits in Agusan",
+    "bisaya": "sagradong bukid",
+    "pos": "noun",
+    "semantic_domain": "SACRED_PLACE",
+    "genre": "LEGEND"
+  },
+  {
+    "manobo": "wuhig",
+    "english": "water, fresh stream",
+    "bisaya": "tubig",
+    "pos": "noun",
+    "semantic_domain": "HYDROLOGY",
+    "genre": "LEGEND"
+  },
+  {
+    "manobo": "adgawan",
+    "english": "Adgawan river, sacred ancestral waterway",
+    "bisaya": "suba sa Adgawan",
+    "pos": "noun",
+    "semantic_domain": "LANDMARK",
+    "genre": "LEGEND"
+  },
+  {
+    "manobo": "sapa",
+    "english": "creek, river tributary",
+    "bisaya": "sapa",
+    "pos": "noun",
+    "semantic_domain": "HYDROLOGY",
+    "genre": "FOLKTALE"
+  },
+  {
+    "manobo": "guyangan",
+    "english": "dense primeval forest, jungle",
+    "bisaya": "lasang, kakahoyan",
+    "pos": "noun",
+    "semantic_domain": "ECOLOGY",
+    "genre": "FOLKTALE"
+  },
+  {
+    "manobo": "ligsok",
+    "english": "small boy, young child",
+    "bisaya": "batang gamay",
+    "pos": "noun",
+    "semantic_domain": "CHARACTERS",
+    "genre": "FOLKTALE"
+  },
+  {
+    "manobo": "yumad",
+    "english": "native child, indigenous youngster",
+    "bisaya": "batang lumad",
+    "pos": "noun",
+    "semantic_domain": "CHARACTERS",
+    "genre": "FOLKTALE"
+  },
+  {
+    "manobo": "bata",
+    "english": "child, youth",
+    "bisaya": "bata",
+    "pos": "noun",
+    "semantic_domain": "CHARACTERS",
+    "genre": "FOLKTALE"
+  },
+  {
+    "manobo": "amuk",
+    "english": "monkey, clever trickster animal character",
+    "bisaya": "unggoy",
+    "pos": "noun",
+    "semantic_domain": "FAUNA",
+    "genre": "FOLKTALE"
+  },
+  {
+    "manobo": "buwaya",
+    "english": "crocodile, river reptile outwitted in fables",
+    "bisaya": "buaya",
+    "pos": "noun",
+    "semantic_domain": "FAUNA",
+    "genre": "FOLKTALE"
+  },
+  {
+    "manobo": "bauu",
+    "english": "turtle, river tortoise",
+    "bisaya": "bao",
+    "pos": "noun",
+    "semantic_domain": "FAUNA",
+    "genre": "FOLKTALE"
+  },
+  {
+    "manobo": "ulaging",
+    "english": "chanted heroic epic narrative of Manobo clan",
+    "bisaya": "epikong awit sa bayani",
+    "pos": "noun",
+    "semantic_domain": "EPIC",
+    "genre": "EPIC"
+  },
+  {
+    "manobo": "agyu",
+    "english": "legendary culture hero, epic chieftain warrior",
+    "bisaya": "bayaning Agyu",
+    "pos": "noun",
+    "semantic_domain": "HERO",
+    "genre": "EPIC"
+  },
+  {
+    "manobo": "bagani",
+    "english": "consecrated warrior, clan protector",
+    "bisaya": "maisog nga manggugubat",
+    "pos": "noun",
+    "semantic_domain": "HERO",
+    "genre": "EPIC"
+  },
+  {
+    "manobo": "sibat",
+    "english": "hunting spear, warrior lance",
+    "bisaya": "bangkaw",
+    "pos": "noun",
+    "semantic_domain": "WEAPONS",
+    "genre": "EPIC"
+  },
+  {
+    "manobo": "kalis",
+    "english": "traditional bladed sword",
+    "bisaya": "kalis, espada",
+    "pos": "noun",
+    "semantic_domain": "WEAPONS",
+    "genre": "EPIC"
+  },
+  {
+    "manobo": "pangayaw",
+    "english": "defensive expedition, warrior pursuit",
+    "bisaya": "panalipod sa teritoryo",
+    "pos": "noun",
+    "semantic_domain": "WARFARE",
+    "genre": "EPIC"
+  },
+  {
+    "manobo": "tigmo",
+    "english": "riddle, metaphorical puzzle question",
+    "bisaya": "tigmo, tugkaron",
+    "pos": "noun",
+    "semantic_domain": "GNOMIC",
+    "genre": "RIDDLE"
+  },
+  {
+    "manobo": "tu maintok pad",
+    "english": "when still small or young (riddle opening formula)",
+    "bisaya": "sa gamay pa",
+    "pos": "phrase",
+    "semantic_domain": "RIDDLE_FORMULA",
+    "genre": "RIDDLE"
+  },
+  {
+    "manobo": "nukoy kani",
+    "english": "what is this, guess what (riddle interrogative)",
+    "bisaya": "unsa kini",
+    "pos": "phrase",
+    "semantic_domain": "RIDDLE_FORMULA",
+    "genre": "RIDDLE"
+  },
+  {
+    "manobo": "uling",
+    "english": "charcoal, black carbon",
+    "bisaya": "uling",
+    "pos": "noun",
+    "semantic_domain": "OBJECTS",
+    "genre": "RIDDLE"
+  },
+  {
+    "manobo": "lubi",
+    "english": "coconut tree and fruit",
+    "bisaya": "lubi",
+    "pos": "noun",
+    "semantic_domain": "FLORA",
+    "genre": "RIDDLE"
+  },
+  {
+    "manobo": "tubo",
+    "english": "sugarcane stalk",
+    "bisaya": "tubo",
+    "pos": "noun",
+    "semantic_domain": "FLORA",
+    "genre": "RIDDLE"
+  },
+  {
+    "manobo": "batong",
+    "english": "string beans, legume",
+    "bisaya": "batong",
+    "pos": "noun",
+    "semantic_domain": "FLORA",
+    "genre": "RIDDLE"
+  },
+  {
+    "manobo": "panultihon",
+    "english": "proverb, traditional maxim of wisdom",
+    "bisaya": "panultihon, sanglitanan",
+    "pos": "noun",
+    "semantic_domain": "WISDOM",
+    "genre": "PROVERB"
+  },
+  {
+    "manobo": "inggad nukoy ka lisud",
+    "english": "no matter how difficult life is (proverbial maxim)",
+    "bisaya": "bisan unsa kalisod",
+    "pos": "phrase",
+    "semantic_domain": "ETHICS",
+    "genre": "PROVERB"
+  },
+  {
+    "manobo": "kinabuhi",
+    "english": "life, human existence",
+    "bisaya": "kinabuhi",
+    "pos": "noun",
+    "semantic_domain": "ETHICS",
+    "genre": "PROVERB"
+  },
+  {
+    "manobo": "kinaiya",
+    "english": "character, moral demeanor, inner attitude",
+    "bisaya": "batasan, kinaiya",
+    "pos": "noun",
+    "semantic_domain": "ETHICS",
+    "genre": "PROVERB"
+  },
+  {
+    "manobo": "marujow",
+    "english": "good, honorable, virtuous, upright",
+    "bisaya": "maayo, tarong",
+    "pos": "adjective",
+    "semantic_domain": "ETHICS",
+    "genre": "PROVERB"
+  },
+  {
+    "manobo": "salig",
+    "english": "trust, confidence in companions",
+    "bisaya": "salig, pagsalig",
+    "pos": "verb",
+    "semantic_domain": "SOCIAL",
+    "genre": "PROVERB"
+  },
+  {
+    "manobo": "lantawod",
+    "english": "look far into the sea or distant horizon",
+    "bisaya": "lantaw sa layo",
+    "pos": "verb",
+    "semantic_domain": "MELODY",
+    "genre": "SONG"
+  },
+  {
+    "manobo": "bayod",
+    "english": "waves of the river or sea, sorrowful movement",
+    "bisaya": "balod",
+    "pos": "noun",
+    "semantic_domain": "MELODY",
+    "genre": "SONG"
+  },
+  {
+    "manobo": "kamingaw",
+    "english": "loneliness, quiet longing, separation",
+    "bisaya": "kamingaw",
+    "pos": "noun",
+    "semantic_domain": "EMOTION",
+    "genre": "SONG"
+  },
+  {
+    "manobo": "kapait",
+    "english": "hardship, bitterness of situation",
+    "bisaya": "kapait, kalisdanan",
+    "pos": "noun",
+    "semantic_domain": "EMOTION",
+    "genre": "SONG"
+  },
+  {
+    "manobo": "sinugow",
+    "english": "weep, tears of longing",
+    "bisaya": "paghilak, luha",
+    "pos": "verb",
+    "semantic_domain": "EMOTION",
+    "genre": "SONG"
+  },
+  {
+    "manobo": "kadikiluman",
+    "english": "nightfall, twilight, gathering darkness",
+    "bisaya": "kagabhion, kangitngit",
+    "pos": "noun",
+    "semantic_domain": "TIME",
+    "genre": "SONG"
+  },
+  {
+    "manobo": "inoy",
+    "english": "mother, maternal ancestor",
+    "bisaya": "inahan",
+    "pos": "noun",
+    "semantic_domain": "KINSHIP",
+    "genre": "SONG"
+  },
+  {
+    "manobo": "katribuhan",
+    "english": "fellow tribespeople, Manobo community",
+    "bisaya": "katribuhan, kapamilya",
+    "pos": "noun",
+    "semantic_domain": "COMMUNITY",
+    "genre": "SONG"
+  },
+  {
+    "manobo": "tudtul",
+    "english": "spoken folk tradition, recitation of historical memories",
+    "bisaya": "sugilanon, kasaysayan",
+    "pos": "noun",
+    "semantic_domain": "ORAL_TRADITION",
+    "genre": "CHANT"
+  },
+  {
+    "manobo": "buwis",
+    "english": "sacred ritual offering to deities and nature guardians",
+    "bisaya": "halad sa espiritu",
+    "pos": "noun",
+    "semantic_domain": "RITUAL",
+    "genre": "CHANT"
+  },
+  {
+    "manobo": "panawagtawag",
+    "english": "invocation prayer chanted by ritual shaman",
+    "bisaya": "pag-ampo, pagtawag sa espiritu",
+    "pos": "noun",
+    "semantic_domain": "RITUAL",
+    "genre": "CHANT"
+  }
+]

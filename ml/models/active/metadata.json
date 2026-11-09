@@ -1,0 +1,767 @@
+{
+  "version": "v2.0.0-webonary",
+  "algorithm": "LogisticRegression",
+  "createdAt": "2026-11-09T03:08:35Z",
+  "datasetSnapshot": "ml/snapshots\\snapshot_1794193713.json",
+  "datasetSize": 71,
+  "verifiedCounts": {
+    "MYTH": 9,
+    "LEGEND": 8,
+    "FOLKTALE": 10,
+    "EPIC": 8,
+    "RIDDLE": 10,
+    "PROVERB": 9,
+    "SONG": 11,
+    "CHANT": 6
+  },
+  "validationMetrics": {
+    "macro_f1": 0.8771,
+    "accuracy": 0.875,
+    "sample_size": 24,
+    "classes": [
+      "CHANT",
+      "EPIC",
+      "FOLKTALE",
+      "LEGEND",
+      "MYTH",
+      "PROVERB",
+      "RIDDLE",
+      "SONG"
+    ],
+    "per_class": {
+      "CHANT": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 2.0
+      },
+      "EPIC": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 3.0
+      },
+      "FOLKTALE": {
+        "precision": 0.6,
+        "recall": 1.0,
+        "f1_score": 0.75,
+        "support": 3.0
+      },
+      "LEGEND": {
+        "precision": 0.6667,
+        "recall": 0.6667,
+        "f1_score": 0.6667,
+        "support": 3.0
+      },
+      "MYTH": {
+        "precision": 1.0,
+        "recall": 0.6667,
+        "f1_score": 0.8,
+        "support": 3.0
+      },
+      "PROVERB": {
+        "precision": 1.0,
+        "recall": 0.6667,
+        "f1_score": 0.8,
+        "support": 3.0
+      },
+      "RIDDLE": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 3.0
+      },
+      "SONG": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 4.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4
+      ]
+    ]
+  },
+  "ruleBaselineMetrics": {
+    "macro_f1": 0.8262,
+    "accuracy": 0.8333,
+    "sample_size": 24,
+    "uncertain_cases": 2,
+    "classes": [
+      "CHANT",
+      "EPIC",
+      "FOLKTALE",
+      "LEGEND",
+      "MYTH",
+      "PROVERB",
+      "RIDDLE",
+      "SONG"
+    ],
+    "per_class": {
+      "CHANT": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1_score": 0.6667,
+        "support": 2.0
+      },
+      "EPIC": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 3.0
+      },
+      "FOLKTALE": {
+        "precision": 0.5,
+        "recall": 0.6667,
+        "f1_score": 0.5714,
+        "support": 3.0
+      },
+      "LEGEND": {
+        "precision": 0.5,
+        "recall": 0.6667,
+        "f1_score": 0.5714,
+        "support": 3.0
+      },
+      "MYTH": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 3.0
+      },
+      "PROVERB": {
+        "precision": 1.0,
+        "recall": 0.6667,
+        "f1_score": 0.8,
+        "support": 3.0
+      },
+      "RIDDLE": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 3.0
+      },
+      "SONG": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 4.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4
+      ]
+    ]
+  },
+  "allCandidateResults": {
+    "LogisticRegression": {
+      "macro_f1": 0.8771,
+      "accuracy": 0.875,
+      "sample_size": 24,
+      "classes": [
+        "CHANT",
+        "EPIC",
+        "FOLKTALE",
+        "LEGEND",
+        "MYTH",
+        "PROVERB",
+        "RIDDLE",
+        "SONG"
+      ],
+      "per_class": {
+        "CHANT": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 2.0
+        },
+        "EPIC": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3.0
+        },
+        "FOLKTALE": {
+          "precision": 0.6,
+          "recall": 1.0,
+          "f1_score": 0.75,
+          "support": 3.0
+        },
+        "LEGEND": {
+          "precision": 0.6667,
+          "recall": 0.6667,
+          "f1_score": 0.6667,
+          "support": 3.0
+        },
+        "MYTH": {
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1_score": 0.8,
+          "support": 3.0
+        },
+        "PROVERB": {
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1_score": 0.8,
+          "support": 3.0
+        },
+        "RIDDLE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3.0
+        },
+        "SONG": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 4.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          2,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ]
+    },
+    "LinearSVC_Calibrated": {
+      "macro_f1": 0.8771,
+      "accuracy": 0.875,
+      "sample_size": 24,
+      "classes": [
+        "CHANT",
+        "EPIC",
+        "FOLKTALE",
+        "LEGEND",
+        "MYTH",
+        "PROVERB",
+        "RIDDLE",
+        "SONG"
+      ],
+      "per_class": {
+        "CHANT": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 2.0
+        },
+        "EPIC": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3.0
+        },
+        "FOLKTALE": {
+          "precision": 0.6,
+          "recall": 1.0,
+          "f1_score": 0.75,
+          "support": 3.0
+        },
+        "LEGEND": {
+          "precision": 0.6667,
+          "recall": 0.6667,
+          "f1_score": 0.6667,
+          "support": 3.0
+        },
+        "MYTH": {
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1_score": 0.8,
+          "support": 3.0
+        },
+        "PROVERB": {
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1_score": 0.8,
+          "support": 3.0
+        },
+        "RIDDLE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3.0
+        },
+        "SONG": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 4.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          2,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ]
+    },
+    "MultinomialNB": {
+      "macro_f1": 0.8771,
+      "accuracy": 0.875,
+      "sample_size": 24,
+      "classes": [
+        "CHANT",
+        "EPIC",
+        "FOLKTALE",
+        "LEGEND",
+        "MYTH",
+        "PROVERB",
+        "RIDDLE",
+        "SONG"
+      ],
+      "per_class": {
+        "CHANT": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 2.0
+        },
+        "EPIC": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3.0
+        },
+        "FOLKTALE": {
+          "precision": 0.6,
+          "recall": 1.0,
+          "f1_score": 0.75,
+          "support": 3.0
+        },
+        "LEGEND": {
+          "precision": 0.6667,
+          "recall": 0.6667,
+          "f1_score": 0.6667,
+          "support": 3.0
+        },
+        "MYTH": {
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1_score": 0.8,
+          "support": 3.0
+        },
+        "PROVERB": {
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1_score": 0.8,
+          "support": 3.0
+        },
+        "RIDDLE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3.0
+        },
+        "SONG": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 4.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          2,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ]
+    }
+  },
+  "promoted": true,
+  "promotionReason": "Passed all checks: Candidate macro-F1 (0.88) >= baseline (0.83) with balanced recall.",
+  "classes": [
+    "CHANT",
+    "EPIC",
+    "FOLKTALE",
+    "LEGEND",
+    "MYTH",
+    "PROVERB",
+    "RIDDLE",
+    "SONG"
+  ]
+}

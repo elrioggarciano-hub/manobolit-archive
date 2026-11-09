@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 export interface ReviewEntry {
   id: string
@@ -80,7 +80,7 @@ export default function ReviewQueue() {
   const [actionMessage, setActionMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
   const [showDefinitionsSidebar, setShowDefinitionsSidebar] = useState(true)
 
-  const fetchQueue = async () => {
+  const fetchQueue = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch(`/api/review?status=${filter}`)
@@ -93,7 +93,7 @@ export default function ReviewQueue() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filter])
 
   const fetchCategories = async () => {
     try {
@@ -109,7 +109,7 @@ export default function ReviewQueue() {
 
   useEffect(() => {
     fetchQueue()
-  }, [filter])
+  }, [fetchQueue])
 
   useEffect(() => {
     fetchCategories()
@@ -277,8 +277,8 @@ export default function ReviewQueue() {
                     border: entry.isHashMismatched
                       ? '2px solid #ef4444'
                       : isSelected
-                      ? '2px solid var(--primary-red, #8F000D)'
-                      : '1px solid var(--border-color)',
+                        ? '2px solid var(--primary-red, #8F000D)'
+                        : '1px solid var(--border-color)',
                     borderRadius: '12px',
                     padding: '20px',
                     display: 'flex',
@@ -300,21 +300,20 @@ export default function ReviewQueue() {
                             entry.reviewStatus === 'VERIFIED'
                               ? 'rgba(16, 185, 129, 0.15)'
                               : entry.reviewStatus === 'UNCERTAIN'
-                              ? 'rgba(168, 85, 247, 0.15)'
-                              : 'rgba(245, 158, 11, 0.15)',
+                                ? 'rgba(168, 85, 247, 0.15)'
+                                : 'rgba(245, 158, 11, 0.15)',
                           color:
                             entry.reviewStatus === 'VERIFIED'
                               ? '#10b981'
                               : entry.reviewStatus === 'UNCERTAIN'
-                              ? '#a855f7'
-                              : '#f59e0b',
-                          border: `1px solid ${
-                            entry.reviewStatus === 'VERIFIED'
+                                ? '#a855f7'
+                                : '#f59e0b',
+                          border: `1px solid ${entry.reviewStatus === 'VERIFIED'
                               ? '#10b98144'
                               : entry.reviewStatus === 'UNCERTAIN'
-                              ? '#a855f744'
-                              : '#f59e0b44'
-                          }`,
+                                ? '#a855f744'
+                                : '#f59e0b44'
+                            }`,
                         }}
                       >
                         {entry.reviewStatus === 'VERIFIED' && 'VERIFIED (Human-Approved)'}

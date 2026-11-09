@@ -209,6 +209,23 @@ export const BIBLE_LEXICON: LexiconEntry[] = [
   { english: 'white', manobo: 'Maputi', bisaya: 'Puti', category: 'ADJECTIVE', notes: 'From Uling Riddle' },
   { english: 'black', manobo: 'Maitom', bisaya: 'Itom', category: 'ADJECTIVE', notes: 'From Uling Riddle' },
 
+  // ── Webonary (SIL International) Cultural & Mythological Vocabulary ──
+  { english: 'monkey', manobo: 'Amuk', bisaya: 'Unggoy', category: 'NOUN', notes: 'From Webonary (SIL) - Animal Fable' },
+  { english: 'crocodile', manobo: 'Buwaya', bisaya: 'Buaya', category: 'NOUN', notes: 'From Webonary (SIL) - Animal Fable' },
+  { english: 'turtle', manobo: 'Bauu', bisaya: 'Bao', category: 'NOUN', notes: 'From Webonary (SIL) - Animal Fable' },
+  { english: 'earth', manobo: 'Tano', bisaya: 'Yuta', category: 'NOUN', notes: 'From Webonary (SIL) - Cosmogony' },
+  { english: 'sky', manobo: 'Langit', bisaya: 'Langit', category: 'NOUN', notes: 'From Webonary (SIL) - Cosmogony' },
+  { english: 'origin', manobo: 'Kagnat', bisaya: 'Sinugdanan', category: 'NOUN', notes: 'From Webonary (SIL) - Cosmogony' },
+  { english: 'warrior', manobo: 'Bagani', bisaya: 'Manggugubat', category: 'NOUN', notes: 'From Webonary (SIL) - Heroic Epic' },
+  { english: 'spear', manobo: 'Sibat', bisaya: 'Bangkaw', category: 'NOUN', notes: 'From Webonary (SIL) - Weaponry' },
+  { english: 'sword', manobo: 'Kalis', bisaya: 'Espada', category: 'NOUN', notes: 'From Webonary (SIL) - Weaponry' },
+  { english: 'shaman', manobo: 'Babaylan', bisaya: 'Tambalan', category: 'NOUN', notes: 'From Webonary (SIL) - Ritual Chants' },
+  { english: 'prayer', manobo: 'Panawagtawag', bisaya: 'Pag-ampo', category: 'NOUN', notes: 'From Webonary (SIL) - Ritual Invocations' },
+  { english: 'offering', manobo: 'Buwis', bisaya: 'Halad', category: 'NOUN', notes: 'From Webonary (SIL) - Ritual Chants' },
+  { english: 'riddle', manobo: 'Tigmo', bisaya: 'Tigmo', category: 'NOUN', notes: 'From Webonary (SIL) - Gnomic Literature' },
+  { english: 'proverb', manobo: 'Panultihon', bisaya: 'Panultihon', category: 'NOUN', notes: 'From Webonary (SIL) - Wisdom Maxims' },
+  { english: 'epic', manobo: 'Ulaging', bisaya: 'Epiko', category: 'NOUN', notes: 'From Webonary (SIL) - Chanted Epics' },
+
   // ── Grammatical Particles & Pronouns ──
   { english: 'the', manobo: 'ka', bisaya: 'ang', category: 'PARTICLE' },
   { english: 'to', manobo: 'tu', bisaya: 'sa', category: 'PARTICLE' },
