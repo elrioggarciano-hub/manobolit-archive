@@ -14,14 +14,12 @@ const LANG_LABELS: Record<TranslationLang, string> = {
   msm: 'Agusan Manobo',
   en: 'English',
   ceb: 'Bisaya (Cebuano)',
-  fil: 'Tagalog',
 }
 
-const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya' | 'tagalog'> = {
+const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
   en: 'english',
   msm: 'manobo',
   ceb: 'bisaya',
-  fil: 'tagalog',
 }
 
 const VOCAB_GROUPS: { label: string; words: string[] }[] = [
@@ -160,7 +158,7 @@ export default function TranslatorClient() {
           setDatasetCount(data.summary.totalPairs)
         }
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   // Dynamic Translation Caller (queries Supabase / Colab API)
@@ -225,7 +223,7 @@ export default function TranslatorClient() {
     setLiveResult(null)
   }
 
-  const langOptions: TranslationLang[] = ['msm', 'en', 'ceb', 'fil']
+  const langOptions: TranslationLang[] = ['msm', 'en', 'ceb']
 
   const lexiconByEnglish = useMemo(() => {
     const map = new Map<string, (typeof BIBLE_LEXICON)[number]>()

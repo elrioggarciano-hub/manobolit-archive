@@ -65,7 +65,7 @@ export const translations = {
 
     // Translator Tool
     translator_title: 'Manobo Translator',
-    translator_subtitle: 'Translate free-form text, sentences, or phrases between Agusan Manobo, English, Bisaya, and Tagalog. Translations are dynamically queried from verified literary entries and cultural lexicons.',
+    translator_subtitle: 'Translate free-form text, sentences, or phrases between Agusan Manobo, English, and Bisaya (Cebuano). Translations are dynamically queried from verified literary entries and cultural lexicons.',
     translator_source_label: 'SOURCE LANGUAGE',
     translator_target_label: 'TARGET LANGUAGE',
     translator_input_placeholder: 'Enter text, word, or phrase to translate...',
@@ -152,7 +152,7 @@ export const translations = {
 
     // Translator Tool
     translator_title: 'Tagasalin ng Manobo',
-    translator_subtitle: 'Magsalin ng malayang teksto, pangungusap, o parirala sa pagitan ng Agusan Manobo, Ingles, Bisaya, at Tagalog. Ang mga salin ay dinamikong kinukuha mula sa mga napatunayang tala at kultural na leksikon.',
+    translator_subtitle: 'Magsalin ng malayang teksto, pangungusap, o parirala sa pagitan ng Agusan Manobo, Ingles, at Bisaya (Cebuano). Ang mga salin ay dinamikong kinukuha mula sa mga napatunayang tala at kultural na leksikon.',
     translator_source_label: 'PINAGMULANG WIKA',
     translator_target_label: 'PATUTUNGUHANG WIKA',
     translator_input_placeholder: 'Maglagay ng teksto, salita, o parirala na isasalin...',
@@ -238,7 +238,7 @@ export const translations = {
 
     // Translator Tool
     translator_title: 'Taghubad sa Manobo',
-    translator_subtitle: 'Maghubad og mga pulong, pahayag, o tudling-pulong tali sa Agusan Manobo, Iningles, Bisaya, ug Tagalog. Ang mga hubad gikuha gikan sa napanalipdang rekord ug kultural nga leksikon.',
+    translator_subtitle: 'Maghubad og mga pulong, pahayag, o tudling-pulong tali sa Agusan Manobo, Iningles, ug Bisaya (Cebuano). Ang mga hubad gikuha gikan sa napanalipdang rekord ug kultural nga leksikon.',
     translator_source_label: 'GIGIKANANG PINULONGAN',
     translator_target_label: 'PADULNGANG PINULONGAN',
     translator_input_placeholder: 'Ibutang ang teksto, pulong, o pahayag nga hubaron...',
@@ -324,7 +324,7 @@ export const translations = {
 
     // Translator Tool
     translator_title: 'Taghubad to Kagi no Minanubu',
-    translator_subtitle: 'Ighubad to mgo pulong wey tudling tali to Minanubu to Agusan, Iningles, Bisaya, wey Tagalog. Igkuha to mgo hubad dio to napamatud-an no kasulatan wey daan no diksiyonaryo.',
+    translator_subtitle: 'Ighubad to mgo pulong wey tudling tali to Minanubu to Agusan, Iningles, wey Bisaya. Igkuha to mgo hubad dio to napamatud-an no kasulatan wey daan no diksiyonaryo.',
     translator_source_label: 'PUNOAN NO PULONG',
     translator_target_label: 'PADULNGAN NO PULONG',
     translator_input_placeholder: 'Isulat to pulong o tudling no ighubad...',

@@ -5,11 +5,10 @@ import { translateText } from './fallback'
 export * from './types'
 export { translateText } from './fallback'
 
-const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya' | 'tagalog'> = {
+const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
   en: 'english',
   msm: 'manobo',
   ceb: 'bisaya',
-  fil: 'tagalog',
 }
 
 function cleanText(text: string): string {
@@ -77,22 +76,21 @@ export async function translateTextDynamic(
   }
 
   // 2. Query dynamic Supabase PostgreSQL ParallelTranslation records (for en, msm, ceb)
-  if (sourceLang !== 'fil' && targetLang !== 'fil') {
-    try {
-      const dbEntries = await prisma.parallelTranslation.findMany({
-        where: { isVerified: true },
-        select: {
-          english: true,
-          manobo: true,
-          bisaya: true,
-          category: true,
-          sourceRef: true,
-        },
-      })
+  try {
+    const dbEntries = await prisma.parallelTranslation.findMany({
+      where: { isVerified: true },
+      select: {
+        english: true,
+        manobo: true,
+        bisaya: true,
+        category: true,
+        sourceRef: true,
+      },
+    })
 
     if (dbEntries && dbEntries.length > 0) {
-      const sourceField = LANG_FIELD[sourceLang] as 'english' | 'manobo' | 'bisaya'
-      const targetField = LANG_FIELD[targetLang] as 'english' | 'manobo' | 'bisaya'
+      const sourceField = LANG_FIELD[sourceLang]
+      const targetField = LANG_FIELD[targetLang]
 
       const matchedPhrases: Array<{ original: string; translated: string; verseRef?: string }> = []
       const words = cleanedInput.split(/\s+/)
@@ -165,9 +163,8 @@ export async function translateTextDynamic(
         engineType: 'DATABASE_DYNAMIC',
       }
     }
-    } catch (dbErr) {
-      console.warn('Dynamic database translation failed, falling back to static corpus:', dbErr)
-    }
+  } catch (dbErr) {
+    console.warn('Dynamic database translation failed, falling back to static corpus:', dbErr)
   }
 
   // 3. Fallback to synchronous static corpus if database is unavailable

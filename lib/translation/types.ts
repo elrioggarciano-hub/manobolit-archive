@@ -1,4 +1,4 @@
-export type TranslationLang = 'en' | 'msm' | 'ceb' | 'fil'
+export type TranslationLang = 'en' | 'msm' | 'ceb'
 
 export interface TranslationResult {
   translatedText: string

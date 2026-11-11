@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { translateTextDynamic, TranslationLang } from '@/lib/translation/engine'
 
-const VALID_LANGS: TranslationLang[] = ['en', 'msm', 'ceb', 'fil']
+const VALID_LANGS: TranslationLang[] = ['en', 'msm', 'ceb']
 
 // POST /api/translate
 export async function POST(request: NextRequest) {

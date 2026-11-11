@@ -1,11 +1,10 @@
 import { BIBLE_PARALLEL_PHRASES, BIBLE_LEXICON } from './bibleCorpus'
 import { TranslationLang, TranslationResult } from './types'
 
-const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya' | 'tagalog'> = {
+const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
   en: 'english',
   msm: 'manobo',
   ceb: 'bisaya',
-  fil: 'tagalog',
 }
 
 function cleanText(text: string): string {
