@@ -523,14 +523,14 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                     <span style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                      Rule-Based Classification
+                      Hybrid ML & Rule-Based Classification
                     </span>
                     <span 
                       onClick={() => setIsDefenseMode(prev => !prev)}
                       style={{ fontSize: '9px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, cursor: 'pointer', userSelect: 'none' }}
-                      title="Matalinong Pag-uuri"
+                      title="Matalinong Pag-uuri gamit ang Machine Learning at Domain Rules"
                     >
-                      Matalinong Pag-uuri
+                      Matalinong Pag-uuri (Hybrid ML)
                     </span>
                   </div>
                   <h2 
@@ -584,7 +584,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   margin: '0 0 28px 0'
                 }}
               >
-                Gamit ang <strong>Rule-Based Classification</strong>, awtomatikong sinusuri ng system ang mga kwento at awiting Manobo. Binabasa nito ang mga katutubong salita at estruktura ng salaysay upang matukoy ang kanilang <strong>Anyo (Genre)</strong>, <strong>Pangunahing Tema</strong>, at <strong>Lugar ng Pinagmulan</strong>.
+                Gamit ang <strong>Hybrid Machine Learning (Multinomial Naive Bayes, LinearSVC, TF-IDF) at Domain Expert Rules (Eugenio 1993)</strong>, awtomatikong sinusuri ng system ang mga kwento at awiting Manobo. Pinagsasama nito ang statistical AI at katutubong kaalaman upang matukoy ang kanilang <strong>Anyo (Genre)</strong>, <strong>Pangunahing Tema</strong>, at <strong>Lugar ng Pinagmulan</strong>.
               </p>
 
               {/* Diagram Flow Container */}
@@ -859,8 +859,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   </div>
 
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Hakbang 2: Pagsusuri ng Alituntunin</div>
-                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>RULE-BASED CLASSIFICATION ENGINE</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Hakbang 2: Pagsusuri ng Alituntunin at ML</div>
+                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>HYBRID CLASSIFICATION ENGINE (ML & RULES)</div>
                   </div>
 
                   {/* Rules list with confidence-tiered indicators + matched evidence */}
@@ -885,7 +885,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         <span style={{ fontSize: '20px' }}>📖</span>
                         <div style={{ fontSize: '11px', fontWeight: 700, color: '#e4e4e7' }}>Naghihintay ng Pagsusuri</div>
                         <p style={{ fontSize: '9.5px', color: '#71717a', margin: 0, lineHeight: 1.4 }}>
-                          Pindutin ang &ldquo;Suriin at I-classify&rdquo; upang basahin ang mga katutubong salita at ilapat ang mga alituntunin.
+                          Pindutin ang &ldquo;Suriin at I-classify&rdquo; upang patakbuhin ang Machine Learning models at ilapat ang mga alituntunin.
                         </p>
                       </div>
                     ) : classificationResult.rulesApplied.length > 0 ? (
@@ -1137,7 +1137,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       </div>
                     </div>
                     <div style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
-                      Rule-Based Classification
+                      Hybrid ML & Rule-Based Engine
                     </div>
                   </div>
 
