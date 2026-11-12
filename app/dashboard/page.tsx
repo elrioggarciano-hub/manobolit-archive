@@ -69,10 +69,10 @@ const getProcessedDashboardData = unstable_cache(
     const topGenre = [...genreGrouped].sort((a, b) => b._count._all - a._count._all)[0]
     const mostCommonGenre = topGenre
       ? {
-          genre: topGenre.genre,
-          count: topGenre._count._all,
-          percent: totalEntries > 0 ? Math.round((topGenre._count._all / totalEntries) * 100) : 0,
-        }
+        genre: topGenre.genre,
+        count: topGenre._count._all,
+        percent: totalEntries > 0 ? Math.round((topGenre._count._all / totalEntries) * 100) : 0,
+      }
       : null
 
     const genreDistribution = [...genreGrouped]

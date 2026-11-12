@@ -156,6 +156,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   // Execution state: do not automatically display results when user selects an entry
   const [hasExecuted, setHasExecuted] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisPhase, setAnalysisPhase] = useState<1 | 2 | 3>(1)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
   const [serverResult, setServerResult] = useState<any>(null)
 
   const classificationResult = useMemo(
@@ -771,6 +773,23 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     type="button"
                     onClick={async () => {
                       setIsAnalyzing(true)
+                      setHasExecuted(false)
+                      setAnalysisPhase(1)
+                      setAnalysisProgress(20)
+
+                      // Stage transitions for clear visual progress
+                      const p1 = setTimeout(() => {
+                        setAnalysisPhase(2)
+                        setAnalysisProgress(55)
+                      }, 400)
+                      const p2 = setTimeout(() => {
+                        setAnalysisPhase(3)
+                        setAnalysisProgress(88)
+                      }, 900)
+
+                      const startTime = Date.now()
+                      const minDuration = 1400
+
                       try {
                         const res = await fetch('/api/classify', {
                           method: 'POST',
@@ -789,6 +808,13 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       } catch (err) {
                         console.error('Classification API error:', err)
                       } finally {
+                        const elapsed = Date.now() - startTime
+                        if (elapsed < minDuration) {
+                          await new Promise(resolve => setTimeout(resolve, minDuration - elapsed))
+                        }
+                        clearTimeout(p1)
+                        clearTimeout(p2)
+                        setAnalysisProgress(100)
                         setHasExecuted(true)
                         setIsAnalyzing(false)
                       }
@@ -812,7 +838,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '6px',
+                      gap: '8px',
                       boxShadow: isAnalyzing ? 'none' : '0 4px 12px rgba(143, 0, 13, 0.35)',
                       transition: 'all 0.2s ease',
                       marginTop: '4px',
@@ -820,7 +846,17 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   >
                     {isAnalyzing ? (
                       <>
-                        <span>⏳</span>
+                        <div
+                          className="animate-spin"
+                          style={{
+                            width: '13px',
+                            height: '13px',
+                            border: '2px solid rgba(255, 255, 255, 0.25)',
+                            borderTopColor: '#ffffff',
+                            borderRadius: '50%',
+                            flexShrink: 0,
+                          }}
+                        />
                         <span>{t('diag_btn_analyzing')}</span>
                       </>
                     ) : (
@@ -877,7 +913,75 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
                   {/* Rules list with confidence-tiered indicators + matched evidence */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', maxWidth: '220px', minHeight: '80px', justifyContent: 'center' }}>
-                    {!hasExecuted ? (
+                    {isAnalyzing ? (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '100%',
+                          minHeight: '140px',
+                          background: 'rgba(143, 0, 13, 0.12)',
+                          border: '1px solid rgba(239, 68, 68, 0.45)',
+                          borderRadius: '6px',
+                          padding: '16px 12px',
+                          textAlign: 'center',
+                          gap: '10px',
+                        }}
+                      >
+                        <div style={{ position: 'relative', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div
+                            className="animate-ping"
+                            style={{
+                              position: 'absolute',
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              background: 'rgba(239, 68, 68, 0.4)',
+                            }}
+                          />
+                          <div
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '50%',
+                              background: '#8F000D',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#ffffff',
+                              fontSize: '13px',
+                              zIndex: 2,
+                              boxShadow: '0 0 12px rgba(239, 68, 68, 0.7)',
+                            }}
+                          >
+                            ⚡
+                          </div>
+                        </div>
+
+                        <div style={{ width: '100%' }}>
+                          <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#ef4444', marginBottom: '6px', lineHeight: 1.3 }}>
+                            {analysisPhase === 1
+                              ? t('diag_analyzing_step_1')
+                              : analysisPhase === 2
+                                ? t('diag_analyzing_step_2')
+                                : t('diag_analyzing_step_3')}
+                          </div>
+                          <div style={{ width: '100%', height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div
+                              style={{
+                                height: '100%',
+                                width: `${analysisProgress}%`,
+                                background: 'linear-gradient(90deg, #ef4444, #f59e0b)',
+                                borderRadius: '2px',
+                                transition: 'width 0.4s ease-in-out',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : !hasExecuted ? (
                       <div
                         style={{
                           display: 'flex',
@@ -975,7 +1079,53 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     minWidth: '220px'
                   }}
                 >
-                  {!hasExecuted ? (
+                  {isAnalyzing ? (
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        width: '100%',
+                        minHeight: '200px',
+                        background: '#09090b',
+                        border: '1px solid #27272a',
+                        borderRadius: '6px',
+                        padding: '20px 16px',
+                        gap: '14px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div
+                          className="animate-spin"
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            border: '2px solid rgba(239, 68, 68, 0.25)',
+                            borderTopColor: '#ef4444',
+                            borderRadius: '50%',
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#e4e4e7' }}>
+                          {t('diag_analyzing_calc')}
+                        </span>
+                      </div>
+
+                      {/* Shimmer skeleton lines */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ width: '40%', height: '10px', background: '#27272a', borderRadius: '3px' }} className="animate-pulse" />
+                        <div style={{ width: '75%', height: '22px', background: '#27272a', borderRadius: '4px' }} className="animate-pulse" />
+                        <div style={{ width: '100%', height: '4px', background: '#1e1e24', borderRadius: '2px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${analysisProgress}%`, background: '#ef4444', transition: 'width 0.4s ease' }} />
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+                        <div style={{ width: '35%', height: '10px', background: '#27272a', borderRadius: '3px' }} className="animate-pulse" />
+                        <div style={{ width: '60%', height: '18px', background: '#27272a', borderRadius: '4px' }} className="animate-pulse" />
+                      </div>
+                    </div>
+                  ) : !hasExecuted ? (
                     <div
                       style={{
                         display: 'flex',
