@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { Language, SUPPORTED_LANGUAGES, translations, TranslationKey, LanguageOption } from '@/lib/i18n/translations'
 
 interface LanguageContextValue {
@@ -42,23 +42,29 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const t = (key: TranslationKey): string => {
+  const t = useCallback((key: TranslationKey): string => {
     const langDict = translations[language] || translations.en
     return (langDict as Record<string, string>)[key] || (translations.en as Record<string, string>)[key] || key
-  }
+  }, [language])
 
-  const currentOption = SUPPORTED_LANGUAGES.find(l => l.code === language) || SUPPORTED_LANGUAGES[0]
+  const currentOption = useMemo(
+    () => SUPPORTED_LANGUAGES.find(l => l.code === language) || SUPPORTED_LANGUAGES[0],
+    [language]
+  )
+
+  const value = useMemo(
+    () => ({
+      language,
+      setLanguage,
+      t,
+      languages: SUPPORTED_LANGUAGES,
+      currentOption,
+    }),
+    [language, t, currentOption]
+  )
 
   return (
-    <LanguageContext.Provider
-      value={{
-        language,
-        setLanguage,
-        t,
-        languages: SUPPORTED_LANGUAGES,
-        currentOption,
-      }}
-    >
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   )

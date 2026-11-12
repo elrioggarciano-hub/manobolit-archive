@@ -189,18 +189,28 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     }
   }, [searchParams])
 
+  // Debounce search sync to URL and sessionStorage to prevent typing lag
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      const currentParam = searchParams.get('search') || ''
+      if (searchInput !== currentParam) {
+        syncStateToUrlAndStorage(appliedGenres, appliedThemes, appliedLocations, activeCategory, searchInput, page)
+      }
+    }, 250)
+    return () => clearTimeout(handler)
+  }, [searchInput, searchParams, appliedGenres, appliedThemes, appliedLocations, activeCategory, page, syncStateToUrlAndStorage])
+
   const handleSearchChange = (value: string) => {
     setSearchInput(value)
     setPage(1)
-    syncStateToUrlAndStorage(appliedGenres, appliedThemes, appliedLocations, activeCategory, value, 1)
   }
 
   // Filter entries
   const filteredEntries = useMemo(() => {
+    const q = searchInput.trim().toLowerCase()
     return initialEntries.filter(entry => {
       // 1. Search filter
-      if (search) {
-        const q = search.toLowerCase()
+      if (q) {
         const matchText = [
           entry.title,
           entry.content,
@@ -255,7 +265,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
       return true
     })
-  }, [initialEntries, search, appliedGenres, appliedThemes, appliedLocations])
+  }, [initialEntries, searchInput, appliedGenres, appliedThemes, appliedLocations])
 
   // Pagination calculations (5 per page to match mockup)
   const itemsPerPage = 5
@@ -754,7 +764,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                           </div>
 
                           {/* Title */}
-                          <Link href={getEntryHref(entry.id)} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
+                          <Link href={getEntryHref(entry.id)} prefetch={true} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
                             <h3
                               style={{
                                 margin: 0,

@@ -2,32 +2,25 @@ import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import ArchiveClient from '@/app/ArchiveClient'
 
-// The page still renders per request (so a build never depends on a live DB
-// connection), but the query result itself is cached in Next's Data Cache and
-// reused across visits until an admin create/update/delete calls
-// revalidateTag('entries') — instead of hitting Supabase on every click.
-export const dynamic = 'force-dynamic'
+// Cache page at edge with ISR (stale-while-revalidate 60s) for instant response times
+export const revalidate = 60
 
-const getEntries = unstable_cache(
-  async () => prisma.literatureEntry.findMany({ orderBy: { createdAt: 'desc' } }),
-  ['home-entries-v3'],
+const getCachedHomeEntries = unstable_cache(
+  async () => {
+    const entries = await prisma.literatureEntry.findMany({ orderBy: { createdAt: 'desc' } })
+    return entries.map(e => ({
+      ...e,
+      themes: JSON.parse(e.themes || '[]') as string[],
+      culturalElements: JSON.parse(e.culturalElements || '[]') as string[],
+      createdAt: new Date(e.createdAt).toISOString(),
+      updatedAt: new Date(e.updatedAt).toISOString(),
+    }))
+  },
+  ['home-entries-v5'],
   { tags: ['entries'] }
 )
 
 export default async function Home() {
-  const entries = await getEntries()
-
-  const parsed = entries.map(e => ({
-    ...e,
-    themes: JSON.parse(e.themes || '[]') as string[],
-    culturalElements: JSON.parse(e.culturalElements || '[]') as string[],
-    // unstable_cache serializes its cached value, so a cache-hit returns
-    // createdAt/updatedAt as plain strings instead of Date instances — wrap
-    // in `new Date(...)` so both the cold-miss (real Date) and cache-hit
-    // (already-stringified) cases produce a valid ISO string.
-    createdAt: new Date(e.createdAt).toISOString(),
-    updatedAt: new Date(e.updatedAt).toISOString(),
-  }))
-
+  const parsed = await getCachedHomeEntries()
   return <ArchiveClient entries={parsed} />
 }

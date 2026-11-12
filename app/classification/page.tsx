@@ -13,33 +13,33 @@ export const metadata = {
 // revalidateTag('entries') — instead of hitting Supabase on every click.
 export const dynamic = 'force-dynamic'
 
-const getEntriesSortedByTitle = unstable_cache(
-  async () => prisma.literatureEntry.findMany({ orderBy: { title: 'asc' } }),
-  ['classification-entries-v5'],
+const getCachedClassificationEntries = unstable_cache(
+  async () => {
+    const entries = await prisma.literatureEntry.findMany({ orderBy: { title: 'asc' } })
+    return entries.map(e => ({
+      id: e.id,
+      title: e.title,
+      manoboTitle: e.manoboTitle,
+      englishTitle: e.englishTitle,
+      type: e.type,
+      content: e.content,
+      transcription: e.transcription || '',
+      translation: e.translation || '',
+      bisayaTranslation: e.bisayaTranslation || '',
+      genre: e.genre,
+      themes: JSON.parse(e.themes || '[]') as string[],
+      culturalElements: JSON.parse(e.culturalElements || '[]') as string[],
+      communityLocation: e.communityLocation || '',
+      municipality: e.municipality || '',
+      barangay: e.barangay || '',
+    }))
+  },
+  ['classification-entries-v6'],
   { tags: ['entries'] }
 )
 
 export default async function ClassificationPage() {
-  const entries = await getEntriesSortedByTitle()
-
-  const parsed = entries.map(e => ({
-    id: e.id,
-    title: e.title,
-    manoboTitle: e.manoboTitle,
-    englishTitle: e.englishTitle,
-    type: e.type,
-    content: e.content,
-    transcription: e.transcription || '',
-    translation: e.translation || '',
-    bisayaTranslation: e.bisayaTranslation || '',
-    genre: e.genre,
-    themes: JSON.parse(e.themes || '[]') as string[],
-    culturalElements: JSON.parse(e.culturalElements || '[]') as string[],
-    communityLocation: e.communityLocation || '',
-    municipality: e.municipality || '',
-    barangay: e.barangay || '',
-  }))
-
+  const parsed = await getCachedClassificationEntries()
   return <ClassificationClient dbEntries={parsed} />
 }
 

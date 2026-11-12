@@ -18,7 +18,7 @@ export default function Header() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10)
     }
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -40,6 +40,7 @@ export default function Header() {
 
     return () => {
       elements.forEach(el => observer.unobserve(el))
+      observer.disconnect()
     }
   }, [pathname])
 
@@ -65,7 +66,7 @@ export default function Header() {
       <div className="w-full px-4 sm:px-6 md:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <Link href="/" prefetch={true} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             <h1 style={{
               margin: 0,
               color: 'var(--brand-accent)',
@@ -87,6 +88,7 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={true}
                   className="relative py-2 text-xs font-bold tracking-wider"
                   style={{
                     textDecoration: 'none',
@@ -146,6 +148,7 @@ export default function Header() {
             {/* Profile Circle Icon */}
             <Link
               href="/admin"
+              prefetch={true}
               className="hidden sm:flex items-center justify-center transition-colors"
               title={t('admin_dashboard')}
               style={{
@@ -237,6 +240,7 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={true}
                   className="py-1 text-sm font-semibold tracking-wider transition-colors duration-200 stagger-item"
                   style={{
                     textDecoration: 'none',
@@ -251,6 +255,7 @@ export default function Header() {
 
             <Link
               href="/admin"
+              prefetch={true}
               className="mt-2 text-center py-2 rounded-md text-sm font-bold btn-anim stagger-item"
               style={{
                 color: 'var(--text-primary)',

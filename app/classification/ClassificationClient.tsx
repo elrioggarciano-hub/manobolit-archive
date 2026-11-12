@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/context/LanguageContext'
 import {
@@ -158,21 +158,29 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [serverResult, setServerResult] = useState<any>(null)
 
-  const classificationResult = classifyEntry(inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm)
-
-  const comparativeReport = computeComparativeMetrics(
-    entriesList.map(e => ({
-      title: e.title,
-      content: e.content,
-      transcription: e.transcription,
-      translation: e.translation,
-      genre: e.genre,
-    }))
+  const classificationResult = useMemo(
+    () => classifyEntry(inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm),
+    [inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm]
   )
 
-  const filteredEntriesList = selectedGenreFilter === 'ALL'
-    ? entriesList
-    : entriesList.filter(entry => entry.genre === selectedGenreFilter)
+  const comparativeReport = useMemo(
+    () =>
+      computeComparativeMetrics(
+        entriesList.map(e => ({
+          title: e.title,
+          content: e.content,
+          transcription: e.transcription,
+          translation: e.translation,
+          genre: e.genre,
+        }))
+      ),
+    [entriesList]
+  )
+
+  const filteredEntriesList = useMemo(
+    () => (selectedGenreFilter === 'ALL' ? entriesList : entriesList.filter(entry => entry.genre === selectedGenreFilter)),
+    [entriesList, selectedGenreFilter]
+  )
 
   useEffect(() => {
     if (selectedEntryId !== 'custom' && !filteredEntriesList.some(e => e.id === selectedEntryId)) {

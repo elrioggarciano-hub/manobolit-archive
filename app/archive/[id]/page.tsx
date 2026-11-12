@@ -1,42 +1,52 @@
 import { notFound } from 'next/navigation'
+import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import EntryDetail from '@/components/EntryDetail'
 import BackButton from '@/components/BackButton'
 
-// Always load live entry data on demand so updates appear immediately without stale cache.
-export const dynamic = 'force-dynamic'
+// Edge ISR with 60s stale-while-revalidate for sub-50ms entry retrieval
+export const revalidate = 60
+
+const getCachedEntry = unstable_cache(
+  async (id: string) => {
+    const entry = await prisma.literatureEntry.findUnique({
+      where: { id },
+      include: {
+        classifications: {
+          orderBy: { timestamp: 'desc' },
+          take: 1,
+        },
+      },
+    })
+    if (!entry) return null
+
+    return {
+      ...entry,
+      themes: JSON.parse(entry.themes || '[]'),
+      culturalElements: JSON.parse(entry.culturalElements || '[]'),
+      createdAt: new Date(entry.createdAt).toISOString(),
+      updatedAt: new Date(entry.updatedAt).toISOString(),
+      classifications: entry.classifications.map(c => ({
+        ...c,
+        classifiedThemes: JSON.parse(c.classifiedThemes || '[]'),
+        rulesApplied: JSON.parse(c.rulesApplied || '[]'),
+        timestamp: new Date(c.timestamp).toISOString(),
+      })),
+    }
+  },
+  ['entry-detail-v4'],
+  { tags: ['entries'] }
+)
 
 interface Props {
   params: { id: string }
 }
 
 export default async function EntryDetailPage({ params }: Props) {
-  const entry = await prisma.literatureEntry.findUnique({
-    where: { id: params.id },
-    include: {
-      classifications: {
-        orderBy: { timestamp: 'desc' },
-        take: 1,
-      },
-    },
-  })
+  const parsed = await getCachedEntry(params.id)
 
-  if (!entry) {
+  if (!parsed) {
     notFound()
-  }
-
-  const parsed = {
-    ...entry,
-    themes: JSON.parse(entry.themes || '[]'),
-    culturalElements: JSON.parse(entry.culturalElements || '[]'),
-    createdAt: entry.createdAt.toISOString(),
-    updatedAt: entry.updatedAt.toISOString(),
-    classifications: entry.classifications.map(c => ({
-      ...c,
-      classifiedThemes: JSON.parse(c.classifiedThemes || '[]'),
-      rulesApplied: JSON.parse(c.rulesApplied || '[]'),
-      timestamp: c.timestamp.toISOString(),
-    })),
   }
 
   return (

@@ -430,8 +430,9 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, maxWidth: '650px' }}>
             {t('section_featured_subtitle')}
           </p>
-          <button
-            onClick={() => router.push('/explore')}
+          <Link
+            href="/explore"
+            prefetch={true}
             style={{
               background: '#f1b80d',
               color: '#1e293b',
@@ -445,12 +446,14 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               marginTop: '8px',
               boxShadow: '0 4px 12px rgba(241,184,13,0.2)',
               transition: 'transform 0.2s, background-color 0.2s',
+              display: 'inline-block',
+              textDecoration: 'none',
             }}
             onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#d4a007'; e.currentTarget.style.transform = 'translateY(-2px)' }}
             onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#f1b80d'; e.currentTarget.style.transform = 'translateY(0)' }}
           >
             {t('btn_browse_archive')} &rarr;
-          </button>
+          </Link>
         </div>
       </section>
 
