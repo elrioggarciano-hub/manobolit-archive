@@ -93,10 +93,13 @@ function formatName(val: string): string {
 
 type ConfidenceTier = 'weak' | 'moderate' | 'strong'
 
-function getConfidenceTier(pct: number): { tier: ConfidenceTier; color: string; label: string } {
-  if (pct < 30) return { tier: 'weak', color: '#ef4444', label: 'Kailangan ng Pagsusuri (Needs Review)' }
-  if (pct < 70) return { tier: 'moderate', color: '#f59e0b', label: 'Katamtaman (Moderate)' }
-  return { tier: 'strong', color: '#10b981', label: 'Kumpirmado (Confirmed)' } // Green for Confirmed!
+function getConfidenceTier(pct: number, t?: (k: string) => string): { tier: ConfidenceTier; color: string; label: string } {
+  const lbl = t
+    ? (pct < 30 ? t('diag_confidence_needs_review') : pct < 70 ? t('diag_confidence_moderate') : t('diag_confidence_confirmed'))
+    : (pct < 30 ? 'Needs Review' : pct < 70 ? 'Moderate' : 'Confirmed')
+  if (pct < 30) return { tier: 'weak', color: '#ef4444', label: lbl }
+  if (pct < 70) return { tier: 'moderate', color: '#f59e0b', label: lbl }
+  return { tier: 'strong', color: '#10b981', label: lbl }
 }
 
 export default function ClassificationClient({ dbEntries = [] }: ClassificationClientProps) {
@@ -635,14 +638,14 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   </div>
 
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Hakbang 1: Pagpili ng Akda</div>
-                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>PUMILI NG KWENTO O AWIT</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>{t('diag_step_1_title')}</div>
+                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>{t('diag_step_1_sub')}</div>
                   </div>
 
                   {/* Choose Genre to Classify Dropdown */}
                   <div style={{ width: '100%', maxWidth: '220px', textAlign: 'left' }}>
                     <label style={{ fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                      SALAIN AYON SA ANYO (GENRE FILTER)
+                      {t('diag_genre_filter')}
                     </label>
                     <select
                       value={selectedGenreFilter}
@@ -664,22 +667,22 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         cursor: 'pointer'
                       }}
                     >
-                      <option value="ALL">Lahat ng Anyo (All Genres)</option>
-                      {entriesList.some(e => e.genre === 'MYTH') && <option value="MYTH">Mito / Oggayam (Myth)</option>}
-                      {entriesList.some(e => e.genre === 'LEGEND') && <option value="LEGEND">Alamat / Tudtul (Legend)</option>}
-                      {entriesList.some(e => e.genre === 'FOLKTALE') && <option value="FOLKTALE">Kwentong-bayan (Folktale)</option>}
-                      {entriesList.some(e => e.genre === 'EPIC') && <option value="EPIC">Epiko / Ulaging (Epic)</option>}
-                      {entriesList.some(e => e.genre === 'RIDDLE') && <option value="RIDDLE">Bugtong (Riddle)</option>}
-                      {entriesList.some(e => e.genre === 'PROVERB') && <option value="PROVERB">Kasabihan (Proverb)</option>}
-                      {entriesList.some(e => e.genre === 'SONG') && <option value="SONG">Awit (Folk Song)</option>}
-                      {entriesList.some(e => e.genre === 'CHANT') && <option value="CHANT">Ritwal / Chant</option>}
+                      <option value="ALL">{t('diag_all_genres')}</option>
+                      {entriesList.some(e => e.genre === 'MYTH') && <option value="MYTH">{t('eug_myths_title')}</option>}
+                      {entriesList.some(e => e.genre === 'LEGEND') && <option value="LEGEND">Legend (Tudtul)</option>}
+                      {entriesList.some(e => e.genre === 'FOLKTALE') && <option value="FOLKTALE">{t('eug_folktales_title')}</option>}
+                      {entriesList.some(e => e.genre === 'EPIC') && <option value="EPIC">{t('eug_epics_title')}</option>}
+                      {entriesList.some(e => e.genre === 'RIDDLE') && <option value="RIDDLE">Riddle (Antoka)</option>}
+                      {entriesList.some(e => e.genre === 'PROVERB') && <option value="PROVERB">Proverb (Panultihon)</option>}
+                      {entriesList.some(e => e.genre === 'SONG') && <option value="SONG">{t('stat_folk_songs')}</option>}
+                      {entriesList.some(e => e.genre === 'CHANT') && <option value="CHANT">Chant (Tudtul/Ritwal)</option>}
                     </select>
                   </div>
 
                   {/* Select Narrative Entry Dropdown */}
                   <div style={{ width: '100%', maxWidth: '220px', textAlign: 'left' }}>
                     <label style={{ fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                      PUMILI MULA SA ARCHIVE
+                      {t('diag_select_from_archive')}
                     </label>
                     <select
                       value={selectedEntryId}
@@ -712,7 +715,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         cursor: 'pointer'
                       }}
                     >
-                      <option value="custom">-- Sariling Teksto / Custom --</option>
+                      <option value="custom">{t('diag_custom_text')}</option>
                       {filteredEntriesList.map(entry => (
                         <option key={entry.id} value={entry.id}>
                           {entry.title}
@@ -741,7 +744,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     {inputTranscription && (
                       <div style={{ marginBottom: '10px' }}>
                         <div style={{ fontSize: '8px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em', marginBottom: '4px' }}>
-                          KATUTUBONG SALAYSAY (MANOBO)
+                          {t('diag_manobo_narrative')}
                         </div>
                         <div style={{ color: '#f1b80d', fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
                           {inputTranscription}
@@ -750,7 +753,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     )}
                     {!inputTranscription && (
                       <div style={{ color: '#71717a', fontStyle: 'italic', textAlign: 'center', marginTop: '30px' }}>
-                        Walang nakakargang teksto
+                        {t('diag_no_text_loaded')}
                       </div>
                     )}
                   </div>
@@ -810,12 +813,12 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     {isAnalyzing ? (
                       <>
                         <span>⏳</span>
-                        <span>Sinusuri ang Akda...</span>
+                        <span>{t('diag_btn_analyzing')}</span>
                       </>
                     ) : (
                       <>
                         <span>⚡</span>
-                        <span>Suriin at I-classify</span>
+                        <span>{t('diag_btn_analyze')}</span>
                       </>
                     )}
                   </button>
@@ -860,8 +863,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   </div>
 
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Hakbang 2: Pagsusuri ng Alituntunin at ML</div>
-                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>HYBRID CLASSIFICATION ENGINE (ML & RULES)</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>{t('diag_step_2_title')}</div>
+                    <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>{t('diag_step_2_sub')}</div>
                   </div>
 
                   {/* Rules list with confidence-tiered indicators + matched evidence */}
@@ -884,9 +887,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         }}
                       >
                         <span style={{ fontSize: '20px' }}>📖</span>
-                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#e4e4e7' }}>Naghihintay ng Pagsusuri</div>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#e4e4e7' }}>{t('diag_waiting_title')}</div>
                         <p style={{ fontSize: '9.5px', color: '#71717a', margin: 0, lineHeight: 1.4 }}>
-                          Pindutin ang &ldquo;Suriin at I-classify&rdquo; upang patakbuhin ang Machine Learning models at ilapat ang mga alituntunin.
+                          {t('diag_waiting_desc')}
                         </p>
                       </div>
                     ) : classificationResult.rulesApplied.length > 0 ? (
@@ -894,7 +897,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         const rule = [...genreRules, ...themeRules, ...locationRules].find(r => r.id === ruleId)
                         const detail = classificationResult.ruleDetails[ruleId]
                         const pct = Math.round((detail?.confidence || 0) * 100)
-                        const { tier, color } = getConfidenceTier(pct)
+                        const { tier, color } = getConfidenceTier(pct, t)
                         const evidence = (detail?.matched || []).slice(0, 2).map(m => m.term).join(', ')
                         return (
                           <div
@@ -912,7 +915,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                 {rule ? rule.name : ruleId}
                               </span>
                               <div
-                                title={`${pct}% katiyakan`}
+                                title={`${pct}%`}
                                 style={{
                                   width: '14px',
                                   height: '14px',
@@ -934,7 +937,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                             </div>
                             {evidence && (
                               <div style={{ marginTop: '4px', fontSize: '9.5px', color: '#a1a1aa', textAlign: 'left', fontStyle: 'italic' }}>
-                                natukoy: &ldquo;{evidence}&rdquo;
+                                {t('diag_detected_evidence')} &ldquo;{evidence}&rdquo;
                               </div>
                             )}
                           </div>
@@ -942,7 +945,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       })
                     ) : (
                       <div style={{ fontSize: '11px', color: '#71717a', fontStyle: 'italic', textAlign: 'center' }}>
-                        Walang alituntuning tumugma
+                        {t('diag_no_rules_matched')}
                       </div>
                     )}
                   </div>
@@ -982,9 +985,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       }}
                     >
                       <span style={{ fontSize: '24px' }}>📊</span>
-                      <div style={{ fontSize: '12px', fontWeight: 700, color: '#e4e4e7' }}>Handa nang Suriin</div>
+                      <div style={{ fontSize: '12px', fontWeight: 700, color: '#e4e4e7' }}>{t('diag_ready_title')}</div>
                       <p style={{ fontSize: '10px', color: '#71717a', margin: 0, maxWidth: '210px', lineHeight: 1.5 }}>
-                        Pumili ng kwento o awit at pindutin ang &ldquo;Suriin at I-classify&rdquo; upang makita ang Anyo, Tema, at Lugar.
+                        {t('diag_ready_desc')}
                       </p>
                     </div>
                   ) : (
@@ -992,12 +995,12 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       {/* Genre Identified — always shown, since a top genre always exists */}
                       {(() => {
                         const pct = Math.round(classificationResult.genre.confidence * 100)
-                        const { color, label } = getConfidenceTier(pct)
+                        const { color, label } = getConfidenceTier(pct, t)
                         return (
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                               <span>→</span>
-                              <span>ANYO NG PANITIKAN (GENRE)</span>
+                              <span>{t('diag_res_genre')}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                               <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
@@ -1039,12 +1042,12 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       {/* Theme Identified */}
                       {classificationResult.themes.length > 0 ? (() => {
                         const pct = Math.round(classificationResult.themes[0].confidence * 100)
-                        const { color, label } = getConfidenceTier(pct)
+                        const { color, label } = getConfidenceTier(pct, t)
                         return (
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                               <span>→</span>
-                              <span>PANGUNAHING TEMA (THEME)</span>
+                              <span>{t('diag_res_theme')}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                               <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
@@ -1064,10 +1067,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                             <span>→</span>
-                            <span>PANGUNAHING TEMA (THEME)</span>
+                            <span>{t('diag_res_theme')}</span>
                           </div>
                           <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>
-                            Walang tiyak na temang naitugma
+                            {t('diag_res_no_theme')}
                           </div>
                         </div>
                       )}
@@ -1075,12 +1078,12 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       {/* Location Identified */}
                       {classificationResult.location ? (() => {
                         const pct = Math.round(classificationResult.location!.confidence * 100)
-                        const { color, label } = getConfidenceTier(pct)
+                        const { color, label } = getConfidenceTier(pct, t)
                         return (
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                               <span>→</span>
-                              <span>LUGAR NG PINAGMULAN (LOCATION)</span>
+                              <span>{t('diag_res_location')}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                               <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
@@ -1100,10 +1103,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
                             <span>→</span>
-                            <span>LUGAR NG PINAGMULAN (LOCATION)</span>
+                            <span>{t('diag_res_location')}</span>
                           </div>
                           <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>
-                            Walang natukoy na pahiwatig ng lokasyon
+                            {t('diag_res_no_location')}
                           </div>
                         </div>
                       )}
@@ -1131,10 +1134,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       <span style={{ fontSize: '22px' }}>💡</span>
                       <div>
                         <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>
-                          Paliwanag ng Pag-uuri (Bakit Ito Na-classify?)
+                          {t('diag_explain_title')}
                         </h4>
                         <span style={{ fontSize: '11px', color: '#a1a1aa' }}>
-                          Matalinong pagsusuri batay sa mga katutubong salita, nilalaman, at alituntunin ng panitikan
+                          {t('diag_explain_sub')}
                         </span>
                       </div>
                     </div>
