@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAudio } from '@/lib/context/AudioContext'
 import { useIsMobile } from '@/lib/hooks/useIsMobile'
+import { useLanguage } from '@/lib/context/LanguageContext'
 
 function formatTime(seconds: number): string {
   if (isNaN(seconds) || seconds === 0) return '0:00'
@@ -28,6 +29,7 @@ export default function PersistentAudioPlayer() {
 
   const [showTranscript, setShowTranscript] = useState(false)
   const isMobile = useIsMobile(640)
+  const { t } = useLanguage()
 
   // Auth screens have no relevance to folk-song playback, and the fixed
   // bottom bar collides with the vertically centered login card.
@@ -58,7 +60,7 @@ export default function PersistentAudioPlayer() {
           textAlign: 'center',
         }}
       >
-        <span style={{ marginRight: '8px' }}>🎵</span> Select a folk song or oral literature piece to listen to the singer.
+        <span style={{ marginRight: '8px' }}>🎵</span> {t('player_empty_prompt')}
       </div>
     )
   }
@@ -101,7 +103,7 @@ export default function PersistentAudioPlayer() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <div>
-              <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--brand-accent)', letterSpacing: '0.1em' }}>SUNG LYRICS & TRANSCRIPT</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--brand-accent)', letterSpacing: '0.1em' }}>{t('player_lyrics_translation')}</span>
               <h4 style={{ margin: '2px 0 0 0', fontSize: '14px', fontWeight: 700, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{currentTrack.title}</h4>
               <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>Singer: {singerName}</p>
             </div>

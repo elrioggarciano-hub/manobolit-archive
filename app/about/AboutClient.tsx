@@ -2,9 +2,11 @@
 
 import Link from 'next/link'
 import { useIsMobile } from '@/lib/hooks/useIsMobile'
+import { useLanguage } from '@/lib/context/LanguageContext'
 
 export default function AboutClient() {
   const isMobile = useIsMobile(860)
+  const { t } = useLanguage()
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-primary)', fontFamily: 'Inter, sans-serif' }}>
@@ -27,7 +29,7 @@ export default function AboutClient() {
                 display: 'block',
                 marginBottom: '16px',
               }}>
-                CULTURAL MISSION
+                {t('about_mission_badge')}
               </span>
 
               <h1 style={{
@@ -38,14 +40,11 @@ export default function AboutClient() {
                 lineHeight: 1.2,
                 color: 'var(--text-primary)',
               }}>
-                Dedicated to the Preservation of Agusan Manobo Oral Traditions
+                {t('about_title')}
               </h1>
 
               <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: '520px' }}>
-                Our mission is rooted in the reverence of heritage. We provide a scientific and
-                digital framework to archive the rich oral literature and folk songs of the
-                Manobo people, ensuring their voices endure through the precision of modern
-                archival technology.
+                {t('about_mission_desc')}
               </p>
             </div>
 
@@ -61,14 +60,11 @@ export default function AboutClient() {
                 color: 'var(--brand-accent)',
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
               }}>
-                The Retrieval System
+                {t('about_system_title')}
               </h2>
 
               <p style={{ margin: '0 0 28px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: '520px' }}>
-                The ManoboLit Archive serves as a responsive retrieval system, housing a curated collection of
-                17 oral literature pieces and 5 folk songs. This digital repository is built upon rigorous scholarly
-                research, primarily backed by the 2024 studies of Catipay &amp; Curato and Maravilla, focusing on
-                the intersection of cultural linguistics and digital archival sciences.
+                {t('about_system_desc')}
               </p>
 
               {/* Stats row */}
@@ -85,7 +81,7 @@ export default function AboutClient() {
                     17
                   </div>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-accent)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                    Oral Literature Pieces
+                    {t('about_oral_pieces')}
                   </div>
                 </div>
 
@@ -101,7 +97,7 @@ export default function AboutClient() {
                     05
                   </div>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: '#f1b80d', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                    Sacred Folk Songs
+                    {t('about_folk_songs')}
                   </div>
                 </div>
               </div>

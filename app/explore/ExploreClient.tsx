@@ -366,7 +366,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
                 </svg>
-                <span>{isMobileFiltersOpen ? 'Hide Filters & Categories' : 'Show Filters & Categories'}</span>
+                <span>{isMobileFiltersOpen ? t('exp_toggle_hide') : t('exp_toggle_show')}</span>
                 {(appliedGenres.length + appliedThemes.length + appliedLocations.length) > 0 && (
                   <span className="bg-[#fee2e2] text-[#8F000D] px-2 py-0.5 rounded text-[10px] font-extrabold ml-1">
                     {appliedGenres.length + appliedThemes.length + appliedLocations.length} active
@@ -389,7 +389,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   fontFamily: 'Cormorant Garamond, Georgia, serif'
                 }}
               >
-                Archive Filters
+                {t('exp_filters')}
               </h2>
               <span className="text-xs text-[var(--text-muted)] tracking-wide">Scholarly Classification</span>
             </div>
@@ -649,7 +649,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               onMouseEnter={e => e.currentTarget.style.background = '#B22222'}
               onMouseLeave={e => e.currentTarget.style.background = '#8F000D'}
             >
-              Apply Filters
+              {t('exp_apply_filters')}
             </button>
           </aside>
 

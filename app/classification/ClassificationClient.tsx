@@ -194,26 +194,26 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const eugenioCards = [
     {
       id: 'EUG-01',
-      title: 'Myths',
-      description: <>Narratives concerning the origins of the world,<br className="hidden md:inline" /> gods, and religious beliefs.</>,
+      title: t('eug_myths_title'),
+      description: <>{t('eug_myths_desc')}</>,
       tags: ['CREATION', 'DEITY', 'CELESTIAL'],
     },
     {
       id: 'EUG-04',
-      title: 'Epics',
-      description: <>Long narrative poems centered on a hero&apos;s exploits<br className="hidden md:inline" /> and supernatural journeys.</>,
+      title: t('eug_epics_title'),
+      description: <>{t('eug_epics_desc')}</>,
       tags: ['HERO', 'QUEST', 'ANCESTORS'],
     },
     {
       id: 'EUG-03',
-      title: 'Folktales',
-      description: <>Fictional narratives involving common folk, animals,<br className="hidden md:inline" /> or magical elements.</>,
+      title: t('eug_folktales_title'),
+      description: <>{t('eug_folktales_desc')}</>,
       tags: ['ANIMAL', 'TRICKSTER', 'FABLE'],
     },
     {
       id: 'EUG-05',
-      title: 'Gnomics',
-      description: <>Short, pithy statements or metaphorical questions<br className="hidden md:inline" /> expressing cultural wisdom.</>,
+      title: t('eug_gnomics_title'),
+      description: <>{t('eug_gnomics_desc')}</>,
       tags: ['METAPHOR', 'WIT', 'ADVICE'],
     },
   ]
@@ -221,33 +221,33 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const andressCards = [
     {
       num: '01',
-      title: 'Creation Myths',
-      description: <>The shaping of the earth, the first<br className="hidden md:inline" /> humans, and the separation of sky<br className="hidden md:inline" /> and soil.</>,
+      title: t('andress_01_title'),
+      description: <>{t('andress_01_desc')}</>,
     },
     {
       num: '02',
-      title: 'Heroic Deeds',
-      description: <>Historical and mythic battles,<br className="hidden md:inline" /> defense of territory, and tests of<br className="hidden md:inline" /> strength.</>,
+      title: t('andress_02_title'),
+      description: <>{t('andress_02_desc')}</>,
     },
     {
       num: '03',
-      title: 'Courtship',
-      description: <>Complex rituals of marriage<br className="hidden md:inline" /> negotiation, dowry, and romantic<br className="hidden md:inline" /> pursuit.</>,
+      title: t('andress_03_title'),
+      description: <>{t('andress_03_desc')}</>,
     },
     {
       num: '04',
-      title: 'Sickness & Healing',
-      description: <>The relationship between human<br className="hidden md:inline" /> spiritual health and the unseen<br className="hidden md:inline" /> spirits.</>,
+      title: t('andress_04_title'),
+      description: <>{t('andress_04_desc')}</>,
     },
     {
       num: '05',
-      title: 'Farming Cycles',
-      description: <>Agricultural rites, planting seasons,<br className="hidden md:inline" /> and the importance of rice (Oma).</>,
+      title: t('andress_05_title'),
+      description: <>{t('andress_05_desc')}</>,
     },
     {
       num: '06',
-      title: 'Displacement',
-      description: <>Narratives of migration, loss of land,<br className="hidden md:inline" /> and the seeking of ancestral homes.</>,
+      title: t('andress_06_title'),
+      description: <>{t('andress_06_desc')}</>,
     },
   ]
 
@@ -268,7 +268,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               marginBottom: '8px'
             }}
           >
-            Methodology & Frameworks
+            {t('class_methodology_badge')}
           </div>
 
           {/* Page Title */}
@@ -325,7 +325,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   color: 'var(--text-primary)'
                 }}
               >
-                Eugenio (1993) Taxonomy
+                {t('class_eugenio_title')}
               </h2>
               <p
                 style={{
@@ -336,7 +336,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   textAlign: 'center'
                 }}
               >
-                Philippine Folk Literature: An Anthology (1993) provides the foundational structural taxonomy for classifying oral<br className="hidden md:inline" /> traditions across the archipelago.
+                {t('class_eugenio_desc')}
               </p>
 
               {/* Grid of Eugenio Cards */}
@@ -448,7 +448,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     textAlign: 'center'
                   }}
                 >
-                  Andress (1985) Thematic Grid
+                  {t('class_andress_title')}
                 </h2>
                 <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
               </div>
@@ -462,7 +462,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   textAlign: 'center'
                 }}
               >
-                Derived from the <em style={{ fontStyle: 'italic' }}>Agusan Manobo Bible Corpus</em>, Thomas Andress identified 12 specific thematic clusters that define the<br className="hidden md:inline" /> Manobo cognitive and cultural universe.
+                {t('class_andress_desc')}
               </p>
 
               {/* Grid of Andress Cards */}
@@ -523,14 +523,14 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                     <span style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                      Hybrid ML & Rule-Based Classification
+                      {t('class_engine_badge')}
                     </span>
                     <span
                       onClick={() => setIsDefenseMode(prev => !prev)}
                       style={{ fontSize: '9px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, cursor: 'pointer', userSelect: 'none' }}
-                      title="Matalinong Pag-uuri gamit ang Machine Learning at Domain Rules"
+                      title="Hybrid ML & Rules"
                     >
-                      Matalinong Pag-uuri (Hybrid ML)
+                      {t('class_engine_defense_pill')}
                     </span>
                   </div>
                   <h2
@@ -542,7 +542,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       color: '#ffffff'
                     }}
                   >
-                    Awtomatikong Pag-uuri (Literature Classification)
+                    {t('class_engine_title')}
                   </h2>
                 </div>
 
@@ -567,10 +567,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       gap: '6px',
                       transition: 'all 0.2s ease',
                     }}
-                    title="Tingnan ang Evaluation Metrics at Benchmark Data para sa Panel"
+                    title={t('class_btn_benchmark')}
                   >
                     <span>📊</span>
-                    <span>Teknikal na Ebalwasyon (Para sa Panel)</span>
+                    <span>{t('class_btn_benchmark')}</span>
                   </button>
                 )}
               </div>
@@ -584,7 +584,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   margin: '0 0 28px 0'
                 }}
               >
-                Gamit ang <strong>Hybrid Machine Learning (Multinomial Naive Bayes, LinearSVC, TF-IDF) at Domain Expert Rules (Eugenio 1993)</strong>, awtomatikong sinusuri ng system ang mga kwento at awiting Manobo. Pinagsasama nito ang statistical AI at katutubong kaalaman upang matukoy ang kanilang <strong>Anyo (Genre)</strong>, <strong>Pangunahing Tema</strong>, at <strong>Lugar ng Pinagmulan</strong>.
+                {t('class_engine_desc')}
               </p>
 
               {/* Diagram Flow Container */}

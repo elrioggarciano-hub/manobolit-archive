@@ -63,7 +63,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
         }}
       >
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <div 
+          <div
             style={{
               display: 'inline-block',
               border: '1px solid rgba(255, 255, 255, 0.4)',
@@ -79,8 +79,8 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           >
             {t('hero_badge')}
           </div>
-          
-          <h1 
+
+          <h1
             style={{
               fontSize: 'clamp(36px, 5.5vw, 56px)',
               fontWeight: 700,
@@ -93,12 +93,12 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             {t('hero_title_1')}<br />{t('hero_title_2')}
           </h1>
 
-          <p 
-            style={{ 
-              color: 'rgba(255, 255, 255, 0.85)', 
-              fontSize: '16px', 
-              maxWidth: '650px', 
-              margin: '0 auto 40px', 
+          <p
+            style={{
+              color: 'rgba(255, 255, 255, 0.85)',
+              fontSize: '16px',
+              maxWidth: '650px',
+              margin: '0 auto 40px',
               lineHeight: 1.6,
               fontFamily: 'Inter, sans-serif'
             }}
@@ -107,7 +107,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           </p>
 
           {/* Search container */}
-          <form 
+          <form
             onSubmit={(e) => {
               e.preventDefault()
               router.push(`/explore?search=${encodeURIComponent(search)}`)
@@ -125,7 +125,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-              <input 
+              <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -168,34 +168,34 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
 
       {/* 2. ARCHIVE AT A GLANCE SECTION */}
       <section className="scroll-reveal" style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 24px 60px' }}>
-        <div 
-          style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'flex-end', 
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
             borderBottom: '1px solid var(--border-color)',
             paddingBottom: '8px',
-            marginBottom: '40px' 
+            marginBottom: '40px'
           }}
         >
           <div style={{ position: 'relative' }}>
-            <h2 
-              style={{ 
-                margin: 0, 
-                fontSize: '28px', 
-                fontWeight: 700, 
-                color: 'var(--text-primary)', 
-                fontFamily: 'Cormorant Garamond, Georgia, serif' 
+            <h2
+              style={{
+                margin: 0,
+                fontSize: '28px',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                fontFamily: 'Cormorant Garamond, Georgia, serif'
               }}
             >
               {t('stat_preserved_entries')}
             </h2>
             <div style={{ position: 'absolute', bottom: '-9px', left: 0, width: '90px', height: '4px', background: '#8F000D' }} />
           </div>
-          <span 
-            style={{ 
-              fontSize: '11px', 
-              fontWeight: 700, 
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 700,
               color: 'var(--text-muted)',
               letterSpacing: '0.08em',
               textTransform: 'uppercase'
@@ -215,7 +215,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               borderTop: '5px solid #8F000D',
               padding: '32px 20px 28px',
               boxShadow: '0 20px 40px -15px rgba(143, 0, 13, 0.08), 0 15px 30px -10px rgba(0, 0, 0, 0.05)',
-              display: 'flex', 
+              display: 'flex',
               flexDirection: 'column',
               transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
@@ -234,14 +234,14 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                 <path d="M12 21V7l3.5-3.5v14z" fill="var(--brand-accent)" stroke="var(--brand-accent)" strokeWidth="1" strokeLinejoin="round" />
               </svg>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE A</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>{t('cat_a_badge')}</span>
             </div>
             <div style={{ marginTop: '28px' }}>
               <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={oralLit} /></div>
               <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>{t('stat_oral_literature')}</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
-              Riddles, proverbs, and folktales documented from Agusan del Sur communities.
+              {t('cat_a_desc')}
             </p>
           </div>
 
@@ -252,9 +252,9 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               background: 'var(--bg-surface)',
               borderRadius: '0px',
               borderTop: '5px solid #f1b80d',
-              padding: '32px 20px 28px', 
-              boxShadow: '0 20px 40px -15px rgba(241, 184, 13, 0.12), 0 15px 30px -10px rgba(0, 0, 0, 0.05)', 
-              display: 'flex', 
+              padding: '32px 20px 28px',
+              boxShadow: '0 20px 40px -15px rgba(241, 184, 13, 0.12), 0 15px 30px -10px rgba(0, 0, 0, 0.05)',
+              display: 'flex',
               flexDirection: 'column',
               transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
@@ -272,14 +272,14 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                 <circle cx="8" cy="18" r="4" fill="#f1b80d" />
                 <path d="M12 18V2l7 4" />
               </svg>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE B</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>{t('cat_b_badge')}</span>
             </div>
             <div style={{ marginTop: '28px' }}>
               <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={folkSongs} /></div>
               <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>{t('stat_folk_songs')}</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
-              AI-generated narrations preserving each song&apos;s lyrical content.
+              {t('cat_b_desc')}
             </p>
           </div>
 
@@ -309,14 +309,14 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block' }}>
                 <path d="M4 10v4M8 6v12M12 3v18M16 6v12M20 10v4" />
               </svg>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>CATALOGUE C</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: "'Montserrat', 'Inter', sans-serif" }}>{t('cat_c_badge')}</span>
             </div>
             <div style={{ marginTop: '28px' }}>
               <div style={{ fontSize: '64px', fontWeight: 400, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1 }}><CountUp value={totalEntries} /></div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>Manobo Transcriptions</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", marginTop: '2px', letterSpacing: '0.01em' }}>{t('cat_c_title')}</div>
             </div>
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, marginTop: '16px' }}>
-              Original Manobo text with English and Bisaya translations, rule-based classified.
+              {t('cat_c_desc')}
             </p>
           </div>
         </div>
@@ -347,7 +347,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                 zIndex: 5,
               }}
             >
-              <div style={{ fontSize: '10px', letterSpacing: '0.15em', fontWeight: 600, color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>SINCE</div>
+              <div style={{ fontSize: '10px', letterSpacing: '0.15em', fontWeight: 600, color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>{t('sec3_since')}</div>
               <div style={{ fontSize: '28px', fontWeight: 700, marginTop: '2px', lineHeight: 1 }}>1985</div>
             </div>
             {/* Required CC BY-SA 4.0 attribution */}
@@ -367,21 +367,21 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
 
           {/* Right: Scientific details */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-accent)', letterSpacing: '0.1em' }}>CLASSIFICATION FRAMEWORKS</span>
-            
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--brand-accent)', letterSpacing: '0.1em' }}>{t('sec3_badge')}</span>
+
             <h2 style={{ margin: 0, fontSize: '36px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif', lineHeight: 1.2 }}>
-              A Scientific Approach to Oral Tradition
+              {t('sec3_title')}
             </h2>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '10px' }}>
               {/* Bullet 1 */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <div style={{ width: '32px', height: '32px', border: '1.5px solid #8F000D', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-accent)', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}>1</div>
-                  <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Eugenio (1993)</h3>
+                  <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{t('sec3_eugenio_title')}</h3>
                 </div>
                 <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
-                  Focuses on the categorization of Philippine folk literature into myths, legends, fables, and fantastic stories, providing a taxonomic framework for structural analysis.
+                  {t('sec3_eugenio_desc')}
                 </p>
               </div>
 
@@ -389,10 +389,10 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <div style={{ width: '32px', height: '32px', border: '1.5px solid #8F000D', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-accent)', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}>2</div>
-                  <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Andress (1985)</h3>
+                  <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{t('sec3_andress_title')}</h3>
                 </div>
                 <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
-                  Identifies 12 thematic clusters specific to Agusan Manobo tradition &mdash; from creation myths to courtship and displacement &mdash; derived from the Agusan Manobo Bible corpus.
+                  {t('sec3_andress_desc')}
                 </p>
               </div>
             </div>
@@ -400,7 +400,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             {/* Quote block */}
             <div style={{ borderLeft: '4px solid #f1b80d', background: 'var(--bg-main)', padding: '20px 24px', marginTop: '24px', borderRadius: '0px' }}>
               <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', fontStyle: 'italic', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
-                &ldquo;By combining these frameworks, ManoboLit ensures that every piece of recorded history is placed within its rightful cultural and linguistic context.&rdquo;
+                &ldquo;{t('sec3_quote')}&rdquo;
               </p>
             </div>
           </div>
@@ -409,16 +409,16 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
 
       {/* 4. EXPERIENCE THE LIVING HERITAGE SECTION */}
       <section className="scroll-reveal px-4 sm:px-6 py-12 sm:py-20" style={{ background: 'var(--bg-main)' }}>
-        <div 
+        <div
           className="px-6 py-12 sm:px-10 sm:py-20"
-          style={{ 
+          style={{
             maxWidth: '1000px',
             margin: '0 auto',
             background: 'var(--bg-surface)',
             border: '1px solid var(--border-color)',
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             gap: '24px',
             textAlign: 'center',
             borderRadius: '0px'
@@ -430,7 +430,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
           <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, maxWidth: '650px' }}>
             {t('section_featured_subtitle')}
           </p>
-          <button 
+          <button
             onClick={() => router.push('/explore')}
             style={{
               background: '#f1b80d',

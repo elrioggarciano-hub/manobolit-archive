@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import CountUp from '@/components/CountUp'
+import { useLanguage } from '@/lib/context/LanguageContext'
 
 export interface LocationStat {
   location: string
@@ -118,6 +119,7 @@ export default function DashboardClient({
   accuracyMetrics?: AccuracyMetrics
   exportRecords?: ExportRecord[]
 }) {
+  const { t } = useLanguage()
   // Same brand palette as the rest of the dashboard, cycled if there are ever
   // more genres archived than colors — never a hardcoded set of genres/shares.
   const GENRE_COLORS = ['#8F000D', '#f1b80d', '#18181b', '#7f7370', '#0ea5e9', '#16a34a']
@@ -200,7 +202,7 @@ export default function DashboardClient({
   return (
     <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <div className="w-full px-6 md:px-8 py-8">
-        
+
         {/* Top Header Section (Full Width, matches classification page header) */}
         <div style={{ marginBottom: '32px' }}>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -216,7 +218,7 @@ export default function DashboardClient({
                   marginBottom: '8px'
                 }}
               >
-                Quantitative Analytics
+                {t('dash_badge')}
               </div>
 
               {/* Page Title */}
@@ -230,7 +232,7 @@ export default function DashboardClient({
                   color: 'var(--text-primary)'
                 }}
               >
-                Research Dashboard
+                {t('dash_title')}
               </h1>
 
               <p
@@ -241,7 +243,7 @@ export default function DashboardClient({
                   margin: '0'
                 }}
               >
-                Quantitative overview of Manobo oral literature classifications and regional distribution across the Agusan River basin.
+                {t('dash_subtitle')}
               </p>
             </div>
 
@@ -261,14 +263,14 @@ export default function DashboardClient({
                 cursor: exportRecords.length === 0 ? 'not-allowed' : 'pointer',
                 opacity: exportRecords.length === 0 ? 0.5 : 1,
               }}
-              title="Export the full archive as a CSV of cultural heritage records"
+              title={t('dash_export_btn')}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
-              EXPORT CULTURAL HERITAGE RECORDS
+              {t('dash_export_btn')}
             </button>
           </div>
         </div>
@@ -280,7 +282,7 @@ export default function DashboardClient({
 
           {/* RIGHT MAIN PANEL: RESEARCH DASHBOARD CONTENT */}
           <main className="flex-1 flex flex-col gap-6">
-            
+
             {/* Stats Cards Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
@@ -380,7 +382,7 @@ export default function DashboardClient({
 
             {/* Middle Row: Charts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               {/* Genre Distribution Card */}
               <div
                 className="bg-[var(--bg-surface)] p-6 flex flex-col justify-between scroll-reveal card-hover"
@@ -392,13 +394,13 @@ export default function DashboardClient({
                 }}
               >
                 <div>
-                  <h3 
-                    style={{ 
-                      margin: '0 0 4px 0', 
-                      fontSize: '20px', 
-                      fontWeight: 700, 
-                      color: 'var(--text-primary)', 
-                      fontFamily: "'Playfair Display', Georgia, serif" 
+                  <h3
+                    style={{
+                      margin: '0 0 4px 0',
+                      fontSize: '20px',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      fontFamily: "'Playfair Display', Georgia, serif"
                     }}
                   >
                     Genre Distribution
@@ -477,13 +479,13 @@ export default function DashboardClient({
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <h3 
-                      style={{ 
-                        margin: '0 0 4px 0', 
-                        fontSize: '20px', 
-                        fontWeight: 700, 
-                        color: 'var(--text-primary)', 
-                        fontFamily: "'Playfair Display', Georgia, serif" 
+                    <h3
+                      style={{
+                        margin: '0 0 4px 0',
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        fontFamily: "'Playfair Display', Georgia, serif"
                       }}
                     >
                       Theme Frequency
@@ -532,7 +534,7 @@ export default function DashboardClient({
 
             {/* Bottom Row: Combined Map & Rankings, and Accuracy */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
+
               {/* Combined Regional Heatmap and Municipality Rank Card */}
               <div
                 className="col-span-1 lg:col-span-2 bg-[var(--bg-surface)] flex flex-col md:flex-row justify-between scroll-reveal card-hover"
@@ -546,13 +548,13 @@ export default function DashboardClient({
                 {/* Left Part: Regional Heatmap */}
                 <div style={{ flex: 1.8, padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
-                    <h3 
-                      style={{ 
-                        margin: '0 0 2px 0', 
-                        fontSize: '18px', 
-                        fontWeight: 700, 
-                        color: 'var(--text-primary)', 
-                        fontFamily: "'Playfair Display', Georgia, serif" 
+                    <h3
+                      style={{
+                        margin: '0 0 2px 0',
+                        fontSize: '18px',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        fontFamily: "'Playfair Display', Georgia, serif"
                       }}
                     >
                       Regional Heatmap
@@ -580,9 +582,9 @@ export default function DashboardClient({
                 </div>
 
                 {/* Right Part: Municipality Rank (integrated, light beige background and responsive border) */}
-                <div 
+                <div
                   className="border-t md:border-t-0 md:border-l border-[var(--border-color)]"
-                  style={{ 
+                  style={{
                     flex: 1,
                     padding: '20px',
                     background: 'var(--bg-main)',
@@ -592,13 +594,13 @@ export default function DashboardClient({
                   }}
                 >
                   <div>
-                    <span 
-                      style={{ 
-                        fontSize: '10px', 
-                        fontWeight: 800, 
-                        color: 'var(--brand-accent)', 
-                        letterSpacing: '0.05em', 
-                        display: 'block', 
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        color: 'var(--brand-accent)',
+                        letterSpacing: '0.05em',
+                        display: 'block',
                         marginBottom: '8px',
                         fontFamily: 'Inter, sans-serif'
                       }}
@@ -646,13 +648,13 @@ export default function DashboardClient({
                 }}
               >
                 <div>
-                  <h3 
-                    style={{ 
-                      margin: '0 0 4px 0', 
-                      fontSize: '24px', 
-                      fontWeight: 700, 
-                      color: 'var(--text-primary)', 
-                      fontFamily: "'Playfair Display', Georgia, serif" 
+                  <h3
+                    style={{
+                      margin: '0 0 4px 0',
+                      fontSize: '24px',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      fontFamily: "'Playfair Display', Georgia, serif"
                     }}
                   >
                     System Accuracy
