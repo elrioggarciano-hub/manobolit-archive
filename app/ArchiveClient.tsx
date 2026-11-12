@@ -112,10 +112,8 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               e.preventDefault()
               router.push(`/explore?search=${encodeURIComponent(search)}`)
             }}
+            className="flex flex-col sm:flex-row mx-auto w-full max-w-[640px]"
             style={{
-              display: 'flex',
-              maxWidth: '640px',
-              margin: '0 auto',
               background: '#ffffff',
               borderRadius: '0px',
               padding: '4px',
@@ -123,8 +121,8 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               border: '1px solid #e2e8f0',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', flex: 1, paddingLeft: '16px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <div style={{ display: 'flex', alignItems: 'center', flex: 1, paddingLeft: '14px' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
               <input 
@@ -145,7 +143,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             </div>
             <button
               type="submit"
-              className="btn-anim"
+              className="btn-anim w-full sm:w-auto mt-2 sm:mt-0"
               style={{
                 background: '#8F000D',
                 color: '#ffffff',
@@ -157,6 +155,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                 cursor: 'pointer',
                 letterSpacing: '0.05em',
                 transition: 'background-color 0.2s',
+                whiteSpace: 'nowrap',
               }}
               onMouseEnter={e => e.currentTarget.style.backgroundColor = '#70000a'}
               onMouseLeave={e => e.currentTarget.style.backgroundColor = '#8F000D'}
@@ -214,7 +213,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               background: 'var(--bg-surface)',
               borderRadius: '0px',
               borderTop: '5px solid #8F000D',
-              padding: '40px 32px 36px 32px',
+              padding: '32px 20px 28px',
               boxShadow: '0 20px 40px -15px rgba(143, 0, 13, 0.08), 0 15px 30px -10px rgba(0, 0, 0, 0.05)',
               display: 'flex', 
               flexDirection: 'column',
@@ -253,7 +252,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               background: 'var(--bg-surface)',
               borderRadius: '0px',
               borderTop: '5px solid #f1b80d',
-              padding: '40px 32px 36px 32px', 
+              padding: '32px 20px 28px', 
               boxShadow: '0 20px 40px -15px rgba(241, 184, 13, 0.12), 0 15px 30px -10px rgba(0, 0, 0, 0.05)', 
               display: 'flex', 
               flexDirection: 'column',
@@ -291,7 +290,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
               background: 'var(--bg-surface)',
               borderRadius: '0px',
               borderTop: '5px solid #8F000D',
-              padding: '40px 32px 36px 32px',
+              padding: '32px 20px 28px',
               boxShadow: '0 20px 40px -15px rgba(143, 0, 13, 0.08), 0 15px 30px -10px rgba(0, 0, 0, 0.05)',
               display: 'flex',
               flexDirection: 'column',
@@ -335,21 +334,21 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
                 style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', objectPosition: '50% 10%', display: 'block' }}
               />
             </div>
-            <div style={{
-              position: 'absolute',
-              bottom: '-24px',
-              right: '-24px',
-              background: '#8F000D',
-              color: '#ffffff',
-              padding: '20px 32px',
-              textAlign: 'center',
-              fontFamily: 'Cormorant Garamond, Georgia, serif',
-              borderRadius: '0px',
-              boxShadow: '0 8px 24px rgba(143, 0, 13, 0.2)',
-              zIndex: 5,
-            }}>
+            <div
+              className="absolute -bottom-4 right-2 sm:-bottom-6 sm:-right-6"
+              style={{
+                background: '#8F000D',
+                color: '#ffffff',
+                padding: '16px 24px',
+                textAlign: 'center',
+                fontFamily: 'Cormorant Garamond, Georgia, serif',
+                borderRadius: '0px',
+                boxShadow: '0 8px 24px rgba(143, 0, 13, 0.2)',
+                zIndex: 5,
+              }}
+            >
               <div style={{ fontSize: '10px', letterSpacing: '0.15em', fontWeight: 600, color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>SINCE</div>
-              <div style={{ fontSize: '32px', fontWeight: 700, marginTop: '4px', lineHeight: 1 }}>1985</div>
+              <div style={{ fontSize: '28px', fontWeight: 700, marginTop: '2px', lineHeight: 1 }}>1985</div>
             </div>
             {/* Required CC BY-SA 4.0 attribution */}
             <div style={{ position: 'absolute', bottom: '8px', left: '8px', fontSize: '9px', color: 'rgba(255,255,255,0.75)', textShadow: '0 1px 3px rgba(0,0,0,0.8)', zIndex: 5 }}>
@@ -409,14 +408,14 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
       </section>
 
       {/* 4. EXPERIENCE THE LIVING HERITAGE SECTION */}
-      <section className="scroll-reveal" style={{ padding: '80px 24px', background: 'var(--bg-main)' }}>
+      <section className="scroll-reveal px-4 sm:px-6 py-12 sm:py-20" style={{ background: 'var(--bg-main)' }}>
         <div 
+          className="px-6 py-12 sm:px-10 sm:py-20"
           style={{ 
             maxWidth: '1000px',
             margin: '0 auto',
             background: 'var(--bg-surface)',
             border: '1px solid var(--border-color)',
-            padding: '80px 40px',
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center', 
@@ -425,7 +424,7 @@ export default function ArchiveClient({ entries }: { entries: Entry[] }) {
             borderRadius: '0px'
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '42px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+          <h2 style={{ margin: 0, fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
             {t('section_featured_title')}
           </h2>
           <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif", lineHeight: 1.6, maxWidth: '650px' }}>

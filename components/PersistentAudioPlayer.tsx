@@ -88,7 +88,7 @@ export default function PersistentAudioPlayer() {
             right: isMobile ? '12px' : '24px',
             left: isMobile ? '12px' : 'auto',
             width: isMobile ? 'auto' : '380px',
-            maxHeight: '320px',
+            maxHeight: isMobile ? 'min(320px, 50vh)' : '320px',
             background: 'var(--bg-surface)',
             border: '1px solid var(--border-color)',
             borderTop: '4px solid #8F000D',

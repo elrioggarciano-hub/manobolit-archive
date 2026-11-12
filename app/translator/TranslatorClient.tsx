@@ -274,7 +274,7 @@ export default function TranslatorClient() {
           <h1
             style={{
               margin: '0 0 12px 0',
-              fontSize: '44px',
+              fontSize: 'clamp(28px, 5vw, 44px)',
               fontWeight: 700,
               fontFamily: 'Cormorant Garamond, Georgia, serif',
               lineHeight: 1.1,
@@ -299,10 +299,10 @@ export default function TranslatorClient() {
 
         {/* Translator Engine Panel */}
         <section
+          className="p-4 sm:p-8"
           style={{
             background: '#18181b',
             color: '#e2e8f0',
-            padding: '32px',
             borderRadius: '6px',
             boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4)',
             maxWidth: '900px',
@@ -359,13 +359,12 @@ export default function TranslatorClient() {
 
             <button
               onClick={swapLanguages}
-              className="btn-anim"
+              className="btn-anim my-2 sm:mt-[18px] self-center"
               aria-label={t('translator_swap')}
               title={t('translator_swap')}
               style={{
                 width: '38px',
                 height: '38px',
-                marginTop: '18px',
                 borderRadius: '50%',
                 background: '#27272a',
                 border: '1px solid #3f3f46',

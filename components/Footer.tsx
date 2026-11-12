@@ -12,10 +12,10 @@ export default function Footer() {
 
   return (
     <footer
+      className="px-4 sm:px-6 md:px-8 pt-12 sm:pt-16 pb-28"
       style={{
         background: '#18181b',
         color: '#f8fafc',
-        padding: '64px 24px 100px', // Extra bottom padding so it is not hidden by the floating audio player
         fontFamily: 'Inter, sans-serif',
         borderTop: '1px solid #27272a',
       }}

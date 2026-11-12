@@ -90,7 +90,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
         <h1 
           style={{ 
             margin: '0 0 4px', 
-            fontSize: '40px', 
+            fontSize: 'clamp(26px, 5vw, 40px)', 
             fontWeight: 700, 
             color: 'var(--text-primary)', 
             fontFamily: 'Cormorant Garamond, Georgia, serif',

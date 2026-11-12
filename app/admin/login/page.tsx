@@ -258,7 +258,7 @@ function LoginForm() {
 
         <form
           onSubmit={handleSubmit}
-          className="admin-login-card"
+          className="admin-login-card p-6 sm:p-9"
           onMouseEnter={() => setCardHover(true)}
           onMouseLeave={() => setCardHover(false)}
           style={{
@@ -268,7 +268,6 @@ function LoginForm() {
             background: 'var(--bg-surface)',
             border: '1px solid rgba(143, 0, 13, 0.14)',
             borderRadius: '16px',
-            padding: '40px 32px',
             boxShadow: cardHover
               ? '0 1px 2px rgba(15, 23, 42, 0.05), 0 16px 32px -12px rgba(143, 0, 13, 0.18)'
               : '0 1px 2px rgba(15, 23, 42, 0.04), var(--card-shadow)',

@@ -240,7 +240,7 @@ export default function ReviewQueue() {
       </div>
 
       {/* Main Grid: Entries Queue + Category Taxonomy Sidebar */}
-      <div style={{ display: 'grid', gridTemplateColumns: showDefinitionsSidebar ? '1fr 340px' : '1fr', gap: '24px' }}>
+      <div className={`grid gap-6 ${showDefinitionsSidebar ? 'grid-cols-1 lg:grid-cols-[1fr_340px]' : 'grid-cols-1'}`}>
         {/* Left Column: Entries List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {loading ? (
@@ -309,10 +309,10 @@ export default function ReviewQueue() {
                                 ? '#a855f7'
                                 : '#f59e0b',
                           border: `1px solid ${entry.reviewStatus === 'VERIFIED'
-                              ? '#10b98144'
-                              : entry.reviewStatus === 'UNCERTAIN'
-                                ? '#a855f744'
-                                : '#f59e0b44'
+                            ? '#10b98144'
+                            : entry.reviewStatus === 'UNCERTAIN'
+                              ? '#a855f744'
+                              : '#f59e0b44'
                             }`,
                         }}
                       >
@@ -614,15 +614,12 @@ export default function ReviewQueue() {
         {/* Right Column: Category Taxonomy Sidebar */}
         {showDefinitionsSidebar && (
           <div
+            className="static lg:sticky top-[100px] max-h-none lg:max-h-[calc(100vh-120px)] overflow-y-auto"
             style={{
               background: 'var(--bg-surface)',
               border: '1px solid var(--border-color)',
               borderRadius: '14px',
               padding: '20px',
-              position: 'sticky',
-              top: '100px',
-              maxHeight: 'calc(100vh - 120px)',
-              overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
               gap: '16px',

@@ -169,8 +169,8 @@ export default function EntryForm({ initialData, mode }: Props) {
         field === 'bisayaTranslation'
           ? 'Please enter Manobo original text or English translation first before auto-translating to Bisaya.'
           : field === 'translation'
-          ? 'Please enter Manobo transcription or Bisaya text first before auto-translating to English.'
-          : `Please fill the source text before auto-translating to ${field}.`
+            ? 'Please enter Manobo transcription or Bisaya text first before auto-translating to English.'
+            : `Please fill the source text before auto-translating to ${field}.`
       raiseError(msg)
       return
     }
@@ -192,8 +192,8 @@ export default function EntryForm({ initialData, mode }: Props) {
           field === 'bisayaTranslation'
             ? 'Bisaya (Cebuano)'
             : field === 'translation'
-            ? 'English'
-            : 'Agusan Manobo'
+              ? 'English'
+              : 'Agusan Manobo'
         setTranslationNotice(
           `✓ Auto-translated to ${targetLabel} using ManoboLit Reference Lexicon (Confidence: ${Math.round(
             data.result.confidence * 100
@@ -604,7 +604,7 @@ export default function EntryForm({ initialData, mode }: Props) {
       )}
 
       {/* Submit */}
-      <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '8px' }}>
+      <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '8px', flexWrap: 'wrap' }}>
         <button type="button" onClick={() => router.back()} className="btn-anim"
           style={{ padding: '10px 24px', background: 'transparent', border: '1px solid var(--border-hover)', borderRadius: '8px', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '14px' }}>
           Cancel

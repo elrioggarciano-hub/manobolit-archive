@@ -223,7 +223,7 @@ export default function DashboardClient({
               <h1
                 style={{
                   margin: '0 0 16px 0',
-                  fontSize: '44px',
+                  fontSize: 'clamp(28px, 5vw, 44px)',
                   fontWeight: 700,
                   fontFamily: "'Playfair Display', Georgia, serif",
                   lineHeight: 1.1,
@@ -579,13 +579,13 @@ export default function DashboardClient({
                   </div>
                 </div>
 
-                {/* Right Part: Municipality Rank (integrated, light beige background and left border) */}
+                {/* Right Part: Municipality Rank (integrated, light beige background and responsive border) */}
                 <div 
+                  className="border-t md:border-t-0 md:border-l border-[var(--border-color)]"
                   style={{ 
                     flex: 1,
                     padding: '20px',
                     background: 'var(--bg-main)',
-                    borderLeft: '1px solid var(--border-color)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between'

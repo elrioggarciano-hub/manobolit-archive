@@ -31,27 +31,30 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
   const router = useRouter()
   const searchParams = useSearchParams()
   const { t } = useLanguage()
-  
+
   const { playTrack, currentTrack, isPlaying, togglePlay } = useAudio()
   const { showToast } = useToast()
 
   // Active category button (GENRES, KEYWORDS, THEMES, LOCATIONS)
   const [activeCategory, setActiveCategory] = useState<'GENRES' | 'KEYWORDS' | 'THEMES' | 'LOCATIONS'>('GENRES')
-  
+
   // Interactive genre filters — start unchecked so "Apply Filters" only narrows
   // results the user actually selected, never a filter they never touched.
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
   const [selectedThemes, setSelectedThemes] = useState<string[]>([])
   const [selectedLocations, setSelectedLocations] = useState<string[]>([])
-  
+
   // Applied filters (empty on load so all items are shown by default)
   const [appliedGenres, setAppliedGenres] = useState<string[]>([])
   const [appliedThemes, setAppliedThemes] = useState<string[]>([])
   const [appliedLocations, setAppliedLocations] = useState<string[]>([])
-  
+
+  // Mobile filter collapse toggle
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
+
   // Local page state
   const [page, setPage] = useState(1)
-  
+
   // Sync page state with search input
   const search = searchParams.get('search') || ''
   const [searchInput, setSearchInput] = useState(search)
@@ -223,7 +226,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
       // 3. Theme filter with partial includes support
       if (appliedThemes.length > 0) {
-        const matchTheme = appliedThemes.some(t => 
+        const matchTheme = appliedThemes.some(t =>
           entry.themes.some(et => {
             const etNorm = et.toUpperCase()
             const tNorm = t.toUpperCase()
@@ -344,17 +347,46 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <div className="w-full px-6 md:px-8 py-6 pb-28 lg:pb-6 lg:h-[calc(100vh-64px-75px)] lg:overflow-hidden">
         <div className="flex flex-col lg:flex-row gap-8 h-full">
-          
+
+          {/* MOBILE FILTER TOGGLE BUTTON (< lg) */}
+          <div className="block lg:hidden w-full">
+            <button
+              type="button"
+              onClick={() => setIsMobileFiltersOpen(prev => !prev)}
+              className="w-full flex items-center justify-between py-2.5 px-4 font-bold text-xs btn-anim"
+              style={{
+                background: isMobileFiltersOpen ? 'var(--primary-red, #8F000D)' : 'var(--bg-surface)',
+                color: isMobileFiltersOpen ? '#ffffff' : 'var(--brand-accent)',
+                border: '1px solid var(--border-color)',
+                borderLeft: '4px solid #8F000D',
+                borderRadius: '0px',
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                <span>{isMobileFiltersOpen ? 'Hide Filters & Categories' : 'Show Filters & Categories'}</span>
+                {(appliedGenres.length + appliedThemes.length + appliedLocations.length) > 0 && (
+                  <span className="bg-[#fee2e2] text-[#8F000D] px-2 py-0.5 rounded text-[10px] font-extrabold ml-1">
+                    {appliedGenres.length + appliedThemes.length + appliedLocations.length} active
+                  </span>
+                )}
+              </div>
+              <span>{isMobileFiltersOpen ? '▲' : '▼'}</span>
+            </button>
+          </div>
+
           {/* LEFT SIDEBAR: FILTERS */}
-          <aside className="w-full lg:w-64 flex-shrink-0 lg:h-full lg:overflow-y-auto pr-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <aside className={`w-full lg:w-64 flex-shrink-0 lg:h-full lg:overflow-y-auto pr-2 ${isMobileFiltersOpen ? 'block' : 'hidden lg:block'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
             <div className="border-b border-[var(--border-color)] pb-2 mb-4">
-              <h2 
-                style={{ 
+              <h2
+                style={{
                   margin: 0,
-                  fontSize: '28px', 
-                  fontWeight: 700, 
-                  color: 'var(--brand-accent)', 
-                  fontFamily: 'Cormorant Garamond, Georgia, serif' 
+                  fontSize: '28px',
+                  fontWeight: 700,
+                  color: 'var(--brand-accent)',
+                  fontFamily: 'Cormorant Garamond, Georgia, serif'
                 }}
               >
                 Archive Filters
@@ -623,7 +655,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
           {/* RIGHT MAIN CONTENT AREA */}
           <main className="flex-1 lg:h-full lg:overflow-y-auto pr-2">
-            
+
             {/* Provenance Banner */}
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#8F000D] mb-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -638,7 +670,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               <h1
                 style={{
                   margin: 0,
-                  fontSize: '44px',
+                  fontSize: 'clamp(28px, 5vw, 44px)',
                   fontWeight: 700,
                   fontFamily: 'Cormorant Garamond, Georgia, serif',
                   lineHeight: 1.1,
@@ -686,7 +718,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
             </div>
 
             {/* CARDS GRID */}
-            <div key={page} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div key={page} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
               {paginatedEntries.map((entry, index) => {
                 const isFeatured = index === 0 && page === 1
                 const isFolkSong = entry.type === 'FOLK_SONG'
@@ -697,7 +729,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
                   return (
                     <div
                       key={entry.id}
-                      className="col-span-1 md:col-span-2 bg-[var(--bg-surface)] flex flex-col sm:flex-row justify-between shadow-sm stagger-item card-hover"
+                      className="col-span-1 sm:col-span-2 bg-[var(--bg-surface)] flex flex-col sm:flex-row justify-between shadow-sm stagger-item card-hover"
                       style={{
                         borderTop: '4px solid #8F000D',
                         borderLeft: '1px solid #8F000D',
@@ -723,11 +755,11 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                           {/* Title */}
                           <Link href={getEntryHref(entry.id)} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
-                            <h3 
-                              style={{ 
+                            <h3
+                              style={{
                                 margin: 0,
-                                fontSize: '28px', 
-                                fontWeight: 700, 
+                                fontSize: '28px',
+                                fontWeight: 700,
                                 color: 'inherit',
                                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                                 lineHeight: 1.15,
@@ -741,8 +773,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                           {/* Subtitle */}
                           {entry.manoboTitle && (
-                            <p 
-                              style={{ 
+                            <p
+                              style={{
                                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                                 fontStyle: 'italic',
                                 color: 'var(--brand-accent)',
@@ -850,11 +882,11 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                       {/* Title */}
                       <Link href={getEntryHref(entry.id)} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
-                        <h3 
-                          style={{ 
+                        <h3
+                          style={{
                             margin: 0,
-                            fontSize: '22px', 
-                            fontWeight: 700, 
+                            fontSize: '22px',
+                            fontWeight: 700,
                             color: 'inherit',
                             fontFamily: 'Cormorant Garamond, Georgia, serif',
                             lineHeight: 1.2,
@@ -868,8 +900,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
                       {/* Subtitle */}
                       {entry.manoboTitle && (
-                        <p 
-                          style={{ 
+                        <p
+                          style={{
                             fontFamily: 'Cormorant Garamond, Georgia, serif',
                             fontStyle: 'italic',
                             color: 'var(--brand-accent)',
@@ -910,7 +942,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
             {/* PAGINATION */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2">
+              <div className="flex justify-center items-center gap-2 flex-wrap">
                 {/* Prev page button */}
                 <button
                   onClick={() => handlePageChange(Math.max(1, page - 1))}

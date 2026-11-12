@@ -62,7 +62,7 @@ export default function Header() {
         fontFamily: 'Inter, sans-serif',
       }}
     >
-      <div className="w-full px-6 md:px-8">
+      <div className="w-full px-4 sm:px-6 md:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
@@ -70,7 +70,7 @@ export default function Header() {
               margin: 0,
               color: 'var(--brand-accent)',
               fontFamily: 'Cormorant Garamond, Georgia, serif',
-              fontSize: '34px',
+              fontSize: 'clamp(20px, 4.5vw, 34px)',
               fontWeight: 700,
               letterSpacing: '-0.02em',
               lineHeight: 1.1
@@ -192,6 +192,35 @@ export default function Header() {
             borderTop: '1px solid var(--header-border)',
           }}
         >
+          {/* Mobile Search Box */}
+          {pathname !== '/' && (
+            <div className="relative mb-4 stagger-item">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-slate-400">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                placeholder={t('search_placeholder')}
+                className="w-full pl-9 pr-4 py-2 text-xs border border-[var(--border-color)] placeholder-slate-500 focus:outline-none input-anim"
+                style={{
+                  borderRadius: '6px',
+                  height: '38px',
+                  background: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setIsMobileMenuOpen(false)
+                    router.push(`/explore?search=${encodeURIComponent(e.currentTarget.value)}`)
+                  }
+                }}
+              />
+            </div>
+          )}
+
           <div className="flex items-center justify-between mb-4 stagger-item">
             <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
               {t('appearance')}

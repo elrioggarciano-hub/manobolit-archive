@@ -152,7 +152,7 @@ export default function AboutClient() {
             <div style={{
               background: '#1A1A1A',
               color: '#ffffff',
-              padding: '40px 39px 40px 61px',
+              padding: isMobile ? '28px 20px' : '40px 39px 40px 61px',
               borderRadius: '0px',
               borderTop: '4px solid #B22222',
             }}>
@@ -219,7 +219,7 @@ export default function AboutClient() {
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: '0',
             border: '1px solid var(--border-color)',
           }}>

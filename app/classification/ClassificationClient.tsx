@@ -46,8 +46,8 @@ const fallbackEntries: DBEntry[] = [
     translation: "The stars were born from the breath of the\nFather Sky. According to the elders, the Sky\nFather wanted to give light to his children.\n\nIn those ancient times, there were no stars in\nthe heavens. The surface of the earth was\nstill in deep darkness. Then Father Sky said,\n\"We shall give birth to the stars.\"",
     bisayaTranslation: "Ang mga bituon natawo gikan sa ginhawa sa Amahang Langit. Sumala sa mga katigulangan, ang Amahang Langit buot mohatag og kahayag sa iyang mga anak.",
     genre: "MYTH",
-    themes: ["COSMOGONY","ORIGINS"],
-    culturalElements: ["Stars","Cosmogony","Origins","Myth"]
+    themes: ["COSMOGONY", "ORIGINS"],
+    culturalElements: ["Stars", "Cosmogony", "Origins", "Myth"]
   },
   {
     id: "fb-buried",
@@ -60,8 +60,8 @@ const fallbackEntries: DBEntry[] = [
     translation: "What Was Buried Has Surfaced Again",
     bisayaTranslation: "Ang nalubong sa tubig maoy mikawas pag-usab. Tan-awa didto sa lawod, kauban ang mga balod sa akong tribo nga dinaog-daog sa daghang katuigan. Nalubong sa kamingaw, dili makatindog kay walay kapasilongan.",
     genre: "SONG",
-    themes: ["NATURE_AND_ENVIRONMENT","HEROIC_DEEDS"],
-    culturalElements: ["Tribal Recognition","Cultural Identity","Resilience","Manobo Folk Song"]
+    themes: ["NATURE_AND_ENVIRONMENT", "HEROIC_DEEDS"],
+    culturalElements: ["Tribal Recognition", "Cultural Identity", "Resilience", "Manobo Folk Song"]
   },
   {
     id: "fb-hardship",
@@ -74,8 +74,8 @@ const fallbackEntries: DBEntry[] = [
     translation: "How hardship my situation is, For the mountains are my home. I weep when I remember my mother. But, because of these neighbors, For they have scorned me. I sometimes cry when I recall your disdain. Oh, farewell to all of you, For I am about to leave. I will look out the window, Leaves of the misitas, Full of tears. Here I am, far away, Facing the great waves. I sometimes cry when I remember your disdain. I sometimes cry when I think of my mother.",
     bisayaTranslation: "Kalisod sa akong kahimtang, ang bukid maoy akong gipuy-an. Muhilak ko usahay kon mahinumdom ko sa akong inahan, ilabina sa mga silingan kay ako ilang gitamay. Muhilak ko kon mahinumdoman nako ang ilang pagtamay.",
     genre: "SONG",
-    themes: ["SOCIAL_CUSTOMS","DEATH_AND_AFTERLIFE"],
-    culturalElements: ["Family Life","Social Isolation","Grief and Loss","Manobo Folk Song"]
+    themes: ["SOCIAL_CUSTOMS", "DEATH_AND_AFTERLIFE"],
+    culturalElements: ["Family Life", "Social Isolation", "Grief and Loss", "Manobo Folk Song"]
   }
 ]
 
@@ -101,7 +101,7 @@ function getConfidenceTier(pct: number): { tier: ConfidenceTier; color: string; 
 
 export default function ClassificationClient({ dbEntries = [] }: ClassificationClientProps) {
   const router = useRouter()
-  
+
   const entriesList = dbEntries.length > 0 ? dbEntries : fallbackEntries
   const initialEntry = entriesList.find(e => e.title.includes("Creation of the Stars")) || entriesList[0]
 
@@ -254,15 +254,15 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   return (
     <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <div className="w-full px-6 md:px-8 py-8">
-        
+
         {/* Top Header Section (Full Width, matches sidebar left edge) */}
         <div style={{ marginBottom: '32px' }}>
           {/* Header Path */}
-          <div 
-            style={{ 
-              fontSize: '11px', 
-              fontWeight: 700, 
-              color: 'var(--brand-accent)', 
+          <div
+            style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              color: 'var(--brand-accent)',
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               marginBottom: '8px'
@@ -272,11 +272,11 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
           </div>
 
           {/* Page Title */}
-          <h1 
-            style={{ 
+          <h1
+            style={{
               margin: '0 0 16px 0',
-              fontSize: '44px', 
-              fontWeight: 700, 
+              fontSize: 'clamp(28px, 5vw, 44px)',
+              fontWeight: 700,
               fontFamily: 'Cormorant Garamond, Georgia, serif',
               lineHeight: 1.1,
               color: 'var(--text-primary)'
@@ -285,7 +285,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
             {t('classification_rules_heading')}
           </h1>
 
-          <p 
+          <p
             style={{
               fontSize: '14px',
               color: 'var(--text-secondary)',
@@ -303,31 +303,31 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
         <div className="flex flex-col lg:flex-row gap-8">
           {/* RIGHT MAIN PANEL */}
           <main className="flex-1 pb-24">
-            
+
             {/* Pink Divider Indicator */}
-            <div 
-              style={{ 
-                width: '32px', 
-                height: '4px', 
-                background: '#db2777', 
+            <div
+              style={{
+                width: '32px',
+                height: '4px',
+                background: '#db2777',
                 margin: '0 auto 24px auto'
-              }} 
+              }}
             />
 
             {/* SECTION 1: EUGENIO TAXONOMY */}
             <section style={{ marginBottom: '60px', textAlign: 'center' }}>
-              <h2 
-                style={{ 
+              <h2
+                style={{
                   margin: '0 0 12px 0',
-                  fontSize: '32px', 
-                  fontWeight: 700, 
+                  fontSize: '32px',
+                  fontWeight: 700,
                   fontFamily: 'Cormorant Garamond, Georgia, serif',
                   color: 'var(--text-primary)'
                 }}
               >
                 Eugenio (1993) Taxonomy
               </h2>
-              <p 
+              <p
                 style={{
                   fontSize: '13px',
                   color: 'var(--text-secondary)',
@@ -340,7 +340,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               </p>
 
               {/* Grid of Eugenio Cards */}
-              <div 
+              <div
                 className="grid grid-cols-1 md:grid-cols-2 gap-6"
                 style={{
                   textAlign: 'left',
@@ -367,7 +367,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     <div>
                       {/* Header Row */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                        <h3 
+                        <h3
                           style={{
                             margin: 0,
                             fontSize: '22px',
@@ -378,7 +378,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         >
                           {card.title}
                         </h3>
-                        <span 
+                        <span
                           style={{
                             background: '#18181b',
                             color: '#ffffff',
@@ -392,9 +392,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           {card.id}
                         </span>
                       </div>
-                      
+
                       {/* Description */}
-                      <p 
+                      <p
                         style={{
                           margin: '0 0 16px 0',
                           fontSize: '13px',
@@ -411,7 +411,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     {/* Tag Badges */}
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       {card.tags.map(tag => (
-                        <span 
+                        <span
                           key={tag}
                           style={{
                             background: '#fee2e2',
@@ -434,15 +434,15 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
             {/* SECTION 2: ANDRESS THEMATIC GRID */}
             <section style={{ marginBottom: '60px' }}>
-              
+
               {/* Header with Horizontal Lines */}
               <div style={{ display: 'flex', alignItems: 'center', margin: '0 0 12px 0' }}>
                 <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
-                <h2 
-                  style={{ 
+                <h2
+                  style={{
                     margin: '0 24px',
-                    fontSize: '32px', 
-                    fontWeight: 700, 
+                    fontSize: '32px',
+                    fontWeight: 700,
                     fontFamily: 'Cormorant Garamond, Georgia, serif',
                     color: 'var(--text-primary)',
                     textAlign: 'center'
@@ -466,7 +466,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               </p>
 
               {/* Grid of Andress Cards */}
-              <div 
+              <div
                 className="grid grid-cols-1 md:grid-cols-3 gap-6"
               >
                 {andressCards.map(card => (
@@ -482,7 +482,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)'
                     }}
                   >
-                    <h3 
+                    <h3
                       style={{
                         margin: '0 0 8px 0',
                         fontSize: '14px',
@@ -493,7 +493,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     >
                       {card.num}: {card.title}
                     </h3>
-                    <p 
+                    <p
                       style={{
                         margin: 0,
                         fontSize: '12px',
@@ -510,10 +510,10 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
 
             {/* SECTION 3: CLASSIFICATION ENGINE & ALGORITHMIC ARCHITECTURE */}
             <section
+              className="p-5 sm:p-8 md:p-10"
               style={{
                 background: '#18181b',
                 color: '#e2e8f0',
-                padding: '40px',
                 borderRadius: '0px',
                 marginBottom: '60px',
                 boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
@@ -525,7 +525,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     <span style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                       Hybrid ML & Rule-Based Classification
                     </span>
-                    <span 
+                    <span
                       onClick={() => setIsDefenseMode(prev => !prev)}
                       style={{ fontSize: '9px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, cursor: 'pointer', userSelect: 'none' }}
                       title="Matalinong Pag-uuri gamit ang Machine Learning at Domain Rules"
@@ -533,11 +533,11 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       Matalinong Pag-uuri (Hybrid ML)
                     </span>
                   </div>
-                  <h2 
-                    style={{ 
+                  <h2
+                    style={{
                       margin: '0 0 10px 0',
-                      fontSize: '32px', 
-                      fontWeight: 700, 
+                      fontSize: '32px',
+                      fontWeight: 700,
                       fontFamily: 'Cormorant Garamond, Georgia, serif',
                       color: '#ffffff'
                     }}
@@ -588,7 +588,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               </p>
 
               {/* Diagram Flow Container */}
-              <div 
+              <div
                 style={{
                   display: 'flex',
                   flexDirection: 'row',
@@ -603,7 +603,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 }}
               >
                 {/* 1. Raw Input Block */}
-                <div 
+                <div
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -614,15 +614,15 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   }}
                 >
                   {/* Gold Document Icon */}
-                  <div 
-                    style={{ 
-                      width: '56px', 
-                      height: '56px', 
-                      background: '#2a2a30', 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                  <div
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      background: '#2a2a30',
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
-                      borderRadius: '10px' 
+                      borderRadius: '10px'
                     }}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1b80d" strokeWidth="2.5">
@@ -633,7 +633,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       <polyline points="10 9 9 9 8 9" />
                     </svg>
                   </div>
-                  
+
                   <div>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', marginBottom: '2px' }}>Hakbang 1: Pagpili ng Akda</div>
                     <div style={{ fontSize: '9px', color: '#71717a', fontWeight: 800, letterSpacing: '0.05em' }}>PUMILI NG KWENTO O AWIT</div>
@@ -675,7 +675,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       {entriesList.some(e => e.genre === 'CHANT') && <option value="CHANT">Ritwal / Chant</option>}
                     </select>
                   </div>
-                  
+
                   {/* Select Narrative Entry Dropdown */}
                   <div style={{ width: '100%', maxWidth: '220px', textAlign: 'left' }}>
                     <label style={{ fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
@@ -823,12 +823,13 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 </div>
 
                 {/* Arrow */}
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#3f3f46', fontSize: '22px' }}>
-                  →
+                <div className="flex justify-center items-center text-[#3f3f46] text-xl my-2 md:my-0">
+                  <span className="hidden md:inline">→</span>
+                  <span className="inline md:hidden">↓</span>
                 </div>
 
                 {/* 2. Rule Matcher Block */}
-                <div 
+                <div
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -839,15 +840,15 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   }}
                 >
                   {/* Red Rule Chart Icon */}
-                  <div 
-                    style={{ 
-                      width: '56px', 
-                      height: '56px', 
-                      background: '#361416', 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                  <div
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      background: '#361416',
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
-                      borderRadius: '10px' 
+                      borderRadius: '10px'
                     }}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
@@ -948,12 +949,13 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                 </div>
 
                 {/* Arrow */}
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#3f3f46', fontSize: '22px' }}>
-                  →
+                <div className="flex justify-center items-center text-[#3f3f46] text-xl my-2 md:my-0">
+                  <span className="hidden md:inline">→</span>
+                  <span className="inline md:hidden">↓</span>
                 </div>
 
                 {/* 3. Identified Result Panel */}
-                <div 
+                <div
                   style={{
                     flex: '1.2 1 240px',
                     display: 'flex',
@@ -1542,6 +1544,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
           onClick={() => setShowBenchmarkModal(false)}
         >
           <div
+            className="p-4 sm:p-8"
             style={{
               background: '#18181b',
               border: '1px solid #3f3f46',
@@ -1550,7 +1553,6 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
               maxWidth: '840px',
               maxHeight: '90vh',
               overflowY: 'auto',
-              padding: '32px',
               color: '#e2e8f0',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
             }}
