@@ -1,0 +1,110 @@
+=== D2 LEAVE-ONE-OUT CROSS-VALIDATION (LOOCV) ===
+Evaluating N=22 entries with fold-specific training corpora (leakage excluded).
+
+=== D2 OVERALL LOOCV METRICS SUMMARY ===
+Mode			Accuracy	Macro Precision	Macro Recall	Macro F1
+-----------------------------------------------------------------------------------------
+RULE_BASED          	1.000		1.000		1.000		1.000
+TF_IDF_VSM          	1.000		1.000		1.000		1.000
+NAIVE_BAYES_ML      	0.682		0.569		0.619		0.560
+NEURAL_SEMANTIC     	0.364		0.385		0.381		0.359
+HYBRID_ENSEMBLE     	0.818		0.639		0.750		0.679
+
+=== D2 DETAILED PER-CLASS BREAKDOWN & CONFUSION MATRICES ===
+
+--- MODE: RULE_BASED ---
+Accuracy: 100.0% | Macro P: 1.000 | Macro R: 1.000 | Macro F1: 1.000
+
+Per-class Metrics:
+Class		Precision	Recall		F1		Support
+FOLKTALE    	1.000		1.000		1.000		4
+PROVERB     	1.000		1.000		1.000		5
+RIDDLE      	1.000		1.000		1.000		8
+SONG        	1.000		1.000		1.000		5
+
+Confusion Matrix (Rows = Actual, Columns = Predicted):
+Actual \ Pred	FOLKTALE	PROVERB 	RIDDLE  	SONG    
+FOLKTALE    	4       	0       	0       	0       
+PROVERB     	0       	5       	0       	0       
+RIDDLE      	0       	0       	8       	0       
+SONG        	0       	0       	0       	5       
+
+------------------------------------------------------------
+
+--- MODE: TF_IDF_VSM ---
+Accuracy: 100.0% | Macro P: 1.000 | Macro R: 1.000 | Macro F1: 1.000
+
+Per-class Metrics:
+Class		Precision	Recall		F1		Support
+FOLKTALE    	1.000		1.000		1.000		4
+PROVERB     	1.000		1.000		1.000		5
+RIDDLE      	1.000		1.000		1.000		8
+SONG        	1.000		1.000		1.000		5
+
+Confusion Matrix (Rows = Actual, Columns = Predicted):
+Actual \ Pred	FOLKTALE	PROVERB 	RIDDLE  	SONG    
+FOLKTALE    	4       	0       	0       	0       
+PROVERB     	0       	5       	0       	0       
+RIDDLE      	0       	0       	8       	0       
+SONG        	0       	0       	0       	5       
+
+------------------------------------------------------------
+
+--- MODE: NAIVE_BAYES_ML ---
+Accuracy: 68.2% | Macro P: 0.569 | Macro R: 0.619 | Macro F1: 0.560
+
+Per-class Metrics:
+Class		Precision	Recall		F1		Support
+FOLKTALE    	0.000		0.000		0.000		4
+PROVERB     	1.000		0.600		0.750		5
+RIDDLE      	0.778		0.875		0.824		8
+SONG        	0.500		1.000		0.667		5
+
+Confusion Matrix (Rows = Actual, Columns = Predicted):
+Actual \ Pred	FOLKTALE	PROVERB 	RIDDLE  	SONG    
+FOLKTALE    	0       	0       	0       	4       
+PROVERB     	0       	3       	2       	0       
+RIDDLE      	0       	0       	7       	1       
+SONG        	0       	0       	0       	5       
+
+------------------------------------------------------------
+
+--- MODE: NEURAL_SEMANTIC ---
+Accuracy: 36.4% | Macro P: 0.385 | Macro R: 0.381 | Macro F1: 0.359
+
+Per-class Metrics:
+Class		Precision	Recall		F1		Support
+CHANT       	0.000		0.000		0.000		0
+FOLKTALE    	0.000		0.000		0.000		4
+LEGEND      	0.000		0.000		0.000		0
+PROVERB     	0.667		0.400		0.500		5
+RIDDLE      	0.250		0.125		0.167		8
+SONG        	0.625		1.000		0.769		5
+
+Confusion Matrix (Rows = Actual, Columns = Predicted):
+Actual \ Pred	CHANT   	FOLKTALE	LEGEND  	PROVERB 	RIDDLE  	SONG    
+CHANT       	0       	0       	0       	0       	0       	0       
+FOLKTALE    	0       	0       	0       	0       	2       	2       
+LEGEND      	0       	0       	0       	0       	0       	0       
+PROVERB     	0       	2       	0       	2       	1       	0       
+RIDDLE      	1       	2       	2       	1       	1       	1       
+SONG        	0       	0       	0       	0       	0       	5       
+
+------------------------------------------------------------
+
+--- MODE: HYBRID_ENSEMBLE ---
+Accuracy: 81.8% | Macro P: 0.639 | Macro R: 0.750 | Macro F1: 0.679
+
+Per-class Metrics:
+Class		Precision	Recall		F1		Support
+FOLKTALE    	0.000		0.000		0.000		4
+PROVERB     	1.000		1.000		1.000		5
+RIDDLE      	1.000		1.000		1.000		8
+SONG        	0.556		1.000		0.714		5
+
+Confusion Matrix (Rows = Actual, Columns = Predicted):
+Actual \ Pred	FOLKTALE	PROVERB 	RIDDLE  	SONG    
+FOLKTALE    	0       	0       	0       	4       
+PROVERB     	0       	5       	0       	0       
+RIDDLE      	0       	0       	8       	0       
+SONG        	0       	0       	0       	5       
