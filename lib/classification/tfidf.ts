@@ -167,7 +167,7 @@ export function textToTFIDFVector(text: string): {
 // Pre-Compute Centroid Vectors for each Genre and Theme
 // -----------------------------------------------------------------------------
 
-interface ClassCentroid {
+export interface ClassCentroid {
   key: string
   category: string
   type: 'GENRE' | 'THEME'
@@ -175,7 +175,11 @@ interface ClassCentroid {
   magnitude: number
 }
 
-const CLASS_CENTROIDS: ClassCentroid[] = Object.entries(CLASS_CORPUS).map(([docKey, tokens]) => {
+export interface TfidfModel {
+  centroids: ClassCentroid[]
+}
+
+export const CLASS_CENTROIDS: ClassCentroid[] = Object.entries(CLASS_CORPUS).map(([docKey, tokens]) => {
   const docText = tokens.join(' ')
   const { vector, magnitude } = textToTFIDFVector(docText)
   const isGenre = docKey.startsWith('GENRE_')
@@ -189,6 +193,10 @@ const CLASS_CENTROIDS: ClassCentroid[] = Object.entries(CLASS_CORPUS).map(([docK
     magnitude,
   }
 })
+
+export const DEFAULT_TFIDF_MODEL: TfidfModel = {
+  centroids: CLASS_CENTROIDS,
+}
 
 /**
  * Computes Cosine Similarity between document vector and class centroid vector.
@@ -238,14 +246,16 @@ export function computeCosineSimilarity(
  */
 export function classifyWithVSM(
   text: string,
-  targetGenreFilter: string = 'ALL'
+  targetGenreFilter: string = 'ALL',
+  model: TfidfModel = DEFAULT_TFIDF_MODEL
 ): VSMResult {
   const { vector: docVec, magnitude: docMag, features } = textToTFIDFVector(text)
 
   const genreScores: VSMScore[] = []
   const themeScores: VSMScore[] = []
+  const centroids = model?.centroids || CLASS_CENTROIDS
 
-  for (const centroid of CLASS_CENTROIDS) {
+  for (const centroid of centroids) {
     if (centroid.type === 'GENRE') {
       if (targetGenreFilter !== 'ALL' && centroid.category !== targetGenreFilter) {
         continue

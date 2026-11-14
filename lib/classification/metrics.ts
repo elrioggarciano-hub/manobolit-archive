@@ -1,5 +1,5 @@
 import { classifyEntry } from './engine'
-import { AlgorithmMode } from './hybrid'
+import { AlgorithmMode, InjectableModels } from './hybrid'
 
 export interface AccuracyMetrics {
   accuracy: number
@@ -32,7 +32,8 @@ export interface ScorableEntry {
  */
 export function computeAccuracyMetrics(
   entries: ScorableEntry[],
-  algorithmMode: AlgorithmMode = 'HYBRID_ENSEMBLE'
+  algorithmMode: AlgorithmMode = 'HYBRID_ENSEMBLE',
+  models?: InjectableModels
 ): AccuracyMetrics {
   if (entries.length === 0) {
     return { accuracy: 0, precision: 0, recall: 0, f1: 0, sampleSize: 0 }
@@ -46,7 +47,7 @@ export function computeAccuracyMetrics(
 
   for (const entry of entries) {
     const textToClassify = [entry.title, entry.content, entry.translation].filter(Boolean).join(' ')
-    const result = classifyEntry(textToClassify, entry.transcription || '', 'ALL', algorithmMode)
+    const result = classifyEntry(textToClassify, entry.transcription || '', 'ALL', algorithmMode, models)
     const predicted = result.genre.value
     const actual = entry.genre
 
@@ -82,12 +83,15 @@ export function computeAccuracyMetrics(
  * Runs a rigorous comparative benchmark across all 5 models:
  * Rule-Based vs TF-IDF VSM vs Naive Bayes ML vs Neural Semantic vs Hybrid Ensemble.
  */
-export function computeComparativeMetrics(entries: ScorableEntry[]): ModelComparisonReport {
-  const ruleBased = computeAccuracyMetrics(entries, 'RULE_BASED')
-  const tfidfVsm = computeAccuracyMetrics(entries, 'TF_IDF_VSM')
-  const naiveBayes = computeAccuracyMetrics(entries, 'NAIVE_BAYES_ML')
-  const neuralSemantic = computeAccuracyMetrics(entries, 'NEURAL_SEMANTIC')
-  const hybridEnsemble = computeAccuracyMetrics(entries, 'HYBRID_ENSEMBLE')
+export function computeComparativeMetrics(
+  entries: ScorableEntry[],
+  models?: InjectableModels
+): ModelComparisonReport {
+  const ruleBased = computeAccuracyMetrics(entries, 'RULE_BASED', models)
+  const tfidfVsm = computeAccuracyMetrics(entries, 'TF_IDF_VSM', models)
+  const naiveBayes = computeAccuracyMetrics(entries, 'NAIVE_BAYES_ML', models)
+  const neuralSemantic = computeAccuracyMetrics(entries, 'NEURAL_SEMANTIC', models)
+  const hybridEnsemble = computeAccuracyMetrics(entries, 'HYBRID_ENSEMBLE', models)
 
   let winner: AlgorithmMode = 'HYBRID_ENSEMBLE'
   if (naiveBayes.f1 > hybridEnsemble.f1) {

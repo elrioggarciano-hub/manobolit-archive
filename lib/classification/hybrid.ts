@@ -5,13 +5,19 @@
 // 4. Dialect-Aware Computational Ethnolinguistics: Levenshtein + Dice Orthographic Matching
 // 5. Domain Ontological Expert System: Eugenio (1993) & Andress (1985) Taxonomies
 
-import { classifyWithVSM, VSMResult, FeatureWeight } from './tfidf'
+import { classifyWithVSM, VSMResult, FeatureWeight, TfidfModel } from './tfidf'
 import { findOrthographicDialectMatches, FuzzyMatchResult } from './fuzzy'
 import { tokenizeUnigrams } from './tokenizer'
 import { genreRules, themeRules, locationRules, ClassificationRule } from './rules'
 import { MatchedTerm, RuleDetail } from './engine'
-import { predictNaiveBayes, NaiveBayesPrediction } from './naiveBayes'
+import { predictNaiveBayes, NaiveBayesPrediction, NaiveBayesModel } from './naiveBayes'
 import { classifyWithNeuralSemantic, NeuralSemanticResult } from './neuralSemantic'
+
+export interface InjectableModels {
+  nb?: NaiveBayesModel
+  tfidf?: TfidfModel
+  charNgram?: any
+}
 
 export type AlgorithmMode =
   | 'HYBRID_ENSEMBLE'
@@ -120,19 +126,20 @@ function scoreRule(rule: ClassificationRule, normalizedText: string): RuleDetail
 export function classifyHybrid(
   fullText: string,
   targetGenreFilter: string = 'ALL',
-  algorithmMode: AlgorithmMode = 'HYBRID_ENSEMBLE'
+  algorithmMode: AlgorithmMode = 'HYBRID_ENSEMBLE',
+  models?: InjectableModels
 ): HybridClassificationResult {
   const normText = fullText.toLowerCase()
   const unigrams = tokenizeUnigrams(normText, false)
 
   // 1. Run Supervised Machine Learning: Multinomial Naive Bayes
-  const nbResult = predictNaiveBayes(normText, targetGenreFilter)
+  const nbResult = predictNaiveBayes(normText, targetGenreFilter, models?.nb)
 
   // 2. Run Deep Learning Neural Semantic Projection (64-D Latent Space)
   const neuralResult = classifyWithNeuralSemantic(normText, targetGenreFilter)
 
   // 3. Run Statistical Information Retrieval: TF-IDF Vector Space Model
-  const vsmResult = classifyWithVSM(normText, targetGenreFilter)
+  const vsmResult = classifyWithVSM(normText, targetGenreFilter, models?.tfidf)
 
   // 4. Run Dialect-Aware Fuzzy Orthographic Matcher (Levenshtein + Dice)
   const fuzzyMatches = findOrthographicDialectMatches(unigrams, 0.78)

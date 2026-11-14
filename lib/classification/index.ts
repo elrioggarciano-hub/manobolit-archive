@@ -5,7 +5,7 @@ export { genreRules, themeRules, locationRules } from './rules'
 export type { ClassificationRule } from './rules'
 
 export { classifyHybrid } from './hybrid'
-export type { AlgorithmMode, HybridClassificationResult, ModelScoreBreakdown } from './hybrid'
+export type { AlgorithmMode, HybridClassificationResult, ModelScoreBreakdown, InjectableModels } from './hybrid'
 
 // 1. Supervised Machine Learning: Multinomial Naive Bayes
 export { trainNaiveBayes, predictNaiveBayes, DEFAULT_TRAINED_NB_MODEL } from './naiveBayes'
@@ -16,8 +16,8 @@ export { classifyWithNeuralSemantic } from './neuralSemantic'
 export type { NeuralSemanticResult } from './neuralSemantic'
 
 // 3. Statistical Information Retrieval: TF-IDF Vector Space Model
-export { classifyWithVSM, textToTFIDFVector, computeCosineSimilarity, getIDF } from './tfidf'
-export type { VSMResult, FeatureWeight, VSMScore, TFIDFVector } from './tfidf'
+export { classifyWithVSM, textToTFIDFVector, computeCosineSimilarity, getIDF, DEFAULT_TFIDF_MODEL } from './tfidf'
+export type { VSMResult, FeatureWeight, VSMScore, TFIDFVector, TfidfModel, ClassCentroid } from './tfidf'
 
 // 4. Dialect-Aware Computational Ethnolinguistics: Fuzzy Orthography
 export {

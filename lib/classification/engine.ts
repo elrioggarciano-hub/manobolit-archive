@@ -1,5 +1,5 @@
 import { genreRules, themeRules, locationRules, ClassificationRule } from './rules'
-import { classifyHybrid, AlgorithmMode, HybridClassificationResult } from './hybrid'
+import { classifyHybrid, AlgorithmMode, HybridClassificationResult, InjectableModels } from './hybrid'
 import { normalizeText as baseNormalize } from './tokenizer'
 
 export interface MatchedTerm {
@@ -60,7 +60,8 @@ export function classifyEntry(
   input: string | EntryLike,
   additionalContext: string = '',
   genreFilter: string = 'ALL',
-  algorithmMode: AlgorithmMode = 'HYBRID_ENSEMBLE'
+  algorithmMode: AlgorithmMode = 'HYBRID_ENSEMBLE',
+  models?: InjectableModels
 ): ClassificationResult {
   let fullText: string
 
@@ -86,5 +87,5 @@ export function classifyEntry(
   }
 
   // Execute Hybrid Classifier
-  return classifyHybrid(fullText, genreFilter, algorithmMode)
+  return classifyHybrid(fullText, genreFilter, algorithmMode, models)
 }
