@@ -1,5 +1,6 @@
 import { BIBLE_PARALLEL_PHRASES, BIBLE_LEXICON } from './bibleCorpus'
-import { TranslationLang, TranslationResult } from './types'
+import { TranslationLang, TranslationResult, MatchedPhrase } from './types'
+import { lookupWebonaryTranslation } from './webonaryValidator'
 
 const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
   en: 'english',
@@ -17,7 +18,7 @@ export function translateText(
   targetLang: TranslationLang = 'msm'
 ): TranslationResult {
   const cleanedInput = cleanText(text)
-  const corpusSource = 'ManoboLit Oral Literature Archive (Trento & Bunawan Corpus, 2024)'
+  const corpusSource = 'Dual Validating Corpus: Agusan Manobo Bible (Primary) + SIL Webonary Dictionary (Supplementary)'
 
   if (!cleanedInput) {
     return {
@@ -30,17 +31,22 @@ export function translateText(
       totalWordsCount: 0,
       corpusSource,
       engineType: 'CORPUS_FALLBACK',
+      bibleWordsCount: 0,
+      webonaryWordsCount: 0,
     }
   }
 
   const sourceField = LANG_FIELD[sourceLang]
   const targetField = LANG_FIELD[targetLang]
 
-  const matchedPhrases: Array<{ original: string; translated: string; verseRef?: string }> = []
+  const matchedPhrases: MatchedPhrase[] = []
   const words = cleanedInput.split(/\s+/)
   let matchedCount = 0
+  let bibleMatchedCount = 0
+  let webonaryFilledCount = 0
   let textToProcess = cleanedInput
 
+  // 1. Primary: Match multi-word phrases from the Agusan Manobo Bible / Thesis Corpus
   for (const phrase of BIBLE_PARALLEL_PHRASES) {
     const sourcePhrase = phrase[sourceField]
     const targetPhrase = phrase[targetField]
@@ -52,32 +58,62 @@ export function translateText(
         original: sourcePhrase,
         translated: targetPhrase,
         verseRef: phrase.verseRef,
+        sourceCorpus: 'BIBLE_CORPUS',
       })
       textToProcess = textToProcess.replace(regex, targetPhrase)
-      matchedCount += sourcePhrase.split(' ').length
+      const count = sourcePhrase.split(' ').length
+      matchedCount += count
+      bibleMatchedCount += count
     }
   }
 
-  const lexiconMap = new Map<string, string>()
+  // 2. Primary: Bible single-word lexicon lookup map
+  const bibleMap = new Map<string, string>()
   for (const entry of BIBLE_LEXICON) {
     const sourceWord = entry[sourceField]
     const targetWord = entry[targetField]
     if (!sourceWord || !targetWord) continue
-    lexiconMap.set(sourceWord.toLowerCase(), targetWord)
+    bibleMap.set(sourceWord.toLowerCase(), targetWord)
   }
 
   const processedTokens = textToProcess.split(/(\s+|[.,!?;:]+)/).map((token) => {
     const cleanToken = token.toLowerCase().replace(/[^a-z0-9-]/g, '')
     if (!cleanToken) return token
 
-    if (lexiconMap.has(cleanToken)) {
+    // A. Check Agusan Manobo Bible Corpus first
+    if (bibleMap.has(cleanToken)) {
       matchedCount++
-      const matched = lexiconMap.get(cleanToken)!
+      bibleMatchedCount++
+      const matched = bibleMap.get(cleanToken)!
+      matchedPhrases.push({
+        original: token,
+        translated: matched,
+        verseRef: 'Agusan Manobo Bible Corpus',
+        sourceCorpus: 'BIBLE_CORPUS',
+      })
       if (token[0] === token[0].toUpperCase()) {
         return matched.charAt(0).toUpperCase() + matched.slice(1)
       }
       return matched
     }
+
+    // B. Supplementary: If NOT in Agusan Manobo Bible, SIL Webonary fills it in!
+    const webonaryMatch = lookupWebonaryTranslation(cleanToken, sourceLang, targetLang)
+    if (webonaryMatch) {
+      matchedCount++
+      webonaryFilledCount++
+      matchedPhrases.push({
+        original: token,
+        translated: webonaryMatch.translation,
+        verseRef: 'SIL International Webonary (ISO 639-3: msm)',
+        sourceCorpus: 'SIL_WEBONARY',
+      })
+      if (token[0] === token[0].toUpperCase()) {
+        return webonaryMatch.translation.charAt(0).toUpperCase() + webonaryMatch.translation.slice(1)
+      }
+      return webonaryMatch.translation
+    }
+
     return token
   })
 
@@ -95,5 +131,7 @@ export function translateText(
     totalWordsCount: words.length,
     corpusSource,
     engineType: 'CORPUS_FALLBACK',
+    bibleWordsCount: bibleMatchedCount,
+    webonaryWordsCount: webonaryFilledCount,
   }
 }

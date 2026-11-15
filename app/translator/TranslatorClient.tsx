@@ -651,13 +651,18 @@ export default function TranslatorClient() {
                       {m.verseRef && (
                         <span
                           style={{
-                            color: 'var(--brand-accent)',
+                            color: m.sourceCorpus === 'SIL_WEBONARY' ? '#facc15' : 'var(--brand-accent)',
                             fontStyle: 'italic',
                             fontWeight: 600,
                             flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '10px',
                           }}
                         >
-                          {m.verseRef}
+                          <span>{m.sourceCorpus === 'SIL_WEBONARY' ? '📚' : '📖'}</span>
+                          <span>{m.verseRef}</span>
                         </span>
                       )}
                     </div>
@@ -755,34 +760,34 @@ export default function TranslatorClient() {
                     const badgeBg = isVerified
                       ? 'rgba(34, 197, 94, 0.12)'
                       : isAffixed
-                      ? 'rgba(14, 165, 233, 0.12)'
-                      : isVariant
-                      ? 'rgba(245, 158, 11, 0.12)'
-                      : 'rgba(113, 113, 122, 0.12)'
+                        ? 'rgba(14, 165, 233, 0.12)'
+                        : isVariant
+                          ? 'rgba(245, 158, 11, 0.12)'
+                          : 'rgba(113, 113, 122, 0.12)'
 
                     const badgeColor = isVerified
                       ? '#4ade80'
                       : isAffixed
-                      ? '#38bdf8'
-                      : isVariant
-                      ? '#fbbf24'
-                      : '#a1a1aa'
+                        ? '#38bdf8'
+                        : isVariant
+                          ? '#fbbf24'
+                          : '#a1a1aa'
 
                     const borderCol = isVerified
                       ? 'rgba(34, 197, 94, 0.3)'
                       : isAffixed
-                      ? 'rgba(14, 165, 233, 0.3)'
-                      : isVariant
-                      ? 'rgba(245, 158, 11, 0.3)'
-                      : 'rgba(113, 113, 122, 0.25)'
+                        ? 'rgba(14, 165, 233, 0.3)'
+                        : isVariant
+                          ? 'rgba(245, 158, 11, 0.3)'
+                          : 'rgba(113, 113, 122, 0.25)'
 
                     const tagLabel = isVerified
                       ? (vw.partOfSpeech || 'Verified')
                       : isAffixed
-                      ? `Affixed Root: ${vw.rootWord || ''}`
-                      : isVariant
-                      ? `Variant: ${vw.rootWord || ''}`
-                      : 'Unregistered'
+                        ? `Affixed Root: ${vw.rootWord || ''}`
+                        : isVariant
+                          ? `Variant: ${vw.rootWord || ''}`
+                          : 'Unregistered'
 
                     return (
                       <div
@@ -846,8 +851,54 @@ export default function TranslatorClient() {
             )}
 
             {liveResult && (
-              <div style={{ marginTop: '12px', fontSize: '10.5px', color: '#71717a' }}>
-                Engine Source: {liveResult.corpusSource}
+              <div
+                style={{
+                  marginTop: '12px',
+                  padding: '10px 14px',
+                  background: '#121214',
+                  border: '1px solid #27272a',
+                  borderRadius: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '9.5px', fontWeight: 800, color: '#a1a1aa', letterSpacing: '0.04em' }}>
+                    DUAL VALIDATING CORPUS:
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      background: 'rgba(59, 130, 246, 0.15)',
+                      color: '#60a5fa',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    📖 Bible Corpus ({liveResult.bibleWordsCount ?? 0} words)
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      background: 'rgba(234, 179, 8, 0.15)',
+                      color: '#facc15',
+                      border: '1px solid rgba(234, 179, 8, 0.3)',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    📚 SIL Webonary Dictionary ({liveResult.webonaryWordsCount ?? 0} supplemented)
+                  </span>
+                </div>
+                <div style={{ fontSize: '10px', color: '#71717a' }}>
+                  {liveResult.corpusSource}
+                </div>
               </div>
             )}
           </div>

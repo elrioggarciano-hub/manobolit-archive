@@ -1,12 +1,12 @@
 import { prisma } from '@/lib/database/prisma'
-import { TranslationLang, TranslationResult } from './types'
+import { TranslationLang, TranslationResult, MatchedPhrase } from './types'
 import { translateText } from './fallback'
-import { validateTextWithWebonary } from './webonaryValidator'
+import { validateTextWithWebonary, lookupWebonaryTranslation } from './webonaryValidator'
 import { translateWithGemini } from './geminiTranslator'
 
 export * from './types'
 export { translateText } from './fallback'
-export { validateTextWithWebonary, validateSingleWord, SIL_WEBONARY_ENTRIES } from './webonaryValidator'
+export { validateTextWithWebonary, validateSingleWord, lookupWebonaryTranslation, SIL_WEBONARY_ENTRIES } from './webonaryValidator'
 
 const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
   en: 'english',
@@ -95,9 +95,11 @@ export async function translateTextDynamic(
       const sourceField = LANG_FIELD[sourceLang]
       const targetField = LANG_FIELD[targetLang]
 
-      const matchedPhrases: Array<{ original: string; translated: string; verseRef?: string }> = []
+      const matchedPhrases: MatchedPhrase[] = []
       const words = cleanedInput.split(/\s+/)
       let matchedCount = 0
+      let bibleMatchedCount = 0
+      let webonaryFilledCount = 0
       let textToProcess = cleanedInput
 
       // Separate into multi-word phrases and single-word lexicon
@@ -118,10 +120,13 @@ export async function translateTextDynamic(
           matchedPhrases.push({
             original: sourcePhrase,
             translated: targetPhrase,
-            verseRef: phrase.sourceRef || 'Archive Corpus',
+            verseRef: phrase.sourceRef || 'Agusan Manobo Bible / Archive Corpus',
+            sourceCorpus: 'BIBLE_CORPUS',
           })
           textToProcess = textToProcess.replace(regex, targetPhrase)
-          matchedCount += sourcePhrase.split(/\s+/).length
+          const phraseWordCount = sourcePhrase.split(/\s+/).length
+          matchedCount += phraseWordCount
+          bibleMatchedCount += phraseWordCount
         }
       }
 
@@ -139,14 +144,40 @@ export async function translateTextDynamic(
         const cleanToken = token.toLowerCase().replace(/[^a-z0-9-]/g, '')
         if (!cleanToken) return token
 
+        // A. Primary: Agusan Manobo Bible / Database Corpus
         if (lexiconMap.has(cleanToken)) {
           matchedCount++
+          bibleMatchedCount++
           const matched = lexiconMap.get(cleanToken)!
+          matchedPhrases.push({
+            original: token,
+            translated: matched,
+            verseRef: 'Agusan Manobo Bible Corpus',
+            sourceCorpus: 'BIBLE_CORPUS',
+          })
           if (token[0] === token[0].toUpperCase()) {
             return matched.charAt(0).toUpperCase() + matched.slice(1)
           }
           return matched
         }
+
+        // B. Supplementary: If missing in the Bible, SIL Webonary fills it in!
+        const webonaryMatch = lookupWebonaryTranslation(cleanToken, sourceLang, targetLang)
+        if (webonaryMatch) {
+          matchedCount++
+          webonaryFilledCount++
+          matchedPhrases.push({
+            original: token,
+            translated: webonaryMatch.translation,
+            verseRef: 'SIL International Webonary (ISO 639-3: msm)',
+            sourceCorpus: 'SIL_WEBONARY',
+          })
+          if (token[0] === token[0].toUpperCase()) {
+            return webonaryMatch.translation.charAt(0).toUpperCase() + webonaryMatch.translation.slice(1)
+          }
+          return webonaryMatch.translation
+        }
+
         return token
       })
 
@@ -176,6 +207,8 @@ export async function translateTextDynamic(
               engineType: 'COLAB_NEURAL_NMT',
               webonaryValidation: validateTextWithWebonary(aiManobo, 'msm'),
               aiReasoning: aiResult.linguisticNotes,
+              bibleWordsCount: bibleMatchedCount,
+              webonaryWordsCount: webonaryFilledCount,
             }
           }
         } catch (aiErr) {
@@ -191,9 +224,11 @@ export async function translateTextDynamic(
         matchedPhrases,
         matchedWordsCount: matchedCount,
         totalWordsCount: words.length,
-        corpusSource: `ManoboLit Dynamic Database Corpus (${dbEntries.length} verified records in Supabase)`,
+        corpusSource: `Dual Validating Corpus: Agusan Manobo Bible (${dbEntries.length} verified records) + SIL Webonary Dictionary (Supplementary)`,
         engineType: 'DATABASE_DYNAMIC',
         webonaryValidation,
+        bibleWordsCount: bibleMatchedCount,
+        webonaryWordsCount: webonaryFilledCount,
       }
     }
   } catch (dbErr) {

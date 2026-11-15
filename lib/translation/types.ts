@@ -21,16 +21,25 @@ export interface WebonaryValidationReport {
   aiAssisted?: boolean
 }
 
+export interface MatchedPhrase {
+  original: string
+  translated: string
+  verseRef?: string
+  sourceCorpus?: 'BIBLE_CORPUS' | 'SIL_WEBONARY'
+}
+
 export interface TranslationResult {
   translatedText: string
   confidence: number
   sourceLang: TranslationLang
   targetLang: TranslationLang
-  matchedPhrases: Array<{ original: string; translated: string; verseRef?: string }>
+  matchedPhrases: MatchedPhrase[]
   matchedWordsCount: number
   totalWordsCount: number
   corpusSource: string
   engineType: 'DATABASE_DYNAMIC' | 'COLAB_NEURAL_NMT' | 'CORPUS_FALLBACK'
   webonaryValidation?: WebonaryValidationReport
   aiReasoning?: string
+  bibleWordsCount?: number
+  webonaryWordsCount?: number
 }

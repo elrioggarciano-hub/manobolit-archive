@@ -112,6 +112,99 @@ export const SIL_WEBONARY_ENTRIES: WebonaryEntry[] = [
   { manobo: 'kandin', root: 'kandin', partOfSpeech: 'PRONOUN', english: 'he / him / she / her', bisaya: 'siya', source: 'SIL Webonary' },
   { manobo: 'kandan', root: 'kandan', partOfSpeech: 'PRONOUN', english: 'their / them', bisaya: 'ila', source: 'SIL Webonary' },
   { manobo: 'ita', root: 'ita', partOfSpeech: 'PRONOUN', english: 'we (inclusive)', bisaya: 'kita', source: 'SIL Webonary' },
+  { manobo: 'si-ak', root: 'si-ak', partOfSpeech: 'PRONOUN', english: 'i / me', bisaya: 'ako', source: 'SIL Webonary' },
+  { manobo: 'ikow', root: 'ikow', partOfSpeech: 'PRONOUN', english: 'you', bisaya: 'ikaw', source: 'SIL Webonary' },
+  { manobo: 'sikami', root: 'kami', partOfSpeech: 'PRONOUN', english: 'we (exclusive)', bisaya: 'kami', source: 'SIL Webonary' },
+  { manobo: 'sikita', root: 'ita', partOfSpeech: 'PRONOUN', english: 'we (inclusive)', bisaya: 'kita', source: 'SIL Webonary' },
+  { manobo: 'sikiyu', root: 'kamo', partOfSpeech: 'PRONOUN', english: 'you all', bisaya: 'kamo', source: 'SIL Webonary' },
+  { manobo: 'sikandan', root: 'kandan', partOfSpeech: 'PRONOUN', english: 'they', bisaya: 'sila', source: 'SIL Webonary' },
+
+  // Anatomy & Body Parts
+  { manobo: 'ulo', root: 'ulo', partOfSpeech: 'NOUN', english: 'head', bisaya: 'ulo', source: 'SIL Webonary', definition: 'Cranial head of human or animal' },
+  { manobo: 'mata', root: 'mata', partOfSpeech: 'NOUN', english: 'eye', bisaya: 'mata', source: 'SIL Webonary', definition: 'Organ of visual perception' },
+  { manobo: 'talinga', root: 'talinga', partOfSpeech: 'NOUN', english: 'ear', bisaya: 'dalunggan', source: 'SIL Webonary', definition: 'Organ of hearing' },
+  { manobo: 'ngipon', root: 'ngipon', partOfSpeech: 'NOUN', english: 'tooth', bisaya: 'ngipon', source: 'SIL Webonary', definition: 'Dental tooth' },
+  { manobo: 'baba', root: 'baba', partOfSpeech: 'NOUN', english: 'mouth', bisaya: 'baba', source: 'SIL Webonary', definition: 'Oral mouth' },
+  { manobo: 'alima', root: 'alima', partOfSpeech: 'NOUN', english: 'hand', bisaya: 'kamot', source: 'SIL Webonary', definition: 'Human hand or arm' },
+  { manobo: 'paa', root: 'paa', partOfSpeech: 'NOUN', english: 'foot', bisaya: 'tiil', source: 'SIL Webonary', definition: 'Lower extremity leg or foot' },
+  { manobo: 'posong', root: 'posong', partOfSpeech: 'NOUN', english: 'heart', bisaya: 'kasingkasing', source: 'SIL Webonary', definition: 'Biological heart or emotional seat of life' },
+  { manobo: 'tian', root: 'tian', partOfSpeech: 'NOUN', english: 'stomach', bisaya: 'tiyan', source: 'SIL Webonary', definition: 'Abdomen or stomach' },
+
+  // Additional Animals
+  { manobo: 'asu', root: 'asu', partOfSpeech: 'NOUN', english: 'dog', bisaya: 'iro', source: 'SIL Webonary', definition: 'Canine companion dog' },
+  { manobo: 'kuring', root: 'kuring', partOfSpeech: 'NOUN', english: 'cat', bisaya: 'iring', source: 'SIL Webonary', definition: 'Domestic feline cat' },
+  { manobo: 'baboy', root: 'baboy', partOfSpeech: 'NOUN', english: 'pig', bisaya: 'baboy', source: 'SIL Webonary', definition: 'Porcine wild or domestic swine' },
+  { manobo: 'kabawo', root: 'kabawo', partOfSpeech: 'NOUN', english: 'carabao', bisaya: 'kabaw', source: 'SIL Webonary', definition: 'Water buffalo draught animal' },
+  { manobo: 'manok', root: 'manok', partOfSpeech: 'NOUN', english: 'chicken', bisaya: 'manok', source: 'SIL Webonary', definition: 'Domestic chicken or fowl' },
+  { manobo: 'sawa', root: 'sawa', partOfSpeech: 'NOUN', english: 'snake', bisaya: 'sawa', source: 'SIL Webonary', definition: 'Serpent or python' },
+  { manobo: 'baki', root: 'baki', partOfSpeech: 'NOUN', english: 'frog', bisaya: 'baki', source: 'SIL Webonary', definition: 'Amphibian frog' },
+
+  // Food, Plants & Domestic Objects
+  { manobo: 'begas', root: 'begas', partOfSpeech: 'NOUN', english: 'rice (uncooked)', bisaya: 'bugas', source: 'SIL Webonary', definition: 'Uncooked husked rice grains' },
+  { manobo: 'kan-on', root: 'kaan', partOfSpeech: 'NOUN', english: 'cooked rice', bisaya: 'kan-on', source: 'SIL Webonary', definition: 'Boiled staple rice food' },
+  { manobo: 'asin', root: 'asin', partOfSpeech: 'NOUN', english: 'salt', bisaya: 'asin', source: 'SIL Webonary', definition: 'Mineral culinary salt' },
+  { manobo: 'lana', root: 'lana', partOfSpeech: 'NOUN', english: 'oil', bisaya: 'lana', source: 'SIL Webonary', definition: 'Plant or coconut oil' },
+  { manobo: 'saging', root: 'saging', partOfSpeech: 'NOUN', english: 'banana', bisaya: 'saging', source: 'SIL Webonary', definition: 'Musa banana plant and fruit' },
+  { manobo: 'kamote', root: 'kamote', partOfSpeech: 'NOUN', english: 'sweet potato', bisaya: 'kamote', source: 'SIL Webonary', definition: 'Edible tuberous sweet potato' },
+  { manobo: 'balay', root: 'balay', partOfSpeech: 'NOUN', english: 'house', bisaya: 'balay', source: 'SIL Webonary', definition: 'Dwelling habitation, ancestral house' },
+  { manobo: 'panimalay', root: 'balay', partOfSpeech: 'NOUN', english: 'household', bisaya: 'panimalay', source: 'SIL Webonary', definition: 'Domestic family unit' },
+  { manobo: 'banwa', root: 'banwa', partOfSpeech: 'NOUN', english: 'village / town', bisaya: 'lungsod', source: 'SIL Webonary', definition: 'Settlement or ancestral domain' },
+
+  // Daily Actions & Verbs
+  { manobo: 'kaan', root: 'kaan', partOfSpeech: 'VERB', english: 'eat', bisaya: 'kaon', source: 'SIL Webonary', definition: 'To ingest food' },
+  { manobo: 'inog', root: 'inog', partOfSpeech: 'VERB', english: 'drink', bisaya: 'inom', source: 'SIL Webonary', definition: 'To consume beverage or water' },
+  { manobo: 'tudog', root: 'tudog', partOfSpeech: 'VERB', english: 'sleep', bisaya: 'katulog', source: 'SIL Webonary', definition: 'To rest in slumber' },
+  { manobo: 'hibat', root: 'hibat', partOfSpeech: 'VERB', english: 'lie down', bisaya: 'higda', source: 'SIL Webonary', definition: 'To recline or rest horizontally' },
+  { manobo: 'hangkat', root: 'hangkat', partOfSpeech: 'VERB', english: 'wake up', bisaya: 'mata', source: 'SIL Webonary', definition: 'To awaken from sleep' },
+  { manobo: 'ikagi', root: 'kagi', partOfSpeech: 'VERB', english: 'speak / talk', bisaya: 'sulti', source: 'SIL Webonary', definition: 'To communicate in speech' },
+  { manobo: 'dinug', root: 'dinug', partOfSpeech: 'VERB', english: 'hear', bisaya: 'dungog', source: 'SIL Webonary', definition: 'To perceive auditory sounds' },
+  { manobo: 'layog', root: 'layog', partOfSpeech: 'VERB', english: 'fly', bisaya: 'lupad', source: 'SIL Webonary', definition: 'To ascend into aerial flight' },
+  { manobo: 'dagan', root: 'dagan', partOfSpeech: 'VERB', english: 'run', bisaya: 'dagan', source: 'SIL Webonary', definition: 'To sprint or run rapidly' },
+  { manobo: 'sulat', root: 'sulat', partOfSpeech: 'VERB', english: 'write', bisaya: 'suwat', source: 'SIL Webonary', definition: 'To inscribe or write text' },
+  { manobo: 'basa', root: 'basa', partOfSpeech: 'VERB', english: 'read', bisaya: 'basa', source: 'SIL Webonary', definition: 'To peruse written words' },
+  { manobo: 'begay', root: 'begay', partOfSpeech: 'VERB', english: 'give', bisaya: 'hatag', source: 'SIL Webonary', definition: 'To present or bestow a gift' },
+  { manobo: 'dawat', root: 'dawat', partOfSpeech: 'VERB', english: 'receive', bisaya: 'dawat', source: 'SIL Webonary', definition: 'To accept what is offered' },
+  { manobo: 'luto', root: 'luto', partOfSpeech: 'VERB', english: 'cook', bisaya: 'luto', source: 'SIL Webonary', definition: 'To prepare meals over fire' },
+  { manobo: 'hugas', root: 'hugas', partOfSpeech: 'VERB', english: 'wash', bisaya: 'hugas', source: 'SIL Webonary', definition: 'To cleanse with water' },
+
+  // Time & Temporal Indicators
+  { manobo: 'sugang', root: 'sugang', partOfSpeech: 'NOUN', english: 'morning', bisaya: 'buntag', source: 'SIL Webonary', definition: 'Early morning, dawn' },
+  { manobo: 'malolom', root: 'malolom', partOfSpeech: 'NOUN', english: 'afternoon', bisaya: 'hapon', source: 'SIL Webonary', definition: 'Late afternoon' },
+  { manobo: 'tuig', root: 'tuig', partOfSpeech: 'NOUN', english: 'year', bisaya: 'tuig', source: 'SIL Webonary', definition: 'Annual seasonal cycle' },
+  { manobo: 'bulan', root: 'bulan', partOfSpeech: 'NOUN', english: 'moon / month', bisaya: 'bulan', source: 'SIL Webonary', definition: 'Celestial moon or calendar month' },
+  { manobo: 'kuno-kuno', root: 'kuno', partOfSpeech: 'ADVERB', english: 'now / today', bisaya: 'karon', source: 'SIL Webonary', definition: 'The present moment or day' },
+  { manobo: 'asolom', root: 'solom', partOfSpeech: 'ADVERB', english: 'tomorrow', bisaya: 'ugma', source: 'SIL Webonary', definition: 'The succeeding day' },
+  { manobo: 'kaapon', root: 'apon', partOfSpeech: 'ADVERB', english: 'yesterday', bisaya: 'kagahapon', source: 'SIL Webonary', definition: 'The day preceding today' },
+  { manobo: 'dini', root: 'dini', partOfSpeech: 'PARTICLE', english: 'here', bisaya: 'diri', source: 'SIL Webonary', definition: 'Close proximal location' },
+
+  // Numbers (Agusan Manobo Numerals)
+  { manobo: 'sabeka', root: 'sabeka', partOfSpeech: 'ADJECTIVE', english: 'one', bisaya: 'usa', source: 'SIL Webonary', definition: 'Cardinal number 1' },
+  { manobo: 'duwa', root: 'duwa', partOfSpeech: 'ADJECTIVE', english: 'two', bisaya: 'duha', source: 'SIL Webonary', definition: 'Cardinal number 2' },
+  { manobo: 'tatlo', root: 'tatlo', partOfSpeech: 'ADJECTIVE', english: 'three', bisaya: 'tulo', source: 'SIL Webonary', definition: 'Cardinal number 3' },
+  { manobo: 'upat', root: 'upat', partOfSpeech: 'ADJECTIVE', english: 'four', bisaya: 'upat', source: 'SIL Webonary', definition: 'Cardinal number 4' },
+  { manobo: 'lima', root: 'lima', partOfSpeech: 'ADJECTIVE', english: 'five', bisaya: 'lima', source: 'SIL Webonary', definition: 'Cardinal number 5' },
+  { manobo: 'an-om', root: 'an-om', partOfSpeech: 'ADJECTIVE', english: 'six', bisaya: 'unom', source: 'SIL Webonary', definition: 'Cardinal number 6' },
+  { manobo: 'pito', root: 'pito', partOfSpeech: 'ADJECTIVE', english: 'seven', bisaya: 'pito', source: 'SIL Webonary', definition: 'Cardinal number 7' },
+  { manobo: 'walo', root: 'walo', partOfSpeech: 'ADJECTIVE', english: 'eight', bisaya: 'walo', source: 'SIL Webonary', definition: 'Cardinal number 8' },
+  { manobo: 'siyam', root: 'siyam', partOfSpeech: 'ADJECTIVE', english: 'nine', bisaya: 'siyam', source: 'SIL Webonary', definition: 'Cardinal number 9' },
+  { manobo: 'sapulo', root: 'sapulo', partOfSpeech: 'ADJECTIVE', english: 'ten', bisaya: 'napulo', source: 'SIL Webonary', definition: 'Cardinal number 10' },
+
+  // Interrogatives
+  { manobo: 'nukoy', root: 'nukoy', partOfSpeech: 'PRONOUN', english: 'what', bisaya: 'unsa', source: 'SIL Webonary', definition: 'Interrogative pronoun: what' },
+  { manobo: 'hintey', root: 'hintey', partOfSpeech: 'PRONOUN', english: 'who', bisaya: 'kinsa', source: 'SIL Webonary', definition: 'Interrogative pronoun: who' },
+  { manobo: 'andoy', root: 'andoy', partOfSpeech: 'ADVERB', english: 'where', bisaya: 'asa', source: 'SIL Webonary', definition: 'Interrogative adverb of place: where' },
+  { manobo: 'kanu', root: 'kanu', partOfSpeech: 'ADVERB', english: 'when', bisaya: 'kanus-a', source: 'SIL Webonary', definition: 'Interrogative adverb of time: when' },
+  { manobo: 'man-u', root: 'man-u', partOfSpeech: 'ADVERB', english: 'how', bisaya: 'giunsa', source: 'SIL Webonary', definition: 'Interrogative adverb of manner: how' },
+
+  // Descriptive Qualities & Colors
+  { manobo: 'mapula', root: 'pula', partOfSpeech: 'ADJECTIVE', english: 'red', bisaya: 'pula', source: 'SIL Webonary', definition: 'Crimson or red hue' },
+  { manobo: 'matan-og', root: 'tan-og', partOfSpeech: 'ADJECTIVE', english: 'cold', bisaya: 'tugnaw', source: 'SIL Webonary', definition: 'Low temperature, chilly' },
+  { manobo: 'mapasu', root: 'pasu', partOfSpeech: 'ADJECTIVE', english: 'hot', bisaya: 'init', source: 'SIL Webonary', definition: 'High thermal heat' },
+  { manobo: 'masinaw', root: 'sinaw', partOfSpeech: 'ADJECTIVE', english: 'bright', bisaya: 'masanag', source: 'SIL Webonary', definition: 'Luminous, shiny, sparkling' },
+  { manobo: 'madat', root: 'dat', partOfSpeech: 'ADJECTIVE', english: 'bad / evil', bisaya: 'daotan', source: 'SIL Webonary', definition: 'Malevolent, harmful, wicked' },
+  { manobo: 'malumok', root: 'lumok', partOfSpeech: 'ADJECTIVE', english: 'soft', bisaya: 'humok', source: 'SIL Webonary', definition: 'Yielding, gentle, pliable' },
+  { manobo: 'matig-a', root: 'tig-a', partOfSpeech: 'ADJECTIVE', english: 'hard', bisaya: 'gahi', source: 'SIL Webonary', definition: 'Solid, rigid, unyielding' },
+  { manobo: 'tibuk', root: 'tibuk', partOfSpeech: 'ADJECTIVE', english: 'all / whole', bisaya: 'tibuok', source: 'SIL Webonary', definition: 'Entire, complete, undivided' },
 ]
 
 // Dialectal and orthographic variants documented in Agusan del Sur
@@ -289,4 +382,72 @@ export function validateTextWithWebonary(
     lexicalAuthority: 'SIL International Webonary (Agusan Manobo, ISO 639-3: msm)',
     summaryNote: `${verifiedCount} of ${tokens.length} words (${Math.round(rate * 100)}%) verified against SIL Webonary standard orthography.`,
   }
+}
+
+/**
+ * Searches the SIL Webonary Dictionary to supplement translations when missing from the Bible corpus.
+ */
+export function lookupWebonaryTranslation(
+  rawWord: string,
+  sourceLang: 'en' | 'msm' | 'ceb',
+  targetLang: 'en' | 'msm' | 'ceb'
+): { translation: string; source: string; notes?: string; rootWord?: string } | null {
+  const clean = rawWord.toLowerCase().replace(/[^a-z0-9-]/g, '')
+  if (!clean) return null
+
+  // 1. Manobo -> English or Bisaya
+  if (sourceLang === 'msm') {
+    const val = validateSingleWord(clean)
+    if (val.status !== 'UNREGISTERED') {
+      const match = SIL_WEBONARY_ENTRIES.find(
+        (e) => e.manobo.toLowerCase() === val.normalizedWord || e.root.toLowerCase() === val.rootWord?.toLowerCase()
+      )
+      if (match) {
+        const trans = targetLang === 'ceb' ? match.bisaya : match.english.split(' / ')[0].split(' (')[0]
+        return {
+          translation: trans,
+          source: 'SIL Webonary Dictionary (ISO 639-3: msm)',
+          notes: val.notes || match.definition,
+          rootWord: match.root,
+        }
+      }
+    }
+    return null
+  }
+
+  // 2. English -> Manobo or Bisaya
+  if (sourceLang === 'en') {
+    for (const entry of SIL_WEBONARY_ENTRIES) {
+      const engTokens = entry.english.toLowerCase().split(/\s*[\/,]\s*|\s+/)
+      const engPhrases = entry.english.toLowerCase().split(/\s*[\/,]\s*/)
+      if (engTokens.includes(clean) || engPhrases.includes(clean)) {
+        return {
+          translation: targetLang === 'msm' ? entry.manobo : entry.bisaya,
+          source: 'SIL Webonary Dictionary (ISO 639-3: msm)',
+          notes: entry.definition || entry.english,
+          rootWord: entry.root,
+        }
+      }
+    }
+    return null
+  }
+
+  // 3. Bisaya -> Manobo or English
+  if (sourceLang === 'ceb') {
+    for (const entry of SIL_WEBONARY_ENTRIES) {
+      const cebTokens = entry.bisaya.toLowerCase().split(/\s*[\/,]\s*|\s+/)
+      const cebPhrases = entry.bisaya.toLowerCase().split(/\s*[\/,]\s*/)
+      if (cebTokens.includes(clean) || cebPhrases.includes(clean)) {
+        return {
+          translation: targetLang === 'msm' ? entry.manobo : entry.english.split(' / ')[0],
+          source: 'SIL Webonary Dictionary (ISO 639-3: msm)',
+          notes: entry.definition || entry.bisaya,
+          rootWord: entry.root,
+        }
+      }
+    }
+    return null
+  }
+
+  return null
 }
