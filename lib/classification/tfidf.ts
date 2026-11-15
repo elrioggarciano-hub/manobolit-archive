@@ -222,48 +222,72 @@ export function trainTfidf(
     return { vector, magnitude, features }
   }
 
-  // 4. Group training document texts by genre and theme
-  const genreTexts: Record<string, string[]> = {}
-  const themeTexts: Record<string, string[]> = {}
+  // 4. Aggregate term counts per genre and theme across individual documents
+  // (unigrams and bigrams are computed per document so they never cross document boundaries)
+  const genreTermCounts: Record<string, Map<string, number>> = {}
+  const themeTermCounts: Record<string, Map<string, number>> = {}
 
   for (const doc of trainingDocs) {
-    if (!genreTexts[doc.genre]) genreTexts[doc.genre] = []
-    genreTexts[doc.genre].push(doc.text)
+    const docUnigrams = tokenizeUnigrams(doc.text, true)
+    const docBigrams = generateWordBigrams(docUnigrams)
+    const docTerms = [...docUnigrams, ...docBigrams]
 
+    // Genre aggregation
+    if (!genreTermCounts[doc.genre]) {
+      genreTermCounts[doc.genre] = new Map<string, number>()
+    }
+    const gMap = genreTermCounts[doc.genre]
+    for (const t of docTerms) {
+      gMap.set(t, (gMap.get(t) || 0) + 1)
+    }
+
+    // Theme aggregation
     if (Array.isArray(doc.themes)) {
       for (const th of doc.themes) {
-        if (!themeTexts[th]) themeTexts[th] = []
-        themeTexts[th].push(doc.text)
+        if (!themeTermCounts[th]) {
+          themeTermCounts[th] = new Map<string, number>()
+        }
+        const thMap = themeTermCounts[th]
+        for (const t of docTerms) {
+          thMap.set(t, (thMap.get(t) || 0) + 1)
+        }
       }
     }
   }
 
-  const centroids: ClassCentroid[] = []
+  // Helper to build a centroid from aggregated term counts
+  const buildCentroidFromCounts = (
+    key: string,
+    category: string,
+    type: 'GENRE' | 'THEME',
+    termCounts: Map<string, number>
+  ): ClassCentroid => {
+    const vector: TFIDFVector = {}
+    let sumSquares = 0
 
-  // Build Genre Centroids from document text
-  for (const [genre, texts] of Object.entries(genreTexts)) {
-    const combinedText = texts.join(' ')
-    const { vector, magnitude } = textToVector(combinedText)
-    centroids.push({
-      key: `GENRE_${genre}`,
-      category: genre,
-      type: 'GENRE',
-      vector,
-      magnitude,
-    })
+    for (const [term, count] of termCounts.entries()) {
+      const tf = 1 + Math.log(count)
+      const idf = idfFn(term)
+      const tfidf = tf * idf
+
+      vector[term] = tfidf
+      sumSquares += tfidf * tfidf
+    }
+
+    const magnitude = Math.sqrt(sumSquares)
+    return { key, category, type, vector, magnitude }
   }
 
-  // Build Theme Centroids from document text
-  for (const [theme, texts] of Object.entries(themeTexts)) {
-    const combinedText = texts.join(' ')
-    const { vector, magnitude } = textToVector(combinedText)
-    centroids.push({
-      key: `THEME_${theme}`,
-      category: theme,
-      type: 'THEME',
-      vector,
-      magnitude,
-    })
+  const centroids: ClassCentroid[] = []
+
+  // Build Genre Centroids from aggregated document term counts
+  for (const [genre, counts] of Object.entries(genreTermCounts)) {
+    centroids.push(buildCentroidFromCounts(`GENRE_${genre}`, genre, 'GENRE', counts))
+  }
+
+  // Build Theme Centroids from aggregated document term counts
+  for (const [theme, counts] of Object.entries(themeTermCounts)) {
+    centroids.push(buildCentroidFromCounts(`THEME_${theme}`, theme, 'THEME', counts))
   }
 
   return {
