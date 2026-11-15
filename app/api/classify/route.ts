@@ -3,11 +3,12 @@ import { classifyEntry, EntryLike } from '@/lib/classification/engine'
 import { AlgorithmMode } from '@/lib/classification/hybrid'
 import { getLatestSnapshot, getActiveModels } from '@/lib/classification/retrain'
 import { ACTIVE_GENRES } from '@/lib/classification/trainingCorpus'
+import { classifyWithGemini } from '@/lib/classification/geminiClassifier'
 import { prisma } from '@/lib/database/prisma'
 
 // POST /api/classify
-// Primary classification endpoint powered by the TypeScript Hybrid Architecture.
-// Returns truthful metadata: algorithm name, mode, snapshot ID, trained samples, per-model scores, and model agreement.
+// Primary classification endpoint powered by the Gemini LLM Semantic Engine
+// with seamless fallback to the TypeScript Hybrid Architecture (NB + TF-IDF + Char N-gram + Rules).
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     const snapshot = getLatestSnapshot()
     const activeModels = getActiveModels()
 
-    // 1. Primary Classification Path: TypeScript Hybrid Engine
+    // 1. Primary Classification Path: TypeScript Hybrid Engine (NB + TF-IDF + Char N-gram + Rules)
     const result = classifyEntry(
       entryLike,
       additionalContext || '',
@@ -62,7 +63,25 @@ export async function POST(request: NextRequest) {
       activeModels
     )
 
-    // 2. Compute individual model predictions and normalized per-model distributions
+    // 2. Optional Semantic LLM Reasoning: Gemini Flash (Option 1)
+    let geminiResult = null
+    try {
+      geminiResult = await classifyWithGemini({
+        transcription: transcription || (additionalContext ? additionalContext : undefined),
+        translation: translation || text,
+        bisayaTranslation: body.bisayaTranslation,
+        additionalContext,
+      })
+    } catch (llmErr: any) {
+      console.warn('[ClassifyAPI] Gemini call bypassed; utilizing local hybrid ensemble:', llmErr.message)
+    }
+
+    const useGemini = Boolean(geminiResult)
+    const finalPredictedGenre = geminiResult ? geminiResult.genre : result.genre.value
+    const finalConfidence = geminiResult ? geminiResult.confidence : result.genre.confidence
+    const finalSource = geminiResult ? 'GEMINI_LLM_SEMANTIC' : 'TS_HYBRID_ENSEMBLE'
+
+    // 3. Compute individual model predictions and normalized per-model distributions
     const breakdown = result.algorithmicBreakdown
     const candidateGenres = ACTIVE_GENRES as readonly string[]
 
@@ -77,9 +96,10 @@ export async function POST(request: NextRequest) {
       tfidfVsm: tfidfOnly.genre.value,
       charNgram: charOnly.genre.value,
       ruleBased: ruleOnly.genre.value,
+      ...(geminiResult ? { geminiLLM: geminiResult.genre } : {}),
     }
 
-    const predictedValue = result.genre.value
+    const predictedValue = finalPredictedGenre
 
     // Models that agreed with the predicted genre (excluding UNCLASSIFIED unless prediction is UNCLASSIFIED)
     const agreeingModels = Object.entries(modelPredictions)
@@ -99,23 +119,30 @@ export async function POST(request: NextRequest) {
     const honestResponse = {
       genre: {
         value: predictedValue,
-        confidence: result.genre.confidence,
+        confidence: finalConfidence,
         allScores: result.genre.allScores,
-        predictionSource: 'TS_HYBRID_ENSEMBLE',
-        modelVersion: snapshot.id,
+        predictionSource: finalSource,
+        modelVersion: geminiResult ? `gemini-${geminiResult.model}` : snapshot.id,
         isUncertain: isUnclassified,
       },
       predictedGenre: predictedValue,
-      confidence: result.genre.confidence,
-      overallConfidence: result.genre.confidence,
+      confidence: finalConfidence,
+      overallConfidence: finalConfidence,
       isUnclassified,
-      isUncertain: isUnclassified || result.genre.confidence < 0.35,
+      isUncertain: isUnclassified || finalConfidence < 0.35,
+
+      // Semantic LLM Explanations (Option 1)
+      reasoning: geminiResult ? geminiResult.reasoning : undefined,
+      culturalThemes: geminiResult && geminiResult.culturalThemes.length ? geminiResult.culturalThemes : undefined,
+      linguisticObservations: geminiResult ? geminiResult.linguisticObservations : undefined,
 
       // Truthful Architecture Provenance
-      algorithm: 'ManoboLit TypeScript Hybrid Architecture (NB + TF-IDF VSM + Char N-Gram + Domain Rules)',
+      algorithm: geminiResult
+        ? `Gemini Semantic LLM (${geminiResult.model}) with Local Hybrid Ensemble Fallback`
+        : 'ManoboLit TypeScript Hybrid Architecture (NB + TF-IDF VSM + Char N-Gram + Domain Rules)',
       algorithmMode,
-      predictionSource: 'TYPESCRIPT_HYBRID_ENGINE',
-      modelVersion: snapshot.id,
+      predictionSource: finalSource,
+      modelVersion: geminiResult ? `gemini-${geminiResult.model}` : snapshot.id,
       modelSnapshotId: snapshot.id,
       trainedSamples: snapshot.trainedSamples,
       vocabularySize: snapshot.vocabularySize,
@@ -126,7 +153,7 @@ export async function POST(request: NextRequest) {
       modelAgreement: {
         agreeingModels,
         agreementCount: agreeingModels.length,
-        totalModels: 4,
+        totalModels: useGemini ? 5 : 4,
         predictions: modelPredictions,
       },
 

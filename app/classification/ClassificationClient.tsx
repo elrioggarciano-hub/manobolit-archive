@@ -1174,8 +1174,16 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                     fontWeight: 700,
                                     padding: '2px 6px',
                                     borderRadius: '4px',
-                                    background: serverResult.predictionSource === 'ML_PIPELINE' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                                    color: serverResult.predictionSource === 'ML_PIPELINE' ? '#10b981' : '#f59e0b',
+                                    background: serverResult.predictionSource === 'GEMINI_LLM_SEMANTIC'
+                                      ? 'rgba(59, 130, 246, 0.2)'
+                                      : serverResult.predictionSource === 'ML_PIPELINE'
+                                      ? 'rgba(16, 185, 129, 0.2)'
+                                      : 'rgba(245, 158, 11, 0.2)',
+                                    color: serverResult.predictionSource === 'GEMINI_LLM_SEMANTIC'
+                                      ? '#60a5fa'
+                                      : serverResult.predictionSource === 'ML_PIPELINE'
+                                      ? '#10b981'
+                                      : '#f59e0b',
                                   }}
                                 >
                                   {serverResult.predictionSource} ({serverResult.modelVersion})
@@ -1184,6 +1192,22 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                   <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' }}>
                                     ⚠️ Flagged for Review
                                   </span>
+                                )}
+                              </div>
+                            )}
+                            {serverResult?.reasoning && (
+                              <div style={{ marginTop: '8px', marginBottom: '8px', padding: '10px 12px', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: '6px' }}>
+                                <div style={{ fontSize: '10px', fontWeight: 800, color: '#60a5fa', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <span>✨</span>
+                                  <span>AI SEMANTIC REASONING (Gemini)</span>
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#d4d4d8', lineHeight: 1.5 }}>
+                                  {serverResult.reasoning}
+                                </div>
+                                {serverResult.linguisticObservations && (
+                                  <div style={{ fontSize: '11px', color: '#a1a1aa', marginTop: '6px', fontStyle: 'italic' }}>
+                                    Note: {serverResult.linguisticObservations}
+                                  </div>
                                 )}
                               </div>
                             )}

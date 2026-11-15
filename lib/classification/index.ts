@@ -62,3 +62,7 @@ export type { LOOCVReport, ModeEvaluationResult, PerClassMetrics, PredictionDeta
 
 export { retrainFromDatabase, getLatestSnapshot, getActiveModels } from './retrain'
 export type { ClassifierSnapshotData, ActiveModels } from './retrain'
+
+// 5. Semantic LLM Reasoning: Gemini Large Language Model
+export { classifyWithGemini } from './geminiClassifier'
+export type { GeminiClassificationResult, ClassificationInputText } from './geminiClassifier'
