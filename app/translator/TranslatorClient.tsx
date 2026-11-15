@@ -666,6 +666,185 @@ export default function TranslatorClient() {
               </div>
             )}
 
+            {/* AI Linguistic Reasoning (when available) */}
+            {liveResult?.aiReasoning && (
+              <div
+                style={{
+                  marginTop: '14px',
+                  padding: '12px 14px',
+                  background: 'rgba(59, 130, 246, 0.08)',
+                  border: '1px solid rgba(59, 130, 246, 0.25)',
+                  borderRadius: '6px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    color: '#60a5fa',
+                    letterSpacing: '0.05em',
+                    marginBottom: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span>✨</span>
+                  <span>AI LINGUISTIC OBSERVATION (SIL Webonary Grounded)</span>
+                </div>
+                <div style={{ fontSize: '12.5px', color: '#e4e4e7', lineHeight: 1.5 }}>
+                  {liveResult.aiReasoning}
+                </div>
+              </div>
+            )}
+
+            {/* SIL Webonary Word Validation Panel */}
+            {liveResult?.webonaryValidation && liveResult.webonaryValidation.validatedWords.length > 0 && (
+              <div
+                style={{
+                  marginTop: '16px',
+                  padding: '14px',
+                  background: '#141416',
+                  border: '1px solid #27272a',
+                  borderRadius: '6px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    marginBottom: '10px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '14px' }}>📖</span>
+                    <span style={{ fontSize: '10px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.06em' }}>
+                      SIL WEBONARY LEXICAL VALIDATION
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      background:
+                        liveResult.webonaryValidation.verificationRate >= 0.7
+                          ? 'rgba(34, 197, 94, 0.18)'
+                          : 'rgba(234, 179, 8, 0.18)',
+                      color:
+                        liveResult.webonaryValidation.verificationRate >= 0.7
+                          ? '#4ade80'
+                          : '#facc15',
+                      border: '1px solid currentColor',
+                    }}
+                  >
+                    {liveResult.webonaryValidation.verifiedTokens} / {liveResult.webonaryValidation.totalTokens} Words Verified ({Math.round(liveResult.webonaryValidation.verificationRate * 100)}%)
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                  {liveResult.webonaryValidation.validatedWords.map((vw, idx) => {
+                    const isVerified = vw.status === 'VERIFIED_SIL'
+                    const isAffixed = vw.status === 'AFFIXED_SIL_ROOT'
+                    const isVariant = vw.status === 'DIALECT_VARIANT'
+
+                    const badgeBg = isVerified
+                      ? 'rgba(34, 197, 94, 0.12)'
+                      : isAffixed
+                      ? 'rgba(14, 165, 233, 0.12)'
+                      : isVariant
+                      ? 'rgba(245, 158, 11, 0.12)'
+                      : 'rgba(113, 113, 122, 0.12)'
+
+                    const badgeColor = isVerified
+                      ? '#4ade80'
+                      : isAffixed
+                      ? '#38bdf8'
+                      : isVariant
+                      ? '#fbbf24'
+                      : '#a1a1aa'
+
+                    const borderCol = isVerified
+                      ? 'rgba(34, 197, 94, 0.3)'
+                      : isAffixed
+                      ? 'rgba(14, 165, 233, 0.3)'
+                      : isVariant
+                      ? 'rgba(245, 158, 11, 0.3)'
+                      : 'rgba(113, 113, 122, 0.25)'
+
+                    const tagLabel = isVerified
+                      ? (vw.partOfSpeech || 'Verified')
+                      : isAffixed
+                      ? `Affixed Root: ${vw.rootWord || ''}`
+                      : isVariant
+                      ? `Variant: ${vw.rootWord || ''}`
+                      : 'Unregistered'
+
+                    return (
+                      <div
+                        key={idx}
+                        title={vw.notes || vw.definition || vw.source}
+                        style={{
+                          background: badgeBg,
+                          color: badgeColor,
+                          border: `1px solid ${borderCol}`,
+                          borderRadius: '4px',
+                          padding: '5px 8px',
+                          fontSize: '11px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                        }}
+                      >
+                        <span style={{ fontWeight: 700, color: '#ffffff' }}>{vw.word}</span>
+                        <span
+                          style={{
+                            fontSize: '9px',
+                            fontWeight: 600,
+                            padding: '1px 4px',
+                            borderRadius: '2px',
+                            background: 'rgba(0,0,0,0.3)',
+                          }}
+                        >
+                          {tagLabel}
+                        </span>
+                        {vw.definition && (
+                          <span style={{ fontSize: '10px', color: '#d4d4d8', opacity: 0.85 }}>
+                            &ldquo;{vw.definition.split(';')[0]}&rdquo;
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <div
+                  style={{
+                    fontSize: '9.5px',
+                    color: '#71717a',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '6px',
+                    borderTop: '1px solid #1f1f23',
+                    paddingTop: '8px',
+                  }}
+                >
+                  <span>
+                    Authority: <strong>{liveResult.webonaryValidation.lexicalAuthority}</strong>
+                  </span>
+                  <span>
+                    {liveResult.webonaryValidation.summaryNote}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {liveResult && (
               <div style={{ marginTop: '12px', fontSize: '10.5px', color: '#71717a' }}>
                 Engine Source: {liveResult.corpusSource}

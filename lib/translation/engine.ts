@@ -1,9 +1,12 @@
 import { prisma } from '@/lib/database/prisma'
 import { TranslationLang, TranslationResult } from './types'
 import { translateText } from './fallback'
+import { validateTextWithWebonary } from './webonaryValidator'
+import { translateWithGemini } from './geminiTranslator'
 
 export * from './types'
 export { translateText } from './fallback'
+export { validateTextWithWebonary, validateSingleWord, SIL_WEBONARY_ENTRIES } from './webonaryValidator'
 
 const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
   en: 'english',
@@ -151,6 +154,35 @@ export async function translateTextDynamic(
       const ratio = words.length > 0 ? Math.min(matchedCount / words.length, 1.0) : 0
       const confidence = Math.round((0.60 + ratio * 0.38) * 100) / 100
 
+      // Compute SIL Webonary lexical validation
+      const manoboTextToValidate = sourceLang === 'msm' ? cleanedInput : (targetLang === 'msm' ? translatedText : '')
+      const webonaryValidation = manoboTextToValidate ? validateTextWithWebonary(manoboTextToValidate, 'msm') : undefined
+
+      // If database matched few words and Gemini API is available, enhance with AI
+      if (ratio < 0.5 && process.env.GEMINI_API_KEY) {
+        try {
+          const aiResult = await translateWithGemini(cleanedInput, sourceLang, targetLang)
+          if (aiResult?.translatedText) {
+            const aiManobo = sourceLang === 'msm' ? cleanedInput : aiResult.translatedText
+            return {
+              translatedText: aiResult.translatedText,
+              confidence: aiResult.confidence,
+              sourceLang,
+              targetLang,
+              matchedPhrases,
+              matchedWordsCount: matchedCount,
+              totalWordsCount: words.length,
+              corpusSource: 'Gemini LLM (SIL Webonary Grounded Translation)',
+              engineType: 'COLAB_NEURAL_NMT',
+              webonaryValidation: validateTextWithWebonary(aiManobo, 'msm'),
+              aiReasoning: aiResult.linguisticNotes,
+            }
+          }
+        } catch (aiErr) {
+          console.warn('[TranslateEngine] Gemini AI translation skipped:', aiErr)
+        }
+      }
+
       return {
         translatedText,
         confidence,
@@ -161,12 +193,43 @@ export async function translateTextDynamic(
         totalWordsCount: words.length,
         corpusSource: `ManoboLit Dynamic Database Corpus (${dbEntries.length} verified records in Supabase)`,
         engineType: 'DATABASE_DYNAMIC',
+        webonaryValidation,
       }
     }
   } catch (dbErr) {
     console.warn('Dynamic database translation failed, falling back to static corpus:', dbErr)
   }
 
-  // 3. Fallback to synchronous static corpus if database is unavailable
-  return translateText(cleanedInput, sourceLang, targetLang)
+  // 3. Check Gemini AI if database was offline
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      const aiResult = await translateWithGemini(cleanedInput, sourceLang, targetLang)
+      if (aiResult?.translatedText) {
+        const aiManobo = sourceLang === 'msm' ? cleanedInput : aiResult.translatedText
+        return {
+          translatedText: aiResult.translatedText,
+          confidence: aiResult.confidence,
+          sourceLang,
+          targetLang,
+          matchedPhrases: [],
+          matchedWordsCount: 0,
+          totalWordsCount: cleanedInput.split(/\s+/).length,
+          corpusSource: 'Gemini LLM (SIL Webonary Grounded Translation)',
+          engineType: 'COLAB_NEURAL_NMT',
+          webonaryValidation: validateTextWithWebonary(aiManobo, 'msm'),
+          aiReasoning: aiResult.linguisticNotes,
+        }
+      }
+    } catch {
+      // Fall through to static
+    }
+  }
+
+  // 4. Fallback to synchronous static corpus if database and AI are unavailable
+  const fallbackResult = translateText(cleanedInput, sourceLang, targetLang)
+  const manoboFallback = sourceLang === 'msm' ? cleanedInput : (targetLang === 'msm' ? fallbackResult.translatedText : '')
+  return {
+    ...fallbackResult,
+    webonaryValidation: manoboFallback ? validateTextWithWebonary(manoboFallback, 'msm') : undefined,
+  }
 }
