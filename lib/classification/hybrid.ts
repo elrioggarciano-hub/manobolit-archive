@@ -219,12 +219,26 @@ export function classifyHybrid(
   genreScoresRule.sort((a, b) => b.confidence - a.confidence)
 
   // --- Theme Classification ---
-  // Requirement: Theme confidence threshold requires >= 2 distinct matched terms (not 1)
+  // Requirement: Theme threshold requires >= 2 distinct terms AFTER deduplication.
+  // If a matched keyword is a substring of a matched phrase in the same rule, count only the phrase.
   const themeResults: { value: string; confidence: number; ruleId: string }[] = []
   for (const rule of themeRules) {
     const detail = scoreRule(rule, normText, activeProfile)
     ruleDetails[rule.id] = detail
-    const distinctTerms = new Set(detail.matched.map(m => m.term.toLowerCase()))
+
+    const matchedPhrases = detail.matched.filter(m => m.type === 'phrase').map(m => m.term.toLowerCase())
+    const dedupedTerms: string[] = []
+
+    for (const m of detail.matched) {
+      const termLower = m.term.toLowerCase()
+      if (m.type === 'keyword') {
+        const isSubsumed = matchedPhrases.some(phrase => phrase.includes(termLower) && phrase !== termLower)
+        if (isSubsumed) continue
+      }
+      dedupedTerms.push(termLower)
+    }
+
+    const distinctTerms = new Set(dedupedTerms)
     if (distinctTerms.size >= 2 && detail.confidence >= 0.12) {
       themeResults.push({ value: rule.value, confidence: detail.confidence, ruleId: rule.id })
     }

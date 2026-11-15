@@ -13,3 +13,4 @@ for (const line of content.split('\n')) {
   }
 }
 process.exit(0);
+

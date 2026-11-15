@@ -160,11 +160,13 @@ export function legacyRuleLexiconCentroids(): ClassCentroid[] {
 export function trainTfidf(
   trainingDocs: TrainingDocument[] = TRAINING_CORPUS
 ): TfidfModel {
-  const totalDocuments = trainingDocs.length
+  // Train ONLY on ACTIVE_GENRES documents (DF, IDF, and class centroids)
+  const activeDocs = trainingDocs.filter(d => (ACTIVE_GENRES as readonly string[]).includes(d.genre))
+  const totalDocuments = activeDocs.length
   const dfMap = new Map<string, number>()
 
-  // 1. Calculate Document Frequency (DF) across all training documents
-  for (const doc of trainingDocs) {
+  // 1. Calculate Document Frequency (DF) across active training documents
+  for (const doc of activeDocs) {
     const cleaned = cleanClassificationText(doc.text)
     const unigrams = tokenizeUnigrams(cleaned, true)
     const bigrams = generateWordBigrams(unigrams)

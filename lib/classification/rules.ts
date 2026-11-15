@@ -125,11 +125,57 @@ export const CORPUS_TUNED_TERMS: string[] = [
   "yumad"
 ]
 
+/**
+ * TRANSCRIPTION_TERMS: Rule terms that appear in the original Manobo transcription
+ * of ANY of the 22 archive entries.
+ * Dropped in 'framework-strict' to establish the absolute lower bound.
+ */
+export const TRANSCRIPTION_TERMS: string[] = [
+  "angud to",
+  "atabay",
+  "bata",
+  "bitok",
+  "bitoy",
+  "buhi gihapon",
+  "diwata",
+  "inggad pusilon",
+  "kaba-kaba",
+  "kabubunganan",
+  "kan isda diya",
+  "kapait",
+  "kunag baja",
+  "kunag ka",
+  "likat diyat",
+  "mang juan",
+  "marco",
+  "marta",
+  "miduun subuka",
+  "pag aslag",
+  "pultahan",
+  "pusilon",
+  "rembo",
+  "sa bukano idow",
+  "sapa",
+  "sigulanon",
+  "sinugow",
+  "su kadukiliman",
+  "tagbanwa",
+  "tala",
+  "tiger",
+  "tu maintok pad",
+  "wuhig",
+  "yumad"
+]
+
 const EXCLUDED_FRAMEWORK_SET = new Set<string>(
   [...GENRE_NAME_TERMS, ...CORPUS_TUNED_TERMS].map(t => t.toLowerCase().trim())
 )
 
-export type RulesProfile = 'framework-only' | 'full'
+const EXCLUDED_STRICT_SET = new Set<string>(
+  [...GENRE_NAME_TERMS, ...CORPUS_TUNED_TERMS, ...TRANSCRIPTION_TERMS].map(t => t.toLowerCase().trim())
+)
+
+export type RulesProfile = 'framework-only' | 'framework-strict' | 'full'
 
 /** Default rules profile across the classification engine: 'framework-only' */
 export let RULES_PROFILE: RulesProfile = 'framework-only'
@@ -139,6 +185,9 @@ export function setRulesProfile(profile: RulesProfile): void {
 }
 
 export function isExcludedByProfile(term: string, profile: RulesProfile): boolean {
+  if (profile === 'framework-strict') {
+    return EXCLUDED_STRICT_SET.has(term.toLowerCase().trim())
+  }
   if (profile === 'framework-only') {
     return EXCLUDED_FRAMEWORK_SET.has(term.toLowerCase().trim())
   }

@@ -58,11 +58,13 @@ export function extractWordBoundedCharNgrams(text: string): string[] {
 export function trainCharNgram(
   trainingDocs: TrainingDocument[] = TRAINING_CORPUS
 ): CharNgramModel {
-  const totalDocuments = trainingDocs.length
+  // Train ONLY on ACTIVE_GENRES documents (DF, IDF, and centroids)
+  const activeDocs = trainingDocs.filter(d => (ACTIVE_GENRES as readonly string[]).includes(d.genre))
+  const totalDocuments = activeDocs.length
   const dfMap = new Map<string, number>()
 
   // 1. Compute document frequency (DF) per document
-  for (const doc of trainingDocs) {
+  for (const doc of activeDocs) {
     const cleaned = cleanClassificationText(doc.text)
     const docGrams = extractWordBoundedCharNgrams(cleaned)
     const uniqueGrams = new Set<string>(docGrams)
@@ -109,7 +111,7 @@ export function trainCharNgram(
 
   // 3. Group normalized doc vectors per genre and compute centroid as normalized sum
   const genreDocVecs: Record<string, Record<string, number>[]> = {}
-  for (const doc of trainingDocs) {
+  for (const doc of activeDocs) {
     if (!genreDocVecs[doc.genre]) genreDocVecs[doc.genre] = []
     const cleaned = cleanClassificationText(doc.text)
     genreDocVecs[doc.genre].push(vectorizeDoc(cleaned))

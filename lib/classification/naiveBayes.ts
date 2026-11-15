@@ -53,7 +53,9 @@ export function trainNaiveBayes(
   trainingData: TrainingDocument[] = TRAINING_CORPUS,
   alpha: number = 1.0
 ): NaiveBayesModel {
-  const classes = Array.from(new Set(trainingData.map(d => d.genre)))
+  // Train ONLY on ACTIVE_GENRES docs (priors, vocabulary, likelihoods)
+  const activeData = trainingData.filter(d => (ACTIVE_GENRES as readonly string[]).includes(d.genre))
+  const classes = [...ACTIVE_GENRES]
   const vocabulary = new Set<string>()
   const classCounts: Record<string, number> = {}
   const wordCountsPerClass: Record<string, Record<string, number>> = {}
@@ -66,7 +68,7 @@ export function trainNaiveBayes(
   }
 
   // 1. Accumulate word counts and class occurrences
-  for (const doc of trainingData) {
+  for (const doc of activeData) {
     classCounts[doc.genre] = (classCounts[doc.genre] || 0) + 1
     const cleanedText = cleanClassificationText(doc.text)
     const unigrams = tokenizeUnigrams(cleanedText, true)
@@ -80,7 +82,7 @@ export function trainNaiveBayes(
     }
   }
 
-  const totalDocuments = trainingData.length
+  const totalDocuments = activeData.length
   const numClasses = classes.length
 
   // 2. Compute Laplace-smoothed Log-Priors: ln P(c)

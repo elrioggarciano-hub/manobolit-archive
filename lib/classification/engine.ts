@@ -20,6 +20,7 @@ export interface ClassificationResult {
     confidence: number
     rulesApplied: string[]
     allScores: { genre: string; confidence: number }[]
+    isUnclassified?: boolean
   }
   themes: {
     value: string
@@ -78,12 +79,13 @@ export function classifyEntry(
   let locationInput: string | undefined
 
   if (typeof input === 'object' && input !== null) {
-    const parts = [
+    const rawJoined = [
       input.transcription,
       input.translation,
       additionalContext,
-    ]
-    rawText = baseNormalize(parts.filter(Boolean).join(' '))
+    ].filter(Boolean).join(' ')
+    const cleaned = cleanClassificationText(rawJoined)
+    rawText = baseNormalize(cleaned)
 
     const locParts = [
       input.communityLocation,
@@ -95,11 +97,10 @@ export function classifyEntry(
       locationInput = locParts.join(', ')
     }
   } else {
-    rawText = baseNormalize(`${input} ${additionalContext}`)
+    const cleaned = cleanClassificationText(`${input} ${additionalContext}`)
+    rawText = baseNormalize(cleaned)
   }
 
-  const fullText = cleanClassificationText(rawText)
-
   // Execute Hybrid Classifier (ignoring targetGenreFilter in the classification path)
-  return classifyHybrid(fullText, 'ALL', algorithmMode, models, locationInput)
+  return classifyHybrid(rawText, 'ALL', algorithmMode, models, locationInput)
 }
