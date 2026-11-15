@@ -48,6 +48,10 @@ export interface EntryLike {
   translation?: string | null
   culturalElements?: string | string[] | null
   type?: string | null
+  communityLocation?: string | null
+  municipality?: string | null
+  barangay?: string | null
+  province?: string | null
 }
 
 /**
@@ -59,6 +63,9 @@ export interface EntryLike {
  *
  * Text policy: Classifies genuine primary oral text (transcription + translation ONLY),
  * excluding modern title metadata and researcher commentary.
+ *
+ * Location policy: Inferred strictly from recorded communityLocation provenance metadata,
+ * never hallucinated from oral story text.
  */
 export function classifyEntry(
   input: string | EntryLike,
@@ -68,6 +75,7 @@ export function classifyEntry(
   models?: InjectableModels
 ): ClassificationResult {
   let rawText: string
+  let locationInput: string | undefined
 
   if (typeof input === 'object' && input !== null) {
     const parts = [
@@ -76,6 +84,16 @@ export function classifyEntry(
       additionalContext,
     ]
     rawText = baseNormalize(parts.filter(Boolean).join(' '))
+
+    const locParts = [
+      input.communityLocation,
+      input.barangay,
+      input.municipality,
+      input.province,
+    ].filter(Boolean)
+    if (locParts.length > 0) {
+      locationInput = locParts.join(', ')
+    }
   } else {
     rawText = baseNormalize(`${input} ${additionalContext}`)
   }
@@ -83,5 +101,5 @@ export function classifyEntry(
   const fullText = cleanClassificationText(rawText)
 
   // Execute Hybrid Classifier
-  return classifyHybrid(fullText, genreFilter, algorithmMode, models)
+  return classifyHybrid(fullText, genreFilter, algorithmMode, models, locationInput)
 }

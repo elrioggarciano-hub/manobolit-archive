@@ -13,6 +13,139 @@ export interface ClassificationRule {
   baseConfidence: number
 }
 
+/**
+ * GENRE_NAME_TERMS: Literal genre taxonomy words, markers, and citation strings.
+ * Excluded under 'framework-only' profile to ensure classifications evaluate genuine
+ * folkloric content rather than explicit label self-references.
+ */
+export const GENRE_NAME_TERMS: string[] = [
+  'riddle', 'riddles', 'tigmo', 'trick riddle', 'this riddle', 'the riddle', 'traditional riddle',
+  'answer:', 'answer :', 'answer is', 'the answer is',
+  'proverb', 'proverbs', 'panultihon', 'this proverb', 'the proverb', 'saying', 'old saying', 'the saying', 'as the saying goes', 'adage',
+  'song', 'songs', 'folk song', 'manobo folk song', 'we sing', 'let us sing', 'sing this song', 'sing',
+  'the song captures', 'the song conveys', 'the song portrays', 'the song talks', 'the song explores', 'the song sends',
+  'folktale', 'folktales', 'sugilanon', 'sigulanon', 'fable',
+  'myth', 'myths', 'origin myth',
+  'legend', 'legends', 'the legend of', 'according to legend', 'legend has it',
+  'epic', 'epics', 'ulaging', 'agyu',
+  'chant', 'chants', 'sacred chant',
+  'maravilla (2024)', 'maravilla, 2024', 'catipay', 'curato'
+]
+
+/**
+ * CORPUS_TUNED_TERMS: Rule terms that appear in exactly one of the 22 database entries.
+ * These were detected via programmatic audit across the archive corpus.
+ * Excluded under 'framework-only' profile to eliminate in-sample single-entry over-fitting.
+ */
+export const CORPUS_TUNED_TERMS: string[] = [
+  "angud to",
+  "animal",
+  "atabay",
+  "bata",
+  "behavior",
+  "birds",
+  "bitok",
+  "bitoy",
+  "buhi gihapon",
+  "butterfly",
+  "century",
+  "cry",
+  "departure",
+  "diwata",
+  "fairy",
+  "fairy took me",
+  "farewell",
+  "field",
+  "foreigners",
+  "forest",
+  "generation",
+  "goddess",
+  "government",
+  "history",
+  "history of the tribe",
+  "horse",
+  "how can you escape",
+  "hunger",
+  "i weep when",
+  "in a village",
+  "in the forest",
+  "inggad pusilon",
+  "kaba-kaba",
+  "kabubunganan",
+  "kan isda diya",
+  "kapait",
+  "kasaysayan",
+  "kayamanan",
+  "kunag baja",
+  "light",
+  "likat diyat",
+  "love",
+  "mang juan",
+  "marco",
+  "marta",
+  "miduun subuka",
+  "mountain",
+  "my love for you",
+  "native",
+  "never",
+  "no matter how hard",
+  "pain",
+  "past",
+  "peace",
+  "place",
+  "plant",
+  "pultahan",
+  "pusilon",
+  "rain",
+  "rembo",
+  "resolution",
+  "resources",
+  "return",
+  "sa bukano idow",
+  "sigulanon",
+  "sinugow",
+  "soil",
+  "spaniards",
+  "su kadukiliman",
+  "sun",
+  "tagbanwa",
+  "tala",
+  "tears are falling",
+  "the night has come",
+  "tree",
+  "tribe",
+  "trust",
+  "village",
+  "wait",
+  "weep",
+  "what was buried",
+  "wheel of eba",
+  "world",
+  "worm",
+  "yumad"
+]
+
+const EXCLUDED_FRAMEWORK_SET = new Set<string>(
+  [...GENRE_NAME_TERMS, ...CORPUS_TUNED_TERMS].map(t => t.toLowerCase().trim())
+)
+
+export type RulesProfile = 'framework-only' | 'full'
+
+/** Default rules profile across the classification engine: 'framework-only' */
+export let RULES_PROFILE: RulesProfile = 'framework-only'
+
+export function setRulesProfile(profile: RulesProfile): void {
+  RULES_PROFILE = profile
+}
+
+export function isExcludedByProfile(term: string, profile: RulesProfile): boolean {
+  if (profile === 'framework-only') {
+    return EXCLUDED_FRAMEWORK_SET.has(term.toLowerCase().trim())
+  }
+  return false
+}
+
+
 export const genreRules: ClassificationRule[] = [
   {
     id: 'G001',
@@ -477,7 +610,7 @@ export const locationRules: ClassificationRule[] = [
     value: 'TRENTO',
     keywords: ['trento', 'tudela'],
     phrases: ['in trento', 'near trento', 'municipality of trento', 'barangay of tudela', 'brgy. tudela'],
-    contextClues: ['agusan del sur', 'communityLocation', 'provincial'],
+    contextClues: ['agusan del sur'],
     baseConfidence: 0.90,
   },
   {
@@ -488,7 +621,7 @@ export const locationRules: ClassificationRule[] = [
     value: 'STA_MARIA',
     keywords: ['maria', 'santa maria', 'sta maria', 'sta. maria'],
     phrases: ['in sta maria', 'in sta. maria', 'in santa maria', 'brgy. sta maria'],
-    contextClues: ['agusan del sur', 'communityLocation'],
+    contextClues: ['agusan del sur'],
     baseConfidence: 0.95,
   },
   {
@@ -521,7 +654,7 @@ export const locationRules: ClassificationRule[] = [
     value: 'BUNAWAN',
     keywords: ['bunawan', 'san andres'],
     phrases: ['in bunawan', 'municipality of bunawan', 'san andres, bunawan', 'bunawan, agusan del sur'],
-    contextClues: ['agusan del sur', 'communityLocation', 'provincial'],
+    contextClues: ['agusan del sur'],
     baseConfidence: 0.92,
   },
   {

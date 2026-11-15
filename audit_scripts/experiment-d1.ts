@@ -27,7 +27,7 @@ async function main() {
   log('=== D1 BASELINE COMPARATIVE METRICS (AS-IS, POST-STEP 4) ===');
   log('Mode            \tAccuracy\tMacro Precision\tMacro Recall\tMacro F1\tSample Size');
   log('-----------------------------------------------------------------------------------------');
-  
+
   const modes: Array<{ name: string; key: keyof typeof report }> = [
     { name: 'RULE_BASED', key: 'ruleBased' },
     { name: 'TF_IDF_VSM', key: 'tfidfVsm' },

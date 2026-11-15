@@ -1,0 +1,50 @@
+=== STEP 5 CHECK 2: NAMED RULE PROFILE LISTS AUDIT ===
+
+1. GENRE_NAME_TERMS (59 total terms):
+   Purpose: Taxonomy markers, category names, editorial labels, and author citations.
+   Excluded under 'framework-only' to prevent self-referential label matching.
+   - "riddle", "riddles", "tigmo", "trick riddle", "this riddle"
+   - "the riddle", "traditional riddle", "answer:", "answer :", "answer is"
+   - "the answer is", "proverb", "proverbs", "panultihon", "this proverb"
+   - "the proverb", "saying", "old saying", "the saying", "as the saying goes"
+   - "adage", "song", "songs", "folk song", "manobo folk song"
+   - "we sing", "let us sing", "sing this song", "sing", "the song captures"
+   - "the song conveys", "the song portrays", "the song talks", "the song explores", "the song sends"
+   - "folktale", "folktales", "sugilanon", "sigulanon", "fable"
+   - "myth", "myths", "origin myth", "legend", "legends"
+   - "the legend of", "according to legend", "legend has it", "epic", "epics"
+   - "ulaging", "agyu", "chant", "chants", "sacred chant"
+   - "maravilla (2024)", "maravilla, 2024", "catipay", "curato"
+
+2. CORPUS_TUNED_TERMS (85 total terms):
+   Purpose: Lexical items and phrases that match in exactly one of the 22 archive entries.
+   Identified via corpus audit across the 22 entries to eliminate in-sample single-entry over-fitting.
+   Excluded under 'framework-only' profile; allowed only in 'full' (in-sample) profile.
+   - "angud to", "animal", "atabay", "bata", "behavior"
+   - "birds", "bitok", "bitoy", "buhi gihapon", "butterfly"
+   - "century", "cry", "departure", "diwata", "fairy"
+   - "fairy took me", "farewell", "field", "foreigners", "forest"
+   - "generation", "goddess", "government", "history", "history of the tribe"
+   - "horse", "how can you escape", "hunger", "i weep when", "in a village"
+   - "in the forest", "inggad pusilon", "kaba-kaba", "kabubunganan", "kan isda diya"
+   - "kapait", "kasaysayan", "kayamanan", "kunag baja", "light"
+   - "likat diyat", "love", "mang juan", "marco", "marta"
+   - "miduun subuka", "mountain", "my love for you", "native", "never"
+   - "no matter how hard", "pain", "past", "peace", "place"
+   - "plant", "pultahan", "pusilon", "rain", "rembo"
+   - "resolution", "resources", "return", "sa bukano idow", "sigulanon"
+   - "sinugow", "soil", "spaniards", "su kadukiliman", "sun"
+   - "tagbanwa", "tala", "tears are falling", "the night has come", "tree"
+   - "tribe", "trust", "village", "wait", "weep"
+   - "what was buried", "wheel of eba", "world", "worm", "yumad"
+
+3. RULES_PROFILE CONFIGURATION & EXCLUSION LOGIC VERIFICATION:
+   Default RULES_PROFILE in rules.ts: "framework-only"
+   Total unique terms tested: 144
+   Terms excluded under 'framework-only': 144 / 144 (100% EXCLUDED)
+   Terms excluded under 'full': 0 / 144 (0% EXCLUDED - ALLOWS IN-SAMPLE HEURISTICS)
+   Status: PASS
+
+--- FILE METRICS ---
+Total Lines: 50
+SHA-256: 77f2814af771cf7e593104bf829dc3e8fc8db3a97ccd33aa46107b29418bdda2

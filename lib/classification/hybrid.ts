@@ -8,7 +8,7 @@
 import { classifyWithVSM, VSMResult, FeatureWeight, TfidfModel } from './tfidf'
 import { findOrthographicDialectMatches, FuzzyMatchResult } from './fuzzy'
 import { tokenizeUnigrams } from './tokenizer'
-import { genreRules, themeRules, locationRules, ClassificationRule } from './rules'
+import { genreRules, themeRules, locationRules, ClassificationRule, RulesProfile, RULES_PROFILE, isExcludedByProfile } from './rules'
 import { MatchedTerm, RuleDetail } from './engine'
 import { predictNaiveBayes, NaiveBayesPrediction, NaiveBayesModel } from './naiveBayes'
 import { classifyWithCharNgram, CharNgramResult, CharNgramModel } from './charNgram'
@@ -19,6 +19,7 @@ export interface InjectableModels {
   nb?: NaiveBayesModel
   tfidf?: TfidfModel
   charNgram?: CharNgramModel
+  rulesProfile?: RulesProfile
 }
 
 export type AlgorithmMode =
@@ -70,36 +71,66 @@ export interface HybridClassificationResult {
   }
 }
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const termRegexCache = new Map<string, RegExp>()
+function getTermBoundaryRegex(term: string): RegExp {
+  const t = term.trim().toLowerCase()
+  let rx = termRegexCache.get(t)
+  if (!rx) {
+    rx = new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegex(t)}(?![\\p{L}\\p{N}])`, 'iu')
+    termRegexCache.set(t, rx)
+  }
+  return rx
+}
+
 /**
- * Baseline Rule-Scoring function (Preserved for comparison & rule-based baseline).
+ * Matches a term strictly within Unicode word boundaries.
+ * Prevents substring false positives (e.g., 'sing' matching in 'crossing' or 'uling' in 'ruling').
  */
-function scoreRule(rule: ClassificationRule, normalizedText: string): RuleDetail {
+export function matchWordBoundary(text: string, term: string): boolean {
+  const t = term.trim()
+  if (!t) return false
+  return getTermBoundaryRegex(t).test(text)
+}
+
+/**
+ * Rule-Scoring function with Unicode word-boundary matching and configurable profile.
+ */
+export function scoreRule(
+  rule: ClassificationRule,
+  normalizedText: string,
+  profile: RulesProfile = RULES_PROFILE
+): RuleDetail {
   let score = 0
   let matchCount = 0
   const matched: MatchedTerm[] = []
 
-  for (const keyword of rule.keywords) {
-    if (normalizedText.includes(keyword.toLowerCase())) {
-      score += 1
-      matchCount++
-      matched.push({ term: keyword, type: 'keyword' })
+  const checkTerm = (term: string, type: 'keyword' | 'phrase' | 'context', weight: number) => {
+    const trimmed = term.trim()
+    if (!trimmed) return
+    if (profile === 'framework-only' && isExcludedByProfile(trimmed, profile)) {
+      return
     }
+    if (matchWordBoundary(normalizedText, trimmed)) {
+      score += weight
+      matchCount++
+      matched.push({ term: trimmed, type })
+    }
+  }
+
+  for (const keyword of rule.keywords) {
+    checkTerm(keyword, 'keyword', 1)
   }
 
   for (const phrase of rule.phrases) {
-    if (normalizedText.includes(phrase.toLowerCase())) {
-      score += 2
-      matchCount++
-      matched.push({ term: phrase, type: 'phrase' })
-    }
+    checkTerm(phrase, 'phrase', 2)
   }
 
   for (const clue of rule.contextClues) {
-    if (normalizedText.includes(clue.toLowerCase())) {
-      score += 1.5
-      matchCount++
-      matched.push({ term: clue, type: 'context' })
-    }
+    checkTerm(clue, 'context', 1.5)
   }
 
   matched.sort((a, b) => {
@@ -128,10 +159,12 @@ export function classifyHybrid(
   fullText: string,
   targetGenreFilter: string = 'ALL',
   algorithmMode: AlgorithmMode = 'HYBRID_ENSEMBLE',
-  models?: InjectableModels
+  models?: InjectableModels,
+  locationInput?: string
 ): HybridClassificationResult {
   const normText = cleanClassificationText(fullText).toLowerCase()
   const unigrams = tokenizeUnigrams(normText, false)
+  const activeProfile = models?.rulesProfile ?? RULES_PROFILE
 
   // 1. Run Supervised Machine Learning: Multinomial Naive Bayes
   const nbResult = predictNaiveBayes(normText, targetGenreFilter, models?.nb)
@@ -159,7 +192,7 @@ export function classifyHybrid(
     } else if (rule.value !== targetGenreFilter) {
       continue
     }
-    const detail = scoreRule(rule, normText)
+    const detail = scoreRule(rule, normText, activeProfile)
     ruleDetails[rule.id] = detail
     if (detail.confidence > 0) {
       genreScoresRule.push({ genre: rule.value, confidence: detail.confidence, ruleId: rule.id })
@@ -169,11 +202,13 @@ export function classifyHybrid(
   genreScoresRule.sort((a, b) => b.confidence - a.confidence)
 
   // --- Theme Classification ---
+  // Requirement: Theme confidence threshold requires >= 2 distinct matched terms (not 1)
   const themeResults: { value: string; confidence: number; ruleId: string }[] = []
   for (const rule of themeRules) {
-    const detail = scoreRule(rule, normText)
+    const detail = scoreRule(rule, normText, activeProfile)
     ruleDetails[rule.id] = detail
-    if (detail.confidence >= 0.12) {
+    const distinctTerms = new Set(detail.matched.map(m => m.term.toLowerCase()))
+    if (distinctTerms.size >= 2 && detail.confidence >= 0.12) {
       themeResults.push({ value: rule.value, confidence: detail.confidence, ruleId: rule.id })
     }
   }
@@ -181,12 +216,16 @@ export function classifyHybrid(
   const topThemes = themeResults.slice(0, 4)
 
   // --- Location Classification ---
+  // Requirement: Remove location inference from content; location must come strictly from recorded communityLocation
   const locationResults: { value: string; confidence: number; ruleId: string }[] = []
-  for (const rule of locationRules) {
-    const detail = scoreRule(rule, normText)
-    ruleDetails[rule.id] = detail
-    if (detail.confidence >= 0.08) {
-      locationResults.push({ value: rule.value, confidence: detail.confidence, ruleId: rule.id })
+  if (locationInput && locationInput.trim()) {
+    const normLoc = locationInput.toLowerCase()
+    for (const rule of locationRules) {
+      const detail = scoreRule(rule, normLoc, 'full')
+      ruleDetails[rule.id] = detail
+      if (detail.confidence >= 0.08) {
+        locationResults.push({ value: rule.value, confidence: detail.confidence, ruleId: rule.id })
+      }
     }
   }
   locationResults.sort((a, b) => b.confidence - a.confidence)
@@ -289,7 +328,8 @@ export function classifyHybrid(
   } else if (algorithmMode === 'TF_IDF_VSM') {
     mathExplanation = `VSM Cosine Similarity Angle: cos(θ) = ${(scoreBreakdown.vsmCosineSimilarity * 100).toFixed(1)}% between Document Vector (||d||=${vsmResult.documentVectorMagnitude}) and ${topGenre.genre} Centroid Vector.`
   } else {
-    mathExplanation = `Domain Rule Pattern Matching: Keyword and phrase triggers evaluated against taxonomic definitions.`
+    const profileLabel = activeProfile === 'full' ? 'full (in-sample)' : 'framework-only'
+    mathExplanation = `Domain Rule Pattern Matching [${profileLabel}]: Word-boundary taxonomic indicators evaluated against Eugenio (1993) definitions.`
   }
 
   return {
