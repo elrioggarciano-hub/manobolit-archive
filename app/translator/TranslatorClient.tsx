@@ -543,9 +543,9 @@ export default function TranslatorClient() {
                     }}
                   >
                     {liveResult.engineType === 'COLAB_NEURAL_NMT'
-                      ? '⚡ COLAB NMT'
+                      ? '⚡ NEURAL NMT'
                       : liveResult.engineType === 'DATABASE_DYNAMIC'
-                        ? '🟢 DYNAMIC SUPABASE DB'
+                        ? '🟢 VERIFIED CORPUS'
                         : 'CORPUS FALLBACK'}
                   </span>
                 )}
@@ -895,9 +895,6 @@ export default function TranslatorClient() {
                   >
                     📚 SIL Webonary Dictionary ({liveResult.webonaryWordsCount ?? 0} supplemented)
                   </span>
-                </div>
-                <div style={{ fontSize: '10px', color: '#71717a' }}>
-                  {liveResult.corpusSource}
                 </div>
               </div>
             )}

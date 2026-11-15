@@ -224,7 +224,7 @@ export async function translateTextDynamic(
         matchedPhrases,
         matchedWordsCount: matchedCount,
         totalWordsCount: words.length,
-        corpusSource: `Dual Validating Corpus: Agusan Manobo Bible (${dbEntries.length} verified records) + SIL Webonary Dictionary (Supplementary)`,
+        corpusSource: 'Dual Validating Corpus: Agusan Manobo Bible (Primary) + SIL Webonary Dictionary (Supplementary)',
         engineType: 'DATABASE_DYNAMIC',
         webonaryValidation,
         bibleWordsCount: bibleMatchedCount,
