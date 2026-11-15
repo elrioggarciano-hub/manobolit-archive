@@ -15,6 +15,7 @@
 
 import { normalizeText, tokenizeUnigrams, generateWordBigrams } from './tokenizer'
 import { genreRules, themeRules } from './rules'
+import { TRAINING_CORPUS, TrainingDocument } from './trainingCorpus'
 
 export interface TFIDFVector {
   [term: string]: number
@@ -42,20 +43,41 @@ export interface VSMResult {
   documentVectorMagnitude: number
 }
 
+export interface ClassCentroid {
+  key: string
+  category: string
+  type: 'GENRE' | 'THEME'
+  vector: TFIDFVector
+  magnitude: number
+}
+
+export interface TfidfModel {
+  centroids: ClassCentroid[]
+  totalDocuments: number
+  dfMap: Map<string, number>
+  getIDF: (term: string) => number
+  textToVector: (text: string) => {
+    vector: TFIDFVector
+    magnitude: number
+    features: FeatureWeight[]
+  }
+}
+
 // -----------------------------------------------------------------------------
-// Pre-Compiled Corpus Profiles
-// Synthesizes the Eugenio (1993) & Andress (1985) reference corpus definitions
-// into class-representative training document profiles.
+// Legacy Rule-Derived Centroids (Archival / Comparative Reference)
 // -----------------------------------------------------------------------------
 
-function buildClassCorpus(): Record<string, string[]> {
+/**
+ * Generates class centroids synthesized directly from genreRules and themeRules keywords.
+ * Kept strictly for archival and comparative benchmarking; unused by default.
+ */
+export function legacyRuleLexiconCentroids(): ClassCentroid[] {
   const corpus: Record<string, string[]> = {}
 
-  // Eugenio 1993 Genre training documents
   for (const rule of genreRules) {
     const tokens = [
       ...rule.keywords,
-      ...rule.keywords, // Weight emphasis on primary keywords
+      ...rule.keywords,
       ...rule.phrases,
       ...rule.contextClues,
       rule.name,
@@ -64,7 +86,6 @@ function buildClassCorpus(): Record<string, string[]> {
     corpus[`GENRE_${rule.value}`] = tokens
   }
 
-  // Andress 1985 Theme training documents
   for (const rule of themeRules) {
     const tokens = [
       ...rule.keywords,
@@ -76,126 +97,204 @@ function buildClassCorpus(): Record<string, string[]> {
     corpus[`THEME_${rule.value}`] = tokens
   }
 
-  return corpus
+  const legacyDfMap = new Map<string, number>()
+  const totalDocs = Object.keys(corpus).length
+
+  for (const [_, tokenList] of Object.entries(corpus)) {
+    const uniqueTermsInDoc = new Set<string>()
+    for (const item of tokenList) {
+      const terms = tokenizeUnigrams(item, true)
+      for (const t of terms) uniqueTermsInDoc.add(t)
+      const bigrams = generateWordBigrams(terms)
+      for (const b of bigrams) uniqueTermsInDoc.add(b)
+    }
+    for (const term of uniqueTermsInDoc) {
+      legacyDfMap.set(term, (legacyDfMap.get(term) || 0) + 1)
+    }
+  }
+
+  const legacyGetIdf = (term: string) => {
+    const df = legacyDfMap.get(term) || 0
+    return Math.log(1 + totalDocs / (1 + df)) + 1.0
+  }
+
+  return Object.entries(corpus).map(([docKey, tokens]) => {
+    const docText = tokens.join(' ')
+    const unigrams = tokenizeUnigrams(docText, true)
+    const bigrams = generateWordBigrams(unigrams)
+    const allTerms = [...unigrams, ...bigrams]
+    const termCounts = new Map<string, number>()
+    for (const t of allTerms) termCounts.set(t, (termCounts.get(t) || 0) + 1)
+
+    const vector: TFIDFVector = {}
+    let sumSquares = 0
+    for (const [term, count] of termCounts.entries()) {
+      const tf = 1 + Math.log(count)
+      const idf = legacyGetIdf(term)
+      const tfidf = tf * idf
+      vector[term] = tfidf
+      sumSquares += tfidf * tfidf
+    }
+    const isGenre = docKey.startsWith('GENRE_')
+    const category = isGenre ? docKey.replace('GENRE_', '') : docKey.replace('THEME_', '')
+    return {
+      key: docKey,
+      category,
+      type: isGenre ? 'GENRE' : 'THEME',
+      vector,
+      magnitude: Math.sqrt(sumSquares),
+    }
+  })
 }
 
-const CLASS_CORPUS = buildClassCorpus()
-const TOTAL_DOCUMENTS = Object.keys(CLASS_CORPUS).length
-
 // -----------------------------------------------------------------------------
-// Document Frequency (DF) and Inverse Document Frequency (IDF) Cache
+// Trainable Document-Derived TF-IDF Vector Space Model
 // -----------------------------------------------------------------------------
-
-const DF_MAP = new Map<string, number>()
-
-// Initialize DF map from class corpus profiles
-for (const [_, tokenList] of Object.entries(CLASS_CORPUS)) {
-  const uniqueTermsInDoc = new Set<string>()
-  for (const item of tokenList) {
-    const terms = tokenizeUnigrams(item, true)
-    for (const t of terms) uniqueTermsInDoc.add(t)
-    const bigrams = generateWordBigrams(terms)
-    for (const b of bigrams) uniqueTermsInDoc.add(b)
-  }
-  for (const term of uniqueTermsInDoc) {
-    DF_MAP.set(term, (DF_MAP.get(term) || 0) + 1)
-  }
-}
 
 /**
- * Calculates smoothed IDF for a given term.
+ * Trains a TF-IDF Vector Space Model from labeled documents only.
+ * Computes empirical Document Frequency (DF), Inverse Document Frequency (IDF),
+ * and normalized class centroid vectors per genre and theme.
+ */
+export function trainTfidf(
+  trainingDocs: TrainingDocument[] = TRAINING_CORPUS
+): TfidfModel {
+  const totalDocuments = trainingDocs.length
+  const dfMap = new Map<string, number>()
+
+  // 1. Calculate Document Frequency (DF) across all training documents
+  for (const doc of trainingDocs) {
+    const unigrams = tokenizeUnigrams(doc.text, true)
+    const bigrams = generateWordBigrams(unigrams)
+    const uniqueTerms = new Set<string>([...unigrams, ...bigrams])
+    for (const term of uniqueTerms) {
+      dfMap.set(term, (dfMap.get(term) || 0) + 1)
+    }
+  }
+
+  // 2. Smoothed IDF calculation function
+  const idfFn = (term: string): number => {
+    const df = dfMap.get(term) || 0
+    return Math.log(1 + totalDocuments / (1 + df)) + 1.0
+  }
+
+  // 3. Document vectorization function using model's IDF
+  const textToVector = (text: string): {
+    vector: TFIDFVector
+    magnitude: number
+    features: FeatureWeight[]
+  } => {
+    const unigrams = tokenizeUnigrams(text, true)
+    const bigrams = generateWordBigrams(unigrams)
+    const allTerms = [...unigrams, ...bigrams]
+
+    if (allTerms.length === 0) {
+      return { vector: {}, magnitude: 0, features: [] }
+    }
+
+    const termCounts = new Map<string, number>()
+    for (const t of allTerms) {
+      termCounts.set(t, (termCounts.get(t) || 0) + 1)
+    }
+
+    const vector: TFIDFVector = {}
+    const features: FeatureWeight[] = []
+    let sumSquares = 0
+
+    for (const [term, count] of termCounts.entries()) {
+      const tf = 1 + Math.log(count)
+      const idf = idfFn(term)
+      const tfidf = tf * idf
+
+      vector[term] = tfidf
+      sumSquares += tfidf * tfidf
+
+      features.push({
+        term,
+        tf: Math.round(tf * 100) / 100,
+        idf: Math.round(idf * 100) / 100,
+        tfidf: Math.round(tfidf * 100) / 100,
+      })
+    }
+
+    const magnitude = Math.sqrt(sumSquares)
+    features.sort((a, b) => b.tfidf - a.tfidf)
+    return { vector, magnitude, features }
+  }
+
+  // 4. Group training document texts by genre and theme
+  const genreTexts: Record<string, string[]> = {}
+  const themeTexts: Record<string, string[]> = {}
+
+  for (const doc of trainingDocs) {
+    if (!genreTexts[doc.genre]) genreTexts[doc.genre] = []
+    genreTexts[doc.genre].push(doc.text)
+
+    if (Array.isArray(doc.themes)) {
+      for (const th of doc.themes) {
+        if (!themeTexts[th]) themeTexts[th] = []
+        themeTexts[th].push(doc.text)
+      }
+    }
+  }
+
+  const centroids: ClassCentroid[] = []
+
+  // Build Genre Centroids from document text
+  for (const [genre, texts] of Object.entries(genreTexts)) {
+    const combinedText = texts.join(' ')
+    const { vector, magnitude } = textToVector(combinedText)
+    centroids.push({
+      key: `GENRE_${genre}`,
+      category: genre,
+      type: 'GENRE',
+      vector,
+      magnitude,
+    })
+  }
+
+  // Build Theme Centroids from document text
+  for (const [theme, texts] of Object.entries(themeTexts)) {
+    const combinedText = texts.join(' ')
+    const { vector, magnitude } = textToVector(combinedText)
+    centroids.push({
+      key: `THEME_${theme}`,
+      category: theme,
+      type: 'THEME',
+      vector,
+      magnitude,
+    })
+  }
+
+  return {
+    centroids,
+    totalDocuments,
+    dfMap,
+    getIDF: idfFn,
+    textToVector,
+  }
+}
+
+// Global trained instance on default TRAINING_CORPUS
+export const DEFAULT_TFIDF_MODEL: TfidfModel = trainTfidf(TRAINING_CORPUS)
+export const CLASS_CENTROIDS: ClassCentroid[] = DEFAULT_TFIDF_MODEL.centroids
+
+/**
+ * Calculates smoothed IDF for a given term (defaults to global model).
  */
 export function getIDF(term: string): number {
-  const df = DF_MAP.get(term) || 0
-  // Smoothed formula: ln(1 + (N / (1 + df))) + 1
-  return Math.log(1 + TOTAL_DOCUMENTS / (1 + df)) + 1.0
+  return DEFAULT_TFIDF_MODEL.getIDF(term)
 }
 
 /**
- * Converts raw text into a normalized TF-IDF vector + feature analysis.
+ * Converts raw text into a normalized TF-IDF vector + feature analysis (defaults to global model).
  */
 export function textToTFIDFVector(text: string): {
   vector: TFIDFVector
   magnitude: number
   features: FeatureWeight[]
 } {
-  const unigrams = tokenizeUnigrams(text, true)
-  const bigrams = generateWordBigrams(unigrams)
-  const allTerms = [...unigrams, ...bigrams]
-
-  if (allTerms.length === 0) {
-    return { vector: {}, magnitude: 0, features: [] }
-  }
-
-  // Calculate raw term frequencies f_{t, d}
-  const termCounts = new Map<string, number>()
-  for (const t of allTerms) {
-    termCounts.set(t, (termCounts.get(t) || 0) + 1)
-  }
-
-  const vector: TFIDFVector = {}
-  const features: FeatureWeight[] = []
-  let sumSquares = 0
-
-  for (const [term, count] of termCounts.entries()) {
-    // Sublinear TF scaling: 1 + ln(count)
-    const tf = 1 + Math.log(count)
-    const idf = getIDF(term)
-    const tfidf = tf * idf
-
-    vector[term] = tfidf
-    sumSquares += tfidf * tfidf
-
-    features.push({
-      term,
-      tf: Math.round(tf * 100) / 100,
-      idf: Math.round(idf * 100) / 100,
-      tfidf: Math.round(tfidf * 100) / 100,
-    })
-  }
-
-  // L2 Euclidean norm
-  const magnitude = Math.sqrt(sumSquares)
-
-  // Sort features by TF-IDF weight descending (most informative terms first)
-  features.sort((a, b) => b.tfidf - a.tfidf)
-
-  return { vector, magnitude, features }
-}
-
-// -----------------------------------------------------------------------------
-// Pre-Compute Centroid Vectors for each Genre and Theme
-// -----------------------------------------------------------------------------
-
-export interface ClassCentroid {
-  key: string
-  category: string
-  type: 'GENRE' | 'THEME'
-  vector: TFIDFVector
-  magnitude: number
-}
-
-export interface TfidfModel {
-  centroids: ClassCentroid[]
-}
-
-export const CLASS_CENTROIDS: ClassCentroid[] = Object.entries(CLASS_CORPUS).map(([docKey, tokens]) => {
-  const docText = tokens.join(' ')
-  const { vector, magnitude } = textToTFIDFVector(docText)
-  const isGenre = docKey.startsWith('GENRE_')
-  const category = isGenre ? docKey.replace('GENRE_', '') : docKey.replace('THEME_', '')
-
-  return {
-    key: docKey,
-    category,
-    type: isGenre ? 'GENRE' : 'THEME',
-    vector,
-    magnitude,
-  }
-})
-
-export const DEFAULT_TFIDF_MODEL: TfidfModel = {
-  centroids: CLASS_CENTROIDS,
+  return DEFAULT_TFIDF_MODEL.textToVector(text)
 }
 
 /**
@@ -249,11 +348,12 @@ export function classifyWithVSM(
   targetGenreFilter: string = 'ALL',
   model: TfidfModel = DEFAULT_TFIDF_MODEL
 ): VSMResult {
-  const { vector: docVec, magnitude: docMag, features } = textToTFIDFVector(text)
+  const activeModel = model || DEFAULT_TFIDF_MODEL
+  const { vector: docVec, magnitude: docMag, features } = activeModel.textToVector(text)
 
   const genreScores: VSMScore[] = []
   const themeScores: VSMScore[] = []
-  const centroids = model?.centroids || CLASS_CENTROIDS
+  const centroids = activeModel.centroids
 
   for (const centroid of centroids) {
     if (centroid.type === 'GENRE') {

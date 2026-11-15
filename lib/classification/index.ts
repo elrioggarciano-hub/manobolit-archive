@@ -16,7 +16,15 @@ export { classifyWithNeuralSemantic } from './neuralSemantic'
 export type { NeuralSemanticResult } from './neuralSemantic'
 
 // 3. Statistical Information Retrieval: TF-IDF Vector Space Model
-export { classifyWithVSM, textToTFIDFVector, computeCosineSimilarity, getIDF, DEFAULT_TFIDF_MODEL } from './tfidf'
+export {
+  classifyWithVSM,
+  textToTFIDFVector,
+  computeCosineSimilarity,
+  getIDF,
+  trainTfidf,
+  legacyRuleLexiconCentroids,
+  DEFAULT_TFIDF_MODEL,
+} from './tfidf'
 export type { VSMResult, FeatureWeight, VSMScore, TFIDFVector, TfidfModel, ClassCentroid } from './tfidf'
 
 // 4. Dialect-Aware Computational Ethnolinguistics: Fuzzy Orthography
