@@ -1,9 +1,9 @@
 // Unified Multi-Tier Classification Architecture:
 // 1. Supervised Machine Learning: Multinomial Naive Bayes (Laplace alpha = 1.0)
-// 2. Deep Learning Neural Latent Embeddings: Dense 64-D Latent Semantic Projections
-// 3. Statistical Information Retrieval: TF-IDF Vector Space Model (VSM)
-// 4. Dialect-Aware Computational Ethnolinguistics: Levenshtein + Dice Orthographic Matching
-// 5. Domain Ontological Expert System: Eugenio (1993) & Andress (1985) Taxonomies
+// 2. Character N-Gram TF-IDF Centroid Model (3-5-grams per word with boundary markers)
+// 3. Statistical Information Retrieval: Word-Level TF-IDF Vector Space Model (VSM)
+// 4. Dialect-Aware Orthographic Matching: Levenshtein + Dice Variants
+// 5. Domain Rules: Eugenio (1993) & Andress (1985) Taxonomies
 
 import { classifyWithVSM, VSMResult, FeatureWeight, TfidfModel } from './tfidf'
 import { findOrthographicDialectMatches, FuzzyMatchResult } from './fuzzy'
@@ -11,24 +11,24 @@ import { tokenizeUnigrams } from './tokenizer'
 import { genreRules, themeRules, locationRules, ClassificationRule } from './rules'
 import { MatchedTerm, RuleDetail } from './engine'
 import { predictNaiveBayes, NaiveBayesPrediction, NaiveBayesModel } from './naiveBayes'
-import { classifyWithNeuralSemantic, NeuralSemanticResult } from './neuralSemantic'
+import { classifyWithCharNgram, CharNgramResult, CharNgramModel } from './charNgram'
 
 export interface InjectableModels {
   nb?: NaiveBayesModel
   tfidf?: TfidfModel
-  charNgram?: any
+  charNgram?: CharNgramModel
 }
 
 export type AlgorithmMode =
   | 'HYBRID_ENSEMBLE'
   | 'NAIVE_BAYES_ML'
-  | 'NEURAL_SEMANTIC'
+  | 'CHAR_NGRAM'
   | 'TF_IDF_VSM'
   | 'RULE_BASED'
 
 export interface ModelScoreBreakdown {
   naiveBayesProbability: number
-  neuralSemanticSimilarity: number
+  charNgramSimilarity: number
   vsmCosineSimilarity: number
   ruleConfidence: number
   fuzzyOrthographicScore: number
@@ -57,10 +57,9 @@ export interface HybridClassificationResult {
   overallConfidence: number
   ruleDetails: Record<string, RuleDetail>
 
-  // Algorithmic Explanations & Scientific Rigor Artifacts for Capstone Defense:
   algorithmicBreakdown: {
     naiveBayes: NaiveBayesPrediction
-    neuralSemantic: NeuralSemanticResult
+    charNgram: CharNgramResult
     vsm: VSMResult
     fuzzyMatches: FuzzyMatchResult[]
     topFeatures: FeatureWeight[]
@@ -70,7 +69,7 @@ export interface HybridClassificationResult {
 }
 
 /**
- * Baseline Rule-Scoring function (Preserved for comparison & expert system branch).
+ * Baseline Rule-Scoring function (Preserved for comparison & rule-based baseline).
  */
 function scoreRule(rule: ClassificationRule, normalizedText: string): RuleDetail {
   let score = 0
@@ -118,10 +117,10 @@ function scoreRule(rule: ClassificationRule, normalizedText: string): RuleDetail
 /**
  * Classifies an entry using the selected Algorithm Mode:
  * - 'NAIVE_BAYES_ML': 100% Supervised Machine Learning (Laplace-smoothed Multinomial Naive Bayes)
- * - 'NEURAL_SEMANTIC': Continuous 64-D Latent Semantic Projections
- * - 'HYBRID_ENSEMBLE': 40% Naive Bayes ML + 25% TF-IDF VSM + 20% Neural Semantic + 15% Rules
+ * - 'CHAR_NGRAM': Character 3-5-Gram TF-IDF Centroid Model
+ * - 'HYBRID_ENSEMBLE': 40% Naive Bayes ML + 25% TF-IDF VSM + 20% Char N-Gram + 15% Rules
  * - 'TF_IDF_VSM': Statistical Information Retrieval Vector Space Model
- * - 'RULE_BASED': Legacy Heuristic Expert System
+ * - 'RULE_BASED': Domain Rule-Based System
  */
 export function classifyHybrid(
   fullText: string,
@@ -135,8 +134,8 @@ export function classifyHybrid(
   // 1. Run Supervised Machine Learning: Multinomial Naive Bayes
   const nbResult = predictNaiveBayes(normText, targetGenreFilter, models?.nb)
 
-  // 2. Run Deep Learning Neural Semantic Projection (64-D Latent Space)
-  const neuralResult = classifyWithNeuralSemantic(normText, targetGenreFilter)
+  // 2. Run Character N-Gram TF-IDF Centroid Model (3-5-grams per word with boundary markers)
+  const charNgramResult = classifyWithCharNgram(normText, targetGenreFilter, models?.charNgram)
 
   // 3. Run Statistical Information Retrieval: TF-IDF Vector Space Model
   const vsmResult = classifyWithVSM(normText, targetGenreFilter, models?.tfidf)
@@ -203,8 +202,8 @@ export function classifyHybrid(
     const nbMatch = nbResult.allProbabilities.find(s => s.genre === genre)
     const nbProb = nbMatch ? nbMatch.probability : 0
 
-    const neuralMatch = neuralResult.allGenreScores.find(s => s.genre === genre)
-    const neuralSim = neuralMatch ? neuralMatch.similarity : 0
+    const charNgramMatch = charNgramResult.allGenreScores.find(s => s.genre === genre)
+    const charSim = charNgramMatch ? charNgramMatch.similarity : 0
 
     let combinedScore = 0
 
@@ -215,17 +214,18 @@ export function classifyHybrid(
     } else if (algorithmMode === 'NAIVE_BAYES_ML') {
       // 100% Supervised Machine Learning Posterior Probability
       combinedScore = nbProb
-    } else if (algorithmMode === 'NEURAL_SEMANTIC') {
-      // Deep Learning Continuous Latent Space Cosine Similarity
-      combinedScore = neuralSim
+    } else if (algorithmMode === 'CHAR_NGRAM') {
+      // Character 3-5-Gram Centroid Cosine Similarity
+      combinedScore = charSim
     } else {
       // 'HYBRID_ENSEMBLE'
-      // Multi-layer weighting: 40% Naive Bayes ML + 25% TF-IDF VSM + 20% Neural Semantic + 15% Rules
+      // INTERIM hybrid weights (NOT tuned, replaced in Step 6):
+      // NB 0.40, TF-IDF 0.25, CHAR_NGRAM 0.20 (neural's old slot), Rules 0.15.
       const genreFuzzyBonus = fuzzyMatches.some(f => f.category === 'GENRE') ? fuzzyScore * 0.15 : 0
       combinedScore =
         (0.40 * nbProb) +
         (0.25 * vsmSim) +
-        (0.20 * neuralSim) +
+        (0.20 * charSim) +
         (0.15 * ruleConf) +
         genreFuzzyBonus
 
@@ -260,11 +260,11 @@ export function classifyHybrid(
   const ruleMatchForTop = genreScoresRule.find(s => s.genre === topGenre.genre)
   const vsmMatchForTop = vsmResult.allGenreScores.find(s => s.category === topGenre.genre)
   const nbMatchForTop = nbResult.allProbabilities.find(s => s.genre === topGenre.genre)
-  const neuralMatchForTop = neuralResult.allGenreScores.find(s => s.genre === topGenre.genre)
+  const charNgramMatchForTop = charNgramResult.allGenreScores.find(s => s.genre === topGenre.genre)
 
   const scoreBreakdown: ModelScoreBreakdown = {
     naiveBayesProbability: nbMatchForTop ? nbMatchForTop.probability : 0,
-    neuralSemanticSimilarity: neuralMatchForTop ? neuralMatchForTop.similarity : 0,
+    charNgramSimilarity: charNgramMatchForTop ? charNgramMatchForTop.similarity : 0,
     vsmCosineSimilarity: vsmMatchForTop ? vsmMatchForTop.cosineSimilarity : 0,
     ruleConfidence: ruleMatchForTop ? ruleMatchForTop.confidence : 0,
     fuzzyOrthographicScore: Math.round(fuzzyScore * 100) / 100,
@@ -274,14 +274,14 @@ export function classifyHybrid(
   let mathExplanation = ''
   if (algorithmMode === 'NAIVE_BAYES_ML') {
     mathExplanation = `Supervised ML Inference: P(${topGenre.genre}|d) = ${(scoreBreakdown.naiveBayesProbability * 100).toFixed(1)}% via Multinomial Naive Bayes (Laplace α=1.0, |V|=${nbResult.modelMetadata.vocabularySize}, N=${nbResult.modelMetadata.trainedSampleCount} training records).`
-  } else if (algorithmMode === 'NEURAL_SEMANTIC') {
-    mathExplanation = `Deep Learning Latent Projection: Cosine alignment = ${(scoreBreakdown.neuralSemanticSimilarity * 100).toFixed(1)}% in 64-D Continuous Dense Semantic Subspace (${neuralResult.semanticClusterName}).`
+  } else if (algorithmMode === 'CHAR_NGRAM') {
+    mathExplanation = `Character N-Gram VSM: Cosine alignment = ${(scoreBreakdown.charNgramSimilarity * 100).toFixed(1)}% between Word-Bounded 3-5-Gram Vector and ${topGenre.genre} Centroid Vector.`
   } else if (algorithmMode === 'HYBRID_ENSEMBLE') {
-    mathExplanation = `Hybrid Quad-Model = (0.40 × Naive Bayes: ${scoreBreakdown.naiveBayesProbability.toFixed(2)}) + (0.25 × TF-IDF VSM: ${scoreBreakdown.vsmCosineSimilarity.toFixed(2)}) + (0.20 × Neural: ${scoreBreakdown.neuralSemanticSimilarity.toFixed(2)}) + (0.15 × Rules: ${scoreBreakdown.ruleConfidence.toFixed(2)}) = ${(topGenre.confidence * 100).toFixed(0)}%`
+    mathExplanation = `Hybrid Model = (0.40 × Naive Bayes: ${scoreBreakdown.naiveBayesProbability.toFixed(2)}) + (0.25 × Word TF-IDF: ${scoreBreakdown.vsmCosineSimilarity.toFixed(2)}) + (0.20 × Char N-gram: ${scoreBreakdown.charNgramSimilarity.toFixed(2)}) + (0.15 × Rules: ${scoreBreakdown.ruleConfidence.toFixed(2)}) = ${(topGenre.confidence * 100).toFixed(0)}%`
   } else if (algorithmMode === 'TF_IDF_VSM') {
     mathExplanation = `VSM Cosine Similarity Angle: cos(θ) = ${(scoreBreakdown.vsmCosineSimilarity * 100).toFixed(1)}% between Document Vector (||d||=${vsmResult.documentVectorMagnitude}) and ${topGenre.genre} Centroid Vector.`
   } else {
-    mathExplanation = `Static Heuristic Pattern Matching: Saturation-scaled keyword/phrase weights against Eugenio (1993) rule triggers.`
+    mathExplanation = `Domain Rule Pattern Matching: Keyword and phrase triggers evaluated against taxonomic definitions.`
   }
 
   return {
@@ -299,7 +299,7 @@ export function classifyHybrid(
     ruleDetails,
     algorithmicBreakdown: {
       naiveBayes: nbResult,
-      neuralSemantic: neuralResult,
+      charNgram: charNgramResult,
       vsm: vsmResult,
       fuzzyMatches,
       topFeatures: vsmResult.extractedFeatures,

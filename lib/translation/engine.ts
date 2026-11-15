@@ -41,7 +41,7 @@ export async function translateTextDynamic(
     }
   }
 
-  // 1. Check external Google Colab / Hugging Face Neural Machine Translation endpoint
+  // 1. Check external translation endpoint
   const colabUrl = process.env.COLAB_TRANSLATION_URL || process.env.HUGGINGFACE_TRANSLATION_URL
   if (colabUrl) {
     try {
@@ -65,7 +65,7 @@ export async function translateTextDynamic(
             matchedPhrases: data.matchedPhrases ?? [],
             matchedWordsCount: data.matchedWordsCount ?? cleanedInput.split(/\s+/).length,
             totalWordsCount: cleanedInput.split(/\s+/).length,
-            corpusSource: 'Google Colab / NLLB-200 Neural Machine Translation Model',
+            corpusSource: 'External Machine Translation Model (NLLB-200)',
             engineType: 'COLAB_NEURAL_NMT',
           }
         }

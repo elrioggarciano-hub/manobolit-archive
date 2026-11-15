@@ -5,7 +5,7 @@ import path from 'path';
 import { TRAINING_CORPUS, TrainingDocument } from '../lib/classification/trainingCorpus';
 import { trainNaiveBayes, predictNaiveBayes, NaiveBayesModel } from '../lib/classification/naiveBayes';
 import { classifyWithVSM } from '../lib/classification/tfidf';
-import { classifyWithNeuralSemantic } from '../lib/classification/neuralSemantic';
+import { classifyWithCharNgram } from '../lib/classification/charNgram';
 import { findOrthographicDialectMatches } from '../lib/classification/fuzzy';
 import { genreRules, themeRules, locationRules, ClassificationRule } from '../lib/classification/rules';
 import { tokenizeUnigrams, normalizeText as baseNormalize } from '../lib/classification/tokenizer';
@@ -80,9 +80,9 @@ function classifyFoldHybrid(
     return { predictedGenre: vsmResult.topGenre, confidence: vsmResult.topGenreSimilarity };
   }
 
-  const neuralResult = classifyWithNeuralSemantic(normText, 'ALL');
-  if (mode === 'NEURAL_SEMANTIC') {
-    return { predictedGenre: neuralResult.predictedGenre, confidence: neuralResult.neuralConfidence };
+  const neuralResult = classifyWithCharNgram(normText, 'ALL');
+  if (mode === ('CHAR_NGRAM' as any) || mode === ('NEURAL_SEMANTIC' as any)) {
+    return { predictedGenre: neuralResult.predictedGenre, confidence: neuralResult.confidence };
   }
 
   // Rule-based
@@ -120,7 +120,7 @@ function classifyFoldHybrid(
     const nbMatch = nbResult.allProbabilities.find(s => s.genre === genre);
     const nbProb = nbMatch ? nbMatch.probability : 0;
 
-    const neuralMatch = neuralResult.allGenreScores.find(s => s.genre === genre);
+    const neuralMatch = (neuralResult.allGenreScores as any[]).find((s: any) => s.genre === genre);
     const neuralSim = neuralMatch ? neuralMatch.similarity : 0;
 
     let combined = (0.40 * nbProb) + (0.25 * vsmSim) + (0.20 * neuralSim) + (0.15 * ruleConf) + genreFuzzyBonus;

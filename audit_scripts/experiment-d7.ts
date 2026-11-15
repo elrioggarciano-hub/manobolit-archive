@@ -79,7 +79,7 @@ async function main() {
       
       const breakdown = run1.algorithmicBreakdown?.scoreBreakdown;
       if (breakdown) {
-        console.log(`  Score Breakdown: NB Prob=${(breakdown.naiveBayesProbability * 100).toFixed(1)}% | VSM Sim=${(breakdown.vsmCosineSimilarity * 100).toFixed(1)}% | Neural Sim=${(breakdown.neuralSemanticSimilarity * 100).toFixed(1)}% | Rule Conf=${(breakdown.ruleConfidence * 100).toFixed(1)}%`);
+        console.log(`  Score Breakdown: NB Prob=${(breakdown.naiveBayesProbability * 100).toFixed(1)}% | VSM Sim=${(breakdown.vsmCosineSimilarity * 100).toFixed(1)}% | Char N-Gram Sim=${(breakdown.charNgramSimilarity * 100).toFixed(1)}% | Rule Conf=${(breakdown.ruleConfidence * 100).toFixed(1)}%`);
       }
       
       console.log('  All Genre Scores:');

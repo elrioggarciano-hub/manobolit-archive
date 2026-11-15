@@ -77,7 +77,7 @@ export async function predictWithML(
     predictionSource: 'RULE_BASED_FALLBACK',
     modelVersion: 'rules-baseline',
     isUncertain: fallback.genre.confidence < uncertaintyThreshold,
-    algorithm: 'Domain Expert System (Eugenio 1993)',
+    algorithm: 'Domain Taxonomy Rules (Eugenio 1993)',
     topFeatures: fallback.genre.rulesApplied.map(r => ({ feature: r, weight: 1.0 })),
   }
 }

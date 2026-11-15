@@ -13,7 +13,7 @@ export interface ModelComparisonReport {
   ruleBased: AccuracyMetrics
   tfidfVsm: AccuracyMetrics
   naiveBayes: AccuracyMetrics
-  neuralSemantic: AccuracyMetrics
+  charNgram: AccuracyMetrics
   hybridEnsemble: AccuracyMetrics
   winner: AlgorithmMode
   academicDefenseSummary: string
@@ -80,8 +80,8 @@ export function computeAccuracyMetrics(
 }
 
 /**
- * Runs a rigorous comparative benchmark across all 5 models:
- * Rule-Based vs TF-IDF VSM vs Naive Bayes ML vs Neural Semantic vs Hybrid Ensemble.
+ * Runs a comparative benchmark across all 5 models:
+ * Rule-Based vs TF-IDF VSM vs Naive Bayes ML vs Character N-Gram VSM vs Hybrid Ensemble.
  */
 export function computeComparativeMetrics(
   entries: ScorableEntry[],
@@ -90,7 +90,7 @@ export function computeComparativeMetrics(
   const ruleBased = computeAccuracyMetrics(entries, 'RULE_BASED', models)
   const tfidfVsm = computeAccuracyMetrics(entries, 'TF_IDF_VSM', models)
   const naiveBayes = computeAccuracyMetrics(entries, 'NAIVE_BAYES_ML', models)
-  const neuralSemantic = computeAccuracyMetrics(entries, 'NEURAL_SEMANTIC', models)
+  const charNgram = computeAccuracyMetrics(entries, 'CHAR_NGRAM', models)
   const hybridEnsemble = computeAccuracyMetrics(entries, 'HYBRID_ENSEMBLE', models)
 
   let winner: AlgorithmMode = 'HYBRID_ENSEMBLE'
@@ -98,13 +98,13 @@ export function computeComparativeMetrics(
     winner = 'NAIVE_BAYES_ML'
   }
 
-  const summary = `Rigorous cross-validation across N=${entries.length} oral literature records proves that Supervised Machine Learning (Multinomial Naive Bayes, F1=${naiveBayes.f1.toFixed(3)}) and Deep Learning Neural Embeddings (F1=${neuralSemantic.f1.toFixed(3)}) dramatically outperform the legacy Rule-Based baseline (F1=${ruleBased.f1.toFixed(3)}). The Hybrid Neuro-Symbolic Ensemble achieves the highest overall F1-Score of ${hybridEnsemble.f1.toFixed(3)} (${(hybridEnsemble.accuracy * 100).toFixed(1)}% accuracy) by fusing probabilistic ML priors with continuous dense semantic projections and dialectal orthographic tolerance.`
+  const summary = `Evaluation across N=${entries.length} oral literature records: Naive Bayes (F1=${naiveBayes.f1.toFixed(3)}), Word TF-IDF VSM (F1=${tfidfVsm.f1.toFixed(3)}), Character N-Gram VSM (F1=${charNgram.f1.toFixed(3)}), Rule-Based (F1=${ruleBased.f1.toFixed(3)}), and Hybrid Ensemble (F1=${hybridEnsemble.f1.toFixed(3)}, ${(hybridEnsemble.accuracy * 100).toFixed(1)}% accuracy).`
 
   return {
     ruleBased,
     tfidfVsm,
     naiveBayes,
-    neuralSemantic,
+    charNgram,
     hybridEnsemble,
     winner,
     academicDefenseSummary: summary,

@@ -268,7 +268,7 @@ export default function TranslatorClient() {
               marginBottom: '8px',
             }}
           >
-            Neural &amp; Database-Driven Translation
+            Dictionary &amp; Corpus-Driven Translation
           </div>
 
           <h1

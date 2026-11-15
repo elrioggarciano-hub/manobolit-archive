@@ -51,8 +51,8 @@ async function main() {
       const vsmMatch = breakdown?.vsm.allGenreScores.find(s => s.category === g);
       const vsmSim = (vsmMatch ? vsmMatch.cosineSimilarity : 0) * 100;
 
-      const neuralMatch = breakdown?.neuralSemantic.allGenreScores.find(s => s.genre === g);
-      const neuralSim = (neuralMatch ? neuralMatch.similarity : 0) * 100;
+      const charMatch = breakdown?.charNgram.allGenreScores.find((s: any) => s.genre === g);
+      const charSim = (charMatch ? charMatch.similarity : 0) * 100;
 
       const ruleDetail = res.ruleDetails;
       // Find rule confidence for genre g
@@ -72,7 +72,7 @@ async function main() {
         }
       }
       // Or get from allScores in raw hybrid
-      console.log(`${g.padEnd(12)}\t${nbProb.toFixed(1).padStart(8)}%\t${vsmSim.toFixed(1).padStart(8)}%\t${neuralSim.toFixed(1).padStart(11)}%\t\t-\t${finalConf.toFixed(1).padStart(12)}%`);
+      console.log(`${g.padEnd(12)}\t${nbProb.toFixed(1).padStart(8)}%\t${vsmSim.toFixed(1).padStart(8)}%\t${charSim.toFixed(1).padStart(11)}%\t\t-\t${finalConf.toFixed(1).padStart(12)}%`);
     }
     console.log('\n');
   }
@@ -81,10 +81,10 @@ async function main() {
   let hybridEqualsNbCount = 0;
   let hybridEqualsRuleCount = 0;
   let hybridEqualsVsmCount = 0;
-  let hybridEqualsNeuralCount = 0;
+  let hybridEqualsCharCount = 0;
 
   console.log('--- 2. CONCORDANCE ACROSS ALL 22 ENTRIES ---');
-  console.log('Index\tActual\t\tHybrid\t\tNB\t\tVSM\t\tNeural\t\tRule\t\tHybrid == NB?');
+  console.log('Index\tActual\t\tHybrid\t\tNB\t\tVSM\t\tCharNgram\tRule\t\tHybrid == NB?');
   console.log('------------------------------------------------------------------------------------------------------------------------');
 
   for (let i = 0; i < entries.length; i++) {
@@ -102,7 +102,7 @@ async function main() {
     const hRes = classifyHybrid(fullText, 'ALL', 'HYBRID_ENSEMBLE');
     const nbRes = classifyHybrid(fullText, 'ALL', 'NAIVE_BAYES_ML');
     const vsmRes = classifyHybrid(fullText, 'ALL', 'TF_IDF_VSM');
-    const neuRes = classifyHybrid(fullText, 'ALL', 'NEURAL_SEMANTIC');
+    const neuRes = classifyHybrid(fullText, 'ALL', 'CHAR_NGRAM');
     const ruleRes = classifyHybrid(fullText, 'ALL', 'RULE_BASED');
 
     const hWinner = hRes.genre.value;
@@ -115,7 +115,7 @@ async function main() {
     if (matchesNb) hybridEqualsNbCount++;
     if (hWinner === ruleWinner) hybridEqualsRuleCount++;
     if (hWinner === vsmWinner) hybridEqualsVsmCount++;
-    if (hWinner === neuWinner) hybridEqualsNeuralCount++;
+    if (hWinner === neuWinner) hybridEqualsCharCount++;
 
     console.log(`${String(i + 1).padStart(2)}\t${e.genre.padEnd(12)}\t${hWinner.padEnd(12)}\t${nbWinner.padEnd(12)}\t${vsmWinner.padEnd(12)}\t${neuWinner.padEnd(12)}\t${ruleWinner.padEnd(12)}\t${matchesNb ? 'YES' : 'NO'}`);
   }
@@ -123,13 +123,13 @@ async function main() {
   const pctNb = (hybridEqualsNbCount / entries.length) * 100;
   const pctRule = (hybridEqualsRuleCount / entries.length) * 100;
   const pctVsm = (hybridEqualsVsmCount / entries.length) * 100;
-  const pctNeural = (hybridEqualsNeuralCount / entries.length) * 100;
+  const pctChar = (hybridEqualsCharCount / entries.length) * 100;
 
   console.log('\n=== SUMMARY OF CONCORDANCE ===');
   console.log(`Hybrid winner == Naive Bayes winner : ${hybridEqualsNbCount} / ${entries.length} (${pctNb.toFixed(1)}%)`);
   console.log(`Hybrid winner == Rule-Based winner  : ${hybridEqualsRuleCount} / ${entries.length} (${pctRule.toFixed(1)}%)`);
   console.log(`Hybrid winner == TF-IDF VSM winner  : ${hybridEqualsVsmCount} / ${entries.length} (${pctVsm.toFixed(1)}%)`);
-  console.log(`Hybrid winner == Neural winner      : ${hybridEqualsNeuralCount} / ${entries.length} (${pctNeural.toFixed(1)}%)`);
+  console.log(`Hybrid winner == Char N-Gram winner : ${hybridEqualsCharCount} / ${entries.length} (${pctChar.toFixed(1)}%)`);
 
   process.exit(0);
 }

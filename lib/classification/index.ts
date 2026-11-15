@@ -11,9 +11,14 @@ export type { AlgorithmMode, HybridClassificationResult, ModelScoreBreakdown, In
 export { trainNaiveBayes, predictNaiveBayes, DEFAULT_TRAINED_NB_MODEL } from './naiveBayes'
 export type { NaiveBayesModel, NaiveBayesPrediction, PredictiveFeature } from './naiveBayes'
 
-// 2. Deep Learning: Neural Semantic Latent Embeddings (64-D)
-export { classifyWithNeuralSemantic } from './neuralSemantic'
-export type { NeuralSemanticResult } from './neuralSemantic'
+// 2. Character N-Gram TF-IDF Centroid Model (3-5-grams per word)
+export {
+  trainCharNgram,
+  classifyWithCharNgram,
+  extractWordBoundedCharNgrams,
+  DEFAULT_CHAR_NGRAM_MODEL,
+} from './charNgram'
+export type { CharNgramModel, CharNgramResult, CharNgramCentroid } from './charNgram'
 
 // 3. Statistical Information Retrieval: TF-IDF Vector Space Model
 export {
@@ -27,7 +32,7 @@ export {
 } from './tfidf'
 export type { VSMResult, FeatureWeight, VSMScore, TFIDFVector, TfidfModel, ClassCentroid } from './tfidf'
 
-// 4. Dialect-Aware Computational Ethnolinguistics: Fuzzy Orthography
+// 4. Dialect-Aware Orthographic Matching: Fuzzy Normalization
 export {
   levenshteinDistance,
   levenshteinSimilarity,

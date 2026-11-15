@@ -28,7 +28,7 @@ async function main() {
     { name: 'RULE_BASED', key: 'ruleBased' },
     { name: 'TF_IDF_VSM', key: 'tfidfVsm' },
     { name: 'NAIVE_BAYES_ML', key: 'naiveBayes' },
-    { name: 'NEURAL_SEMANTIC', key: 'neuralSemantic' },
+    { name: 'CHAR_NGRAM', key: 'charNgram' },
     { name: 'HYBRID_ENSEMBLE', key: 'hybridEnsemble' },
   ];
 

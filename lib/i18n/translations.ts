@@ -236,7 +236,7 @@ export const translations = {
     about_title: 'Dedicated to the Preservation of Agusan Manobo Oral Traditions',
     about_mission_desc: 'Our mission is rooted in the reverence of heritage. We provide a scientific and digital framework to archive the rich oral literature and folk songs of the Manobo people, ensuring their voices endure through the precision of modern archival technology.',
     about_system_title: 'The Retrieval System',
-    about_system_desc: 'The ManoboLit Archive serves as a responsive retrieval system, housing documented oral literature pieces and authentic folk songs. This digital repository is built upon rigorous scholarly research, focusing on cultural linguistics and digital archival sciences.',
+    about_system_desc: 'The ManoboLit Archive serves as a responsive retrieval system, housing documented oral literature pieces and authentic folk songs. This digital repository is built upon scholarly fieldwork and documentation, focusing on cultural linguistics and digital archival sciences.',
     about_oral_pieces: 'Oral Literature Pieces',
     about_folk_songs: 'Folk Songs Documented',
     about_heritage_badge: 'COMMUNITY & STEWARDSHIP',

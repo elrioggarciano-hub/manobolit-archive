@@ -244,7 +244,7 @@ async function main() {
         algorithm: 'RuleBasedBaseline',
         status: 'ACTIVE',
         metrics: JSON.stringify({
-          source: 'Domain Expert System (Eugenio 1993 & Andress 1985 Taxonomies)',
+          source: 'Domain Taxonomy Rules (Eugenio 1993 & Andress 1985 Taxonomies)',
           note: 'Active rule-based baseline pending sufficient human-verified training data'
         }),
         datasetSize: 0,

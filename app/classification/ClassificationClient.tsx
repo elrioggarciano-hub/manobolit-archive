@@ -1456,17 +1456,17 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                               </div>
                             </div>
 
-                            {/* 2. Deep Learning Neural Latent Embeddings */}
+                            {/* 2. Character N-Gram VSM */}
                             <div style={{ background: '#18181b', border: '1px solid #4a1935', borderRadius: '6px', padding: '12px' }}>
                               <div style={{ fontSize: '9px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span>🧠</span>
-                                <span>2. DEEP LEARNING</span>
+                                <span>🔤</span>
+                                <span>2. CHAR N-GRAM</span>
                               </div>
                               <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>
-                                {(classificationResult.algorithmicBreakdown.scoreBreakdown.neuralSemanticSimilarity * 100).toFixed(1)}%
+                                {(classificationResult.algorithmicBreakdown.scoreBreakdown.charNgramSimilarity * 100).toFixed(1)}%
                               </div>
                               <div style={{ fontSize: '9.5px', color: '#a1a1aa', marginTop: '3px' }}>
-                                64-D continuous latent semantic alignment
+                                Word-bounded 3-5-gram TF-IDF cosine alignment
                               </div>
                             </div>
 
@@ -1499,7 +1499,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                             </div>
                           </div>
 
-                          {/* Two-Column Details: ML / NLP Feature Derivations & Neural Latent Space */}
+                          {/* Two-Column Details: ML / NLP Feature Derivations & Character N-Gram VSM */}
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                             {/* Column 1: Naive Bayes Most Predictive Words & TF-IDF Features */}
                             <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
@@ -1536,18 +1536,18 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                               </div>
                             </div>
 
-                            {/* Column 2: Neural Latent Vector Sample & Dialect Matches */}
+                            {/* Column 2: Character N-Gram Alignment & Dialect Matches */}
                             <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '14px' }}>
                               <div style={{ fontSize: '10px', fontWeight: 800, color: '#f472b6', letterSpacing: '0.05em', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
-                                <span>DEEP LEARNING LATENT VECTOR (64-D)</span>
-                                <span style={{ color: '#71717a' }}>SEMANTIC EMBEDDINGS</span>
+                                <span>CHARACTER N-GRAM SUB-WORD MATCHES</span>
+                                <span style={{ color: '#71717a' }}>SUB-WORD VSM</span>
                               </div>
                               <div style={{ fontSize: '10px', color: '#a1a1aa', marginBottom: '8px' }}>
-                                Cluster: <strong style={{ color: '#ffffff' }}>{classificationResult.algorithmicBreakdown.neuralSemantic.semanticClusterName}</strong>
+                                Sub-word Predicted Class: <strong style={{ color: '#ffffff' }}>{classificationResult.algorithmicBreakdown.charNgram.predictedGenre}</strong>
                               </div>
-                              {/* Latent Vector Visualization */}
+                              {/* Sub-word Scores */}
                               <div style={{ background: '#09090b', padding: '8px', borderRadius: '4px', fontFamily: 'monospace', fontSize: '9px', color: '#38bdf8', marginBottom: '12px', wordBreak: 'break-all' }}>
-                                z_sample = [{classificationResult.algorithmicBreakdown.neuralSemantic.latentVectorSample.join(', ')}...]
+                                Top N-Gram Scores: {classificationResult.algorithmicBreakdown.charNgram.allGenreScores.slice(0, 4).map(s => `${s.genre}: ${(s.similarity * 100).toFixed(1)}%`).join(' | ')}
                               </div>
 
                               <div style={{ paddingTop: '8px', borderTop: '1px solid #27272a' }}>
@@ -1811,21 +1811,21 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   {/* Model 4 */}
                   <tr style={{ borderBottom: '1px solid #27272a', background: '#18181b' }}>
                     <td style={{ padding: '12px', fontWeight: 700, color: '#f472b6' }}>
-                      4. Neural Semantic Embeddings
-                      <div style={{ fontSize: '9.5px', color: '#71717a', fontWeight: 400 }}>Deep Learning continuous latent 64-D space</div>
+                      4. Character N-Gram VSM
+                      <div style={{ fontSize: '9.5px', color: '#71717a', fontWeight: 400 }}>Word-bounded 3-5-gram sub-word model</div>
                     </td>
-                    <td style={{ padding: '12px' }}>{(comparativeReport.neuralSemantic.accuracy * 100).toFixed(1)}%</td>
-                    <td style={{ padding: '12px' }}>{comparativeReport.neuralSemantic.precision.toFixed(3)}</td>
-                    <td style={{ padding: '12px' }}>{comparativeReport.neuralSemantic.recall.toFixed(3)}</td>
-                    <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.neuralSemantic.f1.toFixed(3)}</td>
-                    <td style={{ padding: '12px', color: '#f472b6' }}>Deep Learning</td>
+                    <td style={{ padding: '12px' }}>{(comparativeReport.charNgram.accuracy * 100).toFixed(1)}%</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.charNgram.precision.toFixed(3)}</td>
+                    <td style={{ padding: '12px' }}>{comparativeReport.charNgram.recall.toFixed(3)}</td>
+                    <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.charNgram.f1.toFixed(3)}</td>
+                    <td style={{ padding: '12px', color: '#f472b6' }}>Sub-word VSM</td>
                   </tr>
 
                   {/* Model 5 */}
                   <tr style={{ background: 'rgba(16, 185, 129, 0.08)', borderBottom: '2px solid #10b981' }}>
                     <td style={{ padding: '12px', fontWeight: 700, color: '#10b981' }}>
-                      5. Hybrid Quad-Model (Proposed)
-                      <div style={{ fontSize: '9.5px', color: '#10b981', fontWeight: 400 }}>ML + Neural + VSM + Expert Rules + Dialect Fuzzy</div>
+                      5. Hybrid Ensemble (Proposed)
+                      <div style={{ fontSize: '9.5px', color: '#10b981', fontWeight: 400 }}>NB + TF-IDF + Char N-gram + Rules + Dialect Fuzzy</div>
                     </td>
                     <td style={{ padding: '12px', fontWeight: 800, color: '#10b981' }}>{(comparativeReport.hybridEnsemble.accuracy * 100).toFixed(1)}%</td>
                     <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.hybridEnsemble.precision.toFixed(3)}</td>
