@@ -1,0 +1,50 @@
+=== FIX B: ACTIVE GENRES RESTRICTION & CENTROID AUDIT ===
+
+--- 1. MODEL CLASS LISTS & DOCUMENT COUNTS ---
+Active Genres Config: [RIDDLE, PROVERB, FOLKTALE, SONG]
+
+Naive Bayes Model:
+  Classes (4): [RIDDLE, PROVERB, FOLKTALE, SONG]
+  Total Active Training Documents: 9
+  Vocabulary Size: 281
+  Doc counts per class:
+    RIDDLE    : 2 docs
+    PROVERB   : 2 docs
+    FOLKTALE  : 2 docs
+    SONG      : 3 docs
+
+TF-IDF Vector Space Model:
+  Total Active Training Documents: 9
+  DF Map Vocabulary Size: 281
+  Genre Centroids (4): [FOLKTALE, RIDDLE, PROVERB, SONG]
+  Theme Centroids (7): [MORAL_LESSONS, NATURE_AND_ENVIRONMENT, SOCIAL_CUSTOMS, HISTORICAL_EVENTS, HEROIC_DEEDS, DEATH_AND_AFTERLIFE, COURTSHIP_AND_MARRIAGE]
+  Doc counts per active genre in training data:
+    RIDDLE    : 2 docs
+    PROVERB   : 2 docs
+    FOLKTALE  : 2 docs
+    SONG      : 3 docs
+
+Char N-Gram Model:
+  Classes (4): [FOLKTALE, RIDDLE, PROVERB, SONG]
+  Total Active Training Documents: 9
+  DF Map N-Gram Vocabulary Size: 1670
+  Centroids (4): [FOLKTALE, RIDDLE, PROVERB, SONG]
+
+--- 2. INACTIVE GENRE CENTROID AUDIT ---
+  [CONFIRMED] Zero centroids exist for inactive genres (MYTH, LEGEND, EPIC, CHANT).
+  Only ACTIVE_GENRES centroids are present: [FOLKTALE, RIDDLE, PROVERB, SONG].
+
+--- 3. CENTROID DERIVATION PROVENANCE ---
+Centroid construction source check:
+  TF-IDF centroids are constructed in trainTfidf() from individual document term aggregations:
+    const genreTermCounts: Record<string, Map<string, number>> = {}
+    for (const doc of activeDocs) { ... }
+  Legacy rule-derived lexicon centroids function `legacyRuleLexiconCentroids()` is:
+    - Completely uncalled by default runtime.
+    - Retained strictly for comparative archival benchmarking.
+  [CONFIRMED] All active TF-IDF centroids are 100% empirical document-derived term vectors from labeled documents only.
+
+--- FILE METRICS ---
+Total Lines: 50
+SHA-256: f497e6c2137fce06e7244904e77322f64ebeda2680170ead46ab07765c42fbbb
+output complete: yes

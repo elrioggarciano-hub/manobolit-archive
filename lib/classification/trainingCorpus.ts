@@ -11,6 +11,7 @@ export interface TrainingDocument {
   provenance: string
   source: TrainingDocSource
   citation?: string
+  archiveEntryId?: string
 }
 
 /**
@@ -120,8 +121,9 @@ export const TRAINING_CORPUS: TrainingDocument[] = [
     genre: 'RIDDLE',
     themes: ['MORAL_LESSONS', 'NATURE_AND_ENVIRONMENT'],
     provenance: 'Catipay & Curato (2024)',
-    source: 'author-written',
-    citation: 'Catipay & Curato (2024)'
+    source: 'archive-verbatim',
+    citation: 'Catipay & Curato (2024)',
+    archiveEntryId: 'cmvnxgovq000jawurtx7fu6gl'
   },
   {
     id: 'tr-riddle-2',
@@ -129,8 +131,9 @@ export const TRAINING_CORPUS: TrainingDocument[] = [
     genre: 'RIDDLE',
     themes: ['NATURE_AND_ENVIRONMENT'],
     provenance: 'Bunawan Collection',
-    source: 'author-written',
-    citation: 'Catipay & Curato (2024)'
+    source: 'archive-verbatim',
+    citation: 'Catipay & Curato (2024)',
+    archiveEntryId: 'cmvnxgopd000hawurnc0h6dkn'
   },
 
   // ── PROVERBS (Active Genre) ──
@@ -140,8 +143,9 @@ export const TRAINING_CORPUS: TrainingDocument[] = [
     genre: 'PROVERB',
     themes: ['MORAL_LESSONS', 'SOCIAL_CUSTOMS'],
     provenance: 'Catipay & Curato (2024)',
-    source: 'author-written',
-    citation: 'Catipay & Curato (2024)'
+    source: 'archive-verbatim',
+    citation: 'Catipay & Curato (2024)',
+    archiveEntryId: 'cmvnxgnne0005awur0f5n5v8w'
   },
   {
     id: 'tr-proverb-2',
@@ -149,8 +153,9 @@ export const TRAINING_CORPUS: TrainingDocument[] = [
     genre: 'PROVERB',
     themes: ['SOCIAL_CUSTOMS', 'MORAL_LESSONS'],
     provenance: 'Catipay & Curato (2024)',
-    source: 'author-written',
-    citation: 'Catipay & Curato (2024)'
+    source: 'archive-verbatim',
+    citation: 'Catipay & Curato (2024)',
+    archiveEntryId: 'cmvnxgnql0006awurlinvhtmg'
   },
 
   // ── FOLK SONGS (Active Genre) ──
@@ -160,8 +165,9 @@ export const TRAINING_CORPUS: TrainingDocument[] = [
     genre: 'SONG',
     themes: ['HISTORICAL_EVENTS', 'HEROIC_DEEDS', 'NATURE_AND_ENVIRONMENT'],
     provenance: 'Maravilla (2024) - Trento',
-    source: 'author-written',
-    citation: 'Maravilla (2024)'
+    source: 'archive-verbatim',
+    citation: 'Maravilla (2024)',
+    archiveEntryId: 'cmvnxgn290000awurstdp4fdh'
   },
   {
     id: 'tr-song-2',
@@ -169,8 +175,9 @@ export const TRAINING_CORPUS: TrainingDocument[] = [
     genre: 'SONG',
     themes: ['SOCIAL_CUSTOMS', 'DEATH_AND_AFTERLIFE'],
     provenance: 'Maravilla (2024) - Trento',
-    source: 'author-written',
-    citation: 'Maravilla (2024)'
+    source: 'archive-verbatim',
+    citation: 'Maravilla (2024)',
+    archiveEntryId: 'cmvnxgnad0001awur5hbvddjs'
   },
   {
     id: 'tr-song-3',
@@ -178,8 +185,9 @@ export const TRAINING_CORPUS: TrainingDocument[] = [
     genre: 'SONG',
     themes: ['COURTSHIP_AND_MARRIAGE', 'DEATH_AND_AFTERLIFE'],
     provenance: 'Maravilla (2024) - Trento',
-    source: 'author-written',
-    citation: 'Maravilla (2024)'
+    source: 'archive-verbatim',
+    citation: 'Maravilla (2024)',
+    archiveEntryId: 'cmvnxgnk20004awurerpzucdc'
   },
 
   // ── CHANTS (Author-written baseline, inactive in live predictions) ──

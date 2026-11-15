@@ -227,12 +227,12 @@ export function trainTfidf(
     return { vector, magnitude, features }
   }
 
-  // 4. Aggregate term counts per genre and theme across individual documents
+  // 4. Aggregate term counts per genre and theme across individual active documents
   // (unigrams and bigrams are computed per document so they never cross document boundaries)
   const genreTermCounts: Record<string, Map<string, number>> = {}
   const themeTermCounts: Record<string, Map<string, number>> = {}
 
-  for (const doc of trainingDocs) {
+  for (const doc of activeDocs) {
     const cleaned = cleanClassificationText(doc.text)
     const docUnigrams = tokenizeUnigrams(cleaned, true)
     const docBigrams = generateWordBigrams(docUnigrams)
@@ -286,9 +286,11 @@ export function trainTfidf(
 
   const centroids: ClassCentroid[] = []
 
-  // Build Genre Centroids from aggregated document term counts
+  // Build Genre Centroids from aggregated document term counts (active genres only)
   for (const [genre, counts] of Object.entries(genreTermCounts)) {
-    centroids.push(buildCentroidFromCounts(`GENRE_${genre}`, genre, 'GENRE', counts))
+    if ((ACTIVE_GENRES as readonly string[]).includes(genre)) {
+      centroids.push(buildCentroidFromCounts(`GENRE_${genre}`, genre, 'GENRE', counts))
+    }
   }
 
   // Build Theme Centroids from aggregated document term counts

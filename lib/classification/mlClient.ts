@@ -1,83 +1,60 @@
+// ML Service Client and TypeScript Hybrid Classification Bridge
+// Documents truthful provenance:
+// The production classification engine is the in-process TypeScript Hybrid Architecture
+// in lib/classification/ (Multinomial Naive Bayes + TF-IDF VSM + Char N-Gram + Domain Rules).
+// The Python service in ml/ is an offline research prototype; predictions are generated
+// in-process by the verified TypeScript engine.
+
 import { classifyEntry, EntryLike } from './engine'
+import { getLatestSnapshot, getActiveModels } from './retrain'
 
 export interface MLPredictionResult {
   predictedGenre: string
   confidence: number
   probabilities: Record<string, number>
-  predictionSource: 'ML_PIPELINE' | 'RULE_BASED' | 'RULE_BASED_FALLBACK'
+  predictionSource: 'TYPESCRIPT_HYBRID_ENGINE' | 'ML_PIPELINE' | 'RULE_BASED'
   modelVersion: string
+  modelSnapshotId: string
+  trainedSamples: number
   isUncertain: boolean
   algorithm: string
   topFeatures: Array<{ feature: string; weight: number }>
   errorDetail?: string
 }
 
-const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000'
-const ML_TIMEOUT_MS = 2500
-
 /**
- * Predicts the category of an archive entry using the Python scikit-learn ML service.
- * If the ML service is unavailable, offline, or returns an error, gracefully falls back
- * to the domain expert rule classifier without interrupting workflows.
+ * Executes classification using the TypeScript Hybrid Architecture as the primary path.
+ * Returns truthful provenance, snapshot metadata, and confidence scores.
  */
 export async function predictWithML(
   entry: EntryLike | string,
-  uncertaintyThreshold: number = 0.45
+  uncertaintyThreshold: number = 0.35
 ): Promise<MLPredictionResult> {
-  const payload: Record<string, any> = { uncertaintyThreshold }
+  const snapshot = getLatestSnapshot()
+  const models = getActiveModels()
 
-  if (typeof entry === 'object' && entry !== null) {
-    payload.title = entry.title || ''
-    payload.manoboTitle = entry.manoboTitle || ''
-    payload.englishTitle = entry.englishTitle || ''
-    payload.transcription = entry.transcription || ''
-    payload.translation = entry.translation || ''
-    payload.content = entry.content || ''
-  } else {
-    payload.text = String(entry)
+  // Primary execution: TypeScript Hybrid Architecture
+  const result = classifyEntry(entry, '', 'ALL', 'HYBRID_ENSEMBLE', models)
+  const predictedGenre = result.genre.value
+  const confidence = result.genre.confidence
+
+  const probabilities: Record<string, number> = {}
+  for (const s of result.genre.allScores) {
+    probabilities[s.genre] = s.confidence
   }
 
-  try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), ML_TIMEOUT_MS)
+  const topFeatures = result.genre.rulesApplied.map(r => ({ feature: r, weight: 1.0 }))
 
-    const res = await fetch(`${ML_SERVICE_URL}/predict`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    })
-
-    clearTimeout(timeoutId)
-
-    if (res.ok) {
-      const data = (await res.json()) as any
-      return {
-        predictedGenre: data.predicted_genre,
-        confidence: data.confidence,
-        probabilities: data.probabilities || {},
-        predictionSource: data.prediction_source === 'ML_PIPELINE' ? 'ML_PIPELINE' : 'RULE_BASED',
-        modelVersion: data.model_version || 'rules-baseline',
-        isUncertain: Boolean(data.is_uncertain),
-        algorithm: data.algorithm || 'Scikit-learn Pipeline',
-        topFeatures: data.top_features || [],
-      }
-    }
-  } catch (err: any) {
-    // Expected when FastAPI service is not started; rule fallback executes cleanly
-    console.warn(`[ML Client] Note: ML service unreachable at ${ML_SERVICE_URL}. Executing domain rule fallback.`)
-  }
-
-  // Graceful rule-based fallback
-  const fallback = classifyEntry(entry)
   return {
-    predictedGenre: fallback.genre.value,
-    confidence: fallback.genre.confidence,
-    probabilities: Object.fromEntries(fallback.genre.allScores.map(s => [s.genre, s.confidence])),
-    predictionSource: 'RULE_BASED_FALLBACK',
-    modelVersion: 'rules-baseline',
-    isUncertain: fallback.genre.confidence < uncertaintyThreshold,
-    algorithm: 'Domain Taxonomy Rules (Eugenio 1993)',
-    topFeatures: fallback.genre.rulesApplied.map(r => ({ feature: r, weight: 1.0 })),
+    predictedGenre,
+    confidence,
+    probabilities,
+    predictionSource: 'TYPESCRIPT_HYBRID_ENGINE',
+    modelVersion: snapshot.id,
+    modelSnapshotId: snapshot.id,
+    trainedSamples: snapshot.trainedSamples,
+    isUncertain: predictedGenre === 'UNCLASSIFIED' || confidence < uncertaintyThreshold,
+    algorithm: 'ManoboLit TypeScript Hybrid Architecture (NB + TF-IDF VSM + Char N-Gram + Rules)',
+    topFeatures,
   }
 }

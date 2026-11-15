@@ -56,3 +56,9 @@ export {
 
 export { computeAccuracyMetrics, computeComparativeMetrics } from './metrics'
 export type { AccuracyMetrics, ModelComparisonReport, ScorableEntry } from './metrics'
+
+export { runLOOCV, extractEntryText, ARCHIVE_OVERLAPPING_DOC_IDS } from './evaluation'
+export type { LOOCVReport, ModeEvaluationResult, PerClassMetrics, PredictionDetail, MajorityBaseline } from './evaluation'
+
+export { retrainFromDatabase, getLatestSnapshot, getActiveModels } from './retrain'
+export type { ClassifierSnapshotData, ActiveModels } from './retrain'

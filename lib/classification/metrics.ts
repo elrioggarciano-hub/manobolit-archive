@@ -1,5 +1,6 @@
 import { classifyEntry } from './engine'
 import { AlgorithmMode, InjectableModels } from './hybrid'
+import { runLOOCV, LOOCVReport, MajorityBaseline } from './evaluation'
 
 export interface AccuracyMetrics {
   accuracy: number
@@ -7,28 +8,41 @@ export interface AccuracyMetrics {
   recall: number
   f1: number
   sampleSize: number
+  coverage?: number
+  coveredAccuracy?: number
+  flaggedInSample?: boolean
 }
 
 export interface ModelComparisonReport {
   ruleBased: AccuracyMetrics
+  ruleBasedFull?: AccuracyMetrics
   tfidfVsm: AccuracyMetrics
   naiveBayes: AccuracyMetrics
   charNgram: AccuracyMetrics
   hybridEnsemble: AccuracyMetrics
-  winner: AlgorithmMode
+  winner: string
   academicDefenseSummary: string
+  majorityClassBaseline?: MajorityBaseline
 }
 
 export interface ScorableEntry {
+  id?: string
   title?: string
-  content: string
+  content?: string
   transcription?: string | null
   translation?: string | null
+  bisayaTranslation?: string | null
   genre: string
+  themes?: string[]
+  communityLocation?: string | null
+  barangay?: string | null
+  municipality?: string | null
+  province?: string | null
 }
 
 /**
- * Evaluates a specific classifier algorithm against curated ground truth genre labels.
+ * Evaluates a single classifier algorithm against curated ground truth genre labels.
+ * Evaluates primary oral text (transcription + translation ONLY).
  */
 export function computeAccuracyMetrics(
   entries: ScorableEntry[],
@@ -36,7 +50,7 @@ export function computeAccuracyMetrics(
   models?: InjectableModels
 ): AccuracyMetrics {
   if (entries.length === 0) {
-    return { accuracy: 0, precision: 0, recall: 0, f1: 0, sampleSize: 0 }
+    return { accuracy: 0, precision: 0, recall: 0, f1: 0, sampleSize: 0, coverage: 0, coveredAccuracy: 0 }
   }
 
   const classes = Array.from(new Set(entries.map(e => e.genre)))
@@ -44,12 +58,17 @@ export function computeAccuracyMetrics(
   for (const c of classes) stats[c] = { tp: 0, fp: 0, fn: 0 }
 
   let correct = 0
+  let covered = 0
 
   for (const entry of entries) {
     const textToClassify = [entry.transcription, entry.translation].filter(Boolean).join(' ')
     const result = classifyEntry(textToClassify, '', 'ALL', algorithmMode, models)
     const predicted = result.genre.value
     const actual = entry.genre
+
+    if (predicted !== 'UNCLASSIFIED') {
+      covered++
+    }
 
     if (predicted === actual) {
       correct++
@@ -68,7 +87,7 @@ export function computeAccuracyMetrics(
     return { precision, recall, f1 }
   })
 
-  const avg = (nums: number[]) => nums.length > 0 ? nums.reduce((a, b) => a + b, 0) / nums.length : 0
+  const avg = (nums: number[]) => (nums.length > 0 ? nums.reduce((a, b) => a + b, 0) / nums.length : 0)
 
   return {
     accuracy: Math.round((correct / entries.length) * 1000) / 1000,
@@ -76,37 +95,114 @@ export function computeAccuracyMetrics(
     recall: Math.round(avg(perClass.map(p => p.recall)) * 1000) / 1000,
     f1: Math.round(avg(perClass.map(p => p.f1)) * 1000) / 1000,
     sampleSize: entries.length,
+    coverage: Math.round((covered / entries.length) * 1000) / 1000,
+    coveredAccuracy: covered > 0 ? Math.round((correct / covered) * 1000) / 1000 : 0,
   }
 }
 
 /**
- * Runs a comparative benchmark across all 5 models:
- * Rule-Based vs TF-IDF VSM vs Naive Bayes ML vs Character N-Gram VSM vs Hybrid Ensemble.
+ * Runs true Leave-One-Out Cross-Validation (LOOCV) comparative benchmark across all classification modes:
+ * Rule-Based (framework-only) vs Rule-Based (full in-sample) vs TF-IDF VSM vs Naive Bayes ML vs Character N-Gram VSM vs Hybrid Ensemble.
+ *
+ * Winner is selected strictly by argmax over out-of-sample Macro-F1 (ties reported honestly).
+ * Summary string is dynamically generated strictly from computed metrics without hardcoded or causal claims.
  */
 export function computeComparativeMetrics(
   entries: ScorableEntry[],
   models?: InjectableModels
 ): ModelComparisonReport {
-  const ruleBased = computeAccuracyMetrics(entries, 'RULE_BASED', models)
-  const tfidfVsm = computeAccuracyMetrics(entries, 'TF_IDF_VSM', models)
-  const naiveBayes = computeAccuracyMetrics(entries, 'NAIVE_BAYES_ML', models)
-  const charNgram = computeAccuracyMetrics(entries, 'CHAR_NGRAM', models)
-  const hybridEnsemble = computeAccuracyMetrics(entries, 'HYBRID_ENSEMBLE', models)
-
-  let winner: AlgorithmMode = 'HYBRID_ENSEMBLE'
-  if (naiveBayes.f1 > hybridEnsemble.f1) {
-    winner = 'NAIVE_BAYES_ML'
+  if (entries.length === 0) {
+    const emptyMetrics: AccuracyMetrics = { accuracy: 0, precision: 0, recall: 0, f1: 0, sampleSize: 0, coverage: 0 }
+    return {
+      ruleBased: emptyMetrics,
+      ruleBasedFull: emptyMetrics,
+      tfidfVsm: emptyMetrics,
+      naiveBayes: emptyMetrics,
+      charNgram: emptyMetrics,
+      hybridEnsemble: emptyMetrics,
+      winner: 'NONE',
+      academicDefenseSummary: 'No entries provided for evaluation.',
+    }
   }
 
-  const summary = `Evaluation across N=${entries.length} oral literature records: Naive Bayes (F1=${naiveBayes.f1.toFixed(3)}), Word TF-IDF VSM (F1=${tfidfVsm.f1.toFixed(3)}), Character N-Gram VSM (F1=${charNgram.f1.toFixed(3)}), Rule-Based (F1=${ruleBased.f1.toFixed(3)}), and Hybrid Ensemble (F1=${hybridEnsemble.f1.toFixed(3)}, ${(hybridEnsemble.accuracy * 100).toFixed(1)}% accuracy).`
+  // Run LOOCV across all folds with fold-retrained models
+  const loocv: LOOCVReport = runLOOCV(entries, { textConfig: 'both', stripAnswer: true })
+
+  const ruleBased: AccuracyMetrics = {
+    accuracy: loocv.modes.ruleBasedFramework.accuracy,
+    precision: loocv.modes.ruleBasedFramework.macroPrecision,
+    recall: loocv.modes.ruleBasedFramework.macroRecall,
+    f1: loocv.modes.ruleBasedFramework.macroF1,
+    sampleSize: loocv.sampleSize,
+    coverage: loocv.modes.ruleBasedFramework.coverage,
+    coveredAccuracy: loocv.modes.ruleBasedFramework.coveredAccuracy,
+    flaggedInSample: false,
+  }
+
+  const ruleBasedFull: AccuracyMetrics = {
+    accuracy: loocv.modes.ruleBasedFull.accuracy,
+    precision: loocv.modes.ruleBasedFull.macroPrecision,
+    recall: loocv.modes.ruleBasedFull.macroRecall,
+    f1: loocv.modes.ruleBasedFull.macroF1,
+    sampleSize: loocv.sampleSize,
+    coverage: loocv.modes.ruleBasedFull.coverage,
+    coveredAccuracy: loocv.modes.ruleBasedFull.coveredAccuracy,
+    flaggedInSample: true,
+  }
+
+  const tfidfVsm: AccuracyMetrics = {
+    accuracy: loocv.modes.tfidfVsm.accuracy,
+    precision: loocv.modes.tfidfVsm.macroPrecision,
+    recall: loocv.modes.tfidfVsm.macroRecall,
+    f1: loocv.modes.tfidfVsm.macroF1,
+    sampleSize: loocv.sampleSize,
+    coverage: loocv.modes.tfidfVsm.coverage,
+    coveredAccuracy: loocv.modes.tfidfVsm.coveredAccuracy,
+    flaggedInSample: false,
+  }
+
+  const naiveBayes: AccuracyMetrics = {
+    accuracy: loocv.modes.naiveBayes.accuracy,
+    precision: loocv.modes.naiveBayes.macroPrecision,
+    recall: loocv.modes.naiveBayes.macroRecall,
+    f1: loocv.modes.naiveBayes.macroF1,
+    sampleSize: loocv.sampleSize,
+    coverage: loocv.modes.naiveBayes.coverage,
+    coveredAccuracy: loocv.modes.naiveBayes.coveredAccuracy,
+    flaggedInSample: false,
+  }
+
+  const charNgram: AccuracyMetrics = {
+    accuracy: loocv.modes.charNgram.accuracy,
+    precision: loocv.modes.charNgram.macroPrecision,
+    recall: loocv.modes.charNgram.macroRecall,
+    f1: loocv.modes.charNgram.macroF1,
+    sampleSize: loocv.sampleSize,
+    coverage: loocv.modes.charNgram.coverage,
+    coveredAccuracy: loocv.modes.charNgram.coveredAccuracy,
+    flaggedInSample: false,
+  }
+
+  const hybridEnsemble: AccuracyMetrics = {
+    accuracy: loocv.modes.hybridEnsemble.accuracy,
+    precision: loocv.modes.hybridEnsemble.macroPrecision,
+    recall: loocv.modes.hybridEnsemble.macroRecall,
+    f1: loocv.modes.hybridEnsemble.macroF1,
+    sampleSize: loocv.sampleSize,
+    coverage: loocv.modes.hybridEnsemble.coverage,
+    coveredAccuracy: loocv.modes.hybridEnsemble.coveredAccuracy,
+    flaggedInSample: false,
+  }
 
   return {
     ruleBased,
+    ruleBasedFull,
     tfidfVsm,
     naiveBayes,
     charNgram,
     hybridEnsemble,
-    winner,
-    academicDefenseSummary: summary,
+    winner: loocv.winner,
+    academicDefenseSummary: loocv.academicDefenseSummary,
+    majorityClassBaseline: loocv.majorityBaseline,
   }
 }

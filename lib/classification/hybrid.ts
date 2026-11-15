@@ -128,7 +128,7 @@ export function scoreRule(
   const checkTerm = (term: string, type: 'keyword' | 'phrase' | 'context', weight: number) => {
     const trimmed = term.trim()
     if (!trimmed) return
-    if (profile === 'framework-only' && isExcludedByProfile(trimmed, profile)) {
+    if (profile !== 'full' && isExcludedByProfile(trimmed, profile)) {
       return
     }
     if (matchWordBoundary(normalizedText, trimmed)) {
@@ -378,7 +378,7 @@ export function classifyHybrid(
   } else if (algorithmMode === 'TF_IDF_VSM') {
     mathExplanation = `TF-IDF VSM: Calibrated Softmax probability = ${(P_1 * 100).toFixed(1)}% (temperature T=0.25 over word TF-IDF cosine alignment).`
   } else {
-    const profileLabel = activeProfile === 'full' ? 'full (in-sample)' : 'framework-only'
+    const profileLabel = activeProfile === 'full' ? 'full (in-sample)' : (activeProfile === 'framework-strict' ? 'framework-strict (lower bound)' : 'framework-only')
     mathExplanation = `Domain Rule Pattern Matching [${profileLabel}]: Calibrated Softmax probability = ${(P_1 * 100).toFixed(1)}% (temperature T=0.25).`
   }
 

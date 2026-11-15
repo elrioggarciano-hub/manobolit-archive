@@ -42,6 +42,7 @@ model LiteratureEntry {
   verifiedThemes      String?   // JSON array stored as string
   reviewerId          String?
   reviewedAt          DateTime?
+  verifiedAt          DateTime?
   reviewNotes         String?
   contentHash         String?   // SHA-256 hash of title, content, transcription, translation
   verifiedContentHash String?   // Hash when verification was confirmed
@@ -150,3 +151,13 @@ model ParallelTranslation {
   @@index([manobo])
   @@index([bisaya])
 }
+
+model ClassifierSnapshot {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  trainedSamples Int
+  vocabularySize Int
+  modelJson      String   // Serialized JSON of trained Naive Bayes, TF-IDF, and Char N-Gram models
+  loocvJson      String   // Serialized JSON of out-of-sample LOOCV evaluation metrics
+}
+

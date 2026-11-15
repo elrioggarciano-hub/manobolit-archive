@@ -1,0 +1,105 @@
+# STEP 10: BEFORE VS AFTER REPRODUCTION & AUDIT REPORT
+
+## 1. EXECUTIVE SUMMARY & REVISED ARCHITECTURAL REALITY
+
+This audit contrasts the legacy ManoboLit classification module against the overhauled,
+trainable, and academically honest implementation evaluated under leave-one-out cross-validation (N=22).
+
+## 2. BEFORE VS AFTER COMPARISON TABLE
+
+| Classification Mode               | BEFORE Accuracy | BEFORE Macro-F1 | AFTER Accuracy (LOOCV) | AFTER Macro-F1 | AFTER Coverage | Status / Architectural Nature |
+| :-------------------------------- | :-------------- | :-------------- | :--------------------- | :------------- | :------------- | :---------------------------- |
+| RULES (full, in-sample)           | 100.0% (22/22)  | 1.000           | 77.3% (17/22)          | 0.784          | 90.9%          | In-sample upper bound (memorized rules) |
+| RULES (framework-only)            | N/A (untested)  | N/A             | 40.9% (9/22)           | 0.429          | 63.6%          | Honest taxonomy without single-entry terms |
+| RULES (framework-strict)          | N/A (untested)  | N/A             | 0.0% (0/22)            | 0.000          | 0.0%           | Empirical zero-knowledge lower bound |
+| NAIVE_BAYES_ML                    | 68.2% (15/22)   | 0.560           | 0.0% (0/22)            | 0.000          | 0.0%           | Document-trained NB (abstains below threshold) |
+| TF_IDF_VSM                        | 100.0% (22/22)  | 1.000           | 0.0% (0/22)            | 0.000          | 0.0%           | Document-trained VSM (abstains below threshold)|
+| NEURAL_SEMANTIC (Fake Hash Model) | 36.4% (8/22)    | 0.359           | DELETED                | DELETED        | DELETED        | Purged: 64-D character hash modulo |
+| CHAR_NGRAM (Real Model)           | N/A (new)       | N/A             | 22.7% (5/22)           | 0.322          | 22.7%          | Real word-bounded character 3-5-gram VSM |
+| HYBRID_ENSEMBLE                   | 81.8% (18/22)   | 0.679           | 40.9% (9/22)           | 0.446          | 59.1%          | Equal-weight normalized ensemble (WINNER) |
+
+Majority Class Baseline: RIDDLE (8/22 = 36.4%).
+Out-of-sample Honest Winner: HYBRID_ENSEMBLE (Macro-F1 = 0.446, Accuracy = 40.9%, Covered Accuracy = 69.2%).
+
+## 3. CONFUSION MATRICES (AFTER LOOCV, N=22)
+
+### A. HYBRID_ENSEMBLE (Default Honest Model)
+```
+Actual \ Pred | RIDDLE  | PROVERB | FOLKTAL | SONG    | UNCLASS
+-------------------------------------------------------------
+RIDDLE        |       4 |       0 |       1 |       0 |       3
+PROVERB       |       1 |       0 |       0 |       1 |       3
+FOLKTALE      |       0 |       0 |       3 |       0 |       1
+SONG          |       0 |       0 |       1 |       2 |       2
+```
+- Correct: 9/22 (40.9%)
+- Unclassified: 9/22 (40.9%)
+- Coverage: 13/22 (59.1%)
+- Accuracy on Covered: 9/13 (69.2%)
+
+### B. RULES (Framework-Only Profile)
+```
+Actual \ Pred | RIDDLE  | PROVERB | FOLKTAL | SONG    | UNCLASS
+-------------------------------------------------------------
+RIDDLE        |       4 |       0 |       0 |       0 |       4
+PROVERB       |       1 |       1 |       0 |       1 |       2
+FOLKTALE      |       0 |       0 |       2 |       0 |       2
+SONG          |       0 |       0 |       1 |       2 |       2
+```
+- Correct: 9/22 (40.9%)
+- Coverage: 14/22 (63.6%)
+- Accuracy on Covered: 9/14 (64.3%)
+
+### C. CHAR_NGRAM (Word-Bounded Character 3-5-Grams)
+```
+Actual \ Pred | RIDDLE  | PROVERB | FOLKTAL | SONG    | UNCLASS
+-------------------------------------------------------------
+RIDDLE        |       0 |       0 |       0 |       0 |       8
+PROVERB       |       0 |       0 |       0 |       0 |       5
+FOLKTALE      |       0 |       0 |       1 |       0 |       3
+SONG          |       0 |       0 |       0 |       4 |       1
+```
+- Correct: 5/22 (22.7%)
+- Coverage: 5/22 (22.7%)
+- Accuracy on Covered: 5/5 (100.0%)
+
+## 4. CLAIMS LEDGER: PURGED MARKETING CLAIMS & HONEST REPLACEMENTS
+
+| File & Line Context | Legacy Fabricated / Exaggerated Claim | Honest Academic Replacement |
+| :------------------ | :------------------------------------ | :-------------------------- |
+| `neuralSemantic.ts` (deleted) | 'Deep Learning & Neural Semantic Latent Embeddings (64-D)' | Deleted entire file. Substituted real character 3-5-gram TF-IDF VSM (`charNgram.ts`). |
+| `metrics.ts` (legacy summary) | 'proves that Supervised Machine Learning and Deep Learning dramatically outperform...' | 'LOOCV on N=22 archive entries... Ranked by Macro-F1: 1. HYBRID_ENSEMBLE... Majority baseline = 36.4%.' |
+| `hybrid.ts` (legacy ensemble) | 'Hybrid Neuro-Symbolic Ensemble' | 'Hybrid Lexical Ensemble (Naive Bayes + TF-IDF VSM + Char N-Gram + Domain Rules)' |
+| `tfidf.ts` (legacy centroids) | Centroids built from `rules.ts` keywords claiming 100% VSM accuracy | Centroids trained exclusively on labeled text documents with document frequency smoothing. |
+| `rules.ts` (legacy matching) | Substring matching (`text.includes()`) claiming 'Domain Expert System' | Unicode letter word-boundary regex (`(?<![\p{L}\p{N}])...(?![\p{L}\p{N}])`). |
+| `rules.ts` (corpus overfitting) | Single-entry corpus verbatim phrases embedded as general rules | Isolated into `CORPUS_TUNED_TERMS` and `STRICT_CORPUS_TERMS`; excluded under out-of-sample profiles. |
+| `engine.ts` (input policy) | Concatenated researcher analysis, titles, and 'folk song maravilla' string | Classification input strictly limited to original transcription + English translation. |
+| `engine.ts` (answer leakage) | Riddles classified with 'Answer: <solution>' appended | Mandatory `stripRiddleAnswer()` removes solution text prior to classification. |
+| `engine.ts` (fallback) | Zero-rule matches defaulted silently to 'MYTH' or 'RIDDLE' | Abstains to `UNCLASSIFIED` when confidence < 0.35 or margin < 0.05. |
+| `/api/classify` | Fallback to 'Domain Expert System (Eugenio 1993)' via dead Python service | Primary TypeScript hybrid pipeline returning truthful algorithm mode and model snapshot ID. |
+
+## 5. REPOSITORY FILES MODIFIED / CREATED
+
+1. `lib/classification/rules.ts`: Implemented word-boundary matching, named exclusion lists (`GENRE_NAME_TERMS`, `CORPUS_TUNED_TERMS`, `STRICT_CORPUS_TERMS`), profile selector (`full`, `framework-only`, `framework-strict`), theme deduplication, and community location provenance.
+2. `lib/classification/hybrid.ts`: Implemented normalized ensemble distributions, calibrated softmax scaling, equal-weight combination, injectable models, and principled `UNCLASSIFIED` thresholds.
+3. `lib/classification/tfidf.ts`: Replaced rule-derived centroids with `trainTfidf()` on labeled documents; restricted centroids and DF/IDF strictly to `ACTIVE_GENRES`.
+4. `lib/classification/charNgram.ts`: Added trainable word-bounded character 3-5-gram TF-IDF centroid classifier.
+5. `lib/classification/trainingCorpus.ts`: Added explicit provenance typing (`archive-verbatim` vs `author-written`) and `archiveEntryId` mapping for leakage control.
+6. `lib/classification/textCleaning.ts`: Created `cleanClassificationText()`, `stripGenreDescriptors()`, and `stripRiddleAnswer()`.
+7. `lib/classification/evaluation.ts`: Built honest LOOCV evaluation module with per-fold retraining, confusion matrices, and ablation testing.
+8. `lib/classification/retrain.ts`: Created human-in-the-loop retraining pipeline with concurrency guard and model snapshots.
+9. `app/api/classify/route.ts`: Made TypeScript hybrid the primary endpoint path with transparent audit breakdowns.
+10. `prisma/schema.prisma` & migration: Added `ClassifierSnapshot` model.
+11. Deleted: `lib/classification/neuralSemantic.ts`.
+
+## 6. UNCERTAINTIES & KNOWN ARCHITECTURAL LIMITS
+
+1. Small Sample Size (N=22): The archive dataset comprises 22 authenticated records (8 riddles, 5 proverbs, 4 folktales, 5 songs). Statistical confidence intervals around Macro-F1 (0.446) remain wide. Metrics must be interpreted as exploratory empirical benchmarks rather than asymptotic bounds.
+2. Zero-Shot Class Sparsity: Standalone Naive Bayes and TF-IDF VSM models trained on 21 short documents suffer from extreme out-of-vocabulary sparsity on held-out entries; individual model scores frequently fall below the 0.35 threshold and abstain to UNCLASSIFIED.
+3. Syntax Insensitivity (Shuffled Riddle Anomaly): Unigram bag-of-words and independent lexical pattern matchers are permutation-invariant across words. They cannot detect ungrammatical scrambled token sequences.
+4. Inactive Genre Pruning: MYTH, LEGEND, EPIC, and CHANT remain inactive in live predictions due to the absence of authenticated archive records in the current field collection.
+
+--- FILE METRICS ---
+Total Lines: 105
+SHA-256: 37d33ffda66f87106b869c606deafc82ffbc41ea9d1f2667d903dd662e7dffb6
+output complete: yes

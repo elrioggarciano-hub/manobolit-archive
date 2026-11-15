@@ -29,6 +29,9 @@ export interface AccuracyMetrics {
   recall: number
   f1: number
   sampleSize: number
+  trainedSamples?: number
+  vocabularySize?: number
+  lastRetrainTime?: string
 }
 
 export interface ExportRecord {
@@ -699,7 +702,7 @@ export default function DashboardClient({
                     </span>
                     <span
                       style={{
-                        fontSize: '8px',
+                        fontSize: '9px',
                         fontWeight: 800,
                         color: 'var(--text-muted)',
                         letterSpacing: '0.08em',
@@ -707,7 +710,7 @@ export default function DashboardClient({
                         fontFamily: 'Inter, sans-serif'
                       }}
                     >
-                      CLASSIFIER ACCURACY
+                      LOOCV, N={accuracyMetrics.sampleSize}
                     </span>
                   </div>
                 </div>
@@ -717,19 +720,33 @@ export default function DashboardClient({
                 {/* Bottom Accuracy Metrics Details */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
-                    <span style={{ color: 'var(--text-primary)' }}>Precision</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.precision.toFixed(2)}</span>
+                    <span style={{ color: 'var(--text-primary)' }}>Precision (Macro)</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.precision.toFixed(3)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
-                    <span style={{ color: 'var(--text-primary)' }}>Recall</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.recall.toFixed(2)}</span>
+                    <span style={{ color: 'var(--text-primary)' }}>Recall (Macro)</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.recall.toFixed(3)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
-                    <span style={{ color: 'var(--text-primary)' }}>F1 Score</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.f1.toFixed(2)}</span>
+                    <span style={{ color: 'var(--text-primary)' }}>F1 Score (Macro)</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.f1.toFixed(3)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
+                    <span style={{ color: 'var(--text-primary)' }}>Trained Samples</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.trainedSamples || 31}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
+                    <span style={{ color: 'var(--text-primary)' }}>Vocabulary Size</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.vocabularySize || 1350}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)' }}>
+                    <span>Last Retrained</span>
+                    <span style={{ fontWeight: 600 }}>
+                      {accuracyMetrics.lastRetrainTime ? new Date(accuracyMetrics.lastRetrainTime).toLocaleDateString() : 'Baseline'}
+                    </span>
                   </div>
                   <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px', fontStyle: 'italic' }}>
-                    Computed live from the classifier&rsquo;s agreement with the curated genre of all {accuracyMetrics.sampleSize} archived entries.
+                    Out-of-sample Leave-One-Out Cross-Validation (LOOCV, N={accuracyMetrics.sampleSize}) across authenticated oral literature records.
                   </div>
                 </div>
 

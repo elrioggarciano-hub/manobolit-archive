@@ -1,0 +1,112 @@
+=== PART 3: VERIFY-FROM-PREDICTIONS, CLAIMS LEDGER & SYSTEM INTEGRITY ===
+
+--- 1. DIRECT VERIFICATION FROM RAW PREDICTION ARRAYS ---
+1. Majority Baseline Verification: RIDDLE (8/22) -> VERIFIED
+2. Rules Profile Monotonicity: strict (0.0%) <= framework-only (40.9%) <= full (77.3%) -> VERIFIED
+3. Honest Winner Argmax by Macro-F1: HYBRID_ENSEMBLE (Macro-F1=0.446) -> VERIFIED
+4. Confusion Matrix Conservation: All row sums match true class support exactly -> VERIFIED
+
+--- 2. CLAIMS LEDGER (PURGED FABRICATIONS & HONEST REPLACEMENTS) ---
+| # | Legacy Purged Claim                                | Root Cause in Old Code                             | Defensible Replacement & Current Status |
+|---|---------------------------------------------------|---------------------------------------------------|-----------------------------------------|
+| 1 | 'Deep Learning & Neural Semantic Latent 64-D'     | `neuralSemantic.ts` 64-D character hash modulo    | Purged completely. Replaced with real word-bounded character 3-5-gram TF-IDF VSM (`charNgram.ts`). |
+| 2 | 'Supervised ML and Neural prove 81.8% accuracy'   | Hardcoded summary claiming ML beat 100% rules     | Generated summary built strictly from computed LOOCV numbers. No causal claims. |
+| 3 | 'Domain Expert System achieves 100% accuracy'     | Rules contained single-entry verbatim phrases     | Split into named profiles. Framework-only achieves 40.9% LOOCV; strict achieves 0.0% lower bound. |
+| 4 | 'TF-IDF Vector Space Model achieves 100% accuracy'| Centroids built from rules.ts keywords            | Centroids trained on genuine labeled documents; zero rule leakage. |
+| 5 | 'Hybrid Neuro-Symbolic Ensemble'                  | Marketing label combining hash & rules            | Fused equal-weight ensemble (NB + TF-IDF + Char N-gram + Framework Rules). |
+| 6 | 'Zero error on Riddle, Proverb, Folktale, Song'   | In-sample evaluation on training data              | Evaluated under honest LOOCV (N=22) with per-fold retraining and UNCLASSIFIED abstention. |
+| 7 | Classification on researcher commentary           | Text classified included `content` field          | Classification input strictly restricted to transcription + translation. |
+| 8 | Injected 'folk song maravilla' string              | Hardcoded label injection inside `engine.ts`      | Completely removed. Text classified as genuine oral literature. |
+| 9 | Riddles classified with 'Answer: <text>'           | Solution text leaked into classification input    | Stripped via `stripRiddleAnswer()` before tokenization. |
+| 10| Target genre filter forced desired predictions     | `targetGenreFilter` override in classifier path    | Removed from inference engine; candidate space restricted to active genres. |
+
+--- 3. TYPESCRIPT TYPECHECK & GIT WORKING TREE STATUS ---
+TypeScript Typecheck (`npx --yes tsc --noEmit`):
+  [PASS] Exit code 0. Zero TypeScript diagnostic errors.
+
+Git Working Tree Status:
+M  app/api/classify/route.ts
+MM app/api/review/route.ts
+M  app/classification/ClassificationClient.tsx
+M  app/dashboard/DashboardClient.tsx
+M  app/dashboard/page.tsx
+ M audit_scripts/check-damgo-matching.ts
+ M audit_scripts/check-damgo-parts.ts
+ M audit_scripts/check-entry19.ts
+ M audit_scripts/debug-damgo.ts
+ M audit_scripts/debug-r1-damgo.ts
+ M audit_scripts/find-strict-terms.ts
+ M audit_scripts/inspect-damgo-obj.ts
+ M audit_scripts/test-damgo-score.ts
+AM lib/classification/evaluation.ts
+ M lib/classification/hybrid.ts
+ M lib/classification/index.ts
+M  lib/classification/metrics.ts
+M  lib/classification/mlClient.ts
+A  lib/classification/retrain.ts
+ M lib/classification/rules.ts
+ M lib/classification/tfidf.ts
+ M lib/classification/trainingCorpus.ts
+A  prisma/migrations/20261115_add_classifier_snapshot/migration.sql
+M  prisma/schema.prisma
+?? audit_scripts/check-all-step11.ts
+?? audit_scripts/check-corpus-entry-map.ts
+?? audit_scripts/compute-strict-terms.ts
+?? audit_scripts/debug-api-res.ts
+?? audit_scripts/experiment-fix-a.ts
+?? audit_scripts/find-final-pass.ts
+?? audit_scripts/find-prompt-parts.ts
+?? audit_scripts/find-prompt-parts2.ts
+?? audit_scripts/found_1974.txt
+?? audit_scripts/found_2009.txt
+?? audit_scripts/found_3049.txt
+?? audit_scripts/found_3162.txt
+?? audit_scripts/found_3356.txt
+?? audit_scripts/found_3367.txt
+?? audit_scripts/found_3368.txt
+?? audit_scripts/found_3374.txt
+?? audit_scripts/found_3375.txt
+?? audit_scripts/found_3381.txt
+?? audit_scripts/found_3382.txt
+?? audit_scripts/found_3383.txt
+?? audit_scripts/found_3394.txt
+?? audit_scripts/found_3401.txt
+?? audit_scripts/found_3415.txt
+?? audit_scripts/found_3420.txt
+?? audit_scripts/out/active-snapshot.json
+?? audit_scripts/out/fix-a.txt
+?? audit_scripts/out/fix-b.txt
+?? audit_scripts/out/fix-c.txt
+?? audit_scripts/out/fix-d.txt
+?? audit_scripts/out/step10-before-after.txt
+?? audit_scripts/out/step11-decision-tree.txt
+?? audit_scripts/out/step7-loocv.txt
+?? audit_scripts/out/step8-retrain.txt
+?? audit_scripts/out/step9-api.txt
+?? audit_scripts/part_prompt_3163.txt
+?? audit_scripts/part_prompt_3356.txt
+?? audit_scripts/read-all-original-steps.ts
+?? audit_scripts/run-fix-a.ts
+?? audit_scripts/run-fix-b.ts
+?? audit_scripts/run-fix-c.ts
+?? audit_scripts/run-fix-d.ts
+?? audit_scripts/run-part3-verify.ts
+?? audit_scripts/run-step10-before-after.ts
+?? audit_scripts/run-step11-tree.ts
+?? audit_scripts/run-step7-loocv.ts
+?? audit_scripts/run-step8-retrain.ts
+?? audit_scripts/run-step9-api.ts
+?? audit_scripts/search-step11.ts
+?? audit_scripts/test-strict-def.ts
+?? audit_scripts/user_prompt_2711.txt
+?? audit_scripts/user_prompt_3163.txt
+?? audit_scripts/user_prompt_3356.txt
+?? audit_scripts/user_step_prompt_1225.txt
+?? audit_scripts/user_step_prompt_3163.txt
+?? audit_scripts/user_step_prompt_3356.txt
+?? lib/classification/decisionTree.ts
+
+--- FILE METRICS ---
+Total Lines: 112
+SHA-256: 25662427ded3c54e3e8f504a60518a1ca2d1b492f349e2e75db43884af5d03da
+output complete: yes

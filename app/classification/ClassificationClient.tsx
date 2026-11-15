@@ -1787,7 +1787,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
             </div>
 
             <p style={{ fontSize: '12px', color: '#a1a1aa', lineHeight: 1.6, marginBottom: '20px' }}>
-              Empirical multi-tier benchmark na nagpapatunay ng kahusayan ng proposed Hybrid Rule-Based Machine Learning laban sa baseline models sa lahat ng {comparativeReport.hybridEnsemble.sampleSize} na mga akdang pampanitikan ng Agusan Manobo.
+              Empirical comparative benchmark gamit ang Leave-One-Out Cross-Validation (LOOCV) laban sa baseline models sa lahat ng {comparativeReport.hybridEnsemble.sampleSize} na mga akdang pampanitikan ng Agusan Manobo.
             </p>
 
             {/* Benchmark Table */}
@@ -1869,7 +1869,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.hybridEnsemble.recall.toFixed(3)}</td>
                     <td style={{ padding: '12px', fontWeight: 800, color: '#10b981' }}>{comparativeReport.hybridEnsemble.f1.toFixed(3)}</td>
                     <td style={{ padding: '12px' }}>
-                      <span style={{ background: '#10b981', color: '#000', padding: '2px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: 800 }}>OPTIMAL</span>
+                      <span style={{ background: '#10b981', color: '#000', padding: '2px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: 800 }}>
+                        {comparativeReport.winner.includes('HYBRID_ENSEMBLE') ? 'TOP F1' : 'PROPOSED'}
+                      </span>
                     </td>
                   </tr>
                 </tbody>

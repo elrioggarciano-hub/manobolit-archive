@@ -3,6 +3,7 @@ import { revalidateTag, revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { computeContentHash } from '@/lib/classification/contentHash'
 import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/session'
+import { retrainFromDatabase } from '@/lib/classification'
 
 // GET /api/review - Fetch records with review filters
 export async function GET(request: NextRequest) {
@@ -160,11 +161,19 @@ export async function POST(request: NextRequest) {
         genre: finalGenre || entry.genre, // Keep display genre aligned with approved
         reviewerId: 'admin',
         reviewedAt: new Date(),
+        verifiedAt: newStatus === 'VERIFIED' ? new Date() : null,
         reviewNotes: notes || null,
         contentHash,
         verifiedContentHash: newStatus === 'VERIFIED' ? contentHash : null,
       },
     })
+
+    // 4. Trigger human-in-the-loop retraining when verified
+    if (newStatus === 'VERIFIED') {
+      retrainFromDatabase().catch((err: unknown) => {
+        console.error('[Retrain Trigger Error]:', err)
+      })
+    }
 
     revalidateTag('entries')
     revalidatePath('/admin')
