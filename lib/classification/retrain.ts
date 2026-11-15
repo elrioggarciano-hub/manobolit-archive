@@ -36,7 +36,7 @@ let activeRetrainPromise: Promise<ClassifierSnapshotData> | null = null
 let currentSnapshot: ClassifierSnapshotData | null = null
 let currentModels: ActiveModels | null = null
 
-const SNAPSHOT_CACHE_PATH = path.join(process.cwd(), 'audit_scripts', 'out', 'active-snapshot.json')
+const SNAPSHOT_CACHE_PATH = path.join(process.cwd(), '.cache', 'active-snapshot.json')
 
 /**
  * Loads the active snapshot from disk or falls back to base corpus models.
@@ -137,13 +137,7 @@ export async function retrainFromDatabase(
             province: e.province,
           }))
         } catch (dbErr: any) {
-          console.warn('[Retrain] Database offline or query failed; falling back to entries.json:', dbErr.message)
-          const fallbackPath = path.join(process.cwd(), 'audit_scripts', 'entries.json')
-          if (fs.existsSync(fallbackPath)) {
-            const fallbackEntries = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'))
-            verifiedRecords = fallbackEntries
-            archiveEntriesForLOOCV = fallbackEntries
-          }
+          console.warn('[Retrain] Database offline or query failed:', dbErr.message)
         }
       }
 
