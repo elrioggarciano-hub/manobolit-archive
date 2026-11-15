@@ -172,7 +172,7 @@ export function classifyWithCharNgram(
 
   if (grams.length === 0 || activeModel.centroids.length === 0) {
     return {
-      predictedGenre: targetGenreFilter !== 'ALL' ? targetGenreFilter : defaultFallback,
+      predictedGenre: 'UNCLASSIFIED',
       confidence: 0,
       allGenreScores: activeModel.centroids
         .filter(c => targetGenreFilter === 'ALL' ? activeGenreSet.has(c.genre) : c.genre === targetGenreFilter)
@@ -225,10 +225,11 @@ export function classifyWithCharNgram(
   }
 
   scores.sort((a, b) => b.similarity - a.similarity)
-  const top = scores[0] || { genre: defaultFallback, similarity: 0 }
+  const top = scores[0] || { genre: 'UNCLASSIFIED', similarity: 0 }
+  const predictedGenre = top.similarity > 0 ? top.genre : 'UNCLASSIFIED'
 
   return {
-    predictedGenre: top.genre,
+    predictedGenre,
     confidence: top.similarity,
     allGenreScores: scores,
   }

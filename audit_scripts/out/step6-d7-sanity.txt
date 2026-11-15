@@ -1,0 +1,108 @@
+=== STEP 6 CHECK: D7 SANITY TESTS (RUN TWICE EACH) ===
+
+========================================================================
+Test Case: "empty"
+Input Text: ""
+========================================================================
+RUN 1:
+  Predicted Genre : UNCLASSIFIED
+  Confidence      : 0
+  Is Unclassified : true
+  All Scores      : SONG:0.265, RIDDLE:0.245, PROVERB:0.245, FOLKTALE:0.245
+  Math Explanation: Equal-Weight Ensemble = (0.25 × NB: 30.8%) + (0.25 × TF-IDF: 25.0%) + (0.25 × Char N-gram: 25.0%) + (0.25 × Rules: 25.0%) = 26.5% -> UNCLASSIFIED (top score 26.5% < 35% or margin 2.0% < 5%).
+RUN 2:
+  Predicted Genre : UNCLASSIFIED
+  Confidence      : 0
+  Is Unclassified : true
+  Deterministic   : YES (IDENTICAL)
+  Status          : PASS
+
+========================================================================
+Test Case: "gibberish"
+Input Text: "asdf qwer zxcv poiuy lkjhg mnbvc"
+========================================================================
+RUN 1:
+  Predicted Genre : UNCLASSIFIED
+  Confidence      : 0
+  Is Unclassified : true
+  All Scores      : PROVERB:0.251, SONG:0.25, RIDDLE:0.249, FOLKTALE:0.249
+  Math Explanation: Equal-Weight Ensemble = (0.25 × NB: 24.8%) + (0.25 × TF-IDF: 25.0%) + (0.25 × Char N-gram: 25.6%) + (0.25 × Rules: 25.0%) = 25.1% -> UNCLASSIFIED (top score 25.1% < 35% or margin 0.1% < 5%).
+RUN 2:
+  Predicted Genre : UNCLASSIFIED
+  Confidence      : 0
+  Is Unclassified : true
+  Deterministic   : YES (IDENTICAL)
+  Status          : PASS
+
+========================================================================
+Test Case: "recipe"
+Input Text: "Preheat oven to 375 degrees. Whisk flour, baking powder, and sugar in a large bo"
+========================================================================
+RUN 1:
+  Predicted Genre : UNCLASSIFIED
+  Confidence      : 0
+  Is Unclassified : true
+  All Scores      : PROVERB:0.251, SONG:0.251, FOLKTALE:0.25, RIDDLE:0.248
+  Math Explanation: Equal-Weight Ensemble = (0.25 × NB: 24.9%) + (0.25 × TF-IDF: 25.0%) + (0.25 × Char N-gram: 25.4%) + (0.25 × Rules: 25.0%) = 25.1% -> UNCLASSIFIED (top score 25.1% < 35% or margin 0.0% < 5%).
+RUN 2:
+  Predicted Genre : UNCLASSIFIED
+  Confidence      : 0
+  Is Unclassified : true
+  Deterministic   : YES (IDENTICAL)
+  Status          : PASS
+
+========================================================================
+Test Case: "shuffled riddle"
+Input Text: "angud bitok pad unto maintok kaba-kaba aslag pag to Tu"
+========================================================================
+RUN 1:
+  Predicted Genre : UNCLASSIFIED
+  Confidence      : 0
+  Is Unclassified : true
+  All Scores      : RIDDLE:0.272, PROVERB:0.254, SONG:0.25, FOLKTALE:0.224
+  Math Explanation: Equal-Weight Ensemble = (0.25 × NB: 25.5%) + (0.25 × TF-IDF: 27.2%) + (0.25 × Char N-gram: 31.3%) + (0.25 × Rules: 25.0%) = 27.2% -> UNCLASSIFIED (top score 27.2% < 35% or margin 1.8% < 5%).
+RUN 2:
+  Predicted Genre : UNCLASSIFIED
+  Confidence      : 0
+  Is Unclassified : true
+  Deterministic   : YES (IDENTICAL)
+  Status          : FAIL
+
+========================================================================
+Test Case: "title removed"
+Input Text: "Inggad pusilon, buhi gihapon. Even if you shoot it, it will still be alive."
+========================================================================
+RUN 1:
+  Predicted Genre : RIDDLE
+  Confidence      : 0.379
+  Is Unclassified : false
+  All Scores      : RIDDLE:0.379, PROVERB:0.228, FOLKTALE:0.199, SONG:0.194
+  Math Explanation: Equal-Weight Ensemble = (0.25 × NB: 30.8%) + (0.25 × TF-IDF: 45.8%) + (0.25 × Char N-gram: 49.9%) + (0.25 × Rules: 25.0%) = 37.9%
+RUN 2:
+  Predicted Genre : RIDDLE
+  Confidence      : 0.379
+  Is Unclassified : false
+  Deterministic   : YES (IDENTICAL)
+  Status          : PASS
+
+========================================================================
+Test Case: "title swapped to Riddle"
+Input Text: "Riddle. Inggad pusilon, buhi gihapon. Even if you shoot it, it will still be ali"
+========================================================================
+RUN 1:
+  Predicted Genre : RIDDLE
+  Confidence      : 0.379
+  Is Unclassified : false
+  All Scores      : RIDDLE:0.379, PROVERB:0.228, FOLKTALE:0.199, SONG:0.194
+  Math Explanation: Equal-Weight Ensemble = (0.25 × NB: 30.8%) + (0.25 × TF-IDF: 45.8%) + (0.25 × Char N-gram: 49.9%) + (0.25 × Rules: 25.0%) = 37.9%
+RUN 2:
+  Predicted Genre : RIDDLE
+  Confidence      : 0.379
+  Is Unclassified : false
+  Deterministic   : YES (IDENTICAL)
+  Status          : PASS
+
+
+--- FILE METRICS ---
+Total Lines: 108
+SHA-256: 7164bf027ffa89e3ab5e49c877042b5d8055958cc5b03f6e1df2cb19bf82c5a2

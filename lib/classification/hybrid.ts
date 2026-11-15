@@ -29,6 +29,19 @@ export type AlgorithmMode =
   | 'TF_IDF_VSM'
   | 'RULE_BASED'
 
+export const UNCLASSIFIED_THRESHOLD = 0.35
+export const UNCLASSIFIED_MARGIN = 0.05
+
+/**
+ * Converts raw non-negative model scores to a calibrated probability distribution using Softmax.
+ */
+export function softmaxDistribution(scores: number[], temperature: number = 0.25): number[] {
+  const max = Math.max(...scores)
+  const exps = scores.map(s => Math.exp((s - max) / temperature))
+  const sum = exps.reduce((a, b) => a + b, 0)
+  return exps.map(e => (sum > 0 ? e / sum : 1 / scores.length))
+}
+
 export interface ModelScoreBreakdown {
   naiveBayesProbability: number
   charNgramSimilarity: number
@@ -36,6 +49,9 @@ export interface ModelScoreBreakdown {
   ruleConfidence: number
   fuzzyOrthographicScore: number
   ensembleConfidence: number
+  unclassifiedThreshold: number
+  unclassifiedMargin: number
+  isUnclassified: boolean
 }
 
 export interface HybridClassificationResult {
@@ -45,6 +61,7 @@ export interface HybridClassificationResult {
     confidence: number
     rulesApplied: string[]
     allScores: { genre: string; confidence: number }[]
+    isUnclassified?: boolean
   }
   themes: {
     value: string
@@ -232,67 +249,82 @@ export function classifyHybrid(
   const topLocation = locationResults[0] ?? null
 
   // 6. Synthesize Scores according to the selected Algorithm Mode
-  const candidateGenres = targetGenreFilter === 'ALL'
-    ? (ACTIVE_GENRES as readonly string[])
-    : [targetGenreFilter]
+  // TargetGenreFilter is removed from classification path (model evaluates across all ACTIVE_GENRES)
+  const candidateGenres = ACTIVE_GENRES as readonly string[]
+
+  // Convert each model's outputs across ACTIVE_GENRES into calibrated probability distributions
+  const rawVsmScores = candidateGenres.map(g => {
+    const m = vsmResult.allGenreScores.find(s => s.category === g)
+    return m ? m.cosineSimilarity : 0
+  })
+  const rawCharScores = candidateGenres.map(g => {
+    const m = charNgramResult.allGenreScores.find(s => s.genre === g)
+    return m ? m.similarity : 0
+  })
+  const rawRuleScores = candidateGenres.map(g => {
+    const m = genreScoresRule.find(s => s.genre === g)
+    return m ? m.confidence : 0
+  })
+
+  // Softmax normalization with temperature T = 0.25 for cosine / rule score calibration
+  const pVsmArr = softmaxDistribution(rawVsmScores, 0.25)
+  const pCharArr = softmaxDistribution(rawCharScores, 0.25)
+  const pRuleArr = softmaxDistribution(rawRuleScores, 0.25)
+
+  const pNB: Record<string, number> = {}
+  const pVSM: Record<string, number> = {}
+  const pChar: Record<string, number> = {}
+  const pRules: Record<string, number> = {}
+
+  candidateGenres.forEach((genre, idx) => {
+    const nbMatch = nbResult.allProbabilities.find(s => s.genre === genre)
+    pNB[genre] = nbMatch ? nbMatch.probability : 1 / candidateGenres.length
+    pVSM[genre] = pVsmArr[idx]
+    pChar[genre] = pCharArr[idx]
+    pRules[genre] = pRuleArr[idx]
+  })
 
   const finalGenreScores: { genre: string; confidence: number; ruleId: string }[] = []
 
   for (const genre of candidateGenres) {
     const ruleMatch = genreScoresRule.find(s => s.genre === genre)
-    const ruleConf = ruleMatch ? ruleMatch.confidence : 0
     const ruleId = ruleMatch ? ruleMatch.ruleId : (genreRules.find(r => r.value === genre)?.id || 'G001')
 
-    const vsmMatch = vsmResult.allGenreScores.find(s => s.category === genre)
-    const vsmSim = vsmMatch ? vsmMatch.cosineSimilarity : 0
-
-    const nbMatch = nbResult.allProbabilities.find(s => s.genre === genre)
-    const nbProb = nbMatch ? nbMatch.probability : 0
-
-    const charNgramMatch = charNgramResult.allGenreScores.find(s => s.genre === genre)
-    const charSim = charNgramMatch ? charNgramMatch.similarity : 0
-
-    let combinedScore = 0
+    let combinedProb = 0
 
     if (algorithmMode === 'RULE_BASED') {
-      combinedScore = ruleConf
+      combinedProb = pRules[genre]
     } else if (algorithmMode === 'TF_IDF_VSM') {
-      combinedScore = vsmSim
+      combinedProb = pVSM[genre]
     } else if (algorithmMode === 'NAIVE_BAYES_ML') {
-      // 100% Supervised Machine Learning Posterior Probability
-      combinedScore = nbProb
+      combinedProb = pNB[genre]
     } else if (algorithmMode === 'CHAR_NGRAM') {
-      // Character 3-5-Gram Centroid Cosine Similarity
-      combinedScore = charSim
+      combinedProb = pChar[genre]
     } else {
-      // 'HYBRID_ENSEMBLE'
-      // INTERIM hybrid weights (NOT tuned, replaced in Step 6):
-      // NB 0.40, TF-IDF 0.25, CHAR_NGRAM 0.20 (neural's old slot), Rules 0.15.
-      const genreFuzzyBonus = fuzzyMatches.some(f => f.category === 'GENRE') ? fuzzyScore * 0.15 : 0
-      combinedScore =
-        (0.40 * nbProb) +
-        (0.25 * vsmSim) +
-        (0.20 * charSim) +
-        (0.15 * ruleConf) +
-        genreFuzzyBonus
-
-      combinedScore = Math.min(1.0, combinedScore)
+      // 'HYBRID_ENSEMBLE': Default combination = equal-weight average of normalized scores
+      // (Fuzzy bonus removed from probability combination to maintain calibrated probability distribution)
+      combinedProb = (pNB[genre] + pVSM[genre] + pChar[genre] + pRules[genre]) / 4
     }
 
     finalGenreScores.push({
       genre,
-      confidence: Math.round(combinedScore * 100) / 100,
+      confidence: Math.round(combinedProb * 1000) / 1000,
       ruleId,
     })
   }
 
   finalGenreScores.sort((a, b) => b.confidence - a.confidence)
 
-  const topGenre = finalGenreScores[0] || {
-    genre: targetGenreFilter !== 'ALL' ? targetGenreFilter : (ACTIVE_GENRES[0] || 'RIDDLE'),
-    confidence: 0,
-    ruleId: 'G001',
-  }
+  // Abstention mechanism: UNCLASSIFIED if top score < THRESHOLD or margin to second < MARGIN
+  // Special requirement: If no rule fires for any genre, RULE_BASED must return UNCLASSIFIED
+  const P_1 = finalGenreScores[0]?.confidence ?? 0
+  const P_2 = finalGenreScores[1]?.confidence ?? 0
+  const margin = Math.round((P_1 - P_2) * 1000) / 1000
+
+  const isRuleBasedNoFire = algorithmMode === 'RULE_BASED' && genreScoresRule.length === 0
+  const isUnclassified = isRuleBasedNoFire || P_1 < UNCLASSIFIED_THRESHOLD || margin < UNCLASSIFIED_MARGIN
+  const topGenreValue = isUnclassified ? 'UNCLASSIFIED' : (finalGenreScores[0]?.genre ?? 'UNCLASSIFIED')
+  const topGenreConfidence = isUnclassified ? 0 : P_1
 
   const appliedGenreRuleIds = finalGenreScores
     .filter(s => s.confidence > 0.05)
@@ -304,10 +336,11 @@ export function classifyHybrid(
     ...(topLocation ? [topLocation.ruleId] : []),
   ]
 
-  const ruleMatchForTop = genreScoresRule.find(s => s.genre === topGenre.genre)
-  const vsmMatchForTop = vsmResult.allGenreScores.find(s => s.category === topGenre.genre)
-  const nbMatchForTop = nbResult.allProbabilities.find(s => s.genre === topGenre.genre)
-  const charNgramMatchForTop = charNgramResult.allGenreScores.find(s => s.genre === topGenre.genre)
+  const topGenreCandidate = finalGenreScores[0]?.genre || ACTIVE_GENRES[0]
+  const ruleMatchForTop = genreScoresRule.find(s => s.genre === topGenreCandidate)
+  const vsmMatchForTop = vsmResult.allGenreScores.find(s => s.category === topGenreCandidate)
+  const nbMatchForTop = nbResult.allProbabilities.find(s => s.genre === topGenreCandidate)
+  const charNgramMatchForTop = charNgramResult.allGenreScores.find(s => s.genre === topGenreCandidate)
 
   const scoreBreakdown: ModelScoreBreakdown = {
     naiveBayesProbability: nbMatchForTop ? nbMatchForTop.probability : 0,
@@ -315,35 +348,43 @@ export function classifyHybrid(
     vsmCosineSimilarity: vsmMatchForTop ? vsmMatchForTop.cosineSimilarity : 0,
     ruleConfidence: ruleMatchForTop ? ruleMatchForTop.confidence : 0,
     fuzzyOrthographicScore: Math.round(fuzzyScore * 100) / 100,
-    ensembleConfidence: topGenre.confidence,
+    ensembleConfidence: topGenreConfidence,
+    unclassifiedThreshold: UNCLASSIFIED_THRESHOLD,
+    unclassifiedMargin: UNCLASSIFIED_MARGIN,
+    isUnclassified,
   }
 
   let mathExplanation = ''
   if (algorithmMode === 'NAIVE_BAYES_ML') {
-    mathExplanation = `Supervised ML Inference: P(${topGenre.genre}|d) = ${(scoreBreakdown.naiveBayesProbability * 100).toFixed(1)}% via Multinomial Naive Bayes (Laplace α=1.0, |V|=${nbResult.modelMetadata.vocabularySize}, N=${nbResult.modelMetadata.trainedSampleCount} training records).`
+    mathExplanation = `Supervised ML Inference: P(${topGenreValue}|d) = ${(P_1 * 100).toFixed(1)}% via Multinomial Naive Bayes (Laplace α=1.0, length-normalized).`
   } else if (algorithmMode === 'CHAR_NGRAM') {
-    mathExplanation = `Character N-Gram VSM: Cosine alignment = ${(scoreBreakdown.charNgramSimilarity * 100).toFixed(1)}% between Word-Bounded 3-5-Gram Vector and ${topGenre.genre} Centroid Vector.`
+    mathExplanation = `Character N-Gram VSM: Calibrated Softmax probability = ${(P_1 * 100).toFixed(1)}% (temperature T=0.25 over 3-5-gram cosine alignment).`
   } else if (algorithmMode === 'HYBRID_ENSEMBLE') {
-    mathExplanation = `Hybrid Model = (0.40 × Naive Bayes: ${scoreBreakdown.naiveBayesProbability.toFixed(2)}) + (0.25 × Word TF-IDF: ${scoreBreakdown.vsmCosineSimilarity.toFixed(2)}) + (0.20 × Char N-gram: ${scoreBreakdown.charNgramSimilarity.toFixed(2)}) + (0.15 × Rules: ${scoreBreakdown.ruleConfidence.toFixed(2)}) = ${(topGenre.confidence * 100).toFixed(0)}%`
+    mathExplanation = `Equal-Weight Ensemble = (0.25 × NB: ${(pNB[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 × TF-IDF: ${(pVSM[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 × Char N-gram: ${(pChar[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 × Rules: ${(pRules[topGenreCandidate] * 100).toFixed(1)}%) = ${(P_1 * 100).toFixed(1)}%`
   } else if (algorithmMode === 'TF_IDF_VSM') {
-    mathExplanation = `VSM Cosine Similarity Angle: cos(θ) = ${(scoreBreakdown.vsmCosineSimilarity * 100).toFixed(1)}% between Document Vector (||d||=${vsmResult.documentVectorMagnitude}) and ${topGenre.genre} Centroid Vector.`
+    mathExplanation = `TF-IDF VSM: Calibrated Softmax probability = ${(P_1 * 100).toFixed(1)}% (temperature T=0.25 over word TF-IDF cosine alignment).`
   } else {
     const profileLabel = activeProfile === 'full' ? 'full (in-sample)' : 'framework-only'
-    mathExplanation = `Domain Rule Pattern Matching [${profileLabel}]: Word-boundary taxonomic indicators evaluated against Eugenio (1993) definitions.`
+    mathExplanation = `Domain Rule Pattern Matching [${profileLabel}]: Calibrated Softmax probability = ${(P_1 * 100).toFixed(1)}% (temperature T=0.25).`
+  }
+
+  if (isUnclassified) {
+    mathExplanation += ` -> UNCLASSIFIED (top score ${(P_1 * 100).toFixed(1)}% < ${(UNCLASSIFIED_THRESHOLD * 100).toFixed(0)}% or margin ${(margin * 100).toFixed(1)}% < ${(UNCLASSIFIED_MARGIN * 100).toFixed(0)}%).`
   }
 
   return {
     algorithmMode,
     genre: {
-      value: topGenre.genre,
-      confidence: topGenre.confidence,
+      value: topGenreValue,
+      confidence: topGenreConfidence,
       rulesApplied: appliedGenreRuleIds,
       allScores: finalGenreScores.map(s => ({ genre: s.genre, confidence: s.confidence })),
+      isUnclassified,
     },
     themes: topThemes,
     location: topLocation,
     rulesApplied: allRulesApplied,
-    overallConfidence: topGenre.confidence,
+    overallConfidence: topGenreConfidence,
     ruleDetails,
     algorithmicBreakdown: {
       naiveBayes: nbResult,

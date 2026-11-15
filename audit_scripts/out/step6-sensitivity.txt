@@ -1,0 +1,44 @@
+=== STEP 6 ENSEMBLE SENSITIVITY ANALYSIS ===
+
+=========================================================================================
+PART 1: ABSTENTION SENSITIVITY TABLE (COVERAGE VS ACCURACY ON N=22 ARCHIVE RECORDS)
+Default Fixed Constants chosen a priori: THRESHOLD = 0.35, MARGIN = 0.05
+=========================================================================================
+Threshold	Margin	Classified	Unclassified	Coverage	Acc(Covered)	Acc(Overall)
+-----------------------------------------------------------------------------------------
+0.28		0.02	19		3		86.4%		78.9%		68.2%
+0.30		0.03	18		4		81.8%		83.3%		68.2%
+0.35		0.05	14		8		63.6%		78.6%		50.0% *
+0.40		0.08	12		10		54.5%		91.7%		50.0%
+0.45		0.10	7		15		31.8%		100.0%		31.8%
+
+* Denotes default fixed constants implemented in the production engine.
+
+=========================================================================================
+PART 2: WEIGHTING SENSITIVITY TABLE (SENSITIVITY ONLY, NOT TUNED)
+Notice: Equal-weighting (0.25 each) is the default; no weights were tuned to fit the 22 entries.
+=========================================================================================
+Weighting Scheme               	NB	TF-IDF	Char	Rules	Coverage	Acc(Covered)	Acc(Overall)
+-----------------------------------------------------------------------------------------
+Equal-Weight (Default)        	0.25	0.25	0.25	0.25	63.6%		78.6%		50.0%
+Interim Step 4 (40/25/20/15)  	0.40	0.25	0.20	0.15	40.9%		100.0%		40.9%
+Subword-Heavy (20/20/40/20)   	0.20	0.20	0.40	0.20	63.6%		85.7%		54.5%
+Lexical-Heavy (20/40/20/20)   	0.20	0.40	0.20	0.20	63.6%		85.7%		54.5%
+Rules-Heavy (15/15/15/55)     	0.15	0.15	0.15	0.55	77.3%		76.5%		59.1%
+Pure ML Ensemble (50/25/25/0) 	0.50	0.25	0.25	0.00	31.8%		100.0%		31.8%
+
+=========================================================================================
+PART 3: FUZZY BONUS ARCHITECTURAL DECISION REPORT
+=========================================================================================
+- Evaluation: The previous implementation added an arbitrary scalar bonus (+0.15) to every
+  genre whenever a generic 'GENRE' variant (e.g. 'tudtul') matched anywhere in the text.
+- Architectural Choice: REMOVED additive fuzzy bonus from the genre ensemble combination.
+- Academic Defense Rationale: Additive scalar bonuses disrupt the mathematical calibration
+  of normalized probability distributions (sum = 1.0). In low-resource text classification,
+  dialectal variations are already captured robustly by the character 3-5-gram subword model.
+- Diagnostic Retention: Fuzzy orthographic matches remain active in algorithmicBreakdown.fuzzyMatches
+  for transparency and cultural-linguistic inspection in the user interface.
+
+--- FILE METRICS ---
+Total Lines: 44
+SHA-256: b8640a6d9c02442518b753227039606a3d322b9fb0992894c1b54eecac578530

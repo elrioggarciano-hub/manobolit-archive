@@ -1,0 +1,17 @@
+=== D1 BASELINE COMPARATIVE METRICS (AS-IS, POST-STEP 6 ENSEMBLE FIXES) ===
+Mode            	Accuracy	Macro Precision	Macro Recall	Macro F1	Sample Size
+-----------------------------------------------------------------------------------------
+RULE_BASED      	0.500		0.531		0.475		0.492		22
+TF_IDF_VSM      	0.318		0.750		0.313		0.430		22
+NAIVE_BAYES_ML  	0.091		0.250		0.100		0.143		22
+CHAR_NGRAM      	0.409		0.750		0.413		0.493		22
+HYBRID_ENSEMBLE 	0.500		0.792		0.481		0.589		22
+
+Winner: HYBRID_ENSEMBLE
+
+=== GENERATED ACADEMIC DEFENSE SUMMARY ===
+Evaluation across N=22 oral literature records: Naive Bayes (F1=0.143), Word TF-IDF VSM (F1=0.430), Character N-Gram VSM (F1=0.493), Rule-Based (F1=0.492), and Hybrid Ensemble (F1=0.589, 50.0% accuracy).
+
+--- FILE METRICS ---
+Total Lines: 17
+SHA-256: 461bc210c244dffc39ae47bb6816633adb0c96fa7630c26d9eea2428e5f7bb6c

@@ -118,14 +118,14 @@ export function predictNaiveBayes(
   const unigrams = tokenizeUnigrams(text, true)
   const bigrams = generateWordBigrams(unigrams)
   const tokens = [...unigrams, ...bigrams]
+  const tokenCount = Math.max(1, tokens.length)
 
   const activeGenreSet = new Set<string>(ACTIVE_GENRES)
   const availableClasses = model.classes.filter(c => activeGenreSet.has(c))
-  const candidateClasses = targetGenreFilter === 'ALL'
-    ? (availableClasses.length > 0 ? availableClasses : model.classes)
-    : model.classes.filter(c => c === targetGenreFilter)
+  const candidateClasses = availableClasses.length > 0 ? availableClasses : [...ACTIVE_GENRES]
 
   const logLikelihoods: Record<string, number> = {}
+  const rawLogLikelihoods: Record<string, number> = {}
   const wordContributions: Record<string, PredictiveFeature[]> = {}
 
   for (const c of candidateClasses) {
@@ -161,12 +161,14 @@ export function predictNaiveBayes(
       }
     }
 
-    logLikelihoods[c] = logProb
+    rawLogLikelihoods[c] = logProb
+    // Length normalization: divide by token count so probabilities do not saturate at 0/1
+    logLikelihoods[c] = tokens.length > 0 ? logProb / tokenCount : (model.priors[c] || Math.log(1 / candidateClasses.length))
     features.sort((a, b) => b.logOddsRatio - a.logOddsRatio)
     wordContributions[c] = features
   }
 
-  // 3. Calibrated Softmax Normalization
+  // 3. Calibrated Softmax Normalization over length-normalized log-likelihoods
   const logValues = candidateClasses.map(c => logLikelihoods[c])
   const maxLog = Math.max(...logValues)
   let sumExp = 0
@@ -183,13 +185,13 @@ export function predictNaiveBayes(
     return {
       genre: c,
       probability: Math.round(prob * 1000) / 1000,
-      logLikelihood: Math.round(logLikelihoods[c] * 100) / 100,
+      logLikelihood: Math.round(rawLogLikelihoods[c] * 100) / 100,
     }
   })
 
   allProbabilities.sort((a, b) => b.probability - a.probability)
 
-  const topPrediction = allProbabilities[0] || { genre: 'MYTH', probability: 0, logLikelihood: 0 }
+  const topPrediction = allProbabilities[0] || { genre: 'UNCLASSIFIED', probability: 0, logLikelihood: 0 }
   const topFeatures = wordContributions[topPrediction.genre]?.slice(0, 5) || []
 
   return {

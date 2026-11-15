@@ -423,7 +423,9 @@ export function classifyWithVSM(
   genreScores.sort((a, b) => b.cosineSimilarity - a.cosineSimilarity)
   themeScores.sort((a, b) => b.cosineSimilarity - a.cosineSimilarity)
 
-  const topGenre = genreScores.length > 0 ? genreScores[0].category : (ACTIVE_GENRES[0] || 'RIDDLE')
+  const topGenre = (genreScores.length > 0 && genreScores[0].cosineSimilarity > 0)
+    ? genreScores[0].category
+    : 'UNCLASSIFIED'
   const topGenreSimilarity = genreScores.length > 0 ? genreScores[0].cosineSimilarity : 0
 
   return {

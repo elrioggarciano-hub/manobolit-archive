@@ -1,0 +1,190 @@
+========================================================================================
+                     PART B: STEP 5 DIAGNOSTICS AUDIT REPORT                           
+========================================================================================
+
+--- 1. RULE_BASED (FRAMEWORK-ONLY) PER-ENTRY BREAKDOWN ---
+Total Entries: 22
+
+[Entry  1/22] ID: cmvnxgn290000awurstdp4fdh | Actual: SONG     | Returned: FOLKTALE (Conf: 0.36) | MaxRuleConf: 0.36 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.36 | matched: [wuhig]
+   - SONG    : conf=0.00 | matched: []
+
+[Entry  2/22] ID: cmvnxgnad0001awur5hbvddjs | Actual: SONG     | Returned: SONG     (Conf: 0.36) | MaxRuleConf: 0.36 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.36 | matched: [tears]
+
+[Entry  3/22] ID: cmvnxgndm0002awurbswjwf5u | Actual: SONG     | Returned: RIDDLE   (Conf: 0.00) | MaxRuleConf: 0.00 | ZeroAllGenres: YES
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry  4/22] ID: cmvnxgngu0003awurd1ls30t7 | Actual: SONG     | Returned: FOLKTALE (Conf: 0.72) | MaxRuleConf: 0.72 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.72 | matched: [fish, sapa]
+   - SONG    : conf=0.00 | matched: []
+
+[Entry  5/22] ID: cmvnxgnk20004awurerpzucdc | Actual: SONG     | Returned: SONG     (Conf: 0.73) | MaxRuleConf: 0.73 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.73 | matched: [loneliness, tears]
+
+[Entry  6/22] ID: cmvnxgnne0005awur0f5n5v8w | Actual: PROVERB  | Returned: RIDDLE   (Conf: 0.00) | MaxRuleConf: 0.00 | ZeroAllGenres: YES
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry  7/22] ID: cmvnxgnql0006awurlinvhtmg | Actual: PROVERB  | Returned: RIDDLE   (Conf: 0.00) | MaxRuleConf: 0.00 | ZeroAllGenres: YES
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry  8/22] ID: cmvnxgntr0007awurbl837ni7 | Actual: PROVERB  | Returned: SONG     (Conf: 0.36) | MaxRuleConf: 0.36 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.36 | matched: [loneliness]
+
+[Entry  9/22] ID: cmvnxgnwx0008awurjw4x5974 | Actual: PROVERB  | Returned: RIDDLE   (Conf: 0.00) | MaxRuleConf: 0.00 | ZeroAllGenres: YES
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 10/22] ID: cmvnxgo030009awurc7f4qx96 | Actual: PROVERB  | Returned: RIDDLE   (Conf: 0.74) | MaxRuleConf: 0.74 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.74 | matched: [kunag ka]
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 11/22] ID: cmvnxgo3c000aawurlj0566ik | Actual: FOLKTALE | Returned: FOLKTALE (Conf: 0.90) | MaxRuleConf: 0.90 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.90 | matched: [one day, fish, stream, sapa]
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 12/22] ID: cmvnxgo6g000bawuri9kyo1sb | Actual: FOLKTALE | Returned: FOLKTALE (Conf: 0.90) | MaxRuleConf: 0.90 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.90 | matched: [one day, stream, wuhig]
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 13/22] ID: cmvnxgo9m000cawura7gvmbxo | Actual: FOLKTALE | Returned: FOLKTALE (Conf: 0.36) | MaxRuleConf: 0.36 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.36 | matched: [tiger]
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 14/22] ID: cmvnxgocr000dawur922xnfd3 | Actual: FOLKTALE | Returned: RIDDLE   (Conf: 0.00) | MaxRuleConf: 0.00 | ZeroAllGenres: YES
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 15/22] ID: cmvnxgofz000eawurnhvtejos | Actual: RIDDLE   | Returned: RIDDLE   (Conf: 0.92) | MaxRuleConf: 0.92 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.92 | matched: [tu maintok pad, pag aslag]
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 16/22] ID: cmvnxgoj3000fawur8q4u714a | Actual: RIDDLE   | Returned: RIDDLE   (Conf: 0.92) | MaxRuleConf: 0.92 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.92 | matched: [tu maintok pad, pag aslag]
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 17/22] ID: cmvnxgom7000gawur9w6ejezs | Actual: RIDDLE   | Returned: RIDDLE   (Conf: 0.74) | MaxRuleConf: 0.74 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.74 | matched: [kunag ka]
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.36 | matched: [wuhig]
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 18/22] ID: cmvnxgopd000hawurnc0h6dkn | Actual: RIDDLE   | Returned: RIDDLE   (Conf: 0.74) | MaxRuleConf: 0.74 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.74 | matched: [kunag ka]
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 19/22] ID: cmvnxgosl000iawur72f32ymm | Actual: RIDDLE   | Returned: FOLKTALE (Conf: 0.36) | MaxRuleConf: 0.36 | ZeroAllGenres: NO
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.36 | matched: [tiger]
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 20/22] ID: cmvnxgovq000jawurtx7fu6gl | Actual: RIDDLE   | Returned: RIDDLE   (Conf: 0.00) | MaxRuleConf: 0.00 | ZeroAllGenres: YES
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 21/22] ID: cmvnxgoyx000kawurm8pvofao | Actual: RIDDLE   | Returned: RIDDLE   (Conf: 0.00) | MaxRuleConf: 0.00 | ZeroAllGenres: YES
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+[Entry 22/22] ID: cmvnxgp23000lawurh0cascmz | Actual: RIDDLE   | Returned: RIDDLE   (Conf: 0.00) | MaxRuleConf: 0.00 | ZeroAllGenres: YES
+   - RIDDLE  : conf=0.00 | matched: []
+   - PROVERB : conf=0.00 | matched: []
+   - FOLKTALE: conf=0.00 | matched: []
+   - SONG    : conf=0.00 | matched: []
+
+--- SUMMARY OF QUESTION 1 ---
+Entries with ZERO rule confidence for all 4 active genres: 8 / 22 (36.4%)
+When all genres have zero rule confidence, the code returns: 'RIDDLE'
+Reason / Fallback Code (from lib/classification/hybrid.ts lines 289-295):
+   finalGenreScores.sort((a, b) => b.confidence - a.confidence)
+   const topGenre = finalGenreScores[0] || {
+     genre: targetGenreFilter !== 'ALL' ? targetGenreFilter : (ACTIVE_GENRES[0] || 'RIDDLE'),
+     confidence: 0,
+     ruleId: 'G001',
+   }
+Because all scores are 0.00, Array.prototype.sort preserves original insertion order, which is candidateGenres = ACTIVE_GENRES = ['RIDDLE', 'PROVERB', 'FOLKTALE', 'SONG'].
+Thus, finalGenreScores[0] is always RIDDLE with confidence 0.00.
+
+--- 2. ACCURACY ON COVERED ENTRIES ONLY (QUESTION 2) ---
+Total Entries: 22
+Entries where at least one rule fired (Covered): 14 / 22 (63.6% coverage)
+Correct on covered entries: 9 / 14
+Accuracy on covered entries: 0.643 (64.3%)
+Overall accuracy (treating zero-rule entries as returned by code): 0.545 (12/22)
+
+--- 3. FREE-TEXT TEST FOR LOCATION (QUESTION 3) ---
+Input 1: "Agusan del Sur"
+   Location returned: null
+   Expected: null | Match Expected: YES
+Input 2: "In Agusan del Sur the hunter climbed the mountain"
+   Location returned: null
+   Expected: null | Match Expected: YES
+Code explanation: In lib/classification/engine.ts lines 88-96, locationInput is ONLY extracted from metadata properties:
+   const locParts = [input.communityLocation, input.barangay, input.municipality, input.province].filter(Boolean)
+When input is a plain string, locationInput is undefined. Furthermore, in lib/classification/hybrid.ts lines 220-230:
+   if (locationInput && locationInput.trim()) { ... }
+Free oral text is never scanned for location rules; location is strictly derived from recorded provenance metadata.
+
+--- 4. THEME THRESHOLD & OVERLAPPING TERMS (QUESTION 4) ---
+Theme threshold implementation in lib/classification/hybrid.ts lines 205-214:
+   const distinctTerms = new Set(detail.matched.map(m => m.term.toLowerCase()))
+   if (distinctTerms.size >= 2 && detail.confidence >= 0.12) { ... }
+Testing with text containing: "peace and harmony" for rule T014 (Conflict and Resolution):
+   Rule: T014 (Conflict & Resolution Theme)
+   Keywords include: 'harmony'
+   Phrases include: 'peace and harmony'
+   Matched terms array: [peace and harmony, peace, harmony]
+   distinctTerms Set: [peace and harmony, peace, harmony]
+   distinctTerms.size: 3
+   Did both keyword and enclosing phrase fire? YES
+   Are overlapping terms deduplicated by substring containment? NO.
+   Deduplication only removes identical strings via Set(term). A keyword that is a substring of an enclosing matched phrase (e.g. 'harmony' inside 'peace and harmony') is counted as 2 distinct terms.
+
+--- FILE METRICS ---
+Total Lines: 190
+SHA-256: 8cd2780f6c353a5e3358763044d356f3ac5a697a4722154a4813d0718bece69e

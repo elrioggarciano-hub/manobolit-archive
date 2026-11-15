@@ -100,6 +100,6 @@ export function classifyEntry(
 
   const fullText = cleanClassificationText(rawText)
 
-  // Execute Hybrid Classifier
-  return classifyHybrid(fullText, genreFilter, algorithmMode, models, locationInput)
+  // Execute Hybrid Classifier (ignoring targetGenreFilter in the classification path)
+  return classifyHybrid(fullText, 'ALL', algorithmMode, models, locationInput)
 }
