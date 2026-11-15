@@ -1,147 +1,195 @@
 // Ground-Truth Training Corpus for Supervised Machine Learning
 // Synthesizes authenticated field records from Catipay & Curato (2024) and Maravilla (2024).
 
+export type TrainingDocSource = 'archive-verbatim' | 'author-written'
+
 export interface TrainingDocument {
   id: string
   text: string
   genre: 'MYTH' | 'LEGEND' | 'FOLKTALE' | 'EPIC' | 'RIDDLE' | 'PROVERB' | 'SONG' | 'CHANT'
   themes: string[]
   provenance: string
+  source: TrainingDocSource
+  citation?: string
 }
 
+/**
+ * Active genres present in genuine archive field collections (Catipay & Curato 2024, Maravilla 2024).
+ * MYTH, LEGEND, EPIC, and CHANT are retained in code for taxonomic completeness, but inactive in prediction.
+ */
+export const ACTIVE_GENRES = ['RIDDLE', 'PROVERB', 'FOLKTALE', 'SONG'] as const
+export type ActiveGenre = typeof ACTIVE_GENRES[number]
+
+export const ALL_GENRES = ['MYTH', 'LEGEND', 'FOLKTALE', 'EPIC', 'RIDDLE', 'PROVERB', 'SONG', 'CHANT'] as const
+export type AllGenre = typeof ALL_GENRES[number]
+
 export const TRAINING_CORPUS: TrainingDocument[] = [
-  // ── MYTHS ──
+  // ── MYTHS (Author-written baseline, inactive in live predictions) ──
   {
     id: 'tr-myth-1',
-    text: "The stars were born from the breath of Father Sky. In those ancient times, there were no stars in the heavens. The surface of the earth was still in deep darkness. Then Father Sky said, We shall give birth to the stars. Creation origin deity celestial cosmos d-anak te meogingon so mga bituen te amay he langit.",
+    text: "The stars were born from the breath of Father Sky. In those ancient times, there were no stars in the heavens. The surface of the earth was still in deep darkness. Then Father Sky said, We shall give birth to the stars. D-anak te meogingon so mga bituen te amay he langit.",
     genre: 'MYTH',
     themes: ['COSMOGONY', 'ORIGINS'],
-    provenance: 'Agusan Manobo Origin Myth'
+    provenance: 'Agusan Manobo Origin Narrative',
+    source: 'author-written',
+    citation: 'Eugenio (1993)'
   },
   {
     id: 'tr-myth-2',
-    text: "In the beginning of all things, the supreme creator deity shaped the primordial universe. The heavens and the earth were separated by divine spirits. Ancestral shamans recount the dawn of time when gods walked the world before human existence.",
+    text: "In the beginning of all things, the supreme creator shaped the primordial universe. The heavens and the earth were separated by spirits. Ancestral shamans recount the dawn of time when divine beings walked the world before human existence.",
     genre: 'MYTH',
     themes: ['CREATION_MYTHS', 'SPIRIT_WORLD'],
-    provenance: 'Agusan Manobo Cosmogony'
+    provenance: 'Agusan Manobo Cosmogony',
+    source: 'author-written',
+    citation: 'Eugenio (1993)'
   },
   {
     id: 'tr-myth-3',
-    text: "How the first humans came to be from clay and breath of the great spirit. Deities formed mankind to steward the sacred soil and rivers of Mindanao.",
+    text: "How the first humans came to be from clay and breath of the great spirit. Spirits formed mankind to steward the soil and rivers of Mindanao.",
     genre: 'MYTH',
     themes: ['CREATION_MYTHS', 'NATURE_AND_ENVIRONMENT'],
-    provenance: 'Agusan Manobo Genesis'
+    provenance: 'Agusan Manobo Genesis',
+    source: 'author-written',
+    citation: 'Eugenio (1993)'
   },
 
-  // ── LEGENDS ──
+  // ── LEGENDS (Author-written baseline, inactive in live predictions) ──
   {
     id: 'tr-legend-1',
-    text: "According to legend, Lake Bababu was guarded by a sacred water spirit. Long ago, ancient ancestors witnessed the lake form after a supernatural hero struck the mountain with his spear. It came to be known as a holy place of pilgrimage.",
+    text: "Lake Bababu was guarded by a water spirit. Long ago, ancient ancestors witnessed the lake form after a warrior struck the mountain with his spear. It came to be known as a gathering place of pilgrimage.",
     genre: 'LEGEND',
     themes: ['HISTORICAL_EVENTS', 'SUPERNATURAL_BEINGS'],
-    provenance: 'Agusan del Sur Landmark Legend'
+    provenance: 'Agusan del Sur Landmark Narrative',
+    source: 'author-written',
+    citation: 'Eugenio (1993)'
   },
   {
     id: 'tr-legend-2',
-    text: "The sacred mountain was protected by guardian spirits. Villagers say that during ancient wars, the mountain concealed the warriors within sacred mists, establishing the origin of the boundary between tribes.",
+    text: "The mountain was protected by guardian spirits. Villagers say that during ancient wars, the mountain concealed the warriors within mists, establishing the boundary between tribes.",
     genre: 'LEGEND',
     themes: ['HISTORICAL_EVENTS', 'HEROIC_DEEDS'],
-    provenance: 'Bunawan Sacred Mountain'
+    provenance: 'Bunawan Landmark Narrative',
+    source: 'author-written',
+    citation: 'Eugenio (1993)'
   },
 
-  // ── FOLKTALES ──
+  // ── FOLKTALES (Active Genre) ──
   {
     id: 'tr-folktale-1',
-    text: "Once upon a time in a faraway village, the clever monkey outwitted the foolish crocodile at the river bank. The monkey leaped across the backs of turtles to escape, leaving a moral lesson about wit over brute force. Sugilanon tudtul bata sapa wuhig.",
+    text: "Once upon a time in a faraway village, the clever monkey outwitted the foolish crocodile at the river bank. The monkey leaped across the backs of turtles to escape to the other side of the water.",
     genre: 'FOLKTALE',
     themes: ['MORAL_LESSONS', 'NATURE_AND_ENVIRONMENT'],
-    provenance: 'Catipay & Curato (2024)'
+    provenance: 'Catipay & Curato (2024)',
+    source: 'author-written',
+    citation: 'Catipay & Curato (2024)'
   },
   {
     id: 'tr-folktale-2',
-    text: "A long ago trickster fable about the deer and the cunning bird. They competed to see who could harvest the wild fruits first. Entertainment and traditional moral wisdom for children in the tribe.",
+    text: "A story about the deer and the cunning bird. They competed to see who could harvest the wild fruits first across the forest.",
     genre: 'FOLKTALE',
     themes: ['MORAL_LESSONS'],
-    provenance: 'Agusan Manobo Oral Tale'
+    provenance: 'Agusan Manobo Oral Tale',
+    source: 'author-written',
+    citation: 'Eugenio (1993)'
   },
 
-  // ── EPICS ──
+  // ── EPICS (Author-written baseline, inactive in live predictions) ──
   {
     id: 'tr-epic-1',
-    text: "The great warrior chieftain Agyu embarked on a long quest across mountains and seas with his golden sword to protect his clan from invaders. In the epic battle of Ulaging, the brave champion defeated the enemies and secured victory for his people.",
+    text: "The great warrior chieftain Agyu embarked on a long quest across mountains and seas with his golden sword to protect his clan from invaders. In the battle of Ulaging, the brave champion defeated the enemies and secured victory for his people.",
     genre: 'EPIC',
     themes: ['HEROIC_DEEDS', 'HISTORICAL_EVENTS'],
-    provenance: 'Ulaging Epic Cycle'
+    provenance: 'Ulaging Narrative Cycle',
+    source: 'author-written',
+    citation: 'Ulaging Epic Cycle'
   },
   {
     id: 'tr-epic-2',
-    text: "Heroic narrative poem of ancient conquests, courage, and tribal warfare. The champion defended the ancestral domain against foreign conquerors through supernatural strength and valor.",
+    text: "Chieftain narratives of ancient journeys and clan defense. The champion defended the ancestral domain against foreign conquerors through strength and valor.",
     genre: 'EPIC',
     themes: ['HEROIC_DEEDS'],
-    provenance: 'Agusan Manobo Ulaging'
+    provenance: 'Agusan Manobo Ulaging',
+    source: 'author-written',
+    citation: 'Ulaging Epic Cycle'
   },
 
-  // ── RIDDLES ──
+  // ── RIDDLES (Active Genre) ──
   {
     id: 'tr-riddle-1',
-    text: "What am I? When young it is small, when struck it does not cry. Answer: tobacco leaf. Tigmo riddle puzzle wordplay mystery question tu maintok pad inggad pusilon buhi gihapon.",
+    text: "Tu maintok pad inggad pusilon buhi gihapon. When young it is small, when struck it does not cry.",
     genre: 'RIDDLE',
     themes: ['MORAL_LESSONS', 'NATURE_AND_ENVIRONMENT'],
-    provenance: 'Catipay & Curato (2024)'
+    provenance: 'Catipay & Curato (2024)',
+    source: 'author-written',
+    citation: 'Catipay & Curato (2024)'
   },
   {
     id: 'tr-riddle-2',
-    text: "A traditional riddle about the coconut tree and well. Guess the mystery of the shadow that walks on water but leaves no footprint. Tigmo panultihon.",
+    text: "Atabay ni eba kunag ka yakasan. Guess the mystery that walks on water but leaves no footprint.",
     genre: 'RIDDLE',
     themes: ['NATURE_AND_ENVIRONMENT'],
-    provenance: 'Bunawan Riddle Collection'
+    provenance: 'Bunawan Collection',
+    source: 'author-written',
+    citation: 'Catipay & Curato (2024)'
   },
 
-  // ── PROVERBS ──
+  // ── PROVERBS (Active Genre) ──
   {
     id: 'tr-proverb-1',
-    text: "Panultihon: No matter how hard life is, it is better to suffer from hunger than to do things you should not. This proverb emphasizes integrity, resisting temptation, and principled living. Inggad nukoy ka lisud kan kinabuhi, mas marujow pad nug antus.",
+    text: "Inggad nukoy ka lisud kan kinabuhi, mas marujow pad nug antus ki to ka buntas kaysa ug himo tu saya. No matter how hard life is, it is better to suffer from hunger than to do things you should not.",
     genre: 'PROVERB',
     themes: ['MORAL_LESSONS', 'SOCIAL_CUSTOMS'],
-    provenance: 'Catipay & Curato (2024)'
+    provenance: 'Catipay & Curato (2024)',
+    source: 'author-written',
+    citation: 'Catipay & Curato (2024)'
   },
   {
     id: 'tr-proverb-2',
-    text: "Panultihon: Trust is always slow, but consistent effort achieves lasting peace. Salig kilang permi su inggad hinuy hinuy. Traditional wisdom on patience and social harmony.",
+    text: "Salig kilang permi su inggad hinuy hinuy, ugka abut tada inggad maintok. Trust is always slow, but consistent effort achieves lasting quietness.",
     genre: 'PROVERB',
     themes: ['SOCIAL_CUSTOMS', 'MORAL_LESSONS'],
-    provenance: 'Catipay & Curato (2024)'
+    provenance: 'Catipay & Curato (2024)',
+    source: 'author-written',
+    citation: 'Catipay & Curato (2024)'
   },
 
-  // ── FOLK SONGS ──
+  // ── FOLK SONGS (Active Genre) ──
   {
     id: 'tr-song-1',
-    text: "What Was Buried Has Surfaced Again. The song captures the journey of the Manobo tribe, who have long felt invisible and neglected. Lantawod diya lawod nig duma kan bayod soe tribu ko no daog-daog mahawig no katuigan, niglubong on tu kamingaw kunag pakabarog so wara ka silungan. IPRA Law 8371 Maravilla (2024).",
+    text: "Lantawod diya lawod nig duma kan bayod soe tribu ko no daog-daog mahawig no katuigan, niglubong on tu kamingaw kunag pakabarog so wara ka silungan. What was buried deep under the water has surfaced again to the light.",
     genre: 'SONG',
     themes: ['HISTORICAL_EVENTS', 'HEROIC_DEEDS', 'NATURE_AND_ENVIRONMENT'],
-    provenance: 'Maravilla (2024) - Trento'
+    provenance: 'Maravilla (2024) - Trento',
+    source: 'author-written',
+    citation: 'Maravilla (2024)'
   },
   {
     id: 'tr-song-2',
-    text: "How hardship my situation is, For the mountains are my home. I weep when I remember my mother. Kapait soe Kanak kahimtang bubungan SI Kanak pig ugpaan ug sinugow a Man usahay tug paka dumdum a tu kanay inoy. Lyrical melody sorrow tears loneliness.",
+    text: "Kapait soe Kanak kahimtang bubungan SI Kanak pig ugpaan ug sinugow a Man usahay tug paka dumdum a tu kanay inoy. How hardship my situation is, for the mountains are my home and I weep when I remember my mother.",
     genre: 'SONG',
     themes: ['SOCIAL_CUSTOMS', 'DEATH_AND_AFTERLIFE'],
-    provenance: 'Maravilla (2024) - Trento'
+    provenance: 'Maravilla (2024) - Trento',
+    source: 'author-written',
+    citation: 'Maravilla (2024)'
   },
   {
     id: 'tr-song-3',
-    text: "The Night Has Come. Kadikiluman kan adlaw madani ug sayop mig abot tu kakuba tu daegeha mga yuha migtagdo tu mata. The song portrays deep sorrow, loneliness, and separation.",
+    text: "Kadikiluman kan adlaw madani ug sayop mig abot tu kakuba tu daegeha mga yuha migtagdo tu mata. The darkness has come when you are far away and heavy tears fall from my eyes.",
     genre: 'SONG',
     themes: ['COURTSHIP_AND_MARRIAGE', 'DEATH_AND_AFTERLIFE'],
-    provenance: 'Maravilla (2024) - Trento'
+    provenance: 'Maravilla (2024) - Trento',
+    source: 'author-written',
+    citation: 'Maravilla (2024)'
   },
 
-  // ── CHANTS ──
+  // ── CHANTS (Author-written baseline, inactive in live predictions) ──
   {
     id: 'tr-chant-1',
-    text: "Sacred ritual chant invoking ancestral spirits and deities during harvest ceremony. Chanted prayer, blessing, and incantation by the babaylan shaman for protection and communal healing.",
+    text: "Ritual invocation of ancestral spirits during harvest ceremony. Prayer, blessing, and invocation by the babaylan for protection and communal healing.",
     genre: 'CHANT',
     themes: ['SPIRIT_WORLD', 'AGRICULTURAL_CYCLES'],
-    provenance: 'Agusan Manobo Ritual Chants'
+    provenance: 'Agusan Manobo Ritual Field Notes',
+    source: 'author-written',
+    citation: 'Eugenio (1993)'
   }
 ]

@@ -10,9 +10,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { text, additionalContext, entryId, title, transcription, translation, content } = body
 
-    const rawText = text || [title, transcription, translation, content, additionalContext].filter(Boolean).join(' ')
+    const rawText = text || [transcription, translation, additionalContext].filter(Boolean).join(' ')
     if (!rawText) {
-      return NextResponse.json({ error: 'Text or entry content fields are required' }, { status: 400 })
+      return NextResponse.json({ error: 'Transcription or translation fields are required' }, { status: 400 })
     }
 
     // Execute real ML prediction with graceful rule fallback

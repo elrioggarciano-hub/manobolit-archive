@@ -1,6 +1,7 @@
 import { genreRules, themeRules, locationRules, ClassificationRule } from './rules'
 import { classifyHybrid, AlgorithmMode, HybridClassificationResult, InjectableModels } from './hybrid'
 import { normalizeText as baseNormalize } from './tokenizer'
+import { cleanClassificationText } from './textCleaning'
 
 export interface MatchedTerm {
   term: string
@@ -51,10 +52,13 @@ export interface EntryLike {
 
 /**
  * Classifies literature entries across Eugenio (1993) genres, Andress (1985) themes,
- * and provenance locations using the upgraded Hybrid NLP & Vector Space Architecture.
+ * and provenance locations using the Hybrid Classification Architecture.
  *
- * Defaults to 'HYBRID_ENSEMBLE' (combines 50% TF-IDF Cosine Similarity, 35% Domain Expert Rules,
- * and 15% Dialect-Aware Fuzzy Orthography).
+ * Combines Multinomial Naive Bayes, TF-IDF Vector Space Model, Character N-Gram Centroids,
+ * and Domain Rules with Dialect-Aware Fuzzy Orthography.
+ *
+ * Text policy: Classifies genuine primary oral text (transcription + translation ONLY),
+ * excluding modern title metadata and researcher commentary.
  */
 export function classifyEntry(
   input: string | EntryLike,
@@ -63,28 +67,20 @@ export function classifyEntry(
   algorithmMode: AlgorithmMode = 'HYBRID_ENSEMBLE',
   models?: InjectableModels
 ): ClassificationResult {
-  let fullText: string
+  let rawText: string
 
   if (typeof input === 'object' && input !== null) {
     const parts = [
-      input.title,
-      input.englishTitle,
-      input.manoboTitle,
-      input.content,
       input.transcription,
       input.translation,
-      typeof input.culturalElements === 'string'
-        ? input.culturalElements
-        : Array.isArray(input.culturalElements)
-          ? input.culturalElements.join(' ')
-          : '',
-      input.type === 'FOLK_SONG' ? 'folk song maravilla' : '',
       additionalContext,
     ]
-    fullText = baseNormalize(parts.filter(Boolean).join(' '))
+    rawText = baseNormalize(parts.filter(Boolean).join(' '))
   } else {
-    fullText = baseNormalize(`${input} ${additionalContext}`)
+    rawText = baseNormalize(`${input} ${additionalContext}`)
   }
+
+  const fullText = cleanClassificationText(rawText)
 
   // Execute Hybrid Classifier
   return classifyHybrid(fullText, genreFilter, algorithmMode, models)

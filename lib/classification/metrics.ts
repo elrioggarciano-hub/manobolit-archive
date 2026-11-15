@@ -46,8 +46,8 @@ export function computeAccuracyMetrics(
   let correct = 0
 
   for (const entry of entries) {
-    const textToClassify = [entry.title, entry.content, entry.translation].filter(Boolean).join(' ')
-    const result = classifyEntry(textToClassify, entry.transcription || '', 'ALL', algorithmMode, models)
+    const textToClassify = [entry.transcription, entry.translation].filter(Boolean).join(' ')
+    const result = classifyEntry(textToClassify, '', 'ALL', algorithmMode, models)
     const predicted = result.genre.value
     const actual = entry.genre
 

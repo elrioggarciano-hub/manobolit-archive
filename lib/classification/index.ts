@@ -44,8 +44,15 @@ export type { FuzzyMatchResult, DialectVariant } from './fuzzy'
 
 export { normalizeText, tokenizeUnigrams, generateWordBigrams, generateCharNgrams, STOPWORDS } from './tokenizer'
 
-export { TRAINING_CORPUS } from './trainingCorpus'
-export type { TrainingDocument } from './trainingCorpus'
+export { TRAINING_CORPUS, ACTIVE_GENRES, ALL_GENRES } from './trainingCorpus'
+export type { TrainingDocument, ActiveGenre, AllGenre, TrainingDocSource } from './trainingCorpus'
+
+export {
+  stripRiddleAnswer,
+  stripGenreDescriptors,
+  cleanClassificationText,
+  getCleanClassificationInput,
+} from './textCleaning'
 
 export { computeAccuracyMetrics, computeComparativeMetrics } from './metrics'
 export type { AccuracyMetrics, ModelComparisonReport, ScorableEntry } from './metrics'

@@ -2,7 +2,8 @@
 // Formulated for low-resource agglutinative morphological robustness.
 
 import { tokenizeUnigrams } from './tokenizer'
-import { TRAINING_CORPUS, TrainingDocument } from './trainingCorpus'
+import { TRAINING_CORPUS, TrainingDocument, ACTIVE_GENRES } from './trainingCorpus'
+import { cleanClassificationText } from './textCleaning'
 
 export interface CharNgramCentroid {
   genre: string
@@ -62,7 +63,8 @@ export function trainCharNgram(
 
   // 1. Compute document frequency (DF) per document
   for (const doc of trainingDocs) {
-    const docGrams = extractWordBoundedCharNgrams(doc.text)
+    const cleaned = cleanClassificationText(doc.text)
+    const docGrams = extractWordBoundedCharNgrams(cleaned)
     const uniqueGrams = new Set<string>(docGrams)
     for (const g of uniqueGrams) {
       dfMap.set(g, (dfMap.get(g) || 0) + 1)
@@ -109,7 +111,8 @@ export function trainCharNgram(
   const genreDocVecs: Record<string, Record<string, number>[]> = {}
   for (const doc of trainingDocs) {
     if (!genreDocVecs[doc.genre]) genreDocVecs[doc.genre] = []
-    genreDocVecs[doc.genre].push(vectorizeDoc(doc.text))
+    const cleaned = cleanClassificationText(doc.text)
+    genreDocVecs[doc.genre].push(vectorizeDoc(cleaned))
   }
 
   const classes = Object.keys(genreDocVecs)
@@ -161,13 +164,19 @@ export function classifyWithCharNgram(
   model: CharNgramModel = DEFAULT_CHAR_NGRAM_MODEL
 ): CharNgramResult {
   const activeModel = model || DEFAULT_CHAR_NGRAM_MODEL
-  const grams = extractWordBoundedCharNgrams(text)
+  const cleaned = cleanClassificationText(text)
+  const grams = extractWordBoundedCharNgrams(cleaned)
+
+  const activeGenreSet = new Set<string>(ACTIVE_GENRES)
+  const defaultFallback = ACTIVE_GENRES[0] || 'RIDDLE'
 
   if (grams.length === 0 || activeModel.centroids.length === 0) {
     return {
-      predictedGenre: targetGenreFilter !== 'ALL' ? targetGenreFilter : (activeModel.classes[0] || 'MYTH'),
+      predictedGenre: targetGenreFilter !== 'ALL' ? targetGenreFilter : defaultFallback,
       confidence: 0,
-      allGenreScores: activeModel.centroids.map(c => ({ genre: c.genre, similarity: 0 })),
+      allGenreScores: activeModel.centroids
+        .filter(c => targetGenreFilter === 'ALL' ? activeGenreSet.has(c.genre) : c.genre === targetGenreFilter)
+        .map(c => ({ genre: c.genre, similarity: 0 })),
     }
   }
 
@@ -195,7 +204,7 @@ export function classifyWithCharNgram(
 
   // Cosine similarity against each centroid
   const candidateCentroids = targetGenreFilter === 'ALL'
-    ? activeModel.centroids
+    ? activeModel.centroids.filter(c => activeGenreSet.has(c.genre))
     : activeModel.centroids.filter(c => c.genre === targetGenreFilter)
 
   const scores: { genre: string; similarity: number }[] = []
@@ -216,7 +225,7 @@ export function classifyWithCharNgram(
   }
 
   scores.sort((a, b) => b.similarity - a.similarity)
-  const top = scores[0] || { genre: activeModel.classes[0] || 'MYTH', similarity: 0 }
+  const top = scores[0] || { genre: defaultFallback, similarity: 0 }
 
   return {
     predictedGenre: top.genre,

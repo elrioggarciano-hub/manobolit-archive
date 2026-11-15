@@ -15,7 +15,8 @@
 
 import { normalizeText, tokenizeUnigrams, generateWordBigrams } from './tokenizer'
 import { genreRules, themeRules } from './rules'
-import { TRAINING_CORPUS, TrainingDocument } from './trainingCorpus'
+import { TRAINING_CORPUS, TrainingDocument, ACTIVE_GENRES } from './trainingCorpus'
+import { cleanClassificationText } from './textCleaning'
 
 export interface TFIDFVector {
   [term: string]: number
@@ -164,7 +165,8 @@ export function trainTfidf(
 
   // 1. Calculate Document Frequency (DF) across all training documents
   for (const doc of trainingDocs) {
-    const unigrams = tokenizeUnigrams(doc.text, true)
+    const cleaned = cleanClassificationText(doc.text)
+    const unigrams = tokenizeUnigrams(cleaned, true)
     const bigrams = generateWordBigrams(unigrams)
     const uniqueTerms = new Set<string>([...unigrams, ...bigrams])
     for (const term of uniqueTerms) {
@@ -179,11 +181,12 @@ export function trainTfidf(
   }
 
   // 3. Document vectorization function using model's IDF
-  const textToVector = (text: string): {
+  const textToVector = (rawText: string): {
     vector: TFIDFVector
     magnitude: number
     features: FeatureWeight[]
   } => {
+    const text = cleanClassificationText(rawText)
     const unigrams = tokenizeUnigrams(text, true)
     const bigrams = generateWordBigrams(unigrams)
     const allTerms = [...unigrams, ...bigrams]
@@ -228,7 +231,8 @@ export function trainTfidf(
   const themeTermCounts: Record<string, Map<string, number>> = {}
 
   for (const doc of trainingDocs) {
-    const docUnigrams = tokenizeUnigrams(doc.text, true)
+    const cleaned = cleanClassificationText(doc.text)
+    const docUnigrams = tokenizeUnigrams(cleaned, true)
     const docBigrams = generateWordBigrams(docUnigrams)
     const docTerms = [...docUnigrams, ...docBigrams]
 
@@ -373,15 +377,19 @@ export function classifyWithVSM(
   model: TfidfModel = DEFAULT_TFIDF_MODEL
 ): VSMResult {
   const activeModel = model || DEFAULT_TFIDF_MODEL
-  const { vector: docVec, magnitude: docMag, features } = activeModel.textToVector(text)
+  const cleanedText = cleanClassificationText(text)
+  const { vector: docVec, magnitude: docMag, features } = activeModel.textToVector(cleanedText)
 
   const genreScores: VSMScore[] = []
   const themeScores: VSMScore[] = []
   const centroids = activeModel.centroids
+  const activeGenreSet = new Set<string>(ACTIVE_GENRES)
 
   for (const centroid of centroids) {
     if (centroid.type === 'GENRE') {
-      if (targetGenreFilter !== 'ALL' && centroid.category !== targetGenreFilter) {
+      if (targetGenreFilter === 'ALL') {
+        if (!activeGenreSet.has(centroid.category)) continue
+      } else if (centroid.category !== targetGenreFilter) {
         continue
       }
       const { similarity, sharedFeatures } = computeCosineSimilarity(
@@ -415,7 +423,7 @@ export function classifyWithVSM(
   genreScores.sort((a, b) => b.cosineSimilarity - a.cosineSimilarity)
   themeScores.sort((a, b) => b.cosineSimilarity - a.cosineSimilarity)
 
-  const topGenre = genreScores.length > 0 ? genreScores[0].category : 'MYTH'
+  const topGenre = genreScores.length > 0 ? genreScores[0].category : (ACTIVE_GENRES[0] || 'RIDDLE')
   const topGenreSimilarity = genreScores.length > 0 ? genreScores[0].cosineSimilarity : 0
 
   return {

@@ -108,17 +108,11 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const entriesList = dbEntries.length > 0 ? dbEntries : fallbackEntries
   const initialEntry = entriesList.find(e => e.title.includes("Creation of the Stars")) || entriesList[0]
 
-  // Combine content + translation + metadata for 100% accurate classification matching
+  // Primary oral text (transcription + translation only, excluding title and researcher commentary)
   const getEntryClassificationText = (entry: DBEntry) => {
     const parts = [
-      entry.title,
-      entry.manoboTitle,
-      entry.content,
+      entry.transcription,
       entry.translation,
-      entry.communityLocation,
-      entry.municipality,
-      entry.barangay,
-      (entry.culturalElements || []).join(' ')
     ].filter(Boolean)
     return parts.join(' ')
   }
@@ -129,6 +123,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [inputTranscription, setInputTranscription] = useState(initialEntry ? (initialEntry.transcription || '') : '')
   const [selectedTranslation, setSelectedTranslation] = useState(initialEntry?.translation || '')
   const [selectedBisayaTranslation, setSelectedBisayaTranslation] = useState(initialEntry?.bisayaTranslation || '')
+  const [selectedContent, setSelectedContent] = useState(initialEntry?.content || '')
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>('ALL')
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<AlgorithmMode>('HYBRID_ENSEMBLE')
   const [showBenchmarkModal, setShowBenchmarkModal] = useState<boolean>(false)
@@ -194,12 +189,14 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
         setInputTranscription(nextEntry.transcription || '')
         setSelectedTranslation(nextEntry.translation || '')
         setSelectedBisayaTranslation(nextEntry.bisayaTranslation || '')
+        setSelectedContent(nextEntry.content || '')
       } else {
         setSelectedEntryId('custom')
         setInputText('')
         setInputTranscription('')
         setSelectedTranslation('')
         setSelectedBisayaTranslation('')
+        setSelectedContent('')
       }
     }
   }, [selectedGenreFilter, entriesList, selectedEntryId, filteredEntriesList])
@@ -709,6 +706,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                             setInputTranscription(found.transcription || '')
                             setSelectedTranslation(found.translation || '')
                             setSelectedBisayaTranslation(found.bisayaTranslation || '')
+                            setSelectedContent(found.content || '')
                           }
                         }
                       }}
@@ -1676,6 +1674,45 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       {selectedBisayaTranslation || 'No translation available.'}
                     </p>
                   </div>
+
+                  {selectedContent && (
+                    <div
+                      className="stagger-item card-hover"
+                      style={{
+                        background: 'var(--bg-surface)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '0px',
+                        padding: '20px',
+                      }}
+                    >
+                      <h3
+                        style={{
+                          margin: '0 0 12px',
+                          fontSize: '10px',
+                          fontWeight: 800,
+                          color: '#a1a1aa',
+                          letterSpacing: '0.05em',
+                          borderBottom: '1px solid var(--border-color)',
+                          paddingBottom: '8px'
+                        }}
+                      >
+                        RESEARCHER'S ANALYSIS (CONTEXT & COMMENTARY)
+                      </h3>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: '13px',
+                          lineHeight: 1.6,
+                          color: 'var(--text-secondary)',
+                          whiteSpace: 'pre-line',
+                          fontFamily: 'Inter, sans-serif',
+                          fontStyle: 'italic'
+                        }}
+                      >
+                        {selectedContent}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </section>
             )}

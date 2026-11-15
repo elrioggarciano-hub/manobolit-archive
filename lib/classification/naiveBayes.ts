@@ -12,7 +12,8 @@
 //        P(c | d) = exp(log P(c | d) - max_k log P(k | d)) / sum_j exp(log P(j | d) - max_k log P(k | d))
 
 import { tokenizeUnigrams, generateWordBigrams } from './tokenizer'
-import { TRAINING_CORPUS, TrainingDocument } from './trainingCorpus'
+import { TRAINING_CORPUS, TrainingDocument, ACTIVE_GENRES } from './trainingCorpus'
+import { cleanClassificationText } from './textCleaning'
 
 export interface NaiveBayesModel {
   classes: string[]
@@ -67,7 +68,8 @@ export function trainNaiveBayes(
   // 1. Accumulate word counts and class occurrences
   for (const doc of trainingData) {
     classCounts[doc.genre] = (classCounts[doc.genre] || 0) + 1
-    const unigrams = tokenizeUnigrams(doc.text, true)
+    const cleanedText = cleanClassificationText(doc.text)
+    const unigrams = tokenizeUnigrams(cleanedText, true)
     const bigrams = generateWordBigrams(unigrams)
     const tokens = [...unigrams, ...bigrams]
 
@@ -108,16 +110,19 @@ export const DEFAULT_TRAINED_NB_MODEL: NaiveBayesModel = trainNaiveBayes(TRAININ
  * Predicts the class of a text using the trained Multinomial Naive Bayes Machine Learning model.
  */
 export function predictNaiveBayes(
-  text: string,
+  rawText: string,
   targetGenreFilter: string = 'ALL',
   model: NaiveBayesModel = DEFAULT_TRAINED_NB_MODEL
 ): NaiveBayesPrediction {
+  const text = cleanClassificationText(rawText)
   const unigrams = tokenizeUnigrams(text, true)
   const bigrams = generateWordBigrams(unigrams)
   const tokens = [...unigrams, ...bigrams]
 
+  const activeGenreSet = new Set<string>(ACTIVE_GENRES)
+  const availableClasses = model.classes.filter(c => activeGenreSet.has(c))
   const candidateClasses = targetGenreFilter === 'ALL'
-    ? model.classes
+    ? (availableClasses.length > 0 ? availableClasses : model.classes)
     : model.classes.filter(c => c === targetGenreFilter)
 
   const logLikelihoods: Record<string, number> = {}

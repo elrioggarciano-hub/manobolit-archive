@@ -12,6 +12,8 @@ import { genreRules, themeRules, locationRules, ClassificationRule } from './rul
 import { MatchedTerm, RuleDetail } from './engine'
 import { predictNaiveBayes, NaiveBayesPrediction, NaiveBayesModel } from './naiveBayes'
 import { classifyWithCharNgram, CharNgramResult, CharNgramModel } from './charNgram'
+import { ACTIVE_GENRES } from './trainingCorpus'
+import { cleanClassificationText } from './textCleaning'
 
 export interface InjectableModels {
   nb?: NaiveBayesModel
@@ -128,7 +130,7 @@ export function classifyHybrid(
   algorithmMode: AlgorithmMode = 'HYBRID_ENSEMBLE',
   models?: InjectableModels
 ): HybridClassificationResult {
-  const normText = fullText.toLowerCase()
+  const normText = cleanClassificationText(fullText).toLowerCase()
   const unigrams = tokenizeUnigrams(normText, false)
 
   // 1. Run Supervised Machine Learning: Multinomial Naive Bayes
@@ -147,11 +149,16 @@ export function classifyHybrid(
     : 0.0
 
   // 5. Run Heuristic Rule Engine
+  const activeGenreSet = new Set<string>(ACTIVE_GENRES)
   const ruleDetails: Record<string, RuleDetail> = {}
   const genreScoresRule: { genre: string; confidence: number; ruleId: string }[] = []
 
   for (const rule of genreRules) {
-    if (targetGenreFilter !== 'ALL' && rule.value !== targetGenreFilter) continue
+    if (targetGenreFilter === 'ALL') {
+      if (!activeGenreSet.has(rule.value)) continue
+    } else if (rule.value !== targetGenreFilter) {
+      continue
+    }
     const detail = scoreRule(rule, normText)
     ruleDetails[rule.id] = detail
     if (detail.confidence > 0) {
@@ -186,8 +193,9 @@ export function classifyHybrid(
   const topLocation = locationResults[0] ?? null
 
   // 6. Synthesize Scores according to the selected Algorithm Mode
-  const allGenres = Array.from(new Set(genreRules.map(r => r.value)))
-  const candidateGenres = targetGenreFilter === 'ALL' ? allGenres : [targetGenreFilter]
+  const candidateGenres = targetGenreFilter === 'ALL'
+    ? (ACTIVE_GENRES as readonly string[])
+    : [targetGenreFilter]
 
   const finalGenreScores: { genre: string; confidence: number; ruleId: string }[] = []
 
@@ -242,7 +250,7 @@ export function classifyHybrid(
   finalGenreScores.sort((a, b) => b.confidence - a.confidence)
 
   const topGenre = finalGenreScores[0] || {
-    genre: targetGenreFilter !== 'ALL' ? targetGenreFilter : 'MYTH',
+    genre: targetGenreFilter !== 'ALL' ? targetGenreFilter : (ACTIVE_GENRES[0] || 'RIDDLE'),
     confidence: 0,
     ruleId: 'G001',
   }

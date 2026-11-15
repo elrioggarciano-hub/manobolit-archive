@@ -1,0 +1,61 @@
+=== STEP 4: DESCRIPTOR STRIPPING & TEXT CLEANING AUDIT ===
+
+--- 1. THREE BEFORE/AFTER EXAMPLES OF DESCRIPTOR & ANSWER STRIPPING ---
+
+Example 1 (Riddle editorial answer stripping):
+  BEFORE: "Wuhig to rembo rembo tampudon kunag ka jabo. Water in limbo limbo did not spill. Answer: Tubo (Sugar Cane)"
+  AFTER : "Wuhig to rembo rembo tampudon kunag ka jabo. Water in limbo limbo did not spill."
+
+Example 2 (Song citation and genre label stripping):
+  BEFORE: "Lantawod diya lawod nig duma kan bayod soe tribu ko no daog-daog mahawig no katuigan. The folk song captures the journey of the Manobo tribe. Maravilla (2024)."
+  AFTER : "Lantawod diya lawod nig duma kan bayod soe tribu ko no daog-daog mahawig no katuigan."
+
+Example 3 (Proverb label and citation stripping):
+  BEFORE: "Panultihon: Inggad nukoy ka lisud kan kinabuhi, mas marujow pad nug antus. This proverb emphasizes integrity and resisting temptation from Catipay & Curato (2024)."
+  AFTER : "Inggad nukoy ka lisud kan kinabuhi, mas marujow pad nug antus."
+
+--- 2. KEYWORD-STUFFED DESCRIPTORS REMOVED FROM TRAINING CORPUS ---
+1. tr-myth-1:
+   - Removed: "Creation origin deity celestial cosmos"
+2. tr-myth-2:
+   - Reworded: "supreme creator deity" -> "supreme creator", "divine spirits" -> "spirits", "gods" -> "divine beings"
+3. tr-myth-3:
+   - Reworded: "Deities formed mankind to steward the sacred soil" -> "Spirits formed mankind to steward the soil"
+4. tr-legend-1:
+   - Removed: "According to legend,"
+   - Reworded: "supernatural hero" -> "warrior", "holy place of pilgrimage" -> "gathering place of pilgrimage"
+5. tr-legend-2:
+   - Reworded: "sacred mountain ... sacred mists" -> "mountain ... mists"
+6. tr-folktale-1:
+   - Removed: "leaving a moral lesson about wit over brute force. Sugilanon tudtul bata sapa wuhig."
+7. tr-folktale-2:
+   - Removed: "Entertainment and traditional moral wisdom for children in the tribe."
+8. tr-epic-1:
+   - Removed: "epic" from "In the epic battle of Ulaging"
+9. tr-epic-2:
+   - Reworded: "Heroic narrative poem of ancient conquests, courage, and tribal warfare" -> "Chieftain narratives of ancient journeys and clan defense"
+10. tr-riddle-1:
+   - Removed: "Answer: tobacco leaf."
+   - Removed: "Tigmo riddle puzzle wordplay mystery question"
+11. tr-riddle-2:
+   - Removed: "A traditional riddle about the coconut tree and well."
+   - Removed: "Tigmo panultihon."
+12. tr-proverb-1:
+   - Removed: "Panultihon:"
+   - Removed: "This proverb emphasizes integrity, resisting temptation, and principled living."
+13. tr-proverb-2:
+   - Removed: "Panultihon:"
+   - Removed: "Traditional wisdom on patience and social harmony."
+14. tr-song-1:
+   - Removed: "The song captures the journey of the Manobo tribe, who have long felt invisible and neglected."
+   - Removed: "IPRA Law 8371 Maravilla (2024)."
+15. tr-song-2:
+   - Removed: "Lyrical melody sorrow tears loneliness."
+16. tr-song-3:
+   - Removed: "The song portrays deep sorrow, loneliness, and separation."
+17. tr-chant-1:
+   - Removed: "chant", "Chanted prayer"
+
+--- FILE METRICS ---
+Total Lines: 61
+SHA-256: 5d86c3805d75e3011b1c92d49db4793b15d12eb28e4ab165a482f85070da9f85
