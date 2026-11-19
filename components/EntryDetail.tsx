@@ -68,17 +68,17 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
   const confidence = (latestClassification && latestClassification.confidenceScore >= 0.50)
     ? Math.round(latestClassification.confidenceScore * 100)
     : Math.round(liveClassification.overallConfidence * 100)
-  
+
   return (
     <div className="anim-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 80px', fontFamily: 'Inter, sans-serif' }}>
-      
+
       {/* Title Header Block */}
       <div style={{ marginBottom: '24px' }}>
-        <span 
-          style={{ 
-            fontSize: '9px', 
-            fontWeight: 800, 
-            color: 'var(--brand-accent)', 
+        <span
+          style={{
+            fontSize: '9px',
+            fontWeight: 800,
+            color: 'var(--brand-accent)',
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             display: 'block',
@@ -87,26 +87,26 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
         >
           MANOBO ORAL TRADITION
         </span>
-        <h1 
-          style={{ 
-            margin: '0 0 4px', 
-            fontSize: 'clamp(26px, 5vw, 40px)', 
-            fontWeight: 700, 
-            color: 'var(--text-primary)', 
+        <h1
+          style={{
+            margin: '0 0 4px',
+            fontSize: 'clamp(26px, 5vw, 40px)',
+            fontWeight: 700,
+            color: 'var(--text-primary)',
             fontFamily: 'Cormorant Garamond, Georgia, serif',
-            lineHeight: 1.1 
+            lineHeight: 1.1
           }}
         >
           {entry.title}
         </h1>
         {entry.manoboTitle && (
-          <p 
-            style={{ 
-              margin: 0, 
-              fontSize: '18px', 
-              color: 'var(--text-primary)', 
+          <p
+            style={{
+              margin: 0,
+              fontSize: '18px',
+              color: 'var(--text-primary)',
               fontFamily: 'Cormorant Garamond, Georgia, serif',
-              fontStyle: 'italic' 
+              fontStyle: 'italic'
             }}
           >
             {entry.manoboTitle}
@@ -130,10 +130,10 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
       {/* Main Grid Content Block */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Left Columns (Transcription & Translation & Metadata) */}
         <div className="lg:col-span-2">
-          
+
           {/* Manobo Transcription */}
           <div>
             <h3
@@ -164,21 +164,21 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
           </div>
 
           {/* Metadata Row */}
-          <div 
-            style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', 
-              gap: '16px', 
-              marginTop: '32px', 
-              borderTop: '1px solid var(--border-color)', 
-              paddingTop: '20px' 
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+              gap: '16px',
+              marginTop: '32px',
+              borderTop: '1px solid var(--border-color)',
+              paddingTop: '20px'
             }}
           >
             <div>
               <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>RECORDING YEAR</div>
               <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{entry.yearCollected || '1992'}</div>
             </div>
-            
+
             <div>
               <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>PROVINCE</div>
               <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{entry.province}</div>
@@ -199,7 +199,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
         {/* Right Sidebar Cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          
+
           {/* Card 1: Archive Classification */}
           <div
             className="stagger-item card-hover"
@@ -210,13 +210,13 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               borderRadius: '0px'
             }}
           >
-            <h4 
-              style={{ 
-                margin: '0 0 16px 0', 
-                fontSize: '10px', 
-                fontWeight: 800, 
-                color: 'var(--brand-accent)', 
-                letterSpacing: '0.05em' 
+            <h4
+              style={{
+                margin: '0 0 16px 0',
+                fontSize: '10px',
+                fontWeight: 800,
+                color: 'var(--brand-accent)',
+                letterSpacing: '0.05em'
               }}
             >
               ARCHIVE CLASSIFICATION
@@ -226,23 +226,23 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             <div style={{ marginBottom: '16px' }}>
               <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>GENRE (EUGENIO)</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span 
-                  style={{ 
-                    background: '#18181b', 
-                    color: '#ffffff', 
-                    fontSize: '9px', 
-                    fontWeight: 700, 
-                    padding: '4px 10px', 
+                <span
+                  style={{
+                    background: '#18181b',
+                    color: '#ffffff',
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    padding: '4px 10px',
                     borderRadius: '0px',
                     letterSpacing: '0.05em'
                   }}
                 >
                   {entry.genre}
                 </span>
-                
+
                 {/* Custom Edit/Review Icon */}
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" style={{ cursor: 'pointer' }}>
-                  <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                  <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
                 </svg>
               </div>
             </div>
@@ -310,18 +310,18 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               borderRadius: '0px'
             }}
           >
-            <h4 
-              style={{ 
-                margin: '0 0 12px 0', 
-                fontSize: '10px', 
-                fontWeight: 800, 
-                color: 'var(--brand-accent)', 
-                letterSpacing: '0.05em' 
+            <h4
+              style={{
+                margin: '0 0 12px 0',
+                fontSize: '10px',
+                fontWeight: 800,
+                color: 'var(--brand-accent)',
+                letterSpacing: '0.05em'
               }}
             >
               RULE-BASED ANALYSIS
             </h4>
-            
+
             <p style={{ margin: '0 0 20px 0', fontSize: '12px', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
               {getAnalysisText(entry)}
             </p>

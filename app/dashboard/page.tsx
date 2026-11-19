@@ -28,7 +28,7 @@ const getProcessedDashboardData = unstable_cache(
     let loocvReport: any = null
     try {
       loocvReport = JSON.parse(snapshot.loocvJson)
-    } catch (e) {}
+    } catch (e) { }
 
     const ensemble = loocvReport?.modes?.hybridEnsemble || {
       accuracy: 0.409,
