@@ -50,6 +50,7 @@ export default function Header() {
     { href: '/translator', label: t('nav_translator') },
     { href: '/dashboard', label: t('nav_dashboard') },
     { href: '/about', label: t('nav_about') },
+    { href: '/manual', label: t('nav_manual') },
   ]
 
   return (
@@ -83,7 +84,7 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || (item.href === '/explore' && pathname.startsWith('/explore')) || (item.href === '/about' && pathname === '/about')
+              const isActive = pathname === item.href || (item.href === '/explore' && pathname.startsWith('/explore')) || (item.href === '/about' && pathname === '/about') || (item.href === '/manual' && pathname.startsWith('/manual'))
               return (
                 <Link
                   key={item.href}

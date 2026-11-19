@@ -148,6 +148,26 @@ export default function AdminClient({ initialEntries }: Props) {
             >
               + New Entry
             </Link>
+            <Link
+              href="/manual?role=admin"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '9px 16px',
+                background: 'var(--bg-surface)',
+                color: 'var(--text-primary)',
+                textDecoration: 'none',
+                borderRadius: '8px',
+                fontWeight: 600,
+                fontSize: '13px',
+                border: '1px solid var(--border-color)',
+                transition: 'all 0.2s ease',
+              }}
+              title="Open Digital User Manual (Administrator Guide)"
+            >
+              📖 User Manual
+            </Link>
             <LogoutButton />
           </div>
         </div>

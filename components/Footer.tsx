@@ -74,6 +74,7 @@ export default function Footer() {
                 { label: t('footer_nav_explorer'), href: '/explore' },
                 { label: t('footer_nav_rules'), href: '/classification' },
                 { label: t('footer_nav_about'), href: '/about' },
+                { label: t('footer_nav_manual'), href: '/manual' },
                 { label: t('footer_nav_ethics'), href: '/ethics' },
               ].map(link => (
                 <Link
