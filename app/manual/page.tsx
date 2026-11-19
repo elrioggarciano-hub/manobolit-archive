@@ -17,3 +17,4 @@ export default function ManualPage({ searchParams }: PageProps) {
   const role = searchParams?.role || 'all'
   return <ManualClient initialRole={role} />
 }
+

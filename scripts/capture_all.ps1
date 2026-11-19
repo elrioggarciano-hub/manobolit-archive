@@ -20,3 +20,4 @@ foreach ($p in $pages) {
 }
 
 Write-Host "All page screenshots captured successfully!"
+

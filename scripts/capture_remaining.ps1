@@ -27,3 +27,4 @@ Capture-Page "http://localhost:3000/dashboard" "fig6_dashboard.png" 6
 Capture-Page "http://localhost:3000/admin/login" "fig7_admin_login.png" 7
 
 Write-Host "Completed capturing all remaining pages!"
+
