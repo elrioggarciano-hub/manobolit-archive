@@ -5,6 +5,16 @@ import Link from 'next/link'
 import { MANUAL_METADATA, MANUAL_CHAPTERS } from '@/lib/manual/manualData'
 
 export default function ManualPrintPage() {
+  React.useEffect(() => {
+    // Automatically trigger PDF print/save dialog on load
+    const timer = setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        window.print()
+      }
+    }, 600)
+    return () => clearTimeout(timer)
+  }, [])
+
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
       window.print()
