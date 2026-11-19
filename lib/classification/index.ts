@@ -59,10 +59,3 @@ export type { AccuracyMetrics, ModelComparisonReport, ScorableEntry } from './me
 
 export { runLOOCV, extractEntryText, ARCHIVE_OVERLAPPING_DOC_IDS } from './evaluation'
 export type { LOOCVReport, ModeEvaluationResult, PerClassMetrics, PredictionDetail, MajorityBaseline } from './evaluation'
-
-export { retrainFromDatabase, getLatestSnapshot, getActiveModels } from './retrain'
-export type { ClassifierSnapshotData, ActiveModels } from './retrain'
-
-// 5. Semantic LLM Reasoning: Gemini Large Language Model
-export { classifyWithGemini } from './geminiClassifier'
-export type { GeminiClassificationResult, ClassificationInputText } from './geminiClassifier'

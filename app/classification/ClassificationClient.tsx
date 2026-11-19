@@ -1720,7 +1720,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           paddingBottom: '8px'
                         }}
                       >
-                        RESEARCHER'S ANALYSIS (CONTEXT & COMMENTARY)
+                        RESEARCHER&apos;S ANALYSIS (CONTEXT &amp; COMMENTARY)
                       </h3>
                       <p
                         style={{

@@ -41,7 +41,7 @@ Return your evaluation strictly as a valid JSON object matching this schema:
  */
 export async function classifyWithGemini(
   input: ClassificationInputText,
-  preferredModel: string = 'gemini-flash-lite-latest'
+  preferredModel: string = 'gemini-3.5-flash-lite'
 ): Promise<GeminiClassificationResult | null> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -68,13 +68,12 @@ export async function classifyWithGemini(
 
   const userPrompt = parts.join('\n\n')
 
-  // Multi-model resilience: try fast and stable flash-lite first, then flash-latest and fallbacks
+  // Multi-model resilience: try fast and stable 3.5 flash-lite first, then 3.8-flash
   const candidateModels = Array.from(new Set([
     preferredModel,
-    'gemini-flash-lite-latest',
-    'gemini-flash-latest',
-    'gemini-3.1-flash-lite',
-    'gemma-4-26b-a4b-it',
+    'gemini-3.5-flash-lite',
+    'gemini-3.8-flash',
+    'gemini-3.5-flash',
   ]))
 
   for (const modelName of candidateModels) {

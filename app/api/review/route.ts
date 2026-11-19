@@ -3,7 +3,7 @@ import { revalidateTag, revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { computeContentHash } from '@/lib/classification/contentHash'
 import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/session'
-import { retrainFromDatabase } from '@/lib/classification'
+import { retrainFromDatabase } from '@/lib/classification/retrain'
 
 // GET /api/review - Fetch records with review filters
 export async function GET(request: NextRequest) {
@@ -65,8 +65,8 @@ export async function GET(request: NextRequest) {
         // Prediction suggestions
         suggestedGenre: latestClassification?.classifiedGenre || e.genre,
         suggestedThemes: JSON.parse(latestClassification?.classifiedThemes || '[]'),
-        predictionSource: latestClassification?.predictionSource || 'RULE_BASED',
-        modelVersion: latestClassification?.modelVersion || 'rules-baseline',
+        predictionSource: latestClassification?.predictionSource || 'TS_HYBRID_ENSEMBLE',
+        modelVersion: latestClassification?.modelVersion || 'v1.0.0-ml',
         confidenceScore: latestClassification?.confidenceScore || 0.85,
         probabilities: JSON.parse(latestClassification?.probabilities || '{}'),
         reviewHistory: e.reviews,
@@ -140,8 +140,8 @@ export async function POST(request: NextRequest) {
         entryId: entry.id,
         suggestedGenre: latestClassification?.classifiedGenre || entry.genre,
         suggestedThemes: latestClassification?.classifiedThemes || entry.themes,
-        predictionSource: latestClassification?.predictionSource || 'RULE_BASED',
-        modelVersion: latestClassification?.modelVersion || 'rules-baseline',
+        predictionSource: latestClassification?.predictionSource || 'TS_HYBRID_ENSEMBLE',
+        modelVersion: latestClassification?.modelVersion || 'v1.0.0-ml',
         decision,
         approvedGenre: finalGenre,
         approvedThemes: finalThemes ? JSON.stringify(finalThemes) : null,

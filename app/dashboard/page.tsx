@@ -1,6 +1,6 @@
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
-import { getLatestSnapshot } from '@/lib/classification'
+import { getLatestSnapshot } from '@/lib/classification/retrain'
 import DashboardClient from './DashboardClient'
 
 // Edge ISR with 60s stale-while-revalidate for sub-50ms dashboard delivery

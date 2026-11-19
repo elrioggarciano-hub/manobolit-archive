@@ -33,18 +33,24 @@ export async function translateWithGemini(
   text: string,
   sourceLang: TranslationLang,
   targetLang: TranslationLang,
-  modelName: string = 'gemini-flash-lite-latest'
+  modelName: string = 'gemini-3.5-flash-lite'
 ): Promise<GeminiTranslationOutput | null> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey || !text.trim()) return null
 
-  const candidateModels = [modelName, 'gemini-flash-latest', 'gemma-4-26b-a4b-it']
+  const candidateModels = Array.from(new Set([
+    modelName,
+    'gemini-3.5-flash-lite',
+    'gemini-3.8-flash',
+    'gemini-3.5-flash',
+  ]))
+
+  const prompt = `Source Language: ${sourceLang}\nTarget Language: ${targetLang}\n\nInput Text:\n"""\n${text.trim()}\n"""`
 
   for (const model of candidateModels) {
+    // Strategy A: GoogleGenAI SDK
     try {
       const ai = new GoogleGenAI({ apiKey })
-      const prompt = `Source Language: ${sourceLang}\nTarget Language: ${targetLang}\n\nInput Text:\n"""\n${text.trim()}\n"""`
-
       const response = await ai.models.generateContent({
         model,
         contents: [
@@ -77,8 +83,52 @@ export async function translateWithGemini(
           }
         }
       }
-    } catch (e: any) {
-      // Continue to next candidate model or fallback
+    } catch {
+      // Continue to Strategy B
+    }
+
+    // Strategy B: Direct REST fetch
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: `${SYSTEM_PROMPT}\n\n${prompt}` }],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.1,
+          },
+        }),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        const textOut = data.candidates?.[0]?.content?.parts?.[0]?.text
+        if (textOut) {
+          let clean = textOut.trim()
+          if (clean.startsWith('```json')) clean = clean.slice(7)
+          if (clean.startsWith('```')) clean = clean.slice(3)
+          if (clean.endsWith('```')) clean = clean.slice(0, -3)
+          clean = clean.trim()
+
+          const parsed = JSON.parse(clean)
+          if (parsed.translatedText) {
+            return {
+              translatedText: parsed.translatedText,
+              confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.95,
+              linguisticNotes: parsed.linguisticNotes,
+              webonaryLexemes: Array.isArray(parsed.webonaryLexemes) ? parsed.webonaryLexemes : [],
+            }
+          }
+        }
+      }
+    } catch {
+      // Continue to next model
     }
   }
 

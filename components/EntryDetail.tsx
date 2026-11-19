@@ -3,7 +3,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 import AudioPlayer from './AudioPlayer'
-import { classifyEntry } from '@/lib/classification'
+import { classifyEntry } from '@/lib/classification/engine'
 
 const RegionalMap = dynamic(() => import('./RegionalMap'), {
   ssr: false,

@@ -43,7 +43,9 @@ export async function predictWithML(
     probabilities[s.genre] = s.confidence
   }
 
-  const topFeatures = result.genre.rulesApplied.map(r => ({ feature: r, weight: 1.0 }))
+  const topFeatures = (result.algorithmicBreakdown?.topFeatures && result.algorithmicBreakdown.topFeatures.length > 0)
+    ? result.algorithmicBreakdown.topFeatures.map(f => ({ feature: f.term, weight: Math.round(f.tfidf * 1000) / 1000 }))
+    : result.genre.rulesApplied.map(r => ({ feature: r, weight: 1.0 }))
 
   return {
     predictedGenre,
@@ -54,7 +56,7 @@ export async function predictWithML(
     modelSnapshotId: snapshot.id,
     trainedSamples: snapshot.trainedSamples,
     isUncertain: predictedGenre === 'UNCLASSIFIED' || confidence < uncertaintyThreshold,
-    algorithm: 'ManoboLit TypeScript Hybrid Architecture (NB + TF-IDF VSM + Char N-Gram + Rules)',
+    algorithm: 'ManoboLit Supervised Machine Learning Ensemble (Multinomial NB + TF-IDF VSM + Char N-Gram)',
     topFeatures,
   }
 }

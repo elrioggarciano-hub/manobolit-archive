@@ -8,7 +8,8 @@ const globalForPrisma = globalThis as unknown as {
 // Prisma 7's "client" engine requires a driver adapter rather than reading the
 // datasource url directly. Connects to the Supabase Postgres database via
 // DATABASE_URL (transaction pooler, see .env).
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL
+const adapter = new PrismaPg({ connectionString })
 
 export const prisma =
   globalForPrisma.prisma ??
