@@ -421,7 +421,9 @@ export const genreRules: ClassificationRule[] = [
       'panultihon', 'integrity', 'temptation', 'trust', 'virtue', 'principled',
       'moral', 'lesson', 'inner beauty', 'character', 'behavior', 'attitude',
       'happiness', 'principled living', 'self-respect', 'kalinaw', 'kalinuw', 'tambal', 'tambi',
-      'paminug', 'bayho', 'kinaiya', 'kuun', 'iyan', 'cure', 'remedy', 'peace', 'edible'
+      'paminug', 'bayho', 'kinaiya', 'kuun', 'iyan', 'cure', 'remedy', 'peace', 'edible',
+      'malisud', 'yangoy', 'langoy', 'abusar', 'abuso', 'abusing', 'mismo', 'nismo', 'kinabuhi',
+      'salig', 'antus', 'buntas', 'swim'
     ],
     phrases: [
       'as the elders say', 'it is said by the wise', 'remember always',
