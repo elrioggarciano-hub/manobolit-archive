@@ -339,11 +339,11 @@ export const genreRules: ClassificationRule[] = [
     value: 'FOLKTALE',
     keywords: [
       'animal', 'trickster', 'moral', 'lesson', 'clever', 'foolish', 'monkey', 'crocodile',
-      'bird', 'fish', 'deer', 'turtle', 'rabbit', 'outwit', 'trick', 'deceive', 'cunning',
-      'fairy', 'diwata', 'goddess', 'river goddess', 'native', 'tiger', 'horse',
+      'bird', 'deer', 'turtle', 'rabbit', 'outwit', 'trick', 'deceive', 'cunning',
+      'fairy', 'diwata', 'goddess', 'river goddess', 'native', 'horse',
       'folktale', 'stream', 'enchanted', 'magical', 'creature', 'spirit creature',
       'tagbanwa', 'sigulanon', 'sugilanon', 'tala', 'marta', 'mang juan', 'marco',
-      'yumad', 'bata', 'sapa', 'misfortune'
+      'yumad', 'bata', 'misfortune'
     ],
     phrases: [
       'once upon a time', 'long ago in a village', 'there lived a', 'in a faraway place',
@@ -393,7 +393,7 @@ export const genreRules: ClassificationRule[] = [
       'mystery', 'brain teaser', 'what is it', 'tigmo',
       'batong', 'uling', 'tubo', 'lubi', 'kahayag', 'damgo', 'anino', 'tabako',
       'kaba-kaba', 'bitok', 'rembo', 'atabay', 'pusilon', 'pultahan', 'bitoy',
-      'nanalingsing', 'pang-pang'
+      'nanalingsing', 'pang-pang', 'tiger', 'palagyo', 'amonohon'
     ],
     phrases: [
       'what has', 'i have no', 'i am always', 'you can see me but',
@@ -401,7 +401,7 @@ export const genreRules: ClassificationRule[] = [
       'tu maintok pad', 'angud to', 'pag aslag', 'kunag ka', 'kunag baja',
       'likat diyat', 'inggad pusilon', 'buhi gihapon', 'answer:', 'answer :',
       'answer is', 'the answer is', 'wheel of eba', 'trick riddle', 'this riddle', 'the riddle',
-      'how can you escape', 'planted tobacco', 'stages of coal'
+      'how can you escape', 'planted tobacco', 'stages of coal', 'unhon ko man', 'unhon ko man pag palagyo'
     ],
     contextClues: [
       'puzzle form', 'question and answer', 'wordplay', 'traditional riddle',
@@ -420,12 +420,17 @@ export const genreRules: ClassificationRule[] = [
       'one must', 'never', 'always remember', 'the wise say',
       'panultihon', 'integrity', 'temptation', 'trust', 'virtue', 'principled',
       'moral', 'lesson', 'inner beauty', 'character', 'behavior', 'attitude',
-      'happiness', 'principled living', 'self-respect'
+      'happiness', 'principled living', 'self-respect', 'kalinaw', 'kalinuw', 'tambal', 'tambi',
+      'paminug', 'bayho', 'kinaiya', 'kuun', 'iyan', 'cure', 'remedy', 'peace', 'edible'
     ],
     phrases: [
       'as the elders say', 'it is said by the wise', 'remember always',
       'as the saying goes', 'a man who', 'no matter how hard', 'it is better to',
-      'it is said', 'it emphasizes', 'this proverb', 'the proverb', 'panultihon'
+      'it is said', 'it emphasizes', 'this proverb', 'the proverb', 'panultihon',
+      'ka kalinaw iyan tambal', 'iyan tambal', 'attitude matters most', 'peace and cure loneliness',
+      'peace is the', 'cure for loneliness', 'change your life', 'bring peace',
+      'behavior is not edible', 'your face is beautiful', 'not edible', 'paminug su',
+      'tambi tu kamingow', 'tambi tu kamingaw', 'kunag ka kuun', 'marujow dag ahaun', 'kan kinaiya nu'
     ],
     contextClues: [
       'short wisdom statement', 'moral instruction', 'traditional saying', 'panultihon'
@@ -444,7 +449,8 @@ export const genreRules: ClassificationRule[] = [
       'folk song', 'manobo folk song', 'tribe', 'tribal', 'tribu', 'katribuhan',
       'longing', 'sorrow', 'loneliness', 'lament', 'kamingaw', 'voice', 'heart', 'tears', 'weep',
       'kadikiluman', 'panaw', 'sinugow', 'kapait', 'nilugdang', 'lugdang', 'lantawod',
-      'kabubunganan', 'kudlung', 'saluray', 'tud-om', 'lullaby', 'ballad'
+      'kabubunganan', 'bubungan', 'opaw', 'naupow', 'pananom', 'kumpaniya',
+      'kudlung', 'saluray', 'tud-om', 'lullaby', 'ballad'
     ],
     phrases: [
       'the song captures', 'the song conveys', 'the song portrays', 'the song talks',
@@ -452,6 +458,7 @@ export const genreRules: ClassificationRule[] = [
       'we sing together', 'sing this song', 'let our voices', 'with song and dance',
       'the night has come', 'i weep when', 'tears are falling', 'what was buried',
       'history of the tribe', 'the mountains are bare', 'hardship of my situation',
+      'opaw on tu kabubunganan', 'naupow on tu mgo bubungan', 'dasigon ko iyu',
       'maravilla (2024)', 'maravilla, 2024'
     ],
     contextClues: [

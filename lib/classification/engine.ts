@@ -80,6 +80,9 @@ export function classifyEntry(
 
   if (typeof input === 'object' && input !== null) {
     const rawJoined = [
+      input.title,
+      input.manoboTitle,
+      input.englishTitle,
       input.transcription,
       input.translation,
       additionalContext,

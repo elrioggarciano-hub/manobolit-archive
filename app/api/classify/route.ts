@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
       confidence: finalConfidence,
       overallConfidence: finalConfidence,
       isUnclassified,
-      isUncertain: isUnclassified || finalConfidence < 0.35,
+      isUncertain: isUnclassified,
 
       // Semantic LLM Explanations (Option 1)
       reasoning: geminiResult ? geminiResult.reasoning : undefined,

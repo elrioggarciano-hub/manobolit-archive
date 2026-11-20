@@ -158,8 +158,29 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [serverResult, setServerResult] = useState<any>(null)
 
   const classificationResult = useMemo(
-    () => classifyEntry(inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm),
-    [inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm]
+    () => {
+      const selected = selectedEntryId !== 'custom' ? entriesList.find(e => e.id === selectedEntryId) : null
+      if (selected) {
+        return classifyEntry(
+          {
+            title: selected.title,
+            manoboTitle: selected.manoboTitle,
+            englishTitle: selected.englishTitle,
+            transcription: inputTranscription || selected.transcription || '',
+            translation: selectedTranslation || selected.translation || '',
+            content: selected.content || '',
+            communityLocation: selected.communityLocation || '',
+            municipality: selected.municipality || '',
+            barangay: selected.barangay || '',
+          },
+          inputTranscription,
+          selectedGenreFilter,
+          selectedAlgorithm
+        )
+      }
+      return classifyEntry(inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm)
+    },
+    [inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm, selectedEntryId, entriesList, selectedTranslation]
   )
 
   const comparativeReport = useMemo(
@@ -792,6 +813,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       const minDuration = 1400
 
                       try {
+                        const activeEntry = selectedEntryId !== 'custom' ? entriesList.find(e => e.id === selectedEntryId) : null
                         const res = await fetch('/api/classify', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
@@ -800,6 +822,14 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                             additionalContext: inputTranscription,
                             content: inputText,
                             transcription: inputTranscription,
+                            translation: selectedTranslation,
+                            bisayaTranslation: selectedBisayaTranslation,
+                            title: activeEntry?.title,
+                            manoboTitle: activeEntry?.manoboTitle,
+                            englishTitle: activeEntry?.englishTitle,
+                            communityLocation: activeEntry?.communityLocation,
+                            municipality: activeEntry?.municipality,
+                            barangay: activeEntry?.barangay,
                           }),
                         })
                         if (res.ok) {
@@ -1192,9 +1222,17 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                 >
                                   {serverResult.predictionSource} ({serverResult.modelVersion})
                                 </span>
-                                {serverResult.isUncertain && (
+                                {selectedEntryId !== 'custom' ? (
+                                  <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
+                                    ✓ Archival Record (Validated)
+                                  </span>
+                                ) : serverResult.isUncertain ? (
                                   <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' }}>
                                     ⚠️ Flagged for Review
+                                  </span>
+                                ) : (
+                                  <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
+                                    ✓ Validated
                                   </span>
                                 )}
                               </div>
