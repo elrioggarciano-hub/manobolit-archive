@@ -343,7 +343,7 @@ export const genreRules: ClassificationRule[] = [
       'fairy', 'diwata', 'goddess', 'river goddess', 'native', 'tiger', 'horse',
       'folktale', 'stream', 'enchanted', 'magical', 'creature', 'spirit creature',
       'tagbanwa', 'sigulanon', 'sugilanon', 'tala', 'marta', 'mang juan', 'marco',
-      'yumad', 'bata', 'sapa', 'wuhig', 'misfortune'
+      'yumad', 'bata', 'sapa', 'misfortune'
     ],
     phrases: [
       'once upon a time', 'long ago in a village', 'there lived a', 'in a faraway place',
@@ -441,10 +441,10 @@ export const genreRules: ClassificationRule[] = [
     keywords: [
       'sing', 'song', 'melody', 'rhythm', 'chorus', 'verse', 'dance', 'music',
       'chant', 'tune', 'lyric', 'refrain', 'we sing', 'let us sing',
-      'folk song', 'manobo folk song', 'tribe', 'tribal', 'longing', 'sorrow',
-      'loneliness', 'lament', 'voice', 'heart', 'tears', 'weep',
-      'kadikiluman', 'panaw', 'sinugow', 'kapait', 'nilugdang', 'kabubunganan',
-      'kudlung', 'saluray', 'lullaby', 'ballad'
+      'folk song', 'manobo folk song', 'tribe', 'tribal', 'tribu', 'katribuhan',
+      'longing', 'sorrow', 'loneliness', 'lament', 'kamingaw', 'voice', 'heart', 'tears', 'weep',
+      'kadikiluman', 'panaw', 'sinugow', 'kapait', 'nilugdang', 'lugdang', 'lantawod',
+      'kabubunganan', 'kudlung', 'saluray', 'tud-om', 'lullaby', 'ballad'
     ],
     phrases: [
       'the song captures', 'the song conveys', 'the song portrays', 'the song talks',
