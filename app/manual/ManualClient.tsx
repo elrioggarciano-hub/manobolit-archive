@@ -330,25 +330,32 @@ export default function ManualClient({ initialRole }: Props) {
   const [selectedRole, setSelectedRole] = useState<'ALL' | 'PUBLIC' | 'ADMIN'>(
     initialRole === 'admin' ? 'ADMIN' : 'ALL'
   )
+  const [activeModalTopic, setActiveModalTopic] = useState<ManualTopic | null>(null)
 
+  // Filter topics based on role pill selection
   const filteredTopics = TOPICS.filter(t => {
     if (selectedRole === 'PUBLIC' && t.role === 'ADMIN') return false
+    if (selectedRole === 'ADMIN' && t.role === 'PUBLIC') return true
     return true
   })
+
+  // Separate into Left Column (odd indices in 1-based order) and Right Column (even indices)
+  const leftCol = filteredTopics.filter((_, idx) => idx % 2 === 0)
+  const rightCol = filteredTopics.filter((_, idx) => idx % 2 !== 0)
 
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: '#f4f6f5',
+        background: '#f8faf9',
         color: '#111827',
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-        padding: '32px 16px 80px',
+        padding: '48px 24px 80px',
       }}
     >
-      <div style={{ maxWidth: '1020px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
         
-        {/* Top Header Block matching the user's reference photo */}
+        {/* Top Header matching reference photo */}
         <div
           style={{
             display: 'flex',
@@ -356,30 +363,32 @@ export default function ManualClient({ initialRole }: Props) {
             justifyContent: 'space-between',
             alignItems: 'flex-start',
             gap: '16px',
-            marginBottom: '24px',
+            marginBottom: '28px',
           }}
         >
           <div>
             <h1
               style={{
                 margin: 0,
-                fontSize: 'clamp(22px, 3vw, 28px)',
-                fontWeight: 800,
+                fontSize: 'clamp(26px, 3.5vw, 34px)',
+                fontWeight: 700,
+                fontFamily: 'Cormorant Garamond, Georgia, serif',
                 letterSpacing: '-0.02em',
                 color: '#111827',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '10px',
                 flexWrap: 'wrap',
+                lineHeight: 1.15,
               }}
             >
               <span>ManoboLit Archive</span>
-              <span style={{ fontWeight: 400, color: '#6b7280' }}>—</span>
+              <span style={{ fontWeight: 400, color: '#9ca3af' }}>—</span>
               <span>User Manual</span>
             </h1>
             <p
               style={{
-                margin: '6px 0 0',
+                margin: '8px 0 0',
                 fontSize: '13px',
                 color: '#6b7280',
               }}
@@ -388,7 +397,7 @@ export default function ManualClient({ initialRole }: Props) {
             </p>
           </div>
 
-          {/* Top-Right "Print manual" Pill Button matching the user's reference photo */}
+          {/* Top-Right "Print manual" Pill Button */}
           <Link
             href="/manual/print"
             target="_blank"
@@ -396,8 +405,7 @@ export default function ManualClient({ initialRole }: Props) {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '7px 20px',
+              padding: '8px 22px',
               borderRadius: '9999px',
               border: '1.5px solid #2d6a4f',
               background: '#ffffff',
@@ -405,8 +413,8 @@ export default function ManualClient({ initialRole }: Props) {
               fontSize: '13px',
               fontWeight: 700,
               textDecoration: 'none',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-              transition: 'all 0.2s ease',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              transition: 'all 0.15s ease',
             }}
             onMouseEnter={e => {
               e.currentTarget.style.background = '#2d6a4f'
@@ -422,32 +430,31 @@ export default function ManualClient({ initialRole }: Props) {
           </Link>
         </div>
 
-        {/* Clean White Contents Card matching the user's reference photo */}
+        {/* Clean White Contents Card - Exactly as in the photo */}
         <div
           style={{
             background: '#ffffff',
-            borderRadius: '16px',
+            borderRadius: '20px',
             border: '1px solid #e5e7eb',
-            padding: '24px 32px',
-            marginBottom: '40px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+            padding: '36px 44px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
           }}
         >
+          {/* Card Header: "Contents" + Role Pills */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '16px',
-              borderBottom: '1px solid #f3f4f6',
-              paddingBottom: '12px',
+              marginBottom: '28px',
             }}
           >
             <h2
               style={{
                 margin: 0,
-                fontSize: '15px',
+                fontSize: '18px',
                 fontWeight: 700,
+                fontFamily: 'Cormorant Garamond, Georgia, serif',
                 color: '#1e3a2f',
                 letterSpacing: '-0.01em',
               }}
@@ -455,164 +462,253 @@ export default function ManualClient({ initialRole }: Props) {
               Contents
             </h2>
 
-            {/* Subtle Role Toggle */}
-            <div style={{ display: 'flex', gap: '6px', fontSize: '11px' }}>
+            {/* Role Filter Pills on the Right */}
+            <div style={{ display: 'flex', gap: '8px' }}>
               {[
                 { id: 'ALL', label: 'All Roles' },
                 { id: 'PUBLIC', label: 'Researcher / Public' },
                 { id: 'ADMIN', label: 'Administrator' },
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setSelectedRole(tab.id as any)}
-                  type="button"
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: '9999px',
-                    border: selectedRole === tab.id ? '1px solid #2d6a4f' : '1px solid #e5e7eb',
-                    background: selectedRole === tab.id ? '#ecfdf5' : 'transparent',
-                    color: selectedRole === tab.id ? '#065f46' : '#6b7280',
-                    cursor: 'pointer',
-                    fontWeight: selectedRole === tab.id ? 700 : 500,
-                  }}
-                >
-                  {tab.label}
-                </button>
-              ))}
+              ].map(tab => {
+                const isActive = selectedRole === tab.id
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSelectedRole(tab.id as any)}
+                    type="button"
+                    style={{
+                      padding: '5px 14px',
+                      borderRadius: '9999px',
+                      border: isActive ? '1.5px solid #059669' : '1px solid #e5e7eb',
+                      background: isActive ? '#ecfdf5' : '#ffffff',
+                      color: isActive ? '#065f46' : '#6b7280',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: isActive ? 700 : 500,
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
-          {/* 2-Column Numbered Table of Contents matching the photo */}
+          {/* 2-Column Table of Contents matching the screenshot */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-              columnGap: '40px',
-              rowGap: '10px',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+              columnGap: '50px',
+              rowGap: '16px',
             }}
           >
-            {filteredTopics.map(topic => (
-              <a
-                key={topic.id}
-                href={`#${topic.id}`}
-                style={{
-                  fontSize: '13px',
-                  color: '#374151',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '3px 0',
-                  transition: 'color 0.15s ease',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.color = '#2d6a4f'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.color = '#374151'
-                }}
-              >
-                <span style={{ fontWeight: 600, color: '#1f2937', minWidth: '22px' }}>
-                  {topic.num}.
-                </span>
-                <span style={{ flex: 1 }}>{topic.title}</span>
-                {topic.role === 'ADMIN' && (
-                  <span
-                    style={{
-                      fontSize: '9px',
-                      fontWeight: 700,
-                      background: '#fee2e2',
-                      color: '#b91c1c',
-                      padding: '1px 5px',
-                      borderRadius: '4px',
-                    }}
-                  >
-                    ADMIN
-                  </span>
-                )}
-              </a>
-            ))}
+            {/* Column 1 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {leftCol.map(topic => (
+                <div
+                  key={topic.id}
+                  onClick={() => setActiveModalTopic(topic)}
+                  style={{
+                    fontSize: '13.5px',
+                    color: '#374151',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    padding: '2px 0',
+                    transition: 'color 0.15s ease',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.color = '#059669'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.color = '#374151'
+                  }}
+                  title="Click to view instructions & screenshot"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontWeight: 600, color: '#111827', minWidth: '22px' }}>
+                      {topic.num}.
+                    </span>
+                    <span>{topic.title}</span>
+                  </div>
+                  {topic.role === 'ADMIN' && (
+                    <span
+                      style={{
+                        fontSize: '9px',
+                        fontWeight: 800,
+                        background: '#fee2e2',
+                        color: '#dc2626',
+                        padding: '1px 6px',
+                        borderRadius: '4px',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      ADMIN
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Column 2 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {rightCol.map(topic => (
+                <div
+                  key={topic.id}
+                  onClick={() => setActiveModalTopic(topic)}
+                  style={{
+                    fontSize: '13.5px',
+                    color: '#374151',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    padding: '2px 0',
+                    transition: 'color 0.15s ease',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.color = '#059669'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.color = '#374151'
+                  }}
+                  title="Click to view instructions & screenshot"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontWeight: 600, color: '#111827', minWidth: '22px' }}>
+                      {topic.num}.
+                    </span>
+                    <span>{topic.title}</span>
+                  </div>
+                  {topic.role === 'ADMIN' && (
+                    <span
+                      style={{
+                        fontSize: '9px',
+                        fontWeight: 800,
+                        background: '#fee2e2',
+                        color: '#dc2626',
+                        padding: '1px 6px',
+                        borderRadius: '4px',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      ADMIN
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Section Contents with Clean Cards, Screenshots, and Red Callouts */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          {filteredTopics.map(topic => (
-            <section
-              key={topic.id}
-              id={topic.id}
+        {/* Modal Popup (Opens only when a user clicks an item for quick inspection) */}
+        {activeModalTopic && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(4px)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px',
+            }}
+            onClick={() => setActiveModalTopic(null)}
+          >
+            <div
               style={{
-                scrollMarginTop: '80px',
                 background: '#ffffff',
                 borderRadius: '16px',
-                border: '1px solid #e5e7eb',
+                maxWidth: '850px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
                 padding: '32px',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                position: 'relative',
               }}
+              onClick={e => e.stopPropagation()}
             >
-              {/* Section Header */}
-              <div
+              {/* Modal Close Button */}
+              <button
+                type="button"
+                onClick={() => setActiveModalTopic(null)}
                 style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  background: '#f3f4f6',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  marginBottom: '16px',
-                  borderBottom: '1px solid #f3f4f6',
-                  paddingBottom: '12px',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  color: '#4b5563',
                 }}
               >
-                <h2
-                  style={{
-                    margin: 0,
-                    fontSize: '19px',
-                    fontWeight: 700,
-                    color: '#111827',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}
-                >
-                  <span style={{ color: '#2d6a4f' }}>{topic.num}.</span>
-                  <span>{topic.title}</span>
-                </h2>
-                <a
-                  href="#"
-                  style={{
-                    fontSize: '11px',
-                    color: '#9ca3af',
-                    textDecoration: 'none',
-                  }}
-                >
-                  Back to top ↑
-                </a>
-              </div>
+                ✕
+              </button>
 
-              {/* Who uses it & Role Context */}
+              {/* Topic Title */}
               <div
                 style={{
-                  fontSize: '12.5px',
-                  color: '#4b5563',
-                  marginBottom: '14px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  color: '#059669',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  marginBottom: '4px',
                 }}
               >
+                Topic {activeModalTopic.num}
+              </div>
+              <h2
+                style={{
+                  margin: '0 0 12px',
+                  fontSize: '22px',
+                  fontWeight: 700,
+                  color: '#111827',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <span>{activeModalTopic.title}</span>
+                {activeModalTopic.role === 'ADMIN' && (
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 800,
+                      background: '#fee2e2',
+                      color: '#dc2626',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    ADMIN ONLY
+                  </span>
+                )}
+              </h2>
+
+              <div style={{ fontSize: '12.5px', color: '#4b5563', marginBottom: '14px' }}>
                 <strong style={{ color: '#111827' }}>Who uses it. </strong>
-                <span>{topic.whoUsesIt}</span>
+                <span>{activeModalTopic.whoUsesIt}</span>
               </div>
 
-              {/* Description */}
-              <p
-                style={{
-                  fontSize: '13.5px',
-                  lineHeight: 1.6,
-                  color: '#374151',
-                  margin: '0 0 20px',
-                }}
-              >
-                {topic.desc}
+              <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: '#374151', marginBottom: '20px' }}>
+                {activeModalTopic.desc}
               </p>
 
-              {/* Screenshot Figure with Red Number Callouts */}
-              {topic.figureImg && topic.figureNum && (
+              {/* Screenshot Figure */}
+              {activeModalTopic.figureImg && activeModalTopic.figureNum && (
                 <div style={{ margin: '20px 0' }}>
                   <div
                     style={{
@@ -623,26 +719,14 @@ export default function ManualClient({ initialRole }: Props) {
                     }}
                   >
                     <img
-                      src={topic.figureImg}
-                      alt={topic.figureTitle || topic.title}
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        display: 'block',
-                      }}
-                      loading="lazy"
+                      src={activeModalTopic.figureImg}
+                      alt={activeModalTopic.figureTitle || activeModalTopic.title}
+                      style={{ width: '100%', height: 'auto', display: 'block' }}
                     />
                   </div>
-                  <div
-                    style={{
-                      marginTop: '8px',
-                      fontSize: '12px',
-                      color: '#4b5563',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <strong style={{ color: '#dc2626' }}>Figure {topic.figureNum}. </strong>
-                    <span>{topic.figureTitle}. </span>
+                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#4b5563', textAlign: 'center' }}>
+                    <strong style={{ color: '#dc2626' }}>Figure {activeModalTopic.figureNum}. </strong>
+                    <span>{activeModalTopic.figureTitle}. </span>
                     <span style={{ fontStyle: 'italic', color: '#6b7280' }}>
                       The red numbers match the steps below.
                     </span>
@@ -650,29 +734,15 @@ export default function ManualClient({ initialRole }: Props) {
                 </div>
               )}
 
-              {/* Numbered Steps */}
-              {topic.steps && topic.steps.length > 0 && (
+              {/* Steps */}
+              {activeModalTopic.steps && activeModalTopic.steps.length > 0 && (
                 <div style={{ margin: '20px 0' }}>
-                  <div
-                    style={{
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      color: '#111827',
-                      marginBottom: '10px',
-                    }}
-                  >
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '10px' }}>
                     Steps
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {topic.steps.map(step => (
-                      <div
-                        key={step.num}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: '12px',
-                        }}
-                      >
+                    {activeModalTopic.steps.map(step => (
+                      <div key={step.num} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                         <div
                           style={{
                             width: '22px',
@@ -701,8 +771,8 @@ export default function ManualClient({ initialRole }: Props) {
                 </div>
               )}
 
-              {/* Good to know yellow callout box */}
-              {topic.goodToKnow && topic.goodToKnow.length > 0 && (
+              {/* Good to know */}
+              {activeModalTopic.goodToKnow && activeModalTopic.goodToKnow.length > 0 && (
                 <div
                   style={{
                     background: '#fef9c3',
@@ -728,16 +798,8 @@ export default function ManualClient({ initialRole }: Props) {
                     <span>💡</span>
                     <span>Good to know</span>
                   </div>
-                  <ul
-                    style={{
-                      margin: 0,
-                      paddingLeft: '18px',
-                      fontSize: '12.5px',
-                      color: '#713f12',
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    {topic.goodToKnow.map((item, idx) => (
+                  <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12.5px', color: '#713f12', lineHeight: 1.55 }}>
+                    {activeModalTopic.goodToKnow.map((item, idx) => (
                       <li key={idx} style={{ marginBottom: '3px' }}>
                         {item}
                       </li>
@@ -745,9 +807,55 @@ export default function ManualClient({ initialRole }: Props) {
                   </ul>
                 </div>
               )}
-            </section>
-          ))}
-        </div>
+
+              {/* Modal Bottom Actions */}
+              <div
+                style={{
+                  marginTop: '28px',
+                  paddingTop: '16px',
+                  borderTop: '1px solid #e5e7eb',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setActiveModalTopic(null)}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: '1px solid #d1d5db',
+                    background: '#ffffff',
+                    color: '#374151',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Close
+                </button>
+                <Link
+                  href="/manual/print"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '6px',
+                    background: '#059669',
+                    color: '#ffffff',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                  }}
+                >
+                  Open Full Printable PDF →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   )
