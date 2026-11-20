@@ -697,6 +697,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         const entryId = e.target.value
                         setSelectedEntryId(entryId)
                         setHasExecuted(false)
+                        setServerResult(null)
                         if (entryId === 'custom') {
                           // Keep current text or reset
                         } else {
@@ -801,7 +802,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         })
                         if (res.ok) {
                           const data = await res.json()
-                          setServerResult(data.result)
+                          setServerResult(data.result || data)
                         }
                       } catch (err) {
                         console.error('Classification API error:', err)

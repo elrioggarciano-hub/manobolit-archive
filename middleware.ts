@@ -17,13 +17,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // API routes: reads stay public, writes require an authenticated session.
+  // API routes: reads and public classification stay public, database writes require an authenticated session.
   const isEntriesWrite = pathname.startsWith('/api/entries') && MUTATING_METHODS.has(request.method)
-  const isClassifyWrite = pathname.startsWith('/api/classify') && MUTATING_METHODS.has(request.method)
   const isReviewWrite = pathname.startsWith('/api/review') && MUTATING_METHODS.has(request.method)
   const isMLWrite = pathname.startsWith('/api/ml') && MUTATING_METHODS.has(request.method)
   
-  if ((isEntriesWrite || isClassifyWrite || isReviewWrite || isMLWrite) && !authed) {
+  if ((isEntriesWrite || isReviewWrite || isMLWrite) && !authed) {
     return NextResponse.json({ error: 'Unauthorized: Action requires authenticated reviewer session' }, { status: 401 })
   }
 
@@ -31,6 +30,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/entries/:path*', '/api/classify/:path*', '/api/review/:path*', '/api/ml/:path*'],
+  matcher: ['/admin/:path*', '/api/entries/:path*', '/api/review/:path*', '/api/ml/:path*'],
 }
 

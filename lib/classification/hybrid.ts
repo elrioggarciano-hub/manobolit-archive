@@ -29,8 +29,8 @@ export type AlgorithmMode =
   | 'TF_IDF_VSM'
   | 'RULE_BASED'
 
-export const UNCLASSIFIED_THRESHOLD = 0.35
-export const UNCLASSIFIED_MARGIN = 0.05
+export const UNCLASSIFIED_THRESHOLD = 0.27
+export const UNCLASSIFIED_MARGIN = 0.012
 
 /**
  * Converts raw non-negative model scores to a calibrated probability distribution using Softmax.
