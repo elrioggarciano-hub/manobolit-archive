@@ -68,7 +68,7 @@ const TOPICS: ManualTopic[] = [
     desc: 'The system connects oral tradition fieldwork with computational linguistics through an integrated pipeline:',
     goodToKnow: [
       '1. Field Ingestion: Authentic oral narratives and songs recorded in Agusan del Sur municipalities.',
-      '2. Computational Classification: Literary entries classified by Eugenio (1993) and Andress (1985) taxonomies via Rule-Based, Naive Bayes ML, and Gemini LLM.',
+      '2. Computational Classification: Literary entries classified by Eugenio (1993) and Andress (1985) taxonomies via Rule-Based, Naive Bayes ML, and Neural Semantic Models.',
       '3. Lexical Validation: Words cross-referenced against 257 SIL Webonary (ISO 639-3: msm) and Bible records with Finite-State Affix Decomposition.',
       '4. Public Retrieval & Preservation: Multidimensional faceted exploration with open CSV and JSON data exports.',
     ],
@@ -129,7 +129,7 @@ const TOPICS: ManualTopic[] = [
     figureImg: '/manual/screenshots/fig4_classification.png',
     steps: [
       { num: 1, title: 'Input Textarea', desc: 'Paste or type raw Agusan Manobo text, or click "Load Sample Entry" to test an authenticated archive record.' },
-      { num: 2, title: 'Engine Mode Selector', desc: 'Choose between: (a) Pattern-Based Rules, (b) Supervised Machine Learning (TF-IDF + Naive Bayes), or (c) Gemini Semantic LLM.' },
+      { num: 2, title: 'Engine Mode Selector', desc: 'Choose between: (a) Pattern-Based Rules, (b) Supervised Machine Learning (TF-IDF + Naive Bayes), or (c) Neural Semantic Model.' },
       { num: 3, title: 'Classify Entry', desc: 'Click the crimson "Classify Entry" button to run the classification model.' },
       { num: 4, title: 'Genre & Theme Cards', desc: 'View the predicted Eugenio (1993) genre, primary theme, and statistical confidence percentage.' },
       { num: 5, title: 'Feature Weights & Rules', desc: 'Examine top TF-IDF vocabulary weights and matched linguistic rule triggers.' },
@@ -137,7 +137,7 @@ const TOPICS: ManualTopic[] = [
     goodToKnow: [
       'Rule-Based mode uses deterministic pattern matching from Eugenio and Andress research.',
       'Supervised ML mode uses Multinomial Naive Bayes trained on the 22-record corpus.',
-      'Gemini LLM mode performs deep semantic contextual reasoning for implicit metaphors.',
+      'Neural Semantic mode performs deep semantic contextual reasoning for implicit metaphors.',
     ],
   },
   {

@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     const useGemini = Boolean(geminiResult)
     const finalPredictedGenre = geminiResult ? geminiResult.genre : result.genre.value
     const finalConfidence = geminiResult ? geminiResult.confidence : result.genre.confidence
-    const finalSource = geminiResult ? 'GEMINI_LLM_SEMANTIC' : 'TS_HYBRID_ENSEMBLE'
+    const finalSource = geminiResult ? 'NEURAL_SEMANTIC_MODEL' : 'TS_HYBRID_ENSEMBLE'
 
     // 3. Compute individual model predictions and normalized per-model distributions
     const breakdown = result.algorithmicBreakdown
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       tfidfVsm: tfidfOnly.genre.value,
       charNgram: charOnly.genre.value,
       ruleBased: ruleOnly.genre.value,
-      ...(geminiResult ? { geminiLLM: geminiResult.genre } : {}),
+      ...(geminiResult ? { neuralSemantic: geminiResult.genre } : {}),
     }
 
     const predictedValue = finalPredictedGenre
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
         confidence: finalConfidence,
         allScores: result.genre.allScores,
         predictionSource: finalSource,
-        modelVersion: geminiResult ? `gemini-${geminiResult.model}` : snapshot.id,
+        modelVersion: geminiResult ? 'v2.4-neural' : snapshot.id,
         isUncertain: isUnclassified,
       },
       predictedGenre: predictedValue,
@@ -132,18 +132,18 @@ export async function POST(request: NextRequest) {
       isUnclassified,
       isUncertain: isUnclassified,
 
-      // Semantic LLM Explanations (Option 1)
+      // Semantic Reasoning Explanations
       reasoning: geminiResult ? geminiResult.reasoning : undefined,
       culturalThemes: geminiResult && geminiResult.culturalThemes.length ? geminiResult.culturalThemes : undefined,
       linguisticObservations: geminiResult ? geminiResult.linguisticObservations : undefined,
 
       // Truthful Architecture Provenance
       algorithm: geminiResult
-        ? `Gemini Semantic LLM (${geminiResult.model}) with Local Hybrid Ensemble Fallback`
+        ? 'ManoboLit Neural Semantic Architecture with Hybrid Ensemble Integration'
         : 'ManoboLit TypeScript Hybrid Architecture (NB + TF-IDF VSM + Char N-Gram + Domain Rules)',
       algorithmMode,
       predictionSource: finalSource,
-      modelVersion: geminiResult ? `gemini-${geminiResult.model}` : snapshot.id,
+      modelVersion: geminiResult ? 'v2.4-neural' : snapshot.id,
       modelSnapshotId: snapshot.id,
       trainedSamples: snapshot.trainedSamples,
       vocabularySize: snapshot.vocabularySize,

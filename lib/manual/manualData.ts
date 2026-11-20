@@ -322,7 +322,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
     title: 'Hybrid Classification Engine Workbench',
     subtitle: 'Pattern-based rules, supervised machine learning, and semantic LLM inference',
     role: 'ALL',
-    summary: 'A complete guide to utilizing the hybrid classification engine, selecting between Rule-Based, Supervised ML (TF-IDF + Naive Bayes), and Gemini Semantic LLM modes, and interpreting model diagnostics.',
+    summary: 'A complete guide to utilizing the hybrid classification engine, selecting between Rule-Based, Supervised ML (TF-IDF + Naive Bayes), and Neural Semantic Model modes, and interpreting model diagnostics.',
     sections: [
       {
         id: '4.1',
@@ -333,7 +333,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
         capabilities: [
           'Paste or type any Agusan Manobo oral narrative or song lyric for instant classification',
           'Load pre-populated sample literature selections from the baseline corpus',
-          'Select between Pattern Rule-Based, Supervised Machine Learning, or Gemini LLM engines',
+          'Select between Pattern Rule-Based, Supervised Machine Learning, or Neural Semantic Model engines',
           'View predicted Genre, Primary Theme, and statistical Confidence percentage',
           'Inspect exact pattern rule triggers, morphological markers, and TF-IDF term weights',
         ],
@@ -352,7 +352,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           {
             number: 2,
             label: 'Classification Engine Mode Selector',
-            instruction: 'Choose your desired classification approach: (a) Rule-Based Pattern Matching, (b) Supervised Machine Learning (TF-IDF + Naive Bayes), or (c) Gemini Semantic LLM.',
+            instruction: 'Choose your desired classification approach: (a) Rule-Based Pattern Matching, (b) Supervised Machine Learning (TF-IDF + Naive Bayes), or (c) Neural Semantic Model.',
           },
           {
             number: 3,
@@ -373,7 +373,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
         goodToKnow: [
           'Pattern-Based mode relies strictly on deterministic lexical and syntactic indicators formulated from Eugenio (1993).',
           'Supervised ML mode calculates term frequencies normalized by inverse document frequency over the 22-record training corpus.',
-          'Gemini Semantic LLM mode performs deep zero-shot contextual analysis using Google Gemini models with full prompt transparency.',
+          'Neural Semantic mode performs deep zero-shot contextual analysis using neural linguistic models with full prompt transparency.',
         ],
       },
     ],
@@ -729,7 +729,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           'ISO 639-3: msm: The international linguistic standard code designating the Agusan Manobo language.',
           'TF-IDF (Term Frequency - Inverse Document Frequency): A statistical measure evaluating how important a word is to a folklore entry relative to the entire archive.',
           'Multinomial Naive Bayes: A supervised probabilistic machine learning classifier that predicts genre based on term distribution probabilities.',
-          'Semantic LLM Classification: Using large language models (Google Gemini) to analyze deep cultural metaphors, contextual pragmatics, and implicit folklore themes.',
+          'Semantic Classification: Using advanced neural language models to analyze deep cultural metaphors, contextual pragmatics, and implicit folklore themes.',
         ],
       },
     ],
