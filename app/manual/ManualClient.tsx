@@ -331,6 +331,18 @@ export default function ManualClient({ initialRole }: Props) {
     initialRole === 'admin' ? 'ADMIN' : 'ALL'
   )
   const [activeModalTopic, setActiveModalTopic] = useState<ManualTopic | null>(null)
+  const [manualPdfUrl, setManualPdfUrl] = useState<string>('/manual/ManoboLit-Archive-User-Manual.pdf')
+
+  React.useEffect(() => {
+    fetch('/api/admin/manual')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.url) {
+          setManualPdfUrl(data.url)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   // Filter topics based on role pill selection
   const filteredTopics = TOPICS.filter(t => {
@@ -354,7 +366,7 @@ export default function ManualClient({ initialRole }: Props) {
       }}
     >
       <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
-        
+
         {/* Top Header matching reference photo */}
         <div
           style={{
@@ -398,8 +410,8 @@ export default function ManualClient({ initialRole }: Props) {
           </div>
 
           {/* Top-Right "Print manual" Pill Button */}
-          <Link
-            href="/manual/print"
+          <a
+            href={manualPdfUrl}
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -424,10 +436,10 @@ export default function ManualClient({ initialRole }: Props) {
               e.currentTarget.style.background = '#ffffff'
               e.currentTarget.style.color = '#2d6a4f'
             }}
-            title="Open complete printable manual and export to PDF"
+            title="Open official PDF manual to print or save"
           >
             Print manual
-          </Link>
+          </a>
         </div>
 
         {/* Clean White Contents Card - Exactly as in the photo */}

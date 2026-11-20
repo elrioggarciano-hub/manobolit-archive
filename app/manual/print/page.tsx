@@ -34,6 +34,14 @@ export default function ManualPrintPage() {
             <Link href="/manual" className="btn-secondary">
               ← Return to Digital Reader
             </Link>
+            <a
+              href="/manual/ManoboLit-Archive-User-Manual.pdf"
+              download="ManoboLit-Archive-User-Manual.pdf"
+              className="btn-secondary"
+              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+            >
+              ⬇️ Save Official PDF
+            </a>
             <button type="button" onClick={handlePrint} className="btn-primary">
               🖨️ Print / Save as PDF
             </button>

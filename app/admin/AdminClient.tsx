@@ -7,6 +7,7 @@ import LogoutButton from '@/components/LogoutButton'
 import ReviewQueue from '@/components/admin/ReviewQueue'
 import MLMonitoring from '@/components/admin/MLMonitoring'
 import DatasetManagement from '@/components/admin/DatasetManagement'
+import ManualManagement from '@/components/admin/ManualManagement'
 
 export interface AdminEntry {
   id: string
@@ -37,7 +38,7 @@ interface Props {
 }
 
 export default function AdminClient({ initialEntries }: Props) {
-  const [adminTab, setAdminTab] = useState<'entries' | 'review' | 'ml' | 'dataset'>('entries')
+  const [adminTab, setAdminTab] = useState<'entries' | 'review' | 'ml' | 'dataset' | 'manual'>('entries')
   const [filterType, setFilterType] = useState<'ALL' | 'ORAL_LITERATURE' | 'FOLK_SONG'>('ALL')
   const [filterGenre, setFilterGenre] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
@@ -188,6 +189,7 @@ export default function AdminClient({ initialEntries }: Props) {
             { id: 'review', label: '📋 Review Queue (Human Verification)' },
             { id: 'ml', label: '⚡ ML Pipeline & Retraining' },
             { id: 'dataset', label: '📦 Dataset & Taxonomies' },
+            { id: 'manual', label: '📄 User Manual & PDF' },
           ].map(tab => (
             <button
               key={tab.id}
@@ -214,6 +216,7 @@ export default function AdminClient({ initialEntries }: Props) {
         {adminTab === 'review' && <ReviewQueue />}
         {adminTab === 'ml' && <MLMonitoring />}
         {adminTab === 'dataset' && <DatasetManagement />}
+        {adminTab === 'manual' && <ManualManagement />}
 
         {adminTab === 'entries' && (
           <>

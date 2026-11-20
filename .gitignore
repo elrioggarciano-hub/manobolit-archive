@@ -43,6 +43,7 @@ Thumbs.db
 /lab5-deliverables/
 /uploads/
 *.pdf
+!public/manual/*.pdf
 *.docx
 ITPC118*.md
 ~$*
