@@ -161,3 +161,16 @@ model ClassifierSnapshot {
   loocvJson      String   // Serialized JSON of out-of-sample LOOCV evaluation metrics
 }
 
+model SystemManual {
+  id            String   @id @default("active-manual")
+  fileName      String
+  fileSizeBytes String
+  fileSize      Int
+  mimeType      String   @default("application/pdf")
+  pdfBase64     String   @db.Text
+  title         String
+  version       String   @default("1.0")
+  updatedAt     DateTime @default(now()) @updatedAt
+}
+
+

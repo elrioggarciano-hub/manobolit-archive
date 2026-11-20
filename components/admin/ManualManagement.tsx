@@ -313,7 +313,7 @@ export default function ManualManagement() {
                   </a>
 
                   <a
-                    href={meta.url}
+                    href={meta.url.includes('?') ? `${meta.url}&download=1` : `${meta.url}?download=1`}
                     download={meta.fileName}
                     style={{
                       display: 'flex',
@@ -582,3 +582,4 @@ export default function ManualManagement() {
     </div>
   )
 }
+

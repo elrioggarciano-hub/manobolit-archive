@@ -331,7 +331,7 @@ export default function ManualClient({ initialRole }: Props) {
     initialRole === 'admin' ? 'ADMIN' : 'ALL'
   )
   const [activeModalTopic, setActiveModalTopic] = useState<ManualTopic | null>(null)
-  const [manualPdfUrl, setManualPdfUrl] = useState<string>('/manual/ManoboLit-Archive-User-Manual.pdf')
+  const [manualPdfUrl, setManualPdfUrl] = useState<string>('/api/manual/pdf')
 
   React.useEffect(() => {
     fetch('/api/admin/manual')
@@ -341,7 +341,7 @@ export default function ManualClient({ initialRole }: Props) {
           setManualPdfUrl(data.url)
         }
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   // Filter topics based on role pill selection
