@@ -46,28 +46,33 @@ export async function translateWithGemini(
   ]))
 
   const prompt = `Source Language: ${sourceLang}\nTarget Language: ${targetLang}\n\nInput Text:\n"""\n${text.trim()}\n"""`
+  const model = modelName || 'gemini-3.5-flash-lite'
 
-  for (const model of candidateModels) {
-    // Strategy A: GoogleGenAI SDK
-    try {
-      const ai = new GoogleGenAI({ apiKey })
-      const response = await ai.models.generateContent({
-        model,
+  // Fast direct REST call to gemini-3.5-flash-lite with strict timeout
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         contents: [
           {
-            role: 'user',
             parts: [{ text: `${SYSTEM_PROMPT}\n\n${prompt}` }],
           },
         ],
-        config: {
+        generationConfig: {
           responseMimeType: 'application/json',
           temperature: 0.1,
         },
-      })
+      }),
+      signal: AbortSignal.timeout(4500),
+    })
 
-      const raw = response.text?.trim()
-      if (raw) {
-        let clean = raw
+    if (res.ok) {
+      const data = await res.json()
+      const textOut = data.candidates?.[0]?.content?.parts?.[0]?.text
+      if (textOut) {
+        let clean = textOut.trim()
         if (clean.startsWith('```json')) clean = clean.slice(7)
         if (clean.startsWith('```')) clean = clean.slice(3)
         if (clean.endsWith('```')) clean = clean.slice(0, -3)
@@ -83,53 +88,9 @@ export async function translateWithGemini(
           }
         }
       }
-    } catch {
-      // Continue to Strategy B
     }
-
-    // Strategy B: Direct REST fetch
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: `${SYSTEM_PROMPT}\n\n${prompt}` }],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.1,
-          },
-        }),
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        const textOut = data.candidates?.[0]?.content?.parts?.[0]?.text
-        if (textOut) {
-          let clean = textOut.trim()
-          if (clean.startsWith('```json')) clean = clean.slice(7)
-          if (clean.startsWith('```')) clean = clean.slice(3)
-          if (clean.endsWith('```')) clean = clean.slice(0, -3)
-          clean = clean.trim()
-
-          const parsed = JSON.parse(clean)
-          if (parsed.translatedText) {
-            return {
-              translatedText: parsed.translatedText,
-              confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.95,
-              linguisticNotes: parsed.linguisticNotes,
-              webonaryLexemes: Array.isArray(parsed.webonaryLexemes) ? parsed.webonaryLexemes : [],
-            }
-          }
-        }
-      }
-    } catch {
-      // Continue to next model
-    }
+  } catch (err: any) {
+    // Graceful fallback to local lexicon and parallel corpus
   }
 
   return null
