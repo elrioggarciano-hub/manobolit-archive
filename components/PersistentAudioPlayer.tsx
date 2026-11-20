@@ -31,9 +31,8 @@ export default function PersistentAudioPlayer() {
   const isMobile = useIsMobile(640)
   const { t } = useLanguage()
 
-  // Auth screens have no relevance to folk-song playback, and the fixed
-  // bottom bar collides with the vertically centered login card.
-  if (pathname === '/admin/login') {
+  // Auth screens, admin views, and print manual should not display audio player
+  if (pathname === '/admin/login' || pathname.startsWith('/admin') || pathname === '/manual/print') {
     return null
   }
 
@@ -45,22 +44,25 @@ export default function PersistentAudioPlayer() {
           bottom: 0,
           left: 0,
           right: 0,
-          minHeight: '75px',
+          height: isMobile ? '44px' : '54px',
           background: 'var(--bg-surface)',
           borderTop: '1px solid var(--border-color)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'var(--text-muted)',
-          fontSize: '13px',
+          fontSize: isMobile ? '11px' : '12.5px',
           fontWeight: 500,
-          zIndex: 1000,
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
-          padding: '12px 16px',
+          zIndex: 900,
+          boxShadow: '0 -2px 10px rgba(0,0,0,0.03)',
+          padding: '4px 16px',
           textAlign: 'center',
         }}
       >
-        <span style={{ marginRight: '8px' }}>🎵</span> {t('player_empty_prompt')}
+        <span style={{ marginRight: '6px' }}>🎵</span>
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {t('player_empty_prompt')}
+        </span>
       </div>
     )
   }

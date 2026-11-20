@@ -35,7 +35,7 @@ export default function ManualPrintPage() {
               ← Return to Digital Reader
             </Link>
             <a
-              href="/manual/ManoboLit-Archive-User-Manual.pdf"
+              href="/api/manual/pdf?download=1"
               download="ManoboLit-Archive-User-Manual.pdf"
               className="btn-secondary"
               style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}

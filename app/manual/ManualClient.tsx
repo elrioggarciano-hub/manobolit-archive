@@ -351,10 +351,6 @@ export default function ManualClient({ initialRole }: Props) {
     return true
   })
 
-  // Separate into Left Column (odd indices in 1-based order) and Right Column (even indices)
-  const leftCol = filteredTopics.filter((_, idx) => idx % 2 === 0)
-  const rightCol = filteredTopics.filter((_, idx) => idx % 2 !== 0)
-
   return (
     <div
       style={{
@@ -362,36 +358,32 @@ export default function ManualClient({ initialRole }: Props) {
         background: '#f8faf9',
         color: '#111827',
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-        padding: '48px 24px 80px',
+        padding: 'clamp(20px, 4vw, 48px) clamp(12px, 3.5vw, 24px) 120px',
       }}
     >
       <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
 
         {/* Top Header matching reference photo */}
         <div
+          className="flex flex-col sm:flex-row justify-between sm:items-center gap-4"
           style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: '16px',
-            marginBottom: '28px',
+            marginBottom: '24px',
           }}
         >
           <div>
             <h1
               style={{
                 margin: 0,
-                fontSize: 'clamp(26px, 3.5vw, 34px)',
+                fontSize: 'clamp(22px, 4vw, 34px)',
                 fontWeight: 700,
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                 letterSpacing: '-0.02em',
                 color: '#111827',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '8px',
                 flexWrap: 'wrap',
-                lineHeight: 1.15,
+                lineHeight: 1.2,
               }}
             >
               <span>ManoboLit Archive</span>
@@ -400,9 +392,10 @@ export default function ManualClient({ initialRole }: Props) {
             </h1>
             <p
               style={{
-                margin: '8px 0 0',
-                fontSize: '13px',
+                margin: '6px 0 0',
+                fontSize: 'clamp(11.5px, 2.5vw, 13px)',
                 color: '#6b7280',
+                lineHeight: 1.4,
               }}
             >
               Digital Classification and Retrieval System for Agusan Manobo Oral Literature · Agusan del Sur State University
@@ -414,10 +407,12 @@ export default function ManualClient({ initialRole }: Props) {
             href={manualPdfUrl}
             target="_blank"
             rel="noopener noreferrer"
+            className="self-start sm:self-auto"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              padding: '8px 22px',
+              justifyContent: 'center',
+              padding: '8px 20px',
               borderRadius: '9999px',
               border: '1.5px solid #2d6a4f',
               background: '#ffffff',
@@ -426,6 +421,7 @@ export default function ManualClient({ initialRole }: Props) {
               fontWeight: 700,
               textDecoration: 'none',
               boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              whiteSpace: 'nowrap',
               transition: 'all 0.15s ease',
             }}
             onMouseEnter={e => {
@@ -446,25 +442,25 @@ export default function ManualClient({ initialRole }: Props) {
         <div
           style={{
             background: '#ffffff',
-            borderRadius: '20px',
+            borderRadius: '16px',
             border: '1px solid #e5e7eb',
-            padding: '36px 44px',
+            padding: 'clamp(18px, 3.5vw, 36px) clamp(16px, 3.5vw, 40px)',
             boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
           }}
         >
           {/* Card Header: "Contents" + Role Pills */}
           <div
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '28px',
+              marginBottom: '24px',
+              paddingBottom: '12px',
+              borderBottom: '1px solid #f3f4f6',
             }}
           >
             <h2
               style={{
                 margin: 0,
-                fontSize: '18px',
+                fontSize: 'clamp(17px, 3vw, 19px)',
                 fontWeight: 700,
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                 color: '#1e3a2f',
@@ -474,8 +470,15 @@ export default function ManualClient({ initialRole }: Props) {
               Contents
             </h2>
 
-            {/* Role Filter Pills on the Right */}
-            <div style={{ display: 'flex', gap: '8px' }}>
+            {/* Role Filter Pills on the Right (Scrollable/Wrap on small mobile) */}
+            <div
+              className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                maxWidth: '100%',
+              }}
+            >
               {[
                 { id: 'ALL', label: 'All Roles' },
                 { id: 'PUBLIC', label: 'Researcher / Public' },
@@ -488,14 +491,16 @@ export default function ManualClient({ initialRole }: Props) {
                     onClick={() => setSelectedRole(tab.id as any)}
                     type="button"
                     style={{
-                      padding: '5px 14px',
+                      padding: '4px 12px',
                       borderRadius: '9999px',
                       border: isActive ? '1.5px solid #059669' : '1px solid #e5e7eb',
                       background: isActive ? '#ecfdf5' : '#ffffff',
                       color: isActive ? '#065f46' : '#6b7280',
                       cursor: 'pointer',
-                      fontSize: '12px',
+                      fontSize: '11.5px',
                       fontWeight: isActive ? 700 : 500,
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
                       transition: 'all 0.15s ease',
                     }}
                   >
@@ -506,112 +511,65 @@ export default function ManualClient({ initialRole }: Props) {
             </div>
           </div>
 
-          {/* 2-Column Table of Contents matching the screenshot */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-              columnGap: '50px',
-              rowGap: '16px',
-            }}
-          >
-            {/* Column 1 */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {leftCol.map(topic => (
-                <div
-                  key={topic.id}
-                  onClick={() => setActiveModalTopic(topic)}
-                  style={{
-                    fontSize: '13.5px',
-                    color: '#374151',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer',
-                    padding: '2px 0',
-                    transition: 'color 0.15s ease',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.color = '#059669'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.color = '#374151'
-                  }}
-                  title="Click to view instructions & screenshot"
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: 600, color: '#111827', minWidth: '22px' }}>
-                      {topic.num}.
-                    </span>
-                    <span>{topic.title}</span>
-                  </div>
-                  {topic.role === 'ADMIN' && (
-                    <span
-                      style={{
-                        fontSize: '9px',
-                        fontWeight: 800,
-                        background: '#fee2e2',
-                        color: '#dc2626',
-                        padding: '1px 6px',
-                        borderRadius: '4px',
-                        letterSpacing: '0.04em',
-                      }}
-                    >
-                      ADMIN
-                    </span>
-                  )}
+          {/* Responsive Table of Contents Grid: 1 column on mobile, 2 columns on desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 lg:gap-x-14 gap-y-3.5">
+            {filteredTopics.map(topic => (
+              <div
+                key={topic.id}
+                onClick={() => setActiveModalTopic(topic)}
+                className="flex items-center justify-between gap-3 py-1 cursor-pointer transition-colors group"
+                style={{
+                  fontSize: 'clamp(12.5px, 2.5vw, 13.5px)',
+                  color: '#374151',
+                  minHeight: '32px',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = '#059669'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = '#374151'
+                }}
+                title="Click to view instructions & screenshot"
+              >
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <span
+                    style={{
+                      fontWeight: 600,
+                      color: '#111827',
+                      minWidth: '22px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {topic.num}.
+                  </span>
+                  <span
+                    style={{
+                      overflowWrap: 'anywhere',
+                      wordBreak: 'break-word',
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {topic.title}
+                  </span>
                 </div>
-              ))}
-            </div>
-
-            {/* Column 2 */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {rightCol.map(topic => (
-                <div
-                  key={topic.id}
-                  onClick={() => setActiveModalTopic(topic)}
-                  style={{
-                    fontSize: '13.5px',
-                    color: '#374151',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer',
-                    padding: '2px 0',
-                    transition: 'color 0.15s ease',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.color = '#059669'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.color = '#374151'
-                  }}
-                  title="Click to view instructions & screenshot"
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: 600, color: '#111827', minWidth: '22px' }}>
-                      {topic.num}.
-                    </span>
-                    <span>{topic.title}</span>
-                  </div>
-                  {topic.role === 'ADMIN' && (
-                    <span
-                      style={{
-                        fontSize: '9px',
-                        fontWeight: 800,
-                        background: '#fee2e2',
-                        color: '#dc2626',
-                        padding: '1px 6px',
-                        borderRadius: '4px',
-                        letterSpacing: '0.04em',
-                      }}
-                    >
-                      ADMIN
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
+                {topic.role === 'ADMIN' && (
+                  <span
+                    style={{
+                      fontSize: '9px',
+                      fontWeight: 800,
+                      background: '#fee2e2',
+                      color: '#dc2626',
+                      padding: '1px 6px',
+                      borderRadius: '4px',
+                      letterSpacing: '0.04em',
+                      flexShrink: 0,
+                    }}
+                  >
+                    ADMIN
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -627,7 +585,7 @@ export default function ManualClient({ initialRole }: Props) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '20px',
+              padding: 'clamp(8px, 3vw, 24px)',
             }}
             onClick={() => setActiveModalTopic(null)}
           >
@@ -637,9 +595,9 @@ export default function ManualClient({ initialRole }: Props) {
                 borderRadius: '16px',
                 maxWidth: '850px',
                 width: '100%',
-                maxHeight: '90vh',
+                maxHeight: '92vh',
                 overflowY: 'auto',
-                padding: '32px',
+                padding: 'clamp(18px, 4vw, 32px)',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
                 position: 'relative',
               }}

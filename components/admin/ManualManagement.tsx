@@ -543,7 +543,7 @@ export default function ManualManagement() {
           <div
             style={{
               width: '100%',
-              height: '680px',
+              height: 'clamp(420px, 65vh, 680px)',
               background: '#525659',
               borderRadius: '12px',
               overflow: 'hidden',
