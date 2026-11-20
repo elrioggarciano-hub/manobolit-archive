@@ -41,7 +41,7 @@ Return your evaluation strictly as a valid JSON object matching this schema:
  */
 export async function classifyWithGemini(
   input: ClassificationInputText,
-  preferredModel: string = 'gemini-3.5-flash-lite'
+  preferredModel: string = 'gemini-3.8-flash'
 ): Promise<GeminiClassificationResult | null> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -68,12 +68,12 @@ export async function classifyWithGemini(
 
   const userPrompt = parts.join('\n\n')
 
-  // Multi-model resilience: try fast and stable 3.5 flash-lite first, then 3.8-flash
+  // Multi-model resilience: prioritize active production Gemini models
   const candidateModels = Array.from(new Set([
     preferredModel,
-    'gemini-3.5-flash-lite',
     'gemini-3.8-flash',
-    'gemini-3.5-flash',
+    'gemini-2.5-flash',
+    'gemini-3.5-flash-lite',
   ]))
 
   for (const modelName of candidateModels) {
@@ -105,7 +105,7 @@ export async function classifyWithGemini(
 
     // Strategy B: Direct REST fetch fallback (matches Google AI Studio curl exactly)
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`
       const res = await fetch(url, {
         method: 'POST',
         headers: {

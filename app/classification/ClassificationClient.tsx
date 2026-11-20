@@ -94,11 +94,13 @@ function formatName(val: string): string {
 type ConfidenceTier = 'weak' | 'moderate' | 'strong'
 
 function getConfidenceTier(pct: number, t?: (k: string) => string): { tier: ConfidenceTier; color: string; label: string } {
+  // In a 4-genre probability space, random chance baseline is 25%.
+  // Scores < 28% are weak/uncertain, 28%-59% represent statistical plurality (Moderate), >= 60% are strong/confirmed.
   const lbl = t
-    ? (pct < 30 ? t('diag_confidence_needs_review') : pct < 70 ? t('diag_confidence_moderate') : t('diag_confidence_confirmed'))
-    : (pct < 30 ? 'Needs Review' : pct < 70 ? 'Moderate' : 'Confirmed')
-  if (pct < 30) return { tier: 'weak', color: '#ef4444', label: lbl }
-  if (pct < 70) return { tier: 'moderate', color: '#f59e0b', label: lbl }
+    ? (pct < 28 ? t('diag_confidence_needs_review') : pct < 60 ? t('diag_confidence_moderate') : t('diag_confidence_confirmed'))
+    : (pct < 28 ? 'Needs Review' : pct < 60 ? 'Moderate' : 'Confirmed')
+  if (pct < 28) return { tier: 'weak', color: '#ef4444', label: lbl }
+  if (pct < 60) return { tier: 'moderate', color: '#f59e0b', label: lbl }
   return { tier: 'strong', color: '#10b981', label: lbl }
 }
 
@@ -1151,8 +1153,9 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     <>
                       {/* Genre Identified — always shown, since a top genre always exists */}
                       {(() => {
-                        const pct = Math.round(classificationResult.genre.confidence * 100)
-                        const { color, label } = getConfidenceTier(pct, t)
+                        const localPct = Math.round(classificationResult.genre.confidence * 100)
+                        const activePct = serverResult ? Math.round(serverResult.overallConfidence * 100) : localPct
+                        const { color, label } = getConfidenceTier(activePct, t)
                         return (
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, color: '#71717a', letterSpacing: '0.08em', marginBottom: '6px' }}>
@@ -1164,7 +1167,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                 {formatName(serverResult?.genre?.value || classificationResult.genre.value)}
                               </span>
                               <span style={{ fontSize: '15px', fontWeight: 700, color }}>
-                                {serverResult ? Math.round(serverResult.overallConfidence * 100) : pct}%
+                                {activePct}%
                               </span>
                             </div>
                             {serverResult && (
@@ -1213,7 +1216,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                               </div>
                             )}
                             <div style={{ height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' }}>
-                              <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
+                              <div style={{ height: '100%', width: `${activePct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
                             </div>
                             <span style={{ fontSize: '9px', fontWeight: 700, color, letterSpacing: '0.04em' }}>{label.toUpperCase()}</span>
                           </div>

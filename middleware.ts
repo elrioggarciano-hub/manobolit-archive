@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
   const isEntriesWrite = pathname.startsWith('/api/entries') && MUTATING_METHODS.has(request.method)
   const isReviewWrite = pathname.startsWith('/api/review') && MUTATING_METHODS.has(request.method)
   const isMLWrite = pathname.startsWith('/api/ml') && MUTATING_METHODS.has(request.method)
-  
+
   if ((isEntriesWrite || isReviewWrite || isMLWrite) && !authed) {
     return NextResponse.json({ error: 'Unauthorized: Action requires authenticated reviewer session' }, { status: 401 })
   }
