@@ -10,6 +10,7 @@ export interface GeminiClassificationResult {
 }
 
 export interface ClassificationInputText {
+  title?: string
   transcription?: string
   translation?: string
   bisayaTranslation?: string
@@ -49,6 +50,9 @@ export async function classifyWithGemini(
   }
 
   const parts: string[] = []
+  if (input.title?.trim()) {
+    parts.push(`Title of Literature:\n"""\n${input.title.trim()}\n"""`)
+  }
   if (input.transcription?.trim()) {
     parts.push(`Original Manobo Transcription:\n"""\n${input.transcription.trim()}\n"""`)
   }

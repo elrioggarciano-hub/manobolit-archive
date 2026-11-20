@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
     let geminiResult = null
     try {
       geminiResult = await classifyWithGemini({
+        title: title || manoboTitle || englishTitle,
         transcription: transcription || (additionalContext ? additionalContext : undefined),
         translation: translation || text,
         bisayaTranslation: body.bisayaTranslation,

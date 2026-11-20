@@ -1211,13 +1211,13 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                     background: serverResult.predictionSource === 'GEMINI_LLM_SEMANTIC'
                                       ? 'rgba(59, 130, 246, 0.2)'
                                       : serverResult.predictionSource === 'ML_PIPELINE'
-                                      ? 'rgba(16, 185, 129, 0.2)'
-                                      : 'rgba(245, 158, 11, 0.2)',
+                                        ? 'rgba(16, 185, 129, 0.2)'
+                                        : 'rgba(245, 158, 11, 0.2)',
                                     color: serverResult.predictionSource === 'GEMINI_LLM_SEMANTIC'
                                       ? '#60a5fa'
                                       : serverResult.predictionSource === 'ML_PIPELINE'
-                                      ? '#10b981'
-                                      : '#f59e0b',
+                                        ? '#10b981'
+                                        : '#f59e0b',
                                   }}
                                 >
                                   {serverResult.predictionSource} ({serverResult.modelVersion})
