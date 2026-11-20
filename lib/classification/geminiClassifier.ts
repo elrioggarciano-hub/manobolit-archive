@@ -42,7 +42,7 @@ Return your evaluation strictly as a valid JSON object matching this schema:
  */
 export async function classifyWithGemini(
   input: ClassificationInputText,
-  preferredModel: string = 'gemini-1.5-flash'
+  preferredModel: string = 'gemini-3.5-flash-lite'
 ): Promise<GeminiClassificationResult | null> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -71,9 +71,9 @@ export async function classifyWithGemini(
   }
 
   const userPrompt = parts.join('\n\n')
-  const modelName = preferredModel || 'gemini-1.5-flash'
+  const modelName = preferredModel || 'gemini-3.5-flash-lite'
 
-  // Fast direct REST call with strict 2.5s timeout to guarantee instant UI response
+  // Fast direct REST call to gemini-3.5-flash-lite with strict timeout
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`
     const res = await fetch(url, {
@@ -88,11 +88,11 @@ export async function classifyWithGemini(
           },
         ],
         generationConfig: {
-          response_mime_type: 'application/json',
+          responseMimeType: 'application/json',
           temperature: 0.1,
         },
       }),
-      signal: AbortSignal.timeout(2500), // Strict 2.5s ceiling ensures zero lag
+      signal: AbortSignal.timeout(3500),
     })
 
     if (res.ok) {
@@ -104,7 +104,7 @@ export async function classifyWithGemini(
       }
     }
   } catch (err: any) {
-    // Graceful instantaneous fallback to local hybrid engine
+    // Gracefully fallback to local hybrid engine
   }
 
   return null
