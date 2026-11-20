@@ -817,6 +817,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         const res = await fetch('/api/classify', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
+                          signal: AbortSignal.timeout(5000),
                           body: JSON.stringify({
                             text: inputText,
                             additionalContext: inputTranscription,

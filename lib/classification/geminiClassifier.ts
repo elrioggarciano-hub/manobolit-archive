@@ -42,7 +42,7 @@ Return your evaluation strictly as a valid JSON object matching this schema:
  */
 export async function classifyWithGemini(
   input: ClassificationInputText,
-  preferredModel: string = 'gemini-3.8-flash'
+  preferredModel: string = 'gemini-1.5-flash'
 ): Promise<GeminiClassificationResult | null> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -71,79 +71,40 @@ export async function classifyWithGemini(
   }
 
   const userPrompt = parts.join('\n\n')
+  const modelName = preferredModel || 'gemini-1.5-flash'
 
-  // Multi-model resilience: prioritize active production Gemini models
-  const candidateModels = Array.from(new Set([
-    preferredModel,
-    'gemini-3.8-flash',
-    'gemini-2.5-flash',
-    'gemini-3.5-flash-lite',
-  ]))
-
-  for (const modelName of candidateModels) {
-    // Strategy A: Using @google/genai SDK
-    try {
-      const ai = new GoogleGenAI({ apiKey })
-      const response = await ai.models.generateContent({
-        model: modelName,
+  // Fast direct REST call with strict 2.5s timeout to guarantee instant UI response
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         contents: [
           {
-            role: 'user',
             parts: [{ text: `${SYSTEM_PROMPT}\n\nCandidate Oral Literature Selection:\n${userPrompt}` }],
           },
         ],
-        config: {
-          responseMimeType: 'application/json',
+        generationConfig: {
+          response_mime_type: 'application/json',
           temperature: 0.1,
         },
-      })
+      }),
+      signal: AbortSignal.timeout(2500), // Strict 2.5s ceiling ensures zero lag
+    })
 
-      const text = response.text
-      if (text) {
-        const parsed = parseGeminiResponse(text, modelName)
+    if (res.ok) {
+      const data = await res.json()
+      const content = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      if (content) {
+        const parsed = parseGeminiResponse(content, modelName)
         if (parsed) return parsed
       }
-    } catch (sdkError: any) {
-      // Continue to Strategy B for this model or next model
     }
-
-    // Strategy B: Direct REST fetch fallback (matches Google AI Studio curl exactly)
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey,
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: `${SYSTEM_PROMPT}\n\nCandidate Oral Literature Selection:\n${userPrompt}` }],
-            },
-          ],
-          generationConfig: {
-            response_mime_type: 'application/json',
-            temperature: 0.1,
-          },
-        }),
-        signal: AbortSignal.timeout(10000), // 10s timeout
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        const content = data?.candidates?.[0]?.content?.parts?.[0]?.text
-        if (content) {
-          const parsed = parseGeminiResponse(content, modelName)
-          if (parsed) return parsed
-        }
-      } else {
-        const errJson = await res.json().catch(() => ({}))
-        console.warn(`[GeminiClassifier] Model ${modelName} returned HTTP ${res.status}:`, errJson?.error?.message?.slice(0, 80))
-      }
-    } catch (restError: any) {
-      console.warn(`[GeminiClassifier] Model ${modelName} REST call error:`, restError.message)
-    }
+  } catch (err: any) {
+    // Graceful instantaneous fallback to local hybrid engine
   }
 
   return null
