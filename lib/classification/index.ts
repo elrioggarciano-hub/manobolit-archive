@@ -1,8 +1,8 @@
 export { classifyEntry } from './engine'
 export type { ClassificationResult, RuleDetail, MatchedTerm, EntryLike } from './engine'
 
-export { genreRules, themeRules, locationRules } from './rules'
-export type { ClassificationRule } from './rules'
+export { FALLBACK_RULE_SET, buildRuleSet, ruleIndex, isExcludedByProfile } from './rules'
+export type { ClassificationRule, RuleSet, RulesProfile } from './rules'
 
 export { classifyHybrid } from './hybrid'
 export type { AlgorithmMode, HybridClassificationResult, ModelScoreBreakdown, InjectableModels } from './hybrid'
@@ -38,7 +38,6 @@ export {
   levenshteinSimilarity,
   charDiceSimilarity,
   findOrthographicDialectMatches,
-  MANOBO_DIALECT_VARIANTS,
 } from './fuzzy'
 export type { FuzzyMatchResult, DialectVariant } from './fuzzy'
 

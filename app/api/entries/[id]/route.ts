@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { classifyEntry } from '@/lib/classification'
+import { ensureActiveModels } from '@/lib/classification/retrain'
 import { predictWithML } from '@/lib/classification/mlClient'
 import { computeContentHash } from '@/lib/classification/contentHash'
 import { translateText } from '@/lib/translation'
@@ -135,7 +136,8 @@ export async function PUT(
     // Delete old classifications and create a new suggested classification using real ML with rule fallback
     await prisma.classification.deleteMany({ where: { entryId: params.id } })
     const mlResult = await predictWithML(entry)
-    const ruleFallback = classifyEntry(entry)
+    // Themes are predicted by the learned k-NN memory over human-verified entries (not keyword rules)
+    const ruleFallback = classifyEntry(entry, '', 'ALL', 'HYBRID_ENSEMBLE', await ensureActiveModels())
 
     await prisma.classification.create({
       data: {

@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/database/prisma'
 import { computeContentHash } from '@/lib/classification/contentHash'
 import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/session'
+import { ensureActiveModels } from '@/lib/classification/retrain'
+import { classifyHybrid } from '@/lib/classification/hybrid'
+import { extractEntryText } from '@/lib/classification/evaluation'
+
+// The verified dataset must always be read live (never frozen at build time)
+export const dynamic = 'force-dynamic'
 
 // GET /api/ml/dataset - Export strictly human-verified dataset
 export async function GET(request: NextRequest) {
@@ -15,6 +21,8 @@ export async function GET(request: NextRequest) {
 
     const verifiedDataset = []
     let excludedCount = 0
+    // Rule-based scores from the current rule base, so the Colab notebook can evaluate rule-based + ML
+    const { rules } = await ensureActiveModels()
 
     for (const e of entries) {
       const currHash = computeContentHash(e)
@@ -32,7 +40,12 @@ export async function GET(request: NextRequest) {
         englishTitle: e.englishTitle,
         transcription: e.transcription,
         translation: e.translation,
+        bisayaTranslation: e.bisayaTranslation,
         content: e.content,
+        ruleScores: Object.fromEntries(
+          classifyHybrid(extractEntryText(e as any, 'both', true), 'ALL', 'RULE_BASED', { rules, rulesProfile: 'framework-only' })
+            .genre.allScores.map(s => [s.genre, s.confidence])
+        ),
         verifiedGenre: e.verifiedGenre || e.genre,
         verifiedThemes: JSON.parse(e.verifiedThemes || '[]'),
         source: e.source,

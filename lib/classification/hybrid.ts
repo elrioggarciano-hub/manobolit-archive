@@ -6,21 +6,25 @@
 // 5. Domain Rules: Eugenio (1993) & Andress (1985) Taxonomies
 
 import { classifyWithVSM, VSMResult, FeatureWeight, TfidfModel } from './tfidf'
-import { findOrthographicDialectMatches, FuzzyMatchResult } from './fuzzy'
+import { findOrthographicDialectMatches, FuzzyMatchResult, DialectVariant } from './fuzzy'
 import { tokenizeUnigrams } from './tokenizer'
-import { genreRules, themeRules, locationRules, ClassificationRule, RulesProfile, RULES_PROFILE, isExcludedByProfile } from './rules'
+import { ClassificationRule, RulesProfile, RULES_PROFILE, isExcludedByProfile, RuleSet, FALLBACK_RULE_SET } from './rules'
 import { MatchedTerm, RuleDetail } from './engine'
 import { predictNaiveBayes, NaiveBayesPrediction, NaiveBayesModel } from './naiveBayes'
 import { classifyWithCharNgram, CharNgramResult, CharNgramModel } from './charNgram'
 import { ACTIVE_GENRES } from './trainingCorpus'
 import { cleanClassificationText } from './textCleaning'
-import { classifyWithKnn, KnnModel, KnnResult } from './knn'
+import { classifyWithKnn, predictThemesWithKnn, KnnModel, KnnResult } from './knn'
 
 export interface InjectableModels {
   nb?: NaiveBayesModel
   tfidf?: TfidfModel
   charNgram?: CharNgramModel
   knn?: KnnModel
+  /** Rule base (Eugenio / Andress / provenance) from the database; defaults to the bundled data file */
+  rules?: RuleSet
+  /** Dialect variants from the lexicon database (used for the orthographic tolerance display). */
+  dialectVariants?: DialectVariant[]
   rulesProfile?: RulesProfile
 }
 
@@ -39,6 +43,11 @@ export const UNCLASSIFIED_MARGIN = 0.012
 // LOOCV on the 22-entry archive (2026-11-22), rules excluded from prediction:
 // NB + TF-IDF + Char N-gram = 50.0% acc; adding k-NN = 68.2% acc (macro-F1 0.686).
 export const KNN_IN_ENSEMBLE = true
+
+// Weight of the rule-based component in the final decision (the rest comes from learned models).
+// Fixed at 0.5 a priori (not tuned): LOOCV on the 22-entry archive gave the same 90.9% accuracy for
+// rule weights 0.3, 0.5 and 0.7 when combining rule scores with the Colab-trained model.
+export const RULE_WEIGHT = 0.5
 
 /**
  * Converts raw non-negative model scores to a calibrated probability distribution using Softmax.
@@ -128,7 +137,8 @@ export function matchWordBoundary(text: string, term: string): boolean {
 export function scoreRule(
   rule: ClassificationRule,
   normalizedText: string,
-  profile: RulesProfile = RULES_PROFILE
+  profile: RulesProfile = RULES_PROFILE,
+  ruleSet: RuleSet = FALLBACK_RULE_SET
 ): RuleDetail {
   let score = 0
   let matchCount = 0
@@ -137,7 +147,7 @@ export function scoreRule(
   const checkTerm = (term: string, type: 'keyword' | 'phrase' | 'context', weight: number) => {
     const trimmed = term.trim()
     if (!trimmed) return
-    if (profile !== 'full' && isExcludedByProfile(trimmed, profile)) {
+    if (profile !== 'full' && isExcludedByProfile(trimmed, profile, ruleSet)) {
       return
     }
     if (matchWordBoundary(normalizedText, trimmed)) {
@@ -177,10 +187,10 @@ export function scoreRule(
  * Classifies an entry using the selected Algorithm Mode:
  * - 'NAIVE_BAYES_ML': 100% Supervised Machine Learning (Laplace-smoothed Multinomial Naive Bayes)
  * - 'CHAR_NGRAM': Character 3-5-Gram TF-IDF Centroid Model
- * - 'HYBRID_ENSEMBLE': equal-weight Naive Bayes + TF-IDF VSM + Char N-Gram (+ k-NN) — learned models only
+ * - 'HYBRID_ENSEMBLE': 0.5 × rule scores (Eugenio/Andress) + 0.5 × learned models (NB + TF-IDF + Char N-Gram + k-NN)
  * - 'KNN_MEMORY': k-nearest verified exemplars
  * - 'TF_IDF_VSM': Statistical Information Retrieval Vector Space Model
- * - 'RULE_BASED': Domain Rule-Based System (evaluation baseline only, never used for production predictions)
+ * - 'RULE_BASED': rule scores only (shown for comparison)
  */
 export function classifyHybrid(
   fullText: string,
@@ -192,6 +202,7 @@ export function classifyHybrid(
   const normText = cleanClassificationText(fullText).toLowerCase()
   const unigrams = tokenizeUnigrams(normText, false)
   const activeProfile = models?.rulesProfile ?? RULES_PROFILE
+  const ruleSet = models?.rules ?? FALLBACK_RULE_SET
 
   // 1. Run Supervised Machine Learning: Multinomial Naive Bayes
   const nbResult = predictNaiveBayes(normText, targetGenreFilter, models?.nb)
@@ -206,7 +217,7 @@ export function classifyHybrid(
   const knnResult = models?.knn ? classifyWithKnn(normText, models.knn) : undefined
 
   // 4. Run Dialect-Aware Fuzzy Orthographic Matcher (Levenshtein + Dice)
-  const fuzzyMatches = findOrthographicDialectMatches(unigrams, 0.78)
+  const fuzzyMatches = findOrthographicDialectMatches(unigrams, models?.dialectVariants ?? [], 0.78)
   const fuzzyScore = fuzzyMatches.length > 0
     ? Math.min(1.0, fuzzyMatches.reduce((acc, m) => acc + m.similarity * 0.35, 0))
     : 0.0
@@ -216,13 +227,13 @@ export function classifyHybrid(
   const ruleDetails: Record<string, RuleDetail> = {}
   const genreScoresRule: { genre: string; confidence: number; ruleId: string }[] = []
 
-  for (const rule of genreRules) {
+  for (const rule of ruleSet.genre) {
     if (targetGenreFilter === 'ALL') {
       if (!activeGenreSet.has(rule.value)) continue
     } else if (rule.value !== targetGenreFilter) {
       continue
     }
-    const detail = scoreRule(rule, normText, activeProfile)
+    const detail = scoreRule(rule, normText, activeProfile, ruleSet)
     ruleDetails[rule.id] = detail
     if (detail.confidence > 0) {
       genreScoresRule.push({ genre: rule.value, confidence: detail.confidence, ruleId: rule.id })
@@ -235,8 +246,8 @@ export function classifyHybrid(
   // Requirement: Theme threshold requires >= 2 distinct terms AFTER deduplication.
   // If a matched keyword is a substring of a matched phrase in the same rule, count only the phrase.
   const themeResults: { value: string; confidence: number; ruleId: string }[] = []
-  for (const rule of themeRules) {
-    const detail = scoreRule(rule, normText, activeProfile)
+  for (const rule of ruleSet.theme) {
+    const detail = scoreRule(rule, normText, activeProfile, ruleSet)
     ruleDetails[rule.id] = detail
 
     const matchedPhrases = detail.matched.filter(m => m.type === 'phrase').map(m => m.term.toLowerCase())
@@ -257,15 +268,31 @@ export function classifyHybrid(
     }
   }
   themeResults.sort((a, b) => b.confidence - a.confidence)
-  const topThemes = themeResults.slice(0, 4)
+  // Themes: Andress (1985) theme rules UNION themes learned from the nearest human-verified entries (k-NN).
+  // LOOCV micro-F1 on the 22-entry archive: rules 0.17, k-NN 0.36, rules ∪ k-NN 0.40.
+  const ruleThemes = themeResults.slice(0, 4)
+  const learnedThemes = models?.knn
+    ? predictThemesWithKnn(normText, models.knn).slice(0, 4).map(t => ({ value: t.value, confidence: t.confidence, ruleId: 'KNN_THEME' }))
+    : []
+  const mergedThemes = new Map<string, { value: string; confidence: number; ruleId: string }>()
+  for (const t of [...ruleThemes, ...learnedThemes]) {
+    const prev = mergedThemes.get(t.value)
+    if (!prev || t.confidence > prev.confidence) mergedThemes.set(t.value, t)
+  }
+  const topThemes =
+    algorithmMode === 'RULE_BASED'
+      ? ruleThemes
+      : algorithmMode === 'KNN_MEMORY'
+      ? learnedThemes
+      : Array.from(mergedThemes.values()).sort((a, b) => b.confidence - a.confidence).slice(0, 6)
 
   // --- Location Classification ---
   // Requirement: Remove location inference from content; location must come strictly from recorded communityLocation
   const locationResults: { value: string; confidence: number; ruleId: string }[] = []
   if (locationInput && locationInput.trim()) {
     const normLoc = locationInput.toLowerCase()
-    for (const rule of locationRules) {
-      const detail = scoreRule(rule, normLoc, 'full')
+    for (const rule of ruleSet.location) {
+      const detail = scoreRule(rule, normLoc, 'full', ruleSet)
       ruleDetails[rule.id] = detail
       if (detail.confidence >= 0.08) {
         locationResults.push({ value: rule.value, confidence: detail.confidence, ruleId: rule.id })
@@ -319,7 +346,7 @@ export function classifyHybrid(
 
   for (const genre of candidateGenres) {
     const ruleMatch = genreScoresRule.find(s => s.genre === genre)
-    const ruleId = ruleMatch ? ruleMatch.ruleId : (genreRules.find(r => r.value === genre)?.id || 'G001')
+    const ruleId = ruleMatch ? ruleMatch.ruleId : (ruleSet.genre.find(r => r.value === genre)?.id || 'G001')
 
     let combinedProb = 0
 
@@ -334,12 +361,12 @@ export function classifyHybrid(
     } else if (algorithmMode === 'KNN_MEMORY') {
       combinedProb = pKnn[genre]
     } else {
-      // 'HYBRID_ENSEMBLE': equal-weight average of the LEARNED models only.
-      // Hand-written domain rules are excluded from prediction and kept solely as an evaluation baseline
-      // (RULE_BASED mode), so genre decisions come from patterns learned from verified data.
-      combinedProb = useKnnVote
+      // 'HYBRID_ENSEMBLE' — rule-based classification supported by machine learning:
+      // RULE_WEIGHT × (Eugenio/Andress rule scores) + (1 − RULE_WEIGHT) × (average of the learned models).
+      const learned = useKnnVote
         ? (pNB[genre] + pVSM[genre] + pChar[genre] + pKnn[genre]) / 4
         : (pNB[genre] + pVSM[genre] + pChar[genre]) / 3
+      combinedProb = RULE_WEIGHT * pRules[genre] + (1 - RULE_WEIGHT) * learned
     }
 
     finalGenreScores.push({
@@ -368,7 +395,7 @@ export function classifyHybrid(
 
   const allRulesApplied = [
     ...appliedGenreRuleIds,
-    ...topThemes.map(t => t.ruleId),
+    ...topThemes.map(t => t.ruleId).filter(id => id !== 'KNN_THEME'),
     ...(topLocation ? [topLocation.ruleId] : []),
   ]
 
@@ -399,9 +426,9 @@ export function classifyHybrid(
     const nn = (knnResult?.neighbors || []).map(n => `${n.genre}@${(n.similarity * 100).toFixed(0)}%`).join(', ')
     mathExplanation = `k-NN Exemplar Memory (k=${models?.knn?.k ?? 0}): similarity-weighted vote = ${(P_1 * 100).toFixed(1)}% from nearest verified entries [${nn}].`
   } else if (algorithmMode === 'HYBRID_ENSEMBLE' && useKnnVote) {
-    mathExplanation = `Learned-Model Ensemble = (0.25 Ã— NB: ${(pNB[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 Ã— TF-IDF: ${(pVSM[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 Ã— Char N-gram: ${(pChar[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 Ã— k-NN: ${(pKnn[topGenreCandidate] * 100).toFixed(1)}%) = ${(P_1 * 100).toFixed(1)}%`
+    mathExplanation = `Rule-Based + ML = 0.5 × Rules (Eugenio/Andress): ${(pRules[topGenreCandidate] * 100).toFixed(1)}% + 0.5 × Learned [NB ${(pNB[topGenreCandidate] * 100).toFixed(1)}%, TF-IDF ${(pVSM[topGenreCandidate] * 100).toFixed(1)}%, Char N-gram ${(pChar[topGenreCandidate] * 100).toFixed(1)}%, k-NN ${(pKnn[topGenreCandidate] * 100).toFixed(1)}%] = ${(P_1 * 100).toFixed(1)}%`
   } else if (algorithmMode === 'HYBRID_ENSEMBLE') {
-    mathExplanation = `Learned-Model Ensemble = (â…“ Ã— NB: ${(pNB[topGenreCandidate] * 100).toFixed(1)}%) + (â…“ Ã— TF-IDF: ${(pVSM[topGenreCandidate] * 100).toFixed(1)}%) + (â…“ Ã— Char N-gram: ${(pChar[topGenreCandidate] * 100).toFixed(1)}%) = ${(P_1 * 100).toFixed(1)}%`
+    mathExplanation = `Rule-Based + ML = 0.5 × Rules (Eugenio/Andress): ${(pRules[topGenreCandidate] * 100).toFixed(1)}% + 0.5 × Learned [NB ${(pNB[topGenreCandidate] * 100).toFixed(1)}%, TF-IDF ${(pVSM[topGenreCandidate] * 100).toFixed(1)}%, Char N-gram ${(pChar[topGenreCandidate] * 100).toFixed(1)}%] = ${(P_1 * 100).toFixed(1)}%`
   } else if (algorithmMode === 'TF_IDF_VSM') {
     mathExplanation = `TF-IDF VSM: Calibrated Softmax probability = ${(P_1 * 100).toFixed(1)}% (temperature T=0.25 over word TF-IDF cosine alignment).`
   } else {

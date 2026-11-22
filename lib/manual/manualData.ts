@@ -47,7 +47,7 @@ export const MANUAL_METADATA = {
   systemUrl: 'http://localhost:3000',
   corpusBaseline: '17 Oral Literature Selections (Catipay & Curato, 2024) and 5 Folk Songs (Maravilla, 2024)',
   taxonomies: 'Damiana L. Eugenio (1993) & George C. Andress (1985)',
-  lexiconCorpus: 'SIL International Webonary (ISO 639-3: msm) & Agusan Manobo Bible (257 Parallel Records)',
+  lexiconCorpus: 'SIL International Webonary (ISO 639-3: msm) & ManoboLit Archive Lexicon (database)',
 }
 
 export const MANUAL_CHAPTERS: ManualChapter[] = [
@@ -83,7 +83,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
         title: 'About the ManoboLit Archive System',
         role: 'ALL',
         whoUsesIt: 'All users.',
-        description: 'The ManoboLit Archive is an advanced digital repository and computational linguistics platform dedicated to the preservation, classification, and retrieval of the oral literature and folk songs of the Agusan Manobo people of Agusan del Sur, Philippines. It integrates supervised machine learning (Multinomial Naive Bayes + TF-IDF) with pattern-based linguistic rules derived from Eugenio (1993) and Andress (1985), coupled with finite-state morphological validation cross-referenced against the SIL International Webonary dictionary and Agusan Manobo Bible.',
+        description: 'The ManoboLit Archive is an advanced digital repository and computational linguistics platform dedicated to the preservation, classification, and retrieval of the oral literature and folk songs of the Agusan Manobo people of Agusan del Sur, Philippines. Genres (Eugenio, 1993) and themes (Andress, 1985) are classified by a rule-based engine whose rule base is stored in the database and grows through rule terms discovered from verified entries, combined 50/50 with machine-learning models that learn from human-verified entries (a Logistic Regression classifier trained in Google Colab, and a k-nearest-neighbour memory for themes). Translation and lexical validation combine a database lexicon, finite-state morphological validation against the SIL International Webonary dictionary, and word translations learned from verified texts.',
         goodToKnow: [
           'Baseline corpus: 17 authentic oral literature pieces collected by Catipay & Curato (2024) and 5 folk songs collected by Maravilla (2024).',
           'Geographic provenance spans key municipalities of Agusan del Sur, including Bayugan, Prosperidad, San Francisco, and Esperanza.',
@@ -322,7 +322,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
     title: 'Hybrid Classification Engine Workbench',
     subtitle: 'Pattern-based rules, supervised machine learning, and semantic LLM inference',
     role: 'ALL',
-    summary: 'A complete guide to utilizing the hybrid classification engine, selecting between Rule-Based, Supervised ML (TF-IDF + Naive Bayes), and Neural Semantic Model modes, and interpreting model diagnostics.',
+    summary: 'A complete guide to the classification module: the rule-based engine (Eugenio and Andress) combined with machine learning, the individual rule and model views shown for comparison, and how to interpret model diagnostics.',
     sections: [
       {
         id: '4.1',
@@ -333,7 +333,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
         capabilities: [
           'Paste or type any Agusan Manobo oral narrative or song lyric for instant classification',
           'Load pre-populated sample literature selections from the baseline corpus',
-          'Select between Pattern Rule-Based, Supervised Machine Learning, or Neural Semantic Model engines',
+          'Compare the rule-based scores with the machine-learning models',
           'View predicted Genre, Primary Theme, and statistical Confidence percentage',
           'Inspect exact pattern rule triggers, morphological markers, and TF-IDF term weights',
         ],
@@ -352,7 +352,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           {
             number: 2,
             label: 'Classification Engine Mode Selector',
-            instruction: 'Choose your desired classification approach: (a) Rule-Based Pattern Matching, (b) Supervised Machine Learning (TF-IDF + Naive Bayes), or (c) Neural Semantic Model.',
+            instruction: 'Choose which view to inspect: Rule-Based + ML (default, the system decision), the rule scores alone, or an individual learned model (Naive Bayes, TF-IDF, Character N-gram, k-NN).',
           },
           {
             number: 3,
@@ -396,7 +396,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           'Translate text between Agusan Manobo, English, and Sinugbuanong Binisaya',
           'Execute word-by-word Finite-State Affix Decomposition for morphological analysis',
           'Cross-reference tokens with the official SIL International Webonary (ISO 639-3: msm) dictionary',
-          'Validate translations against the Agusan Manobo Bible reference corpus',
+          'Validate translations against the archive lexicon and SIL Webonary entries',
           'Copy translations with one click for research documentation',
         ],
         menuLocation: ['Header -> TRANSLATOR (/translator)'],
@@ -433,7 +433,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           },
         ],
         goodToKnow: [
-          'Green "Verified Corpus" badges indicate the word was directly matched against the 257 authentic Webonary & Bible records in PostgreSQL.',
+          'Green "Verified Corpus" badges indicate the word was directly matched against the Webonary and archive lexicon records in the database.',
           'Blue "Morphologically Validated" badges indicate the word root was successfully isolated via Finite-State Affix rules.',
         ],
       },

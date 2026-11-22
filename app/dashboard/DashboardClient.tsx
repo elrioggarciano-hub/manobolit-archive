@@ -202,6 +202,50 @@ export default function DashboardClient({
     URL.revokeObjectURL(url)
   }
 
+  // Same records as the CSV, as structured JSON (themes/cultural elements as arrays) for research reuse.
+  const downloadCulturalHeritageJson = () => {
+    if (exportRecords.length === 0) return
+    const split = (v: string) => (v || '').split('; ').map(x => x.trim()).filter(Boolean)
+    const payload = {
+      dataset: 'ManoboLit Archive — Agusan Manobo Oral Literature and Folk Songs',
+      exportedAt: new Date().toISOString(),
+      taxonomies: { genre: 'Eugenio (1993)', themes: 'Andress (1985)' },
+      count: exportRecords.length,
+      records: exportRecords.map((r, i) => ({
+        no: i + 1,
+        id: r.id,
+        title: r.title,
+        manoboTitle: r.manoboTitle,
+        englishTitle: r.englishTitle,
+        type: TYPE_LABELS[r.type] || r.type,
+        genre: r.genre,
+        genreLabel: EXPORT_GENRE_LABELS[r.genre] || formatGenreLabel(r.genre),
+        themes: split(r.themes),
+        culturalElements: split(r.culturalElements),
+        transcription: r.transcription,
+        translation: r.translation,
+        bisayaTranslation: r.bisayaTranslation,
+        source: r.source,
+        yearCollected: r.yearCollected,
+        narrator: r.narrator,
+        location: {
+          community: r.communityLocation,
+          barangay: r.barangay,
+          municipality: r.municipality,
+          province: r.province,
+        },
+        audioFile: r.audioFile,
+      })),
+    }
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `manobolit-cultural-heritage-records-${new Date().toISOString().slice(0, 10)}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="w-full bg-[var(--bg-main)] text-[var(--text-primary)]" style={{ minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <div className="w-full px-6 md:px-8 py-8">
@@ -250,31 +294,58 @@ export default function DashboardClient({
               </p>
             </div>
 
-            <button
-              onClick={downloadCulturalHeritageRecords}
-              disabled={exportRecords.length === 0}
-              className="btn-anim flex-shrink-0"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                padding: '11px 18px',
-                background: 'var(--brand-accent)',
-                color: '#fff',
-                border: 'none',
-                fontSize: '12px',
-                fontWeight: 700,
-                letterSpacing: '0.03em',
-                cursor: exportRecords.length === 0 ? 'not-allowed' : 'pointer',
-                opacity: exportRecords.length === 0 ? 0.5 : 1,
-              }}
-              title={t('dash_export_btn')}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              {t('dash_export_btn')}
-            </button>
+            <div className="flex flex-wrap gap-2 flex-shrink-0">
+              <button
+                onClick={downloadCulturalHeritageRecords}
+                disabled={exportRecords.length === 0}
+                className="btn-anim flex-shrink-0"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  padding: '11px 18px',
+                  background: 'var(--brand-accent)',
+                  color: '#fff',
+                  border: 'none',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  letterSpacing: '0.03em',
+                  cursor: exportRecords.length === 0 ? 'not-allowed' : 'pointer',
+                  opacity: exportRecords.length === 0 ? 0.5 : 1,
+                }}
+                title={t('dash_export_btn')}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                {t('dash_export_btn')} · CSV
+              </button>
+              <button
+                onClick={downloadCulturalHeritageJson}
+                disabled={exportRecords.length === 0}
+                className="btn-anim flex-shrink-0"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  padding: '11px 18px',
+                  background: 'transparent',
+                  color: 'var(--brand-accent)',
+                  border: '1px solid var(--brand-accent)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  letterSpacing: '0.03em',
+                  cursor: exportRecords.length === 0 ? 'not-allowed' : 'pointer',
+                  opacity: exportRecords.length === 0 ? 0.5 : 1,
+                }}
+                title={t('dash_export_btn')}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                {t('dash_export_btn')} · JSON
+              </button>
+            </div>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { genreRules, themeRules, locationRules, ClassificationRule } from './rules'
+import { ClassificationRule } from './rules'
 import { classifyHybrid, AlgorithmMode, HybridClassificationResult, InjectableModels } from './hybrid'
 import { normalizeText as baseNormalize } from './tokenizer'
 import { cleanClassificationText } from './textCleaning'

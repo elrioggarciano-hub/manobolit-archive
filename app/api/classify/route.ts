@@ -6,10 +6,15 @@ import { ACTIVE_GENRES } from '@/lib/classification/trainingCorpus'
 import { classifyWithGemini } from '@/lib/classification/geminiClassifier'
 import { prisma } from '@/lib/database/prisma'
 import { getActiveTrainedModel, predictWithCompiled } from '@/lib/classification/trainedModel'
+import { blendRulesWithModel } from '@/lib/classification/ruleMlBlend'
+import { ruleIndex } from '@/lib/classification/rules'
+import { getLexicon } from '@/lib/translation/lexiconStore'
+import { dialectVariantGroups } from '@/lib/translation/lexicon'
 
 // POST /api/classify
-// Genre classification. Local prediction comes from the Colab-trained model (if uploaded), otherwise from the
-// in-app learned ensemble. Gemini, when configured, still overrides the final answer. Rules are baseline-only.
+// Rule-based genre/theme classification (Eugenio 1993 / Andress 1985 rule base stored in the database)
+// combined with machine learning: rule scores are blended with the Colab-trained model's probabilities
+// (or with the in-app learned models when no Colab model is uploaded). Gemini, if configured, is advisory only.
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -52,7 +57,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Load models trained on base corpus + all human-verified entries (rebuilt after cold start / new verifications)
-    const activeModels = await ensureActiveModels()
+    const lexicon = await getLexicon()
+    const activeModels = { ...(await ensureActiveModels()), dialectVariants: dialectVariantGroups(lexicon) }
     const snapshot = getLatestSnapshot()
 
     // 1a. Primary local path: the Colab-trained model (scikit-learn artifact uploaded by an admin)
@@ -64,8 +70,8 @@ export async function POST(request: NextRequest) {
         })
       : null
 
-    // 1b. In-app learned ensemble (NB + TF-IDF + Char N-gram + k-NN); used when no trained model is uploaded.
-    // Domain rules are computed only as a comparison baseline and never decide the genre.
+    // 1b. Rule-based + ML ensemble computed in-app (rules 50% + NB/TF-IDF/Char N-gram/k-NN 50%);
+    //     the final answer when no Colab model has been uploaded.
     const result = classifyEntry(
       entryLike,
       additionalContext || '',
@@ -73,6 +79,14 @@ export async function POST(request: NextRequest) {
       algorithmMode as AlgorithmMode,
       activeModels
     )
+
+    // 1c. Rule-based classification (Eugenio 1993 / Andress 1985 rule base from the database)
+    const ruleOnly = classifyEntry(entryLike, additionalContext || '', 'ALL', 'RULE_BASED', activeModels)
+
+    // Final local decision: rule scores combined with the Colab-trained model's probabilities
+    const blended = trained
+      ? blendRulesWithModel(ruleOnly.genre.allScores, trained.probabilities, trainedModel!.artifact.unclassifiedThreshold)
+      : null
 
     // 2. Optional Semantic LLM Reasoning: Gemini Flash (Option 1)
     let geminiResult = null
@@ -88,15 +102,12 @@ export async function POST(request: NextRequest) {
       console.warn('[ClassifyAPI] Gemini call bypassed; utilizing local hybrid ensemble:', llmErr.message)
     }
 
-    const localGenre = trained ? trained.genre : result.genre.value
-    const localConfidence = trained ? trained.confidence : result.genre.confidence
-    const localSource = trained ? 'COLAB_TRAINED_MODEL' : 'TS_LEARNED_ENSEMBLE'
-    const localVersion = trained ? trained.modelVersion : snapshot.id
-
-    const finalPredictedGenre = geminiResult ? geminiResult.genre : localGenre
-    const finalConfidence = geminiResult ? geminiResult.confidence : localConfidence
-    const finalSource = geminiResult ? 'NEURAL_SEMANTIC_MODEL' : localSource
-    const finalVersion = geminiResult ? 'v2.4-neural' : localVersion
+    // The system's own rule-based + ML engine decides; Gemini (if configured) is advisory only —
+    // its opinion and reasoning are returned for comparison but do not override the engine.
+    const finalPredictedGenre = blended ? blended.genre : result.genre.value
+    const finalConfidence = blended ? blended.confidence : result.genre.confidence
+    const finalSource = blended ? 'RULES_PLUS_COLAB_MODEL' : 'RULES_PLUS_LEARNED_ENSEMBLE'
+    const finalVersion = trained ? trained.modelVersion : snapshot.id
 
     // 3. Compute individual model predictions and normalized per-model distributions
     const breakdown = result.algorithmicBreakdown
@@ -106,7 +117,6 @@ export async function POST(request: NextRequest) {
     const nbOnly = classifyEntry(entryLike, additionalContext || '', 'ALL', 'NAIVE_BAYES_ML', activeModels)
     const tfidfOnly = classifyEntry(entryLike, additionalContext || '', 'ALL', 'TF_IDF_VSM', activeModels)
     const charOnly = classifyEntry(entryLike, additionalContext || '', 'ALL', 'CHAR_NGRAM', activeModels)
-    const ruleOnly = classifyEntry(entryLike, additionalContext || '', 'ALL', 'RULE_BASED', activeModels)
     const knnOnly = classifyEntry(entryLike, additionalContext || '', 'ALL', 'KNN_MEMORY', activeModels)
 
     const modelPredictions = {
@@ -116,7 +126,7 @@ export async function POST(request: NextRequest) {
       charNgram: charOnly.genre.value,
       ruleBased: ruleOnly.genre.value,
       knnMemory: knnOnly.genre.value,
-      ...(geminiResult ? { neuralSemantic: geminiResult.genre } : {}),
+      ...(geminiResult ? { geminiAdvisory: geminiResult.genre } : {}),
     }
 
     const predictedValue = finalPredictedGenre
@@ -142,11 +152,7 @@ export async function POST(request: NextRequest) {
       genre: {
         value: predictedValue,
         confidence: finalConfidence,
-        allScores: trained
-          ? [...trained.probabilities]
-              .sort((a, b) => b.probability - a.probability)
-              .map(p => ({ genre: p.genre, confidence: Math.round(p.probability * 1000) / 1000 }))
-          : result.genre.allScores,
+        allScores: blended ? blended.distribution : result.genre.allScores,
         predictionSource: finalSource,
         modelVersion: finalVersion,
         isUncertain: isUnclassified,
@@ -158,16 +164,18 @@ export async function POST(request: NextRequest) {
       isUncertain: isUnclassified,
 
       // Semantic Reasoning Explanations
-      reasoning: geminiResult ? geminiResult.reasoning : undefined,
+      reasoning: geminiResult ? `Gemini advisory opinion (${geminiResult.genre}, not used for the final decision): ${geminiResult.reasoning}` : undefined,
       culturalThemes: geminiResult && geminiResult.culturalThemes.length ? geminiResult.culturalThemes : undefined,
       linguisticObservations: geminiResult ? geminiResult.linguisticObservations : undefined,
 
       // Truthful Architecture Provenance
-      algorithm: geminiResult
-        ? 'Gemini LLM semantic classification (local trained model shown for comparison)'
-        : trained
-        ? trainedModel!.artifact.algorithm + ' — trained in Google Colab on human-verified entries'
-        : 'In-app learned ensemble (Naive Bayes + TF-IDF + Char N-gram + k-NN)',
+      algorithm: trained
+        ? `Rule-based classification (Eugenio 1993 / Andress 1985) + ${trainedModel!.artifact.algorithm} trained in Google Colab on human-verified entries`
+        : 'Rule-based classification (Eugenio 1993 / Andress 1985) + in-app learned models (Naive Bayes, TF-IDF, Char N-gram, k-NN)',
+      ruleWeight: 0.5,
+      // Gemini opinion (advisory only, never overrides the engine)
+      geminiAdvisory: geminiResult ? { genre: geminiResult.genre, confidence: geminiResult.confidence } : undefined,
+      ruleNames: ruleIndex(activeModels.rules),
       algorithmMode,
       predictionSource: finalSource,
       modelVersion: finalVersion,

@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/database/prisma'
 import { computeContentHash } from '@/lib/classification/contentHash'
 
+// Always query the database at request time (never prerender a snapshot at build time)
+export const dynamic = 'force-dynamic'
+
 const OFFICIAL_GENRES = [
   'MYTH', 'LEGEND', 'FOLKTALE', 'EPIC',
   'RIDDLE', 'PROVERB', 'SONG', 'CHANT'

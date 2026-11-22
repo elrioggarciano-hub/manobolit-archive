@@ -15,6 +15,8 @@ import { trainCharNgram, CharNgramModel, DEFAULT_CHAR_NGRAM_MODEL } from './char
 import { trainKnn, KnnModel } from './knn'
 import { runLOOCV, extractEntryText, overlappingDocIds, LOOCVReport } from './evaluation'
 import { loadTrainingCorpus } from './corpusStore'
+import { loadRuleSet } from './ruleStore'
+import { RuleSet, FALLBACK_RULE_SET } from './rules'
 import { ScorableEntry } from './metrics'
 import { tokenizeUnigrams } from './tokenizer'
 
@@ -32,6 +34,8 @@ export interface ActiveModels {
   tfidf: TfidfModel
   charNgram: CharNgramModel
   knn: KnnModel
+  /** rule base (database) used by the rule-based component */
+  rules: RuleSet
 }
 
 let isRetraining = false
@@ -59,10 +63,12 @@ function trainableBase(corpus: TrainingDocument[]): TrainingDocument[] {
 /** Converts human-verified archive records into training documents. */
 export function verifiedRecordsToTrainingDocs(records: any[]): TrainingDocument[] {
   return records.map((e, idx) => {
-    const themes = Array.isArray(e.themes)
-      ? e.themes
-      : typeof e.themes === 'string'
-      ? JSON.parse(e.themes || '[]')
+    // Prefer the reviewer-approved themes; fall back to the entry's recorded themes.
+    const rawThemes = e.verifiedThemes ?? e.themes
+    const themes = Array.isArray(rawThemes)
+      ? rawThemes
+      : typeof rawThemes === 'string'
+      ? JSON.parse(rawThemes || '[]')
       : []
     return {
       id: e.id ? `verified-${e.id}` : `verified-custom-${idx}`,
@@ -76,13 +82,14 @@ export function verifiedRecordsToTrainingDocs(records: any[]): TrainingDocument[
   })
 }
 
-/** Trains every learned model on the given documents. */
-export function buildModels(docs: TrainingDocument[]): ActiveModels {
+/** Trains every learned model on the given documents (and attaches the rule base). */
+export function buildModels(docs: TrainingDocument[], rules: RuleSet = FALLBACK_RULE_SET): ActiveModels {
   return {
     nb: trainNaiveBayes(docs, 1.0),
     tfidf: trainTfidf(docs),
     charNgram: trainCharNgram(docs),
     knn: trainKnn(docs),
+    rules,
   }
 }
 
@@ -128,12 +135,12 @@ export async function ensureActiveModels(force: boolean = false): Promise<Active
   refreshPromise = (async () => {
     try {
       lastFingerprintCheck = Date.now()
-      const corpus = await loadTrainingCorpus()
-      const fingerprint = `${await getVerifiedFingerprint()}|${corpus.fingerprint}`
+      const [corpus, rules] = await Promise.all([loadTrainingCorpus(), loadRuleSet()])
+      const fingerprint = `${await getVerifiedFingerprint()}|${corpus.fingerprint}|${rules.fingerprint}`
       if (!force && currentModels && fingerprint === modelsFingerprint) return currentModels
 
       const verified = await prisma.literatureEntry.findMany({ where: { reviewStatus: 'VERIFIED' } })
-      currentModels = buildModels([...trainableBase(corpus.docs), ...verifiedRecordsToTrainingDocs(verified)])
+      currentModels = buildModels([...trainableBase(corpus.docs), ...verifiedRecordsToTrainingDocs(verified)], rules.ruleSet)
       modelsFingerprint = fingerprint
       await loadLatestSnapshotFromDb()
       console.log(`[Models] Rebuilt from ${corpus.docs.length} corpus docs (${corpus.origin}) + ${verified.length} verified entries.`)
@@ -197,6 +204,7 @@ export function getActiveModels(): ActiveModels {
     tfidf: DEFAULT_TFIDF_MODEL,
     charNgram: DEFAULT_CHAR_NGRAM_MODEL,
     knn: trainKnn(TRAINING_CORPUS),
+    rules: FALLBACK_RULE_SET,
   }
   return currentModels
 }
@@ -257,12 +265,12 @@ export async function retrainFromDatabase(
       console.log(`[Retrain] Human-verified training records available: ${verifiedRecords.length}`);
 
       // 1-2. Base training corpus (minus overlapping entries) + human-verified entries
-      const corpus = await loadTrainingCorpus()
+      const [corpus, rules] = await Promise.all([loadTrainingCorpus(), loadRuleSet()])
       const combinedTrainingSet = [...trainableBase(corpus.docs), ...verifiedRecordsToTrainingDocs(verifiedRecords)]
       console.log(`[Retrain] Combined training set size: ${combinedTrainingSet.length} documents.`);
 
       // 3. Train all models
-      const trained = buildModels(combinedTrainingSet)
+      const trained = buildModels(combinedTrainingSet, rules.ruleSet)
       const nbModel = trained.nb
       const tfidfModel = trained.tfidf
       const charModel = trained.charNgram
@@ -340,7 +348,7 @@ export async function retrainFromDatabase(
       modelsFingerprint = null
       if (!customVerifiedEntries || customVerifiedEntries.length === 0) {
         try {
-          modelsFingerprint = `${await getVerifiedFingerprint()}|${corpus.fingerprint}`
+          modelsFingerprint = `${await getVerifiedFingerprint()}|${corpus.fingerprint}|${rules.fingerprint}`
           lastFingerprintCheck = Date.now()
         } catch {
           // Leave fingerprint null so the next request re-checks the database.

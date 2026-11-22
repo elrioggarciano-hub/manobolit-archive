@@ -197,7 +197,7 @@ function LoginForm() {
             ManoboLit Archive
           </h1>
           <p style={{ margin: 0, fontSize: '15px', lineHeight: 1.65, color: 'rgba(255,255,255,0.72)', maxWidth: '360px' }}>
-            A rule-based classification and retrieval system preserving Agusan Manobo oral literature and folk songs for future generations.
+            A rule-based classification and retrieval system, enhanced with machine learning, preserving Agusan Manobo oral literature and folk songs for future generations.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '40px' }}>

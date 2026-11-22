@@ -1,19 +1,19 @@
 // ML Service Client and TypeScript Hybrid Classification Bridge
 // Documents truthful provenance:
-// 1. Primary: the model trained in Google Colab (notebooks/ManoboLit_Genre_Classifier_Trainer.ipynb),
-//    uploaded by an admin and stored in MLModelRegistry; inference runs in-process (trainedModel.ts).
-// 2. Fallback (no model uploaded): the in-app learned ensemble (Multinomial NB + TF-IDF VSM + Char N-Gram + k-NN).
-// Hand-written domain rules never decide the genre; they are an evaluation baseline only.
+// Rule-based classification (Eugenio 1993 / Andress 1985 rule base in the database) combined with ML:
+// 1. Primary: rule scores blended with the model trained in Google Colab (MLModelRegistry artifact).
+// 2. Fallback (no model uploaded): rules blended with the in-app learned models (NB + TF-IDF + Char N-Gram + k-NN).
 
 import { classifyEntry, EntryLike } from './engine'
 import { getLatestSnapshot, ensureActiveModels } from './retrain'
 import { getActiveTrainedModel, predictWithCompiled } from './trainedModel'
+import { blendRulesWithModel } from './ruleMlBlend'
 
 export interface MLPredictionResult {
   predictedGenre: string
   confidence: number
   probabilities: Record<string, number>
-  predictionSource: 'COLAB_TRAINED_MODEL' | 'TYPESCRIPT_HYBRID_ENGINE' | 'ML_PIPELINE' | 'RULE_BASED'
+  predictionSource: 'RULES_PLUS_COLAB_MODEL' | 'RULES_PLUS_LEARNED_ENSEMBLE' | 'ML_PIPELINE' | 'RULE_BASED'
   modelVersion: string
   modelSnapshotId: string
   trainedSamples: number
@@ -31,33 +31,35 @@ export async function predictWithML(
   entry: EntryLike | string,
   uncertaintyThreshold: number = 0.35
 ): Promise<MLPredictionResult> {
-  // Primary execution: the Colab-trained model uploaded by an admin
+  const models = await ensureActiveModels()
+  const snapshot = getLatestSnapshot()
+
+  // Primary execution: rule-based scores (database rule base) combined with the Colab-trained model
   const trainedModel = await getActiveTrainedModel()
   if (trainedModel) {
     const input = typeof entry === 'string'
       ? { transcription: entry, translation: '' }
       : { transcription: entry.transcription || '', translation: entry.translation || '' }
     const p = predictWithCompiled(trainedModel, input)
+    const rules = classifyEntry(entry, '', 'ALL', 'RULE_BASED', models)
     const a = trainedModel.artifact
+    const b = blendRulesWithModel(rules.genre.allScores, p.probabilities, a.unclassifiedThreshold)
     const probabilities: Record<string, number> = {}
-    for (const x of p.probabilities) probabilities[x.genre] = Math.round(x.probability * 1000) / 1000
-    const topFeatures = p.isUnclassified ? [] : (a.topFeatures?.[p.genre] || []).slice(0, 10)
+    for (const x of b.distribution) probabilities[x.genre] = x.confidence
+    const topFeatures = b.isUnclassified ? [] : (a.topFeatures?.[b.genre] || []).slice(0, 10)
     return {
-      predictedGenre: p.genre,
-      confidence: p.confidence,
+      predictedGenre: b.genre,
+      confidence: b.confidence,
       probabilities,
-      predictionSource: 'COLAB_TRAINED_MODEL',
+      predictionSource: 'RULES_PLUS_COLAB_MODEL',
       modelVersion: a.version,
       modelSnapshotId: a.version,
       trainedSamples: a.trainedSamples,
-      isUncertain: p.isUnclassified || p.confidence < uncertaintyThreshold,
-      algorithm: `${a.algorithm} (trained in Google Colab)`,
+      isUncertain: b.isUnclassified || b.confidence < uncertaintyThreshold,
+      algorithm: `Rule-based (Eugenio/Andress) + ${a.algorithm} trained in Google Colab`,
       topFeatures,
     }
   }
-
-  const models = await ensureActiveModels()
-  const snapshot = getLatestSnapshot()
 
   // Fallback: in-app learned ensemble (NB + TF-IDF + Char N-gram + k-NN)
   const result = classifyEntry(entry, '', 'ALL', 'HYBRID_ENSEMBLE', models)
@@ -77,12 +79,12 @@ export async function predictWithML(
     predictedGenre,
     confidence,
     probabilities,
-    predictionSource: 'TYPESCRIPT_HYBRID_ENGINE',
+    predictionSource: 'RULES_PLUS_LEARNED_ENSEMBLE',
     modelVersion: snapshot.id,
     modelSnapshotId: snapshot.id,
     trainedSamples: snapshot.trainedSamples,
     isUncertain: predictedGenre === 'UNCLASSIFIED' || confidence < uncertaintyThreshold,
-    algorithm: 'In-app learned ensemble (Multinomial NB + TF-IDF VSM + Char N-Gram + k-NN)',
+    algorithm: 'Rule-based (Eugenio/Andress) + in-app learned models (Multinomial NB + TF-IDF VSM + Char N-Gram + k-NN)',
     topFeatures,
   }
 }

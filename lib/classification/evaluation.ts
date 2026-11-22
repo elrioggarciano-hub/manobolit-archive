@@ -470,3 +470,56 @@ export function runAllAblations(entries: ScorableEntry[]): Record<string, LOOCVR
   }
 }
 
+
+export interface ThemeEvaluation {
+  sampleSize: number
+  learnedKnn: { precision: number; recall: number; f1: number }
+  keywordRulesBaseline: { precision: number; recall: number; f1: number }
+  rulesPlusKnn: { precision: number; recall: number; f1: number }
+}
+
+/**
+ * Leave-one-out evaluation of multi-label THEME prediction (micro-averaged P/R/F1):
+ * learned k-NN themes (exemplars exclude the held-out entry) vs. the keyword-rule baseline.
+ */
+export function runThemeLOOCV(entries: ScorableEntry[], options: LOOCVOptions = {}): ThemeEvaluation {
+  const textConfig = options.textConfig || 'both'
+  const stripAnswer = options.stripAnswer !== undefined ? options.stripAnswer : true
+  const corpus = options.baseCorpus || TRAINING_CORPUS
+  const base = corpus.filter(d => !overlappingDocIds(corpus).has(d.id))
+  const tally = { knn: { tp: 0, fp: 0, fn: 0 }, rules: { tp: 0, fp: 0, fn: 0 }, combined: { tp: 0, fp: 0, fn: 0 } }
+
+  entries.forEach((heldOut, i) => {
+    const gold = new Set<string>(((heldOut as any).themes as string[]) || [])
+    const others: TrainingDocument[] = entries
+      .filter((_, idx) => idx !== i)
+      .map((e, idx) => ({
+        id: (e as any).id || `theme-fold-${i}-${idx}`,
+        text: extractEntryText(e, textConfig, stripAnswer),
+        genre: e.genre as any,
+        themes: (e as any).themes || [],
+        provenance: 'Agusan Manobo Archive',
+        source: 'archive-verbatim' as const,
+      }))
+    const text = extractEntryText(heldOut, textConfig, stripAnswer)
+    const knn = trainKnn([...base, ...others])
+    const predicted = {
+      knn: new Set(classifyHybrid(text, 'ALL', 'KNN_MEMORY', { knn }).themes.map(t => t.value)),
+      rules: new Set(classifyHybrid(text, 'ALL', 'RULE_BASED', { rulesProfile: 'framework-only' }).themes.map(t => t.value)),
+      combined: new Set(classifyHybrid(text, 'ALL', 'HYBRID_ENSEMBLE', { knn, rulesProfile: 'framework-only' }).themes.map(t => t.value)),
+    }
+    for (const key of ['knn', 'rules', 'combined'] as const) {
+      for (const p of predicted[key]) gold.has(p) ? tally[key].tp++ : tally[key].fp++
+      for (const g of gold) if (!predicted[key].has(g)) tally[key].fn++
+    }
+  })
+
+  const score = ({ tp, fp, fn }: { tp: number; fp: number; fn: number }) => {
+    const precision = tp + fp ? tp / (tp + fp) : 0
+    const recall = tp + fn ? tp / (tp + fn) : 0
+    const f1 = precision + recall ? (2 * precision * recall) / (precision + recall) : 0
+    const r = (x: number) => Math.round(x * 1000) / 1000
+    return { precision: r(precision), recall: r(recall), f1: r(f1) }
+  }
+  return { sampleSize: entries.length, learnedKnn: score(tally.knn), keywordRulesBaseline: score(tally.rules), rulesPlusKnn: score(tally.combined) }
+}

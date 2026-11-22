@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/database/prisma'
 import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/session'
 
+// Always query the database at request time (never prerender a snapshot at build time)
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const categories = await prisma.categoryDefinition.findMany({

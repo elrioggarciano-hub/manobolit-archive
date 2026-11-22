@@ -76,7 +76,7 @@ export default function PrivacyPolicyPage() {
           <h2 style={h2Style}>2. How We Use Information</h2>
           <p style={pStyle}>Information described above is used to:</p>
           <ul style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
-            <li style={liStyle}>Operate, secure, and maintain the Archive and its rule-based classification system;</li>
+            <li style={liStyle}>Operate, secure, and maintain the Archive and its rule-based classification system (enhanced with machine learning);</li>
             <li style={liStyle}>Preserve and present Agusan Manobo oral literature and folk songs for research, education, and cultural continuity;</li>
             <li style={liStyle}>Respond to inquiries, correction requests, or takedown requests sent to us; and</li>
             <li style={liStyle}>Comply with legal obligations where applicable.</li>

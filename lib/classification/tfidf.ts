@@ -14,7 +14,7 @@
 //        cos(theta) = ( V_doc . V_class ) / ( ||V_doc||_2 * ||V_class||_2 )
 
 import { normalizeText, tokenizeUnigrams, generateWordBigrams } from './tokenizer'
-import { genreRules, themeRules } from './rules'
+import { FALLBACK_RULE_SET } from './rules'
 import { TRAINING_CORPUS, TrainingDocument, ACTIVE_GENRES } from './trainingCorpus'
 import { cleanClassificationText } from './textCleaning'
 
@@ -75,7 +75,7 @@ export interface TfidfModel {
 export function legacyRuleLexiconCentroids(): ClassCentroid[] {
   const corpus: Record<string, string[]> = {}
 
-  for (const rule of genreRules) {
+  for (const rule of FALLBACK_RULE_SET.genre) {
     const tokens = [
       ...rule.keywords,
       ...rule.keywords,
@@ -87,7 +87,7 @@ export function legacyRuleLexiconCentroids(): ClassCentroid[] {
     corpus[`GENRE_${rule.value}`] = tokens
   }
 
-  for (const rule of themeRules) {
+  for (const rule of FALLBACK_RULE_SET.theme) {
     const tokens = [
       ...rule.keywords,
       ...rule.phrases,

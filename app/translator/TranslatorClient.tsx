@@ -464,7 +464,7 @@ export default function TranslatorClient() {
                     letterSpacing: '0.04em',
                   }}
                 >
-                  {isTranslating ? 'TRANSLATING...' : `${Math.round(liveResult.confidence * 100)}% CONFIDENCE`}
+                  {isTranslating ? 'TRANSLATING...' : liveResult.engineType === 'COLAB_NEURAL_NMT' ? `${Math.round(liveResult.confidence * 100)}% CONFIDENCE` : `${Math.round(liveResult.confidence * 100)}% WORDS FOUND`}
                 </span>
               )}
             </div>
@@ -555,7 +555,7 @@ export default function TranslatorClient() {
                       {m.verseRef && (
                         <span
                           style={{
-                            color: m.sourceCorpus === 'SIL_WEBONARY' ? '#facc15' : 'var(--brand-accent)',
+                            color: m.sourceCorpus === 'SIL_WEBONARY' ? '#facc15' : m.sourceCorpus === 'LEARNED_ALIGNMENT' ? '#c084fc' : 'var(--brand-accent)',
                             fontStyle: 'italic',
                             fontWeight: 600,
                             flexShrink: 0,
@@ -565,7 +565,7 @@ export default function TranslatorClient() {
                             fontSize: '10px',
                           }}
                         >
-                          <span>{m.sourceCorpus === 'SIL_WEBONARY' ? '📚' : '📖'}</span>
+                          <span>{m.sourceCorpus === 'SIL_WEBONARY' ? '📚' : m.sourceCorpus === 'LEARNED_ALIGNMENT' ? '🧠' : '📖'}</span>
                           <span>{m.verseRef}</span>
                         </span>
                       )}
@@ -784,7 +784,7 @@ export default function TranslatorClient() {
                       fontWeight: 700,
                     }}
                   >
-                    📖 Bible Corpus ({liveResult.bibleWordsCount ?? 0} words)
+                    📖 Archive Lexicon ({liveResult.bibleWordsCount ?? 0} words)
                   </span>
                   <span
                     style={{
@@ -799,6 +799,22 @@ export default function TranslatorClient() {
                   >
                     📚 SIL Webonary Dictionary ({liveResult.webonaryWordsCount ?? 0} supplemented)
                   </span>
+                  {(liveResult.learnedWordsCount ?? 0) > 0 && (
+                    <span
+                      title="Word translations learned automatically (IBM Model 1) from verified archive texts — not yet verified by a reviewer"
+                      style={{
+                        fontSize: '10px',
+                        background: 'rgba(168, 85, 247, 0.15)',
+                        color: '#c084fc',
+                        border: '1px solid rgba(168, 85, 247, 0.3)',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontWeight: 700,
+                      }}
+                    >
+                      🧠 Learned from archive ({liveResult.learnedWordsCount} words, unverified)
+                    </span>
+                  )}
                 </div>
               </div>
             )}

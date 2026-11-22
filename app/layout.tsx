@@ -12,7 +12,7 @@ import { LanguageProvider } from "@/lib/context/LanguageContext"
 
 export const metadata: Metadata = {
   title: "ManoboLit Archive",
-  description: "A rule-based classification and retrieval system for Agusan Manobo oral literature and folk songs",
+  description: "A rule-based classification and retrieval system, enhanced with machine learning, for Agusan Manobo oral literature and folk songs",
 }
 
 export default function RootLayout({

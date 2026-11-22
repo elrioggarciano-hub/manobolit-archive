@@ -83,7 +83,7 @@ export const translations = {
     cat_b_desc: 'Traditional chants, ritual songs, lullabies, and work songs with original audio and transcription.',
     cat_c_badge: 'CATALOGUE C',
     cat_c_title: 'Manobo Transcriptions',
-    cat_c_desc: 'Original Manobo text with English and Bisaya translations, rule-based classified.',
+    cat_c_desc: 'Original Manobo text with English and Bisaya translations, rule-based classified with machine-learning support.',
 
     // Home Section 3: Scientific Approach
     sec3_badge: 'CLASSIFICATION FRAMEWORKS',
@@ -189,8 +189,8 @@ export const translations = {
     diag_analyzing_step_2: 'Evaluating Naive Bayes & TF-IDF vectors...',
     diag_analyzing_step_3: 'Synthesizing taxonomy & confidence...',
     diag_analyzing_calc: 'Calculating genre and confidence score...',
-    diag_step_2_title: 'Step 2: Rule & ML Analysis',
-    diag_step_2_sub: 'HYBRID CLASSIFICATION ENGINE (ML & RULES)',
+    diag_step_2_title: 'Step 2: Rule-Based Analysis (Eugenio & Andress)',
+    diag_step_2_sub: 'RULE SCORES · COMBINED 50/50 WITH MACHINE LEARNING',
     diag_waiting_title: 'Awaiting Analysis',
     diag_waiting_desc: 'Click "Analyze & Classify" to run Machine Learning models and apply expert rules.',
     diag_no_rules_matched: 'No rules matched',
@@ -329,7 +329,7 @@ export const translations = {
     cat_b_desc: 'Mga tradisyonal na awit, ritwal, oyayi, at awit sa paggawa na may orihinal na audio at transkripsyon.',
     cat_c_badge: 'KATALOGO C',
     cat_c_title: 'Mga Transkripsyon sa Manobo',
-    cat_c_desc: 'Orihinal na tekstong Manobo na may salin sa Ingles at Bisaya, sistematikong inuri ayon sa tuntunin.',
+    cat_c_desc: 'Orihinal na tekstong Manobo na may salin sa Ingles at Bisaya, inuri ayon sa tuntunin sa tulong ng machine learning.',
 
     // Home Section 3: Scientific Approach
     sec3_badge: 'MGA BALANGKAS NG KLASIPIKASYON',
@@ -435,8 +435,8 @@ export const translations = {
     diag_analyzing_step_2: 'Kinakalkula ang Naive Bayes at TF-IDF...',
     diag_analyzing_step_3: 'Inilalapat ang taksonomiya at porsyento...',
     diag_analyzing_calc: 'Kinakalkula ang anyo at porsyento ng tiwala...',
-    diag_step_2_title: 'Hakbang 2: Pagsusuri ng Alituntunin at ML',
-    diag_step_2_sub: 'HYBRID CLASSIFICATION ENGINE (ML & RULES)',
+    diag_step_2_title: 'Hakbang 2: Pagsusuri Batay sa Tuntunin (Eugenio at Andress)',
+    diag_step_2_sub: 'RULE SCORES · COMBINED 50/50 WITH MACHINE LEARNING',
     diag_waiting_title: 'Naghihintay ng Pagsusuri',
     diag_waiting_desc: 'Pindutin ang "Suriin at I-classify" upang patakbuhin ang Machine Learning models at ilapat ang mga alituntunin.',
     diag_no_rules_matched: 'Walang alituntuning tumugma',
@@ -575,7 +575,7 @@ export const translations = {
     cat_b_desc: 'Tradisyonal nga mga awit, ritwal, laylay, ug awit sa pagtrabaho nga adunay orihinal nga tingog ug sinulat.',
     cat_c_badge: 'KATALOGO C',
     cat_c_title: 'Mga Transkripsyon sa Manobo',
-    cat_c_desc: 'Orihinal nga tekstong Manobo nga may hubad sa Iningles ug Bisaya, giklasipikar sumala sa balaod.',
+    cat_c_desc: 'Orihinal nga tekstong Manobo nga may hubad sa Iningles ug Bisaya, giklasipikar sumala sa balaod uban sa tabang sa machine learning.',
 
     // Home Section 3: Scientific Approach
     sec3_badge: 'MGA BALANGKAS SA KLASIPIKASYON',
@@ -681,8 +681,8 @@ export const translations = {
     diag_analyzing_step_2: 'Gikalkula ang Naive Bayes ug TF-IDF...',
     diag_analyzing_step_3: 'Gipatuman ang taksonomiya ug kumpiyansa...',
     diag_analyzing_calc: 'Gikalkula ang matang ug kumpiyansa sa pagsusi...',
-    diag_step_2_title: 'Lakang 2: Pagsusi sa Balaod ug ML',
-    diag_step_2_sub: 'HYBRID CLASSIFICATION ENGINE (ML & RULES)',
+    diag_step_2_title: 'Lakang 2: Pagsusi Sumala sa Balaod (Eugenio ug Andress)',
+    diag_step_2_sub: 'RULE SCORES · COMBINED 50/50 WITH MACHINE LEARNING',
     diag_waiting_title: 'Naghulat sa Pagsusi',
     diag_waiting_desc: 'Pindota ang "Susihon ug I-classify" aron ipadagan ang Machine Learning models ug mga balaod.',
     diag_no_rules_matched: 'Walay balaod nga mitakdo',
@@ -821,7 +821,7 @@ export const translations = {
     cat_b_desc: 'Mgo kanta to tribu, kanta to batasan, kanta to bata, wey kanta to trabaho duma to orihinal no tingog wey kasulatan.',
     cat_c_badge: 'KATALOGO C',
     cat_c_title: 'Mgo Kasulatan to Minanubu',
-    cat_c_desc: 'Punoan no kasulatan to Minanubu duma to hinubad to Iningles wey Bisaya, ginbahin sumala to balaod.',
+    cat_c_desc: 'Punoan no kasulatan to Minanubu duma to hinubad to Iningles wey Bisaya, ginbahin sumala to balaod duma to tabang to machine learning.',
 
     // Home Section 3: Scientific Approach
     sec3_badge: 'MGO BALAOD TO PAGBAHIN-BAHIN',
@@ -927,8 +927,8 @@ export const translations = {
     diag_analyzing_step_2: 'Og-ihapon to Naive Bayes wey TF-IDF...',
     diag_analyzing_step_3: 'Og-igpatuman to kabilin wey porsyento...',
     diag_analyzing_calc: 'Og-ihapon to matang wey porsyento to pagsusi...',
-    diag_step_2_title: 'Lakang 2: Pagsusi to Balaod wey ML',
-    diag_step_2_sub: 'HYBRID CLASSIFICATION ENGINE (ML & RULES)',
+    diag_step_2_title: 'Lakang 2: Pagsusi Sumala to Balaod (Eugenio wey Andress)',
+    diag_step_2_sub: 'RULE SCORES · COMBINED 50/50 WITH MACHINE LEARNING',
     diag_waiting_title: 'Naghulat to Pagsusi',
     diag_waiting_desc: 'Tuoka to "Susia wey I-classify" agon ipadagan to Machine Learning models wey mgo balaod.',
     diag_no_rules_matched: 'Warad balaod no nakatuman',

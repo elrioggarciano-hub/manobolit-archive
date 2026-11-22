@@ -171,7 +171,7 @@ export function validateTextWithWebonary(
 }
 
 /**
- * Searches the SIL Webonary Dictionary to supplement translations when missing from the Bible corpus.
+ * Searches the SIL Webonary Dictionary to supplement translations when missing from the archive lexicon.
  */
 export function lookupWebonaryTranslation(
   rawWord: string,

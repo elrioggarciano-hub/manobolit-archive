@@ -30,11 +30,12 @@ const getCachedEntry = unstable_cache(
         ...c,
         classifiedThemes: JSON.parse(c.classifiedThemes || '[]'),
         rulesApplied: JSON.parse(c.rulesApplied || '[]'),
+        probabilities: c.probabilities ? JSON.parse(c.probabilities) : null,
         timestamp: new Date(c.timestamp).toISOString(),
       })),
     }
   },
-  ['entry-detail-v4'],
+  ['entry-detail-v5'],
   { tags: ['entries'] }
 )
 

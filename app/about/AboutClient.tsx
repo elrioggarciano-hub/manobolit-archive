@@ -163,8 +163,8 @@ export default function AboutClient() {
               </div>
               <p style={{ margin: '0 0 24px', fontSize: '13px', lineHeight: 1.65, color: 'rgba(255,255,255,0.82)' }}>
                 To ensure the highest archival integrity, we
-                utilize rule-based classification models
-                derived from established folkloric frameworks:
+                use rule-based classification derived from established
+                folkloric frameworks, strengthened by machine learning on human-verified entries:
               </p>
 
               {[

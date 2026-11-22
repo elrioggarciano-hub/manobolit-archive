@@ -16,12 +16,12 @@ Translate the user's text accurately between the specified languages:
 - 'ceb' = Bisaya / Cebuano
 
 Requirements:
-1. Adhere strictly to SIL Webonary standard orthography for Agusan Manobo (e.g., 'wuhig' for water, 'bubungan' for mountain, 'ligsok'/'bata' for child, 'diwata' for spirit, 'panow' for walk).
+1. Adhere strictly to SIL Webonary standard orthography for Agusan Manobo. When a VERIFIED GLOSSARY from the ManoboLit lexicon database is provided, use those exact word choices.
 2. Preserve cultural and literary nuance (indigenous oral traditions, kinship terms, ecosystem vocabulary).
 3. Return strictly valid JSON:
 {
   "translatedText": "the accurate translation",
-  "confidence": number between 0.85 and 0.99,
+  "confidence": number between 0.0 and 1.0 reflecting how certain you are (use a low value when unsure),
   "linguisticNotes": "brief grammatical or cultural observation based on SIL Webonary standards",
   "webonaryLexemes": ["key Agusan Manobo terms identified"]
 }`
@@ -33,7 +33,8 @@ export async function translateWithGemini(
   text: string,
   sourceLang: TranslationLang,
   targetLang: TranslationLang,
-  modelName: string = 'gemini-3.5-flash-lite'
+  modelName: string = 'gemini-3.5-flash-lite',
+  glossary: { source: string; target: string }[] = []
 ): Promise<GeminiTranslationOutput | null> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey || !text.trim()) return null
@@ -45,7 +46,12 @@ export async function translateWithGemini(
     'gemini-3.5-flash',
   ]))
 
-  const prompt = `Source Language: ${sourceLang}\nTarget Language: ${targetLang}\n\nInput Text:\n"""\n${text.trim()}\n"""`
+  // Retrieval-augmented grounding: verified pairs from the lexicon database that occur in this input.
+  const glossaryBlock = glossary.length
+    ? `\n\nVERIFIED GLOSSARY (from the ManoboLit lexicon database, ${sourceLang} -> ${targetLang}):\n` +
+      glossary.slice(0, 40).map(g => `- ${g.source} => ${g.target}`).join('\n')
+    : ''
+  const prompt = `Source Language: ${sourceLang}\nTarget Language: ${targetLang}${glossaryBlock}\n\nInput Text:\n"""\n${text.trim()}\n"""`
   const model = modelName || 'gemini-3.5-flash-lite'
 
   // Fast direct REST call to gemini-3.5-flash-lite with strict timeout
@@ -82,7 +88,7 @@ export async function translateWithGemini(
         if (parsed.translatedText) {
           return {
             translatedText: parsed.translatedText,
-            confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.95,
+            confidence: typeof parsed.confidence === 'number' ? Math.max(0, Math.min(1, parsed.confidence)) : 0,
             linguisticNotes: parsed.linguisticNotes,
             webonaryLexemes: Array.isArray(parsed.webonaryLexemes) ? parsed.webonaryLexemes : [],
           }

@@ -3,6 +3,9 @@ import { prisma } from '@/lib/database/prisma'
 import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/session'
 import { compileArtifact, runParityTests, invalidateTrainedModelCache, ARTIFACT_FORMAT } from '@/lib/classification/trainedModel'
 
+// Always query the database at request time (never prerender a snapshot at build time)
+export const dynamic = 'force-dynamic'
+
 async function isAdmin(request: NextRequest) {
   return verifySessionToken(request.cookies.get(SESSION_COOKIE_NAME)?.value)
 }

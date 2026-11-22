@@ -68,8 +68,8 @@ const TOPICS: ManualTopic[] = [
     desc: 'The system connects oral tradition fieldwork with computational linguistics through an integrated pipeline:',
     goodToKnow: [
       '1. Field Ingestion: Authentic oral narratives and songs recorded in Agusan del Sur municipalities.',
-      '2. Computational Classification: Literary entries classified by Eugenio (1993) and Andress (1985) taxonomies via Rule-Based, Naive Bayes ML, and Neural Semantic Models.',
-      '3. Lexical Validation: Words cross-referenced against 257 SIL Webonary (ISO 639-3: msm) and Bible records with Finite-State Affix Decomposition.',
+      '2. Rule-Based Classification with Machine Learning: genres (Eugenio 1993) and themes (Andress 1985) are scored by a rule base stored in the database and combined 50/50 with models learned from human-verified entries (Logistic Regression trained in Google Colab; k-NN for themes). New rule terms are discovered from verified entries and approved by reviewers.',
+      '3. Lexical Validation & Translation: Words cross-referenced against the SIL Webonary (ISO 639-3: msm) entries and archive lexicon stored in the database, with Finite-State Affix Decomposition and word translations learned from verified texts (IBM Model 1).',
       '4. Public Retrieval & Preservation: Multidimensional faceted exploration with open CSV and JSON data exports.',
     ],
   },
@@ -135,7 +135,7 @@ const TOPICS: ManualTopic[] = [
       { num: 5, title: 'Feature Weights & Rules', desc: 'Examine top TF-IDF vocabulary weights and matched linguistic rule triggers.' },
     ],
     goodToKnow: [
-      'Rule-Based mode uses deterministic pattern matching from Eugenio and Andress research.',
+      'The Rule-Based view shows the Eugenio and Andress rule scores alone; the final decision combines them 50/50 with the machine-learning models.',
       'Supervised ML mode uses Multinomial Naive Bayes trained on the 22-record corpus.',
       'Neural Semantic mode performs deep semantic contextual reasoning for implicit metaphors.',
     ],
@@ -158,7 +158,7 @@ const TOPICS: ManualTopic[] = [
       { num: 5, title: 'Morphological Table', desc: 'Inspect broken-down prefixes (mig-, og-), infixes (-in-), root words, and SIL Webonary verification badges.' },
     ],
     goodToKnow: [
-      'Green "Verified Corpus" badge indicates direct match against the 257 PostgreSQL Webonary/Bible entries.',
+      'Green "Verified Corpus" badge indicates a direct match against the Webonary and archive lexicon entries in the database.',
       'Blue "Morphologically Validated" badge indicates root was isolated via finite-state affix grammar rules.',
     ],
   },

@@ -4,6 +4,8 @@
 // against all exemplars; the k most similar vote for their genre, weighted by similarity.
 // Suited to low-resource settings: each newly verified entry is usable immediately,
 // and every prediction can be explained by pointing at the concrete neighbors.
+// The same neighbors also vote for THEMES (multi-label): a theme is predicted when the
+// neighbors carrying it hold at least THEME_VOTE_THRESHOLD of the total neighbor similarity.
 
 import { TrainingDocument, ACTIVE_GENRES } from './trainingCorpus'
 import { extractWordBoundedCharNgrams } from './charNgram'
@@ -14,6 +16,7 @@ type SparseVec = Record<string, number>
 export interface KnnExemplar {
   id: string
   genre: string
+  themes: string[]
   vector: SparseVec
 }
 
@@ -27,6 +30,7 @@ export interface KnnModel {
 export interface KnnNeighbor {
   id: string
   genre: string
+  themes: string[]
   similarity: number
 }
 
@@ -38,6 +42,8 @@ export interface KnnResult {
 }
 
 export const DEFAULT_K = 3
+// Chosen with LOOCV on the 22-entry archive (2026-11-22): k-NN themes micro-F1 0.41 vs keyword rules 0.10.
+export const THEME_VOTE_THRESHOLD = 0.34
 
 function idf(model: Pick<KnnModel, 'dfMap' | 'totalDocuments'>, gram: string): number {
   const df = model.dfMap.get(gram) || 0
@@ -82,7 +88,7 @@ export function trainKnn(docs: TrainingDocument[], k: number = DEFAULT_K): KnnMo
   for (const set of gramSets) for (const g of set) dfMap.set(g, (dfMap.get(g) || 0) + 1)
 
   const base = { dfMap, totalDocuments: active.length }
-  const exemplars = active.map(d => ({ id: d.id, genre: d.genre, vector: vectorize(d.text, base) }))
+  const exemplars = active.map(d => ({ id: d.id, genre: d.genre, themes: d.themes || [], vector: vectorize(d.text, base) }))
   return { exemplars, dfMap, totalDocuments: active.length, k }
 }
 
@@ -105,7 +111,7 @@ export function classifyWithKnn(text: string, model: KnnModel, targetGenreFilter
 
   const neighbors: KnnNeighbor[] = model.exemplars
     .filter(e => genres.includes(e.genre))
-    .map(e => ({ id: e.id, genre: e.genre, similarity: cosine(query, e.vector) }))
+    .map(e => ({ id: e.id, genre: e.genre, themes: e.themes, similarity: cosine(query, e.vector) }))
     .sort((a, b) => b.similarity - a.similarity)
     .slice(0, model.k)
     .filter(n => n.similarity > 0)
@@ -126,4 +132,34 @@ export function classifyWithKnn(text: string, model: KnnModel, targetGenreFilter
     allGenreScores,
     neighbors: neighbors.map(n => ({ ...n, similarity: Math.round(n.similarity * 1000) / 1000 })),
   }
+}
+
+/**
+ * Learned multi-label theme prediction: similarity-weighted theme votes of the k nearest
+ * human-verified exemplars. Returns themes whose vote share reaches the threshold.
+ */
+export function predictThemesWithKnn(
+  text: string,
+  model: KnnModel,
+  threshold: number = THEME_VOTE_THRESHOLD
+): { value: string; confidence: number; neighbors: KnnNeighbor[] }[] {
+  if (!model || model.exemplars.length === 0) return []
+  const query = vectorize(text, model)
+  if (Object.keys(query).length === 0) return []
+
+  const neighbors = model.exemplars
+    .filter(e => e.themes.length > 0)
+    .map(e => ({ id: e.id, genre: e.genre, themes: e.themes, similarity: cosine(query, e.vector) }))
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, model.k)
+    .filter(n => n.similarity > 0)
+  const total = neighbors.reduce((s, n) => s + n.similarity, 0)
+  if (total === 0) return []
+
+  const votes = new Map<string, number>()
+  for (const n of neighbors) for (const t of n.themes) votes.set(t, (votes.get(t) || 0) + n.similarity)
+  return Array.from(votes)
+    .map(([value, v]) => ({ value, confidence: Math.round((v / total) * 1000) / 1000, neighbors: neighbors.filter(n => n.themes.includes(value)) }))
+    .filter(t => t.confidence >= threshold)
+    .sort((a, b) => b.confidence - a.confidence)
 }

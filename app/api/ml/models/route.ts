@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/database/prisma'
 import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/session'
 
+// Always query the database at request time (never prerender a snapshot at build time)
+export const dynamic = 'force-dynamic'
+
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000'
 
 // GET /api/ml/models - Lists models, active model status, and training history

@@ -10,7 +10,8 @@
     "test": "ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" tests/integration.test.ts",
     "seed": "ts-node -e \"require('ts-node').register({module:'commonjs', compilerOptions:{allowJs:false}}); require('./prisma/seed.ts')\"",
     "seed:corpus": "ts-node -P tsconfig.scripts.json prisma/seedTrainingCorpus.ts",
-    "seed:lexicon": "ts-node -P tsconfig.scripts.json prisma/seedLexicon.ts"
+    "seed:lexicon": "ts-node -P tsconfig.scripts.json prisma/seedLexicon.ts",
+    "seed:rules": "ts-node -P tsconfig.scripts.json prisma/seedRules.ts"
   },
   "prisma": {
     "seed": "npm run seed"

@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/context/LanguageContext'
 import {
   classifyEntry,
-  genreRules,
-  themeRules,
-  locationRules,
   AlgorithmMode,
   computeComparativeMetrics,
+  FALLBACK_RULE_SET,
+  ruleIndex,
 } from '@/lib/classification'
+import type { ClassificationResult } from '@/lib/classification'
+
+// Rule names for display; the server response (database rule base) takes precedence when available.
+const FALLBACK_RULE_NAMES = ruleIndex(FALLBACK_RULE_SET)
 
 export interface DBEntry {
   id: string
@@ -157,7 +160,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [analysisProgress, setAnalysisProgress] = useState(0)
   const [serverResult, setServerResult] = useState<any>(null)
 
-  const classificationResult = useMemo(
+  const localClassificationResult = useMemo(
     () => {
       const selected = selectedEntryId !== 'custom' ? entriesList.find(e => e.id === selectedEntryId) : null
       if (selected) {
@@ -182,6 +185,28 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
     },
     [inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm, selectedEntryId, entriesList, selectedTranslation]
   )
+
+  // After "Classify" runs, show the server's result (database rule base + trained model + k-NN themes)
+  // for the default rule-based + ML view; the other model views remain local comparisons.
+  const classificationResult = useMemo((): ClassificationResult => {
+    const local = localClassificationResult
+    if (!serverResult || selectedAlgorithm !== 'HYBRID_ENSEMBLE' || !serverResult.algorithmicBreakdown) return local
+    return {
+      ...local,
+      genre: {
+        ...local.genre,
+        value: serverResult.genre?.value ?? local.genre.value,
+        confidence: serverResult.genre?.confidence ?? local.genre.confidence,
+        allScores: serverResult.genre?.allScores ?? local.genre.allScores,
+      },
+      themes: serverResult.themes ?? local.themes,
+      location: serverResult.location ?? local.location,
+      rulesApplied: serverResult.rulesApplied ?? local.rulesApplied,
+      ruleDetails: serverResult.ruleDetails ?? local.ruleDetails,
+      overallConfidence: serverResult.overallConfidence ?? local.overallConfidence,
+      algorithmicBreakdown: serverResult.algorithmicBreakdown ?? local.algorithmicBreakdown,
+    }
+  }, [localClassificationResult, serverResult, selectedAlgorithm])
 
   const comparativeReport = useMemo(
     () =>
@@ -1038,7 +1063,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       </div>
                     ) : classificationResult.rulesApplied.length > 0 ? (
                       classificationResult.rulesApplied.map(ruleId => {
-                        const rule = [...genreRules, ...themeRules, ...locationRules].find(r => r.id === ruleId)
+                        const rule = serverResult?.ruleNames?.[ruleId] ?? FALLBACK_RULE_NAMES[ruleId]
                         const detail = classificationResult.ruleDetails[ruleId]
                         const pct = Math.round((detail?.confidence || 0) * 100)
                         const { tier, color } = getConfidenceTier(pct, t)
@@ -1365,7 +1390,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       </div>
                     </div>
                     <div style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
-                      Hybrid ML & Rule-Based Engine
+                      Rule-Based + Machine Learning
                     </div>
                   </div>
 
@@ -1400,7 +1425,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       </div>
                     </div>
 
-                    {/* Card 2: Alituntunin ng Anyo at Tema (Rule-Based Reasoning) */}
+                    {/* Card 2: Taxonomy description of the predicted genre (Eugenio 1993 / Andress 1985) */}
                     <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '16px' }}>
                       <div style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.04em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span>📜</span>
@@ -1874,7 +1899,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   {/* Model 1 */}
                   <tr style={{ borderBottom: '1px solid #27272a', background: '#18181b' }}>
                     <td style={{ padding: '12px', fontWeight: 700, color: '#f59e0b' }}>
-                      1. Rule-Based (Legacy)
+                      1. Rule-Based (rules only)
                       <div style={{ fontSize: '9.5px', color: '#71717a', fontWeight: 400 }}>Static keyword heuristic lookups</div>
                     </td>
                     <td style={{ padding: '12px' }}>{(comparativeReport.ruleBased.accuracy * 100).toFixed(1)}%</td>

@@ -25,7 +25,9 @@ export interface MatchedPhrase {
   original: string
   translated: string
   verseRef?: string
-  sourceCorpus?: 'BIBLE_CORPUS' | 'SIL_WEBONARY'
+  sourceCorpus?: 'BIBLE_CORPUS' | 'SIL_WEBONARY' | 'LEARNED_ALIGNMENT'
+  /** For learned translations: IBM Model 1 probability t(target | source) */
+  probability?: number
 }
 
 export interface TranslationResult {
@@ -42,4 +44,6 @@ export interface TranslationResult {
   aiReasoning?: string
   bibleWordsCount?: number
   webonaryWordsCount?: number
+  /** Words filled by the learned alignment model (not counted as verified coverage) */
+  learnedWordsCount?: number
 }

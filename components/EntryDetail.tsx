@@ -3,7 +3,8 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 import AudioPlayer from './AudioPlayer'
-import { classifyEntry } from '@/lib/classification/engine'
+import SyncedTranscript from './SyncedTranscript'
+import { parseSegments } from '@/lib/transcriptSync'
 
 const RegionalMap = dynamic(() => import('./RegionalMap'), {
   ssr: false,
@@ -16,6 +17,9 @@ interface Classification {
   confidenceScore: number
   rulesApplied: string[]
   timestamp: string
+  predictionSource?: string | null
+  modelVersion?: string | null
+  probabilities?: Record<string, number> | null
 }
 
 interface Entry {
@@ -43,31 +47,50 @@ interface Entry {
   culturalElements: string[]
   createdAt: string
   classifications: Classification[]
+  reviewStatus?: string | null
+  verifiedGenre?: string | null
+  transcriptSync?: string | null
 }
 
-const getAnalysisText = (entry: Entry) => {
-  if (entry.genre === 'MYTH') {
-    return 'System classified as Origin Myth based on lexical frequency of "Father Sky" and "Birth" within the introductory markers under Eugenio (1993).'
-  } else if (entry.genre === 'SONG') {
-    return 'System classified as Manobo Folk Song based on lyrical verse stanzas, communal/emotional markers ("kapait", "sinugow", "kadikiluman"), and oral rhythm preservation (Maravilla, 2024).'
-  } else if (entry.genre === 'EPIC') {
-    return 'System classified as Heroic Epic based on presence of warrior narrative frames, tribal defenders, and heroic deeds reference clusters.'
-  } else if (entry.genre === 'RIDDLE') {
-    return 'System classified as Riddle (Tigmo) based on formulaic question-answer structure, metaphorical comparison ("angud to", "tu maintok pad"), and traditional riddle subjects (Catipay & Curato, 2024).'
-  } else if (entry.genre === 'PROVERB') {
-    return 'System classified as Proverb (Panultihon) based on prescriptive moral aphorisms, didactic wisdom rules, and traditional ethical instruction in Eugenio\'s taxonomy.'
-  } else if (entry.genre === 'FOLKTALE') {
-    return 'System classified as Folktale (Sugilanon) based on narrative story markers ("miduun subuka", "one day"), character interactions, and didactic cultural lessons.'
+const SOURCE_LABELS: Record<string, string> = {
+  RULES_PLUS_COLAB_MODEL: 'the rule-based engine (Eugenio 1993 / Andress 1985) combined with the machine-learning model trained in Google Colab',
+  RULES_PLUS_LEARNED_ENSEMBLE: 'the rule-based engine (Eugenio 1993 / Andress 1985) combined with the in-app learned models',
+  COLAB_TRAINED_MODEL: 'the machine-learning model trained in Google Colab on human-verified entries',
+  TS_LEARNED_ENSEMBLE: 'the in-app learned ensemble (Naive Bayes, TF-IDF, character n-grams, k-NN)',
+  TYPESCRIPT_HYBRID_ENGINE: 'the in-app learned ensemble (Naive Bayes, TF-IDF, character n-grams, k-NN)',
+  TS_HYBRID_ENSEMBLE: 'the in-app learned ensemble (Naive Bayes, TF-IDF, character n-grams)',
+  NEURAL_SEMANTIC_MODEL: 'the Gemini large language model',
+}
+
+const pretty = (g: string) => g.charAt(0) + g.slice(1).toLowerCase()
+
+// Explains the actual stored classification (no fixed per-genre text).
+const getAnalysisText = (entry: Entry, latest?: Classification) => {
+  if (!latest) return 'This entry has not been classified yet.'
+  const source = SOURCE_LABELS[latest.predictionSource || ''] || 'the classification model'
+  const pct = Math.round((latest.confidenceScore || 0) * 100)
+  const alternatives = Object.entries(latest.probabilities || {})
+    .filter(([g]) => g !== latest.classifiedGenre)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 2)
+    .map(([g, p]) => `${pretty(g)} ${Math.round(p * 100)}%`)
+  let text =
+    latest.classifiedGenre === 'UNCLASSIFIED'
+      ? `${source.charAt(0).toUpperCase() + source.slice(1)} was not confident enough to assign a genre, so the entry was sent for human review.`
+      : `Predicted as ${pretty(latest.classifiedGenre)} by ${source}${latest.modelVersion ? ` (version ${latest.modelVersion})` : ''} with ${pct}% probability.`
+  if (alternatives.length) text += ` Next most likely: ${alternatives.join(', ')}.`
+  if (entry.reviewStatus === 'VERIFIED') {
+    text += ` Genre confirmed by a human reviewer as ${pretty(entry.verifiedGenre || entry.genre)}.`
   }
-  return `System classified as ${entry.genre} based on matching rule-based keyword heuristics in Eugenio's taxonomy rules.`
+  return text
 }
 
 export default function EntryDetail({ entry }: { entry: Entry }) {
   const latestClassification = entry.classifications?.[0]
-  const liveClassification = classifyEntry(entry)
-  const confidence = (latestClassification && latestClassification.confidenceScore >= 0.50)
-    ? Math.round(latestClassification.confidenceScore * 100)
-    : Math.round(liveClassification.overallConfidence * 100)
+  // The stored model probability, shown as-is (never replaced by another number).
+  const confidence = latestClassification ? Math.round((latestClassification.confidenceScore || 0) * 100) : 0
+  const syncSegments = parseSegments(entry.transcriptSync)
+  const narratorLabel = entry.type === 'FOLK_SONG' ? 'AI Generated' : (entry.narrator || entry.singer || 'AI Generated')
 
   return (
     <div className="anim-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 80px', fontFamily: 'Inter, sans-serif' }}>
@@ -122,7 +145,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             title={entry.title}
             duration={entry.audioDuration}
             transcription={entry.transcription}
-            narrator={entry.type === 'FOLK_SONG' ? 'AI Generated' : (entry.narrator || entry.singer || 'AI Generated')}
+            narrator={narratorLabel}
             entryId={entry.id}
           />
         </div>
@@ -149,18 +172,30 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
             >
               TRANSCRIPTION (MANOBO)
             </h3>
-            <p
-              style={{
-                margin: 0,
-                fontSize: '13px',
-                lineHeight: 1.6,
-                color: 'var(--text-secondary)',
-                whiteSpace: 'pre-line',
-                fontFamily: 'Inter, sans-serif'
-              }}
-            >
-              {entry.transcription || 'No transcription available.'}
-            </p>
+            {entry.audioFile && syncSegments.length > 0 ? (
+              <SyncedTranscript
+                entryId={entry.id}
+                audioFile={entry.audioFile}
+                title={entry.title}
+                duration={entry.audioDuration}
+                narrator={narratorLabel}
+                transcription={entry.transcription}
+                segments={syncSegments}
+              />
+            ) : (
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: '13px',
+                  lineHeight: 1.6,
+                  color: 'var(--text-secondary)',
+                  whiteSpace: 'pre-line',
+                  fontFamily: 'Inter, sans-serif'
+                }}
+              >
+                {entry.transcription || 'No transcription available.'}
+              </p>
+            )}
           </div>
 
           {/* Metadata Row */}
@@ -299,7 +334,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
 
           </div>
 
-          {/* Card 2: Rule-Based Analysis */}
+          {/* Card 2: Classification Analysis (learned model) */}
           <div
             className="stagger-item card-hover"
             style={{
@@ -319,11 +354,11 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
                 letterSpacing: '0.05em'
               }}
             >
-              RULE-BASED ANALYSIS
+              CLASSIFICATION ANALYSIS
             </h4>
 
             <p style={{ margin: '0 0 20px 0', fontSize: '12px', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
-              {getAnalysisText(entry)}
+              {getAnalysisText(entry, latestClassification)}
             </p>
 
             {/* Confidence Slider */}

@@ -12,6 +12,8 @@ export interface Track {
   duration?: number | null
   textToRecite?: string | null
   entryId?: string | null
+  /** Start playback at this position (seconds), e.g. when a synchronized transcript line is clicked */
+  startAt?: number | null
 }
 
 interface AudioContextType {
@@ -27,6 +29,7 @@ interface AudioContextType {
   closeTrack: () => void
   setPlaybackSpeed: (speed: number) => void
   seek: (ratio: number) => void
+  seekTime: (seconds: number) => void
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined)
@@ -79,6 +82,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       if (cancelled) return
       if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
         setDuration(audio.duration)
+      }
+      if (currentTrack.startAt && currentTrack.startAt > 0) {
+        audio.currentTime = currentTrack.startAt
+        setCurrentTime(currentTrack.startAt)
       }
     })
 
@@ -183,6 +190,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     setProgress(ratio * 100)
   }
 
+  const seekTime = (seconds: number) => {
+    const audio = audioRef.current
+    if (!audio || !isFinite(seconds)) return
+    const dur = duration || audio.duration || 0
+    const t = Math.max(0, dur ? Math.min(seconds, dur) : seconds)
+    audio.currentTime = t
+    setCurrentTime(t)
+    if (dur > 0) setProgress((t / dur) * 100)
+  }
+
   return (
     <AudioContext.Provider
       value={{
@@ -198,6 +215,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         closeTrack,
         setPlaybackSpeed,
         seek,
+        seekTime,
       }}
     >
       {children}

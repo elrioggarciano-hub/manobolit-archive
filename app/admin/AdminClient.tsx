@@ -11,6 +11,8 @@ import ManualManagement from '@/components/admin/ManualManagement'
 import TrainingCorpusManagement from '@/components/admin/TrainingCorpusManagement'
 import TrainedModelManagement from '@/components/admin/TrainedModelManagement'
 import LexiconManagement from '@/components/admin/LexiconManagement'
+import LearnedSuggestions from '@/components/admin/LearnedSuggestions'
+import RuleManagement from '@/components/admin/RuleManagement'
 
 export interface AdminEntry {
   id: string
@@ -41,7 +43,7 @@ interface Props {
 }
 
 export default function AdminClient({ initialEntries }: Props) {
-  const [adminTab, setAdminTab] = useState<'entries' | 'review' | 'ml' | 'dataset' | 'corpus' | 'lexicon' | 'manual'>('entries')
+  const [adminTab, setAdminTab] = useState<'entries' | 'review' | 'ml' | 'dataset' | 'rules' | 'corpus' | 'lexicon' | 'manual'>('entries')
   const [filterType, setFilterType] = useState<'ALL' | 'ORAL_LITERATURE' | 'FOLK_SONG'>('ALL')
   const [filterGenre, setFilterGenre] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
@@ -192,6 +194,7 @@ export default function AdminClient({ initialEntries }: Props) {
             { id: 'review', label: '📋 Review Queue (Human Verification)' },
             { id: 'ml', label: '⚡ ML Pipeline & Retraining' },
             { id: 'dataset', label: '📦 Dataset & Taxonomies' },
+            { id: 'rules', label: '📏 Classification Rules' },
             { id: 'corpus', label: '🧠 Training Corpus' },
             { id: 'lexicon', label: '📖 Lexicon & Dictionary' },
             { id: 'manual', label: '📄 User Manual & PDF' },
@@ -226,8 +229,14 @@ export default function AdminClient({ initialEntries }: Props) {
           </>
         )}
         {adminTab === 'dataset' && <DatasetManagement />}
+        {adminTab === 'rules' && <RuleManagement />}
         {adminTab === 'corpus' && <TrainingCorpusManagement />}
-        {adminTab === 'lexicon' && <LexiconManagement />}
+        {adminTab === 'lexicon' && (
+          <>
+            <LearnedSuggestions />
+            <LexiconManagement />
+          </>
+        )}
         {adminTab === 'manual' && <ManualManagement />}
 
         {adminTab === 'entries' && (

@@ -138,6 +138,42 @@ export function buildLexicon(rows: LexiconRow[], groupOrder: string[] = [], orig
   return lex
 }
 
+type LangKey = 'en' | 'msm' | 'ceb'
+const FIELD: Record<LangKey, 'english' | 'manobo' | 'bisaya'> = { en: 'english', msm: 'manobo', ceb: 'bisaya' }
+
+/** Verified lexicon pairs that occur in the input (phrases first, then words) — used to ground the LLM. */
+export function glossaryFor(text: string, source: LangKey, target: LangKey, lex: Lexicon): { source: string; target: string }[] {
+  const lower = ` ${text.toLowerCase().replace(/[.,!?;:"“”()]/g, ' ').replace(/\s+/g, ' ')} `
+  const tokens = new Set(lower.trim().split(' '))
+  const out = new Map<string, string>()
+  for (const p of lex.phrases) {
+    const s = p[FIELD[source]]?.toLowerCase().trim()
+    const t = p[FIELD[target]]?.trim()
+    if (s && t && lower.includes(` ${s} `)) out.set(s, t)
+  }
+  for (const w of [...lex.words, ...lex.webonary]) {
+    const s = w[FIELD[source]]?.toLowerCase().trim()
+    const t = w[FIELD[target]]?.trim()
+    if (s && t && !out.has(s) && tokens.has(s)) out.set(s, t)
+  }
+  return Array.from(out, ([s, t]) => ({ source: s, target: t }))
+}
+
+/** Groups dialect variants by standard spelling (for orthographic fuzzy matching). */
+export function dialectVariantGroups(lex: Lexicon): { canonical: string; variants: string[]; gloss: string }[] {
+  const groups = new Map<string, { canonical: string; variants: string[]; gloss: string }>()
+  for (const [variant, v] of Object.entries(lex.dialectVariants)) {
+    const g = groups.get(v.standard) ?? { canonical: v.standard, variants: [], gloss: '' }
+    g.variants.push(variant)
+    if (!g.gloss) {
+      const w = lex.webonary.find(e => e.manobo === v.standard || e.root === v.standard)
+      g.gloss = w?.english || v.notes
+    }
+    groups.set(v.standard, g)
+  }
+  return Array.from(groups.values())
+}
+
 /** Normalizes admin input into LexiconEntry columns (empty strings become null). */
 export function lexiconDataFromBody(body: any) {
   const opt = (v: any) => (typeof v === 'string' && v.trim() ? v.trim() : null)

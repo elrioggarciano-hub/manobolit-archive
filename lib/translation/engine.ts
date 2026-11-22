@@ -4,6 +4,9 @@ import { translateText } from './fallback'
 import { validateTextWithWebonary, lookupWebonaryTranslation } from './webonaryValidator'
 import { translateWithGemini } from './geminiTranslator'
 import { getLexicon } from './lexiconStore'
+import { glossaryFor } from './lexicon'
+import { getAlignmentModels } from './alignmentStore'
+import { learnedTranslation } from './alignment'
 
 export * from './types'
 export { translateText } from './fallback'
@@ -71,6 +74,7 @@ export async function translateTextDynamic(
 ): Promise<TranslationResult> {
   const cleanedInput = cleanText(text)
   const lex = await getLexicon()
+  const learnedModels = await getAlignmentModels()
   if (!cleanedInput) {
     return {
       translatedText: '',
@@ -130,6 +134,7 @@ export async function translateTextDynamic(
       const matchedPhrases: MatchedPhrase[] = []
       const words = cleanedInput.split(/\s+/)
       let matchedCount = 0
+      let learnedCount = 0
       let textToProcess = cleanedInput
 
       // Separate into multi-word phrases and single-word lexicon
@@ -169,7 +174,7 @@ export async function translateTextDynamic(
         const manoboTextToValidate = sourceLang === 'msm' ? cleanedInput : (targetLang === 'msm' ? textToProcess : '')
         return {
           translatedText: textToProcess,
-          confidence: 0.98,
+          confidence: 1.0, // the whole input is a verified corpus phrase
           sourceLang,
           targetLang,
           matchedPhrases,
@@ -185,7 +190,7 @@ export async function translateTextDynamic(
       // to preserve authentic Agusan Manobo grammatical syntax (VSO word order, focus affixes)
       if (words.length > 2 && process.env.GEMINI_API_KEY) {
         try {
-          const aiResult = await translateWithGemini(cleanedInput, sourceLang, targetLang)
+          const aiResult = await translateWithGemini(cleanedInput, sourceLang, targetLang, undefined, glossaryFor(cleanedInput, sourceLang, targetLang, lex))
           if (aiResult?.translatedText) {
             const aiManobo = sourceLang === 'msm' ? cleanedInput : aiResult.translatedText
             return {
@@ -221,7 +226,7 @@ export async function translateTextDynamic(
         const cleanToken = token.toLowerCase().replace(/[^a-z0-9-]/g, '')
         if (!cleanToken) return token
 
-        // Primary: Database Corpus (Bible & SIL Webonary entries stored in PostgreSQL)
+        // Primary: database corpus (archive lexicon & SIL Webonary entries stored in PostgreSQL)
         if (lexiconMap.has(cleanToken)) {
           matchedCount++
           const item = lexiconMap.get(cleanToken)!
@@ -253,12 +258,27 @@ export async function translateTextDynamic(
           return webonaryMatch.translation
         }
 
+        // Learned: IBM Model 1 alignment trained on verified archive texts (unverified, labelled)
+        const learned = learnedTranslation(learnedModels, sourceLang, targetLang, cleanToken)
+        if (learned) {
+          learnedCount++
+          matchedPhrases.push({
+            original: token,
+            translated: learned.target,
+            verseRef: `Learned from verified archive texts (p = ${learned.probability.toFixed(2)})`,
+            sourceCorpus: 'LEARNED_ALIGNMENT',
+            probability: learned.probability,
+          })
+          return learned.target
+        }
+
         return token
       })
 
       const translatedText = processedTokens.join('')
       const ratio = words.length > 0 ? Math.min(matchedCount / words.length, 1.0) : 0
-      const confidence = Math.round((0.65 + ratio * 0.33) * 100) / 100
+      // Honest coverage: share of input words found in the corpus/lexicon (no invented base score).
+      const confidence = Math.round(ratio * 100) / 100
 
       const manoboTextToValidate = sourceLang === 'msm' ? cleanedInput : (targetLang === 'msm' ? translatedText : '')
       const webonaryValidation = manoboTextToValidate ? validateTextWithWebonary(manoboTextToValidate, lex, 'msm') : undefined
@@ -266,7 +286,7 @@ export async function translateTextDynamic(
       // If database matched few words and Gemini API is available, enhance with AI
       if (ratio < 0.6 && process.env.GEMINI_API_KEY) {
         try {
-          const aiResult = await translateWithGemini(cleanedInput, sourceLang, targetLang)
+          const aiResult = await translateWithGemini(cleanedInput, sourceLang, targetLang, undefined, glossaryFor(cleanedInput, sourceLang, targetLang, lex))
           if (aiResult?.translatedText) {
             const aiManobo = sourceLang === 'msm' ? cleanedInput : aiResult.translatedText
             return {
@@ -299,6 +319,7 @@ export async function translateTextDynamic(
         corpusSource: 'Supabase PostgreSQL Parallel Corpus (Agusan Manobo)',
         engineType: 'DATABASE_DYNAMIC',
         webonaryValidation,
+        learnedWordsCount: learnedCount,
       }
     }
   } catch (dbErr) {
@@ -308,7 +329,7 @@ export async function translateTextDynamic(
   // 3. Fallback to Gemini Neural AI if database is unavailable
   if (process.env.GEMINI_API_KEY) {
     try {
-      const aiResult = await translateWithGemini(cleanedInput, sourceLang, targetLang)
+      const aiResult = await translateWithGemini(cleanedInput, sourceLang, targetLang, undefined, glossaryFor(cleanedInput, sourceLang, targetLang, lex))
       if (aiResult?.translatedText) {
         const aiManobo = sourceLang === 'msm' ? cleanedInput : aiResult.translatedText
         return {
@@ -331,7 +352,7 @@ export async function translateTextDynamic(
   }
 
   // 4. Offline fallback
-  const fallbackResult = translateText(cleanedInput, sourceLang, targetLang, lex)
+  const fallbackResult = translateText(cleanedInput, sourceLang, targetLang, lex, learnedModels)
   const manoboFallback = sourceLang === 'msm' ? cleanedInput : (targetLang === 'msm' ? fallbackResult.translatedText : '')
   return {
     ...fallbackResult,

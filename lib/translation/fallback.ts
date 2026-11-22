@@ -1,5 +1,6 @@
 // Offline corpus translator. Word and phrase data come from the Lexicon (database), never from code.
 import { Lexicon } from './lexicon'
+import { AlignmentModels, learnedTranslation } from './alignment'
 import { TranslationLang, TranslationResult, MatchedPhrase } from './types'
 import { lookupWebonaryTranslation } from './webonaryValidator'
 
@@ -17,10 +18,11 @@ export function translateText(
   text: string,
   sourceLang: TranslationLang,
   targetLang: TranslationLang,
-  lex: Lexicon
+  lex: Lexicon,
+  learnedModels?: AlignmentModels | null
 ): TranslationResult {
   const cleanedInput = cleanText(text)
-  const corpusSource = 'Dual Validating Corpus: Agusan Manobo Bible (Primary) + SIL Webonary Dictionary (Supplementary)'
+  const corpusSource = 'ManoboLit Archive Lexicon (Primary) + SIL Webonary Dictionary (Supplementary) + Learned Alignment'
 
   if (!cleanedInput) {
     return {
@@ -46,9 +48,10 @@ export function translateText(
   let matchedCount = 0
   let bibleMatchedCount = 0
   let webonaryFilledCount = 0
+  let learnedFilledCount = 0
   let textToProcess = cleanedInput
 
-  // 1. Primary: Match multi-word phrases from the Agusan Manobo Bible / Thesis Corpus
+  // 1. Primary: Match multi-word phrases from the archive lexicon (parallel phrases from the 22 entries)
   for (const phrase of lex.phrases) {
     const sourcePhrase = phrase[sourceField]
     const targetPhrase = phrase[targetField]
@@ -69,7 +72,7 @@ export function translateText(
     }
   }
 
-  // 2. Primary: Bible single-word lexicon lookup map
+  // 2. Primary: archive single-word lexicon lookup map
   const bibleMap = new Map<string, string>()
   for (const entry of lex.words) {
     const sourceWord = entry[sourceField]
@@ -82,7 +85,7 @@ export function translateText(
     const cleanToken = token.toLowerCase().replace(/[^a-z0-9-]/g, '')
     if (!cleanToken) return token
 
-    // A. Check Agusan Manobo Bible Corpus first
+    // A. Check the archive lexicon first
     if (bibleMap.has(cleanToken)) {
       matchedCount++
       bibleMatchedCount++
@@ -90,7 +93,7 @@ export function translateText(
       matchedPhrases.push({
         original: token,
         translated: matched,
-        verseRef: 'Agusan Manobo Bible Corpus',
+        verseRef: 'ManoboLit Archive Lexicon',
         sourceCorpus: 'BIBLE_CORPUS',
       })
       if (token[0] === token[0].toUpperCase()) {
@@ -99,7 +102,7 @@ export function translateText(
       return matched
     }
 
-    // B. Supplementary: If NOT in Agusan Manobo Bible, SIL Webonary fills it in!
+    // B. Supplementary: if not in the archive lexicon, the SIL Webonary entries fill it in
     const webonaryMatch = lookupWebonaryTranslation(cleanToken, sourceLang, targetLang, lex)
     if (webonaryMatch) {
       matchedCount++
@@ -116,12 +119,27 @@ export function translateText(
       return webonaryMatch.translation
     }
 
+    // C. Learned: IBM Model 1 word alignment trained on verified archive texts (unverified, labelled)
+    const learned = learnedTranslation(learnedModels, sourceLang, targetLang, cleanToken)
+    if (learned) {
+      learnedFilledCount++
+      matchedPhrases.push({
+        original: token,
+        translated: learned.target,
+        verseRef: `Learned from verified archive texts (p = ${learned.probability.toFixed(2)})`,
+        sourceCorpus: 'LEARNED_ALIGNMENT',
+        probability: learned.probability,
+      })
+      return learned.target
+    }
+
     return token
   })
 
   const translatedText = processedTokens.join('')
   const ratio = words.length > 0 ? Math.min(matchedCount / words.length, 1.0) : 0
-  const confidence = Math.round((0.55 + ratio * 0.43) * 100) / 100
+  // Honest coverage: share of input words found in the lexicon (no invented base score).
+  const confidence = Math.round(ratio * 100) / 100
 
   return {
     translatedText,
@@ -135,5 +153,6 @@ export function translateText(
     engineType: 'CORPUS_FALLBACK',
     bibleWordsCount: bibleMatchedCount,
     webonaryWordsCount: webonaryFilledCount,
+    learnedWordsCount: learnedFilledCount,
   }
 }

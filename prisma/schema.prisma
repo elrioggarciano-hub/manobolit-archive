@@ -22,6 +22,7 @@ model LiteratureEntry {
   bisayaTranslation String?
   audioFile         String?
   audioDuration     Int?
+  transcriptSync    String?   // JSON [{ start: seconds, text }] — line timings set by a reviewer for synchronized playback
   source            String
   yearCollected     Int?
   narrator          String?
@@ -201,6 +202,25 @@ model LexiconEntry {
 
   @@index([kind])
   @@index([manobo])
+}
+
+model ClassificationRule {
+  id             String   @id // e.g. "G005" (genre), "T003" (theme), "L001" (location)
+  name           String
+  type           String   // GENRE | THEME | LOCATION
+  framework      String   // EUGENIO_1993 | ANDRESS_1985 | PROVENANCE
+  value          String   // genre / theme / location code
+  keywords       String   @default("[]") // JSON array
+  phrases        String   @default("[]") // JSON array
+  contextClues   String   @default("[]") // JSON array
+  baseConfidence Float    @default(0.8)
+  source         String   @default("EXPERT") // EXPERT | EXPERT+DISCOVERED (terms approved from rule discovery)
+  sortOrder      Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([type])
 }
 
 model SystemManual {

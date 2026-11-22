@@ -82,30 +82,12 @@ export function charDiceSimilarity(a: string, b: string): number {
  * Known Agusan Manobo dialectal and orthographic variation database.
  * Demonstrates domain-specific knowledge engineering for low-resource Philippine languages.
  */
+/** A standard spelling and its documented variants (built from LexiconEntry DIALECT_VARIANT rows). */
 export interface DialectVariant {
   canonical: string
   variants: string[]
   gloss: string
-  category: 'GENRE' | 'THEME' | 'ETHNONYM'
 }
-
-export const MANOBO_DIALECT_VARIANTS: DialectVariant[] = [
-  { canonical: 'wuhig', variants: ['wohig', 'woheg', 'wahig', 'wahyg'], gloss: 'water / river / stream', category: 'THEME' },
-  { canonical: 'tudtul', variants: ['tultul', 'tutul', 'todtol', 'tudtulanon'], gloss: 'folktale / oral narrative', category: 'GENRE' },
-  { canonical: 'ulaging', variants: ['ulageng', 'olaging', 'ulagingan'], gloss: 'heroic epic chant', category: 'GENRE' },
-  { canonical: 'sugilanon', variants: ['sigulanon', 'sogilanon', 'sugilon'], gloss: 'story / tale', category: 'GENRE' },
-  { canonical: 'bituen', variants: ['bituon', 'betuen', 'bitoon'], gloss: 'stars', category: 'THEME' },
-  { canonical: 'langit', variants: ['langet', 'kalangitan'], gloss: 'sky / heavens', category: 'THEME' },
-  { canonical: 'tano', variants: ['tanu', 'katanoan'], gloss: 'earth / land / soil', category: 'THEME' },
-  { canonical: 'diwata', variants: ['dewata', 'diyuwata', 'diwatah'], gloss: 'spirit / deity', category: 'THEME' },
-  { canonical: 'kadukiliman', variants: ['kadikiluman', 'madalumon', 'maralum'], gloss: 'darkness / night', category: 'THEME' },
-  { canonical: 'sinugow', variants: ['sinugaw', 'manugow', 'sinug-ow'], gloss: 'weeping / sorrow / tears', category: 'THEME' },
-  { canonical: 'kapait', variants: ['kapoit', 'kapa-it'], gloss: 'hardship / bitterness', category: 'THEME' },
-  { canonical: 'bayod', variants: ['balod', 'baod'], gloss: 'ocean wave', category: 'THEME' },
-  { canonical: 'bubungan', variants: ['kabubunganan', 'bubung'], gloss: 'mountains / highlands', category: 'THEME' },
-  { canonical: 'panaw', variants: ['panow', 'pamanaw'], gloss: 'journey / travel', category: 'THEME' },
-  { canonical: 'dinaog-daog', variants: ['daog-daog', 'dinaogdaog', 'pigdaog'], gloss: 'oppressed / marginalized', category: 'THEME' },
-]
 
 export interface FuzzyMatchResult {
   token: string
@@ -113,15 +95,15 @@ export interface FuzzyMatchResult {
   matchedVariant: string
   similarity: number
   gloss: string
-  category: 'GENRE' | 'THEME' | 'ETHNONYM'
 }
 
 /**
- * Scans tokens against the Manobo Dialect Variation database using hybrid Levenshtein + Dice similarity.
- * Returns matches that exceed the orthographic confidence threshold (default >= 0.78).
+ * Scans tokens against the dialect variants stored in the lexicon database using hybrid
+ * Levenshtein + Dice similarity. Returns matches above the orthographic threshold (default >= 0.78).
  */
 export function findOrthographicDialectMatches(
   tokens: string[],
+  dialectVariants: DialectVariant[],
   threshold: number = 0.78
 ): FuzzyMatchResult[] {
   const matches: FuzzyMatchResult[] = []
@@ -131,7 +113,7 @@ export function findOrthographicDialectMatches(
     if (token.length < 3) continue
     const cleanToken = token.toLowerCase()
 
-    for (const entry of MANOBO_DIALECT_VARIANTS) {
+    for (const entry of dialectVariants) {
       const allTargets = [entry.canonical, ...entry.variants]
       for (const target of allTargets) {
         // Compute hybrid similarity (weighted: 50% Levenshtein, 50% Character Dice)
@@ -149,7 +131,6 @@ export function findOrthographicDialectMatches(
               matchedVariant: target,
               similarity: Math.round(hybridSim * 100) / 100,
               gloss: entry.gloss,
-              category: entry.category,
             })
           }
         }

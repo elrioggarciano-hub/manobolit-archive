@@ -190,7 +190,7 @@ export default function MLMonitoring() {
                 }}
               />
               <strong style={{ fontSize: '18px', color: 'var(--text-primary)' }}>
-                {isMLActive ? 'Machine Learning (scikit-learn)' : 'Rule-Based Baseline (Fallback)'}
+                {isMLActive ? 'Rule-Based + Machine Learning (scikit-learn)' : 'Rule-Based + In-app Learned Models'}
               </strong>
             </div>
             <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
