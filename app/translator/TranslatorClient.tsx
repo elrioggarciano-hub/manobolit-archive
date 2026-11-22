@@ -1,14 +1,10 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { useLanguage } from '@/lib/context/LanguageContext'
-import {
-  translateText,
-  TranslationLang,
-  BIBLE_LEXICON,
-  BIBLE_PARALLEL_PHRASES,
-  TranslationResult,
-} from '@/lib/translation'
+import { translateText } from '@/lib/translation/fallback'
+import type { TranslationLang, TranslationResult } from '@/lib/translation/types'
+import { EMPTY_LEXICON, type Lexicon, type LexiconWord, type ParallelPhrase } from '@/lib/translation/lexicon'
 
 const LANG_LABELS: Record<TranslationLang, string> = {
   msm: 'Agusan Manobo',
@@ -22,123 +18,6 @@ const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
   ceb: 'bisaya',
 }
 
-const VOCAB_GROUPS: { label: string; words: string[] }[] = [
-  {
-    label: 'Nature & Land',
-    words: [
-      'mountain',
-      'mountains',
-      'water',
-      'stream',
-      'river',
-      'land',
-      'tree',
-      'trees',
-      'forest',
-      'night',
-      'light',
-      'sun',
-      'star',
-      'stars',
-      'waves',
-      'fish',
-      'tiger',
-      'bird',
-      'beans',
-      'sugarcane',
-      'charcoal',
-      'plants',
-    ],
-  },
-  {
-    label: 'People & Tribe',
-    words: [
-      'tribe',
-      'people',
-      'person',
-      'native',
-      'child',
-      'children',
-      'mother',
-      'father',
-      'family',
-      'neighbors',
-      'outsiders',
-      'husband',
-      'companion',
-    ],
-  },
-  {
-    label: 'Cultural Lore & Spirits',
-    words: [
-      'spirit',
-      'guardian',
-      'blessing',
-      'proverb',
-      'story',
-      'riddle',
-      'song',
-      'history',
-      'gold',
-      'wealth',
-    ],
-  },
-  {
-    label: 'Feelings & Struggle',
-    words: [
-      'hardship',
-      'loneliness',
-      'sorrow',
-      'love',
-      'peace',
-      'tears',
-      'fear',
-      'resilient',
-      'bare',
-      'hunger',
-    ],
-  },
-  {
-    label: 'Actions',
-    words: [
-      'weep',
-      'listen',
-      'walk',
-      'look',
-      'remember',
-      'protect',
-      'help',
-      'clean',
-      'arrive',
-      'return',
-      'plant',
-      'hide',
-      'dwell',
-      'make',
-      'give',
-      'dream',
-    ],
-  },
-  {
-    label: 'Qualities',
-    words: [
-      'good',
-      'beautiful',
-      'hard',
-      'great',
-      'small',
-      'many',
-      'ancient',
-      'true',
-      'white',
-      'black',
-    ],
-  },
-  {
-    label: 'Grammar',
-    words: ['the', 'to', 'in', 'of', 'and', 'my', 'your', 'we', 'they', 'he', 'she', 'you'],
-  },
-]
 
 export default function TranslatorClient() {
   const { t } = useLanguage()
@@ -148,6 +27,21 @@ export default function TranslatorClient() {
   const [isTranslating, setIsTranslating] = useState(false)
   const [liveResult, setLiveResult] = useState<TranslationResult | null>(null)
   const [datasetCount, setDatasetCount] = useState<number>(127)
+  // Words and phrases come from the database (LexiconEntry) via /api/lexicon — none are written in this file.
+  const [lexicon, setLexicon] = useState<Lexicon>(EMPTY_LEXICON)
+  const lexiconRef = useRef<Lexicon>(EMPTY_LEXICON)
+
+  useEffect(() => {
+    fetch('/api/lexicon')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: Lexicon | null) => {
+        if (data?.words) {
+          lexiconRef.current = data
+          setLexicon(data)
+        }
+      })
+      .catch(() => { })
+  }, [])
 
   // Fetch live dataset statistics from the dynamic API
   useEffect(() => {
@@ -191,7 +85,7 @@ export default function TranslatorClient() {
       }
 
       // Fallback
-      setLiveResult(translateText(clean, src, tgt))
+      setLiveResult(translateText(clean, src, tgt, lexiconRef.current))
     },
     []
   )
@@ -226,10 +120,20 @@ export default function TranslatorClient() {
   const langOptions: TranslationLang[] = ['msm', 'en', 'ceb']
 
   const lexiconByEnglish = useMemo(() => {
-    const map = new Map<string, (typeof BIBLE_LEXICON)[number]>()
-    for (const entry of BIBLE_LEXICON) map.set(entry.english, entry)
+    const map = new Map<string, LexiconWord>()
+    for (const entry of lexicon.words) map.set(entry.english, entry)
     return map
-  }, [])
+  }, [lexicon])
+
+  // Vocabulary groups as stored in the lexicon (group label per word, display order from the data)
+  const vocabGroups = useMemo(
+    () =>
+      lexicon.groupOrder.map((label) => ({
+        label,
+        words: Array.from(new Set(lexicon.words.filter((w) => w.group === label).map((w) => w.english))),
+      })),
+    [lexicon]
+  )
 
   const pickWord = (englishKey: string) => {
     const entry = lexiconByEnglish.get(englishKey)
@@ -239,7 +143,7 @@ export default function TranslatorClient() {
     performTranslation(word, sourceLang, targetLang)
   }
 
-  const pickPhrase = (phrase: (typeof BIBLE_PARALLEL_PHRASES)[number]) => {
+  const pickPhrase = (phrase: ParallelPhrase) => {
     const text = phrase[LANG_FIELD[sourceLang]]
     setInputText(text)
     performTranslation(text, sourceLang, targetLang)
@@ -939,7 +843,7 @@ export default function TranslatorClient() {
                 PARALLEL LITERATURE PHRASES
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {BIBLE_PARALLEL_PHRASES.map((phrase, i) => {
+                {lexicon.phrases.map((phrase, i) => {
                   const text = phrase[LANG_FIELD[sourceLang]]
                   const isActive = inputText.trim().toLowerCase() === text.toLowerCase()
                   return (
@@ -967,7 +871,7 @@ export default function TranslatorClient() {
               </div>
             </div>
 
-            {VOCAB_GROUPS.map((group) => (
+            {vocabGroups.map((group) => (
               <div key={group.label}>
                 <div
                   style={{

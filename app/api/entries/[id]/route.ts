@@ -5,6 +5,7 @@ import { classifyEntry } from '@/lib/classification'
 import { predictWithML } from '@/lib/classification/mlClient'
 import { computeContentHash } from '@/lib/classification/contentHash'
 import { translateText } from '@/lib/translation'
+import { getLexicon } from '@/lib/translation/lexiconStore'
 
 // Home/Explore/Classification/Dashboard cache their entry queries under the
 // 'entries' tag, so every mutation must invalidate that tag; the entry detail
@@ -59,29 +60,30 @@ export async function PUT(
     let englishTitle = body.englishTitle || body.title || null
     let transcription = body.transcription || null
     let translation = body.translation || null
+    const lex = await getLexicon()
 
     if (!manoboTitle && (body.title || englishTitle)) {
-      const res = translateText(body.title || englishTitle, 'en', 'msm')
+      const res = translateText(body.title || englishTitle, 'en', 'msm', lex)
       manoboTitle = res.translatedText
     }
 
     if (!transcription && (body.content || translation)) {
-      const res = translateText(body.content || translation, 'en', 'msm')
+      const res = translateText(body.content || translation, 'en', 'msm', lex)
       transcription = res.translatedText
     }
 
     if (!translation && transcription) {
-      const res = translateText(transcription, 'msm', 'en')
+      const res = translateText(transcription, 'msm', 'en', lex)
       translation = res.translatedText
     }
 
     let bisayaTranslation = body.bisayaTranslation || null
 
     if (!bisayaTranslation && transcription) {
-      const res = translateText(transcription, 'msm', 'ceb')
+      const res = translateText(transcription, 'msm', 'ceb', lex)
       bisayaTranslation = res.translatedText
     } else if (!bisayaTranslation && (body.content || translation)) {
-      const res = translateText(body.content || translation, 'en', 'ceb')
+      const res = translateText(body.content || translation, 'en', 'ceb', lex)
       bisayaTranslation = res.translatedText
     }
 

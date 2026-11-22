@@ -1,7 +1,14 @@
 require('dotenv/config')
 const { PrismaClient } = require('../src/generated/prisma')
 const { PrismaPg } = require('@prisma/adapter-pg')
-const { BIBLE_PARALLEL_PHRASES, BIBLE_LEXICON } = require('../lib/translation/bibleCorpus')
+// Word and phrase data live in data/lexicon.json (seed source), not in code.
+const lexiconData = require('../data/lexicon.json')
+const BIBLE_PARALLEL_PHRASES = lexiconData.entries
+  .filter((e: any) => e.kind === 'PHRASE')
+  .map((e: any) => ({ english: e.english, manobo: e.manobo, bisaya: e.bisaya, context: e.notes, verseRef: e.reference, entryTitle: e.entryTitle }))
+const BIBLE_LEXICON = lexiconData.entries
+  .filter((e: any) => e.kind === 'WORD')
+  .map((e: any) => ({ english: e.english, manobo: e.manobo, bisaya: e.bisaya, category: e.partOfSpeech, notes: e.notes }))
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
 const prisma = new PrismaClient({ adapter })

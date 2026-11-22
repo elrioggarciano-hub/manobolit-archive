@@ -1,4 +1,5 @@
-import { BIBLE_PARALLEL_PHRASES, BIBLE_LEXICON } from './bibleCorpus'
+// Offline corpus translator. Word and phrase data come from the Lexicon (database), never from code.
+import { Lexicon } from './lexicon'
 import { TranslationLang, TranslationResult, MatchedPhrase } from './types'
 import { lookupWebonaryTranslation } from './webonaryValidator'
 
@@ -14,8 +15,9 @@ function cleanText(text: string): string {
 
 export function translateText(
   text: string,
-  sourceLang: TranslationLang = 'en',
-  targetLang: TranslationLang = 'msm'
+  sourceLang: TranslationLang,
+  targetLang: TranslationLang,
+  lex: Lexicon
 ): TranslationResult {
   const cleanedInput = cleanText(text)
   const corpusSource = 'Dual Validating Corpus: Agusan Manobo Bible (Primary) + SIL Webonary Dictionary (Supplementary)'
@@ -47,7 +49,7 @@ export function translateText(
   let textToProcess = cleanedInput
 
   // 1. Primary: Match multi-word phrases from the Agusan Manobo Bible / Thesis Corpus
-  for (const phrase of BIBLE_PARALLEL_PHRASES) {
+  for (const phrase of lex.phrases) {
     const sourcePhrase = phrase[sourceField]
     const targetPhrase = phrase[targetField]
     if (!sourcePhrase || !targetPhrase) continue
@@ -69,7 +71,7 @@ export function translateText(
 
   // 2. Primary: Bible single-word lexicon lookup map
   const bibleMap = new Map<string, string>()
-  for (const entry of BIBLE_LEXICON) {
+  for (const entry of lex.words) {
     const sourceWord = entry[sourceField]
     const targetWord = entry[targetField]
     if (!sourceWord || !targetWord) continue
@@ -98,7 +100,7 @@ export function translateText(
     }
 
     // B. Supplementary: If NOT in Agusan Manobo Bible, SIL Webonary fills it in!
-    const webonaryMatch = lookupWebonaryTranslation(cleanToken, sourceLang, targetLang)
+    const webonaryMatch = lookupWebonaryTranslation(cleanToken, sourceLang, targetLang, lex)
     if (webonaryMatch) {
       matchedCount++
       webonaryFilledCount++

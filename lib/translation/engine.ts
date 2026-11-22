@@ -3,10 +3,11 @@ import { TranslationLang, TranslationResult, MatchedPhrase } from './types'
 import { translateText } from './fallback'
 import { validateTextWithWebonary, lookupWebonaryTranslation } from './webonaryValidator'
 import { translateWithGemini } from './geminiTranslator'
+import { getLexicon } from './lexiconStore'
 
 export * from './types'
 export { translateText } from './fallback'
-export { validateTextWithWebonary, validateSingleWord, lookupWebonaryTranslation, SIL_WEBONARY_ENTRIES } from './webonaryValidator'
+export { validateTextWithWebonary, validateSingleWord, lookupWebonaryTranslation } from './webonaryValidator'
 
 const LANG_FIELD: Record<TranslationLang, 'english' | 'manobo' | 'bisaya'> = {
   en: 'english',
@@ -69,6 +70,7 @@ export async function translateTextDynamic(
   targetLang: TranslationLang = 'msm'
 ): Promise<TranslationResult> {
   const cleanedInput = cleanText(text)
+  const lex = await getLexicon()
   if (!cleanedInput) {
     return {
       translatedText: '',
@@ -175,7 +177,7 @@ export async function translateTextDynamic(
           totalWordsCount: words.length,
           corpusSource: 'Supabase PostgreSQL Parallel Corpus (Agusan Manobo)',
           engineType: 'DATABASE_DYNAMIC',
-          webonaryValidation: manoboTextToValidate ? validateTextWithWebonary(manoboTextToValidate, 'msm') : undefined,
+          webonaryValidation: manoboTextToValidate ? validateTextWithWebonary(manoboTextToValidate, lex, 'msm') : undefined,
         }
       }
 
@@ -196,7 +198,7 @@ export async function translateTextDynamic(
               totalWordsCount: words.length,
               corpusSource: 'ManoboLit Neural Engine (SIL Webonary Grounded)',
               engineType: 'COLAB_NEURAL_NMT',
-              webonaryValidation: validateTextWithWebonary(aiManobo, 'msm'),
+              webonaryValidation: validateTextWithWebonary(aiManobo, lex, 'msm'),
               aiReasoning: aiResult.linguisticNotes,
             }
           }
@@ -236,7 +238,7 @@ export async function translateTextDynamic(
         }
 
         // Secondary: Morphology check via Webonary validator
-        const webonaryMatch = lookupWebonaryTranslation(cleanToken, sourceLang, targetLang)
+        const webonaryMatch = lookupWebonaryTranslation(cleanToken, sourceLang, targetLang, lex)
         if (webonaryMatch) {
           matchedCount++
           matchedPhrases.push({
@@ -259,7 +261,7 @@ export async function translateTextDynamic(
       const confidence = Math.round((0.65 + ratio * 0.33) * 100) / 100
 
       const manoboTextToValidate = sourceLang === 'msm' ? cleanedInput : (targetLang === 'msm' ? translatedText : '')
-      const webonaryValidation = manoboTextToValidate ? validateTextWithWebonary(manoboTextToValidate, 'msm') : undefined
+      const webonaryValidation = manoboTextToValidate ? validateTextWithWebonary(manoboTextToValidate, lex, 'msm') : undefined
 
       // If database matched few words and Gemini API is available, enhance with AI
       if (ratio < 0.6 && process.env.GEMINI_API_KEY) {
@@ -277,7 +279,7 @@ export async function translateTextDynamic(
               totalWordsCount: words.length,
               corpusSource: 'ManoboLit Neural Engine (SIL Webonary Grounded)',
               engineType: 'COLAB_NEURAL_NMT',
-              webonaryValidation: validateTextWithWebonary(aiManobo, 'msm'),
+              webonaryValidation: validateTextWithWebonary(aiManobo, lex, 'msm'),
               aiReasoning: aiResult.linguisticNotes,
             }
           }
@@ -319,7 +321,7 @@ export async function translateTextDynamic(
           totalWordsCount: cleanedInput.split(/\s+/).length,
           corpusSource: 'ManoboLit Neural Engine (SIL Webonary Grounded)',
           engineType: 'COLAB_NEURAL_NMT',
-          webonaryValidation: validateTextWithWebonary(aiManobo, 'msm'),
+          webonaryValidation: validateTextWithWebonary(aiManobo, lex, 'msm'),
           aiReasoning: aiResult.linguisticNotes,
         }
       }
@@ -329,11 +331,11 @@ export async function translateTextDynamic(
   }
 
   // 4. Offline fallback
-  const fallbackResult = translateText(cleanedInput, sourceLang, targetLang)
+  const fallbackResult = translateText(cleanedInput, sourceLang, targetLang, lex)
   const manoboFallback = sourceLang === 'msm' ? cleanedInput : (targetLang === 'msm' ? fallbackResult.translatedText : '')
   return {
     ...fallbackResult,
     corpusSource: 'ManoboLit Dynamic Translation Engine',
-    webonaryValidation: manoboFallback ? validateTextWithWebonary(manoboFallback, 'msm') : undefined,
+    webonaryValidation: manoboFallback ? validateTextWithWebonary(manoboFallback, lex, 'msm') : undefined,
   }
 }

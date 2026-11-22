@@ -1,5 +1,5 @@
 export * from './types'
-export * from './bibleCorpus'
+export * from './lexicon'
 export * from './fallback'
 export * from './webonaryValidator'
 export * from './geminiTranslator'

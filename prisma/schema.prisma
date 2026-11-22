@@ -179,6 +179,30 @@ model TrainingCorpusDocument {
   @@index([genre])
 }
 
+model LexiconEntry {
+  id           String   @id @default(cuid())
+  kind         String   // PHRASE | WORD | WEBONARY | DIALECT_VARIANT | PREFIX | SUFFIX
+  manobo       String
+  english      String?
+  bisaya       String?
+  tagalog      String?
+  root         String?  // WEBONARY: root form; DIALECT_VARIANT: standard spelling
+  partOfSpeech String?
+  definition   String?
+  notes        String?
+  reference    String?  // e.g. source entry / verse reference for phrases
+  entryTitle   String?
+  group        String?  // Translator page vocabulary group (e.g. "Nature & Land")
+  source       String?
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([kind])
+  @@index([manobo])
+}
+
 model SystemManual {
   id            String   @id @default("active-manual")
   fileName      String

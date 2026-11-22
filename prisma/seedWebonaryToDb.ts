@@ -1,6 +1,9 @@
 import 'dotenv/config'
 import { prisma } from '../lib/database/prisma'
-import { SIL_WEBONARY_ENTRIES } from '../lib/translation/webonaryValidator'
+import { FALLBACK_LEXICON } from '../lib/translation/lexiconStore'
+
+// Dictionary data lives in data/lexicon.json (seed source), not in code.
+const SIL_WEBONARY_ENTRIES = FALLBACK_LEXICON.webonary
 
 async function seedWebonary() {
   console.log('--- Seeding SIL Webonary Lexicon into Supabase PostgreSQL ---')
