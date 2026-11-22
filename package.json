@@ -11,7 +11,13 @@
     "seed": "ts-node -e \"require('ts-node').register({module:'commonjs', compilerOptions:{allowJs:false}}); require('./prisma/seed.ts')\"",
     "seed:corpus": "ts-node -P tsconfig.scripts.json prisma/seedTrainingCorpus.ts",
     "seed:lexicon": "ts-node -P tsconfig.scripts.json prisma/seedLexicon.ts",
-    "seed:rules": "ts-node -P tsconfig.scripts.json prisma/seedRules.ts"
+    "seed:rules": "ts-node -P tsconfig.scripts.json prisma/seedRules.ts",
+    "eval": "ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/eval-loocv.ts",
+    "eval:learning-curve": "ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/eval-learning-curve.ts",
+    "eval:dataset": "ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/export-seed-dataset.ts",
+    "eval:translation": "npm run eval:dataset && ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/eval-alignment.ts",
+    "test:unit": "npm run eval:dataset && ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/test-sync.ts && ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/test-blend.ts",
+    "notebook:build": "python -I scripts/evaluation/build_notebook.py"
   },
   "prisma": {
     "seed": "npm run seed"

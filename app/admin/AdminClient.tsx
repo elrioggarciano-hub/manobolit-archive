@@ -5,7 +5,6 @@ import Link from 'next/link'
 import DeleteButton from '@/components/DeleteButton'
 import LogoutButton from '@/components/LogoutButton'
 import ReviewQueue from '@/components/admin/ReviewQueue'
-import MLMonitoring from '@/components/admin/MLMonitoring'
 import DatasetManagement from '@/components/admin/DatasetManagement'
 import ManualManagement from '@/components/admin/ManualManagement'
 import TrainingCorpusManagement from '@/components/admin/TrainingCorpusManagement'
@@ -192,7 +191,7 @@ export default function AdminClient({ initialEntries }: Props) {
           {[
             { id: 'entries', label: `📚 Archive Entries (${initialEntries.length})` },
             { id: 'review', label: '📋 Review Queue (Human Verification)' },
-            { id: 'ml', label: '⚡ ML Pipeline & Retraining' },
+            { id: 'ml', label: '⚡ Trained Model (Colab)' },
             { id: 'dataset', label: '📦 Dataset & Taxonomies' },
             { id: 'rules', label: '📏 Classification Rules' },
             { id: 'corpus', label: '🧠 Training Corpus' },
@@ -222,12 +221,7 @@ export default function AdminClient({ initialEntries }: Props) {
         </div>
 
         {adminTab === 'review' && <ReviewQueue />}
-        {adminTab === 'ml' && (
-          <>
-            <TrainedModelManagement />
-            <MLMonitoring />
-          </>
-        )}
+        {adminTab === 'ml' && <TrainedModelManagement />}
         {adminTab === 'dataset' && <DatasetManagement />}
         {adminTab === 'rules' && <RuleManagement />}
         {adminTab === 'corpus' && <TrainingCorpusManagement />}
