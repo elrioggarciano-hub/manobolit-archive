@@ -14,11 +14,13 @@ import { predictNaiveBayes, NaiveBayesPrediction, NaiveBayesModel } from './naiv
 import { classifyWithCharNgram, CharNgramResult, CharNgramModel } from './charNgram'
 import { ACTIVE_GENRES } from './trainingCorpus'
 import { cleanClassificationText } from './textCleaning'
+import { classifyWithKnn, KnnModel, KnnResult } from './knn'
 
 export interface InjectableModels {
   nb?: NaiveBayesModel
   tfidf?: TfidfModel
   charNgram?: CharNgramModel
+  knn?: KnnModel
   rulesProfile?: RulesProfile
 }
 
@@ -28,9 +30,15 @@ export type AlgorithmMode =
   | 'CHAR_NGRAM'
   | 'TF_IDF_VSM'
   | 'RULE_BASED'
+  | 'KNN_MEMORY'
 
 export const UNCLASSIFIED_THRESHOLD = 0.27
 export const UNCLASSIFIED_MARGIN = 0.012
+
+// k-NN exemplar memory joins the learned-model ensemble vote.
+// LOOCV on the 22-entry archive (2026-11-22), rules excluded from prediction:
+// NB + TF-IDF + Char N-gram = 50.0% acc; adding k-NN = 68.2% acc (macro-F1 0.686).
+export const KNN_IN_ENSEMBLE = true
 
 /**
  * Converts raw non-negative model scores to a calibrated probability distribution using Softmax.
@@ -80,6 +88,7 @@ export interface HybridClassificationResult {
   algorithmicBreakdown: {
     naiveBayes: NaiveBayesPrediction
     charNgram: CharNgramResult
+    knn?: KnnResult
     vsm: VSMResult
     fuzzyMatches: FuzzyMatchResult[]
     topFeatures: FeatureWeight[]
@@ -168,9 +177,10 @@ export function scoreRule(
  * Classifies an entry using the selected Algorithm Mode:
  * - 'NAIVE_BAYES_ML': 100% Supervised Machine Learning (Laplace-smoothed Multinomial Naive Bayes)
  * - 'CHAR_NGRAM': Character 3-5-Gram TF-IDF Centroid Model
- * - 'HYBRID_ENSEMBLE': 40% Naive Bayes ML + 25% TF-IDF VSM + 20% Char N-Gram + 15% Rules
+ * - 'HYBRID_ENSEMBLE': equal-weight Naive Bayes + TF-IDF VSM + Char N-Gram (+ k-NN) — learned models only
+ * - 'KNN_MEMORY': k-nearest verified exemplars
  * - 'TF_IDF_VSM': Statistical Information Retrieval Vector Space Model
- * - 'RULE_BASED': Domain Rule-Based System
+ * - 'RULE_BASED': Domain Rule-Based System (evaluation baseline only, never used for production predictions)
  */
 export function classifyHybrid(
   fullText: string,
@@ -191,6 +201,9 @@ export function classifyHybrid(
 
   // 3. Run Statistical Information Retrieval: TF-IDF Vector Space Model
   const vsmResult = classifyWithVSM(normText, targetGenreFilter, models?.tfidf)
+
+  // 3b. k-Nearest-Neighbor exemplar memory (only when a verified-exemplar model is injected)
+  const knnResult = models?.knn ? classifyWithKnn(normText, models.knn) : undefined
 
   // 4. Run Dialect-Aware Fuzzy Orthographic Matcher (Levenshtein + Dice)
   const fuzzyMatches = findOrthographicDialectMatches(unigrams, 0.78)
@@ -289,6 +302,7 @@ export function classifyHybrid(
   const pVSM: Record<string, number> = {}
   const pChar: Record<string, number> = {}
   const pRules: Record<string, number> = {}
+  const pKnn: Record<string, number> = {}
 
   candidateGenres.forEach((genre, idx) => {
     const nbMatch = nbResult.allProbabilities.find(s => s.genre === genre)
@@ -296,7 +310,10 @@ export function classifyHybrid(
     pVSM[genre] = pVsmArr[idx]
     pChar[genre] = pCharArr[idx]
     pRules[genre] = pRuleArr[idx]
+    // kNN already outputs a normalized vote distribution (sums to 1 over neighbors)
+    pKnn[genre] = knnResult ? (knnResult.allGenreScores.find(s => s.genre === genre)?.score ?? 0) : 0
   })
+  const useKnnVote = KNN_IN_ENSEMBLE && Boolean(knnResult && knnResult.neighbors.length > 0)
 
   const finalGenreScores: { genre: string; confidence: number; ruleId: string }[] = []
 
@@ -314,10 +331,15 @@ export function classifyHybrid(
       combinedProb = pNB[genre]
     } else if (algorithmMode === 'CHAR_NGRAM') {
       combinedProb = pChar[genre]
+    } else if (algorithmMode === 'KNN_MEMORY') {
+      combinedProb = pKnn[genre]
     } else {
-      // 'HYBRID_ENSEMBLE': Default combination = equal-weight average of normalized scores
-      // (Fuzzy bonus removed from probability combination to maintain calibrated probability distribution)
-      combinedProb = (pNB[genre] + pVSM[genre] + pChar[genre] + pRules[genre]) / 4
+      // 'HYBRID_ENSEMBLE': equal-weight average of the LEARNED models only.
+      // Hand-written domain rules are excluded from prediction and kept solely as an evaluation baseline
+      // (RULE_BASED mode), so genre decisions come from patterns learned from verified data.
+      combinedProb = useKnnVote
+        ? (pNB[genre] + pVSM[genre] + pChar[genre] + pKnn[genre]) / 4
+        : (pNB[genre] + pVSM[genre] + pChar[genre]) / 3
     }
 
     finalGenreScores.push({
@@ -370,11 +392,16 @@ export function classifyHybrid(
 
   let mathExplanation = ''
   if (algorithmMode === 'NAIVE_BAYES_ML') {
-    mathExplanation = `Supervised ML Inference: P(${topGenreValue}|d) = ${(P_1 * 100).toFixed(1)}% via Multinomial Naive Bayes (Laplace α=1.0, length-normalized).`
+    mathExplanation = `Supervised ML Inference: P(${topGenreValue}|d) = ${(P_1 * 100).toFixed(1)}% via Multinomial Naive Bayes (Laplace Î±=1.0, length-normalized).`
   } else if (algorithmMode === 'CHAR_NGRAM') {
     mathExplanation = `Character N-Gram VSM: Calibrated Softmax probability = ${(P_1 * 100).toFixed(1)}% (temperature T=0.25 over 3-5-gram cosine alignment).`
+  } else if (algorithmMode === 'KNN_MEMORY') {
+    const nn = (knnResult?.neighbors || []).map(n => `${n.genre}@${(n.similarity * 100).toFixed(0)}%`).join(', ')
+    mathExplanation = `k-NN Exemplar Memory (k=${models?.knn?.k ?? 0}): similarity-weighted vote = ${(P_1 * 100).toFixed(1)}% from nearest verified entries [${nn}].`
+  } else if (algorithmMode === 'HYBRID_ENSEMBLE' && useKnnVote) {
+    mathExplanation = `Learned-Model Ensemble = (0.25 Ã— NB: ${(pNB[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 Ã— TF-IDF: ${(pVSM[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 Ã— Char N-gram: ${(pChar[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 Ã— k-NN: ${(pKnn[topGenreCandidate] * 100).toFixed(1)}%) = ${(P_1 * 100).toFixed(1)}%`
   } else if (algorithmMode === 'HYBRID_ENSEMBLE') {
-    mathExplanation = `Equal-Weight Ensemble = (0.25 × NB: ${(pNB[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 × TF-IDF: ${(pVSM[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 × Char N-gram: ${(pChar[topGenreCandidate] * 100).toFixed(1)}%) + (0.25 × Rules: ${(pRules[topGenreCandidate] * 100).toFixed(1)}%) = ${(P_1 * 100).toFixed(1)}%`
+    mathExplanation = `Learned-Model Ensemble = (â…“ Ã— NB: ${(pNB[topGenreCandidate] * 100).toFixed(1)}%) + (â…“ Ã— TF-IDF: ${(pVSM[topGenreCandidate] * 100).toFixed(1)}%) + (â…“ Ã— Char N-gram: ${(pChar[topGenreCandidate] * 100).toFixed(1)}%) = ${(P_1 * 100).toFixed(1)}%`
   } else if (algorithmMode === 'TF_IDF_VSM') {
     mathExplanation = `TF-IDF VSM: Calibrated Softmax probability = ${(P_1 * 100).toFixed(1)}% (temperature T=0.25 over word TF-IDF cosine alignment).`
   } else {
@@ -403,6 +430,7 @@ export function classifyHybrid(
     algorithmicBreakdown: {
       naiveBayes: nbResult,
       charNgram: charNgramResult,
+      knn: knnResult,
       vsm: vsmResult,
       fuzzyMatches,
       topFeatures: vsmResult.extractedFeatures,

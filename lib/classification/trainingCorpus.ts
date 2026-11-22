@@ -1,6 +1,8 @@
 // Ground-Truth Training Corpus for Supervised Machine Learning
 // Synthesizes authenticated field records from Catipay & Curato (2024) and Maravilla (2024).
 
+import corpusData from '../../data/training-corpus.json'
+
 export type TrainingDocSource = 'archive-verbatim' | 'author-written'
 
 export interface TrainingDocument {
@@ -12,6 +14,8 @@ export interface TrainingDocument {
   source: TrainingDocSource
   citation?: string
   archiveEntryId?: string
+  /** True when this doc duplicates an archive field record; excluded from training to avoid evaluation leakage. */
+  overlapsArchive?: boolean
 }
 
 /**
@@ -24,180 +28,9 @@ export type ActiveGenre = typeof ACTIVE_GENRES[number]
 export const ALL_GENRES = ['MYTH', 'LEGEND', 'FOLKTALE', 'EPIC', 'RIDDLE', 'PROVERB', 'SONG', 'CHANT'] as const
 export type AllGenre = typeof ALL_GENRES[number]
 
-export const TRAINING_CORPUS: TrainingDocument[] = [
-  // ── MYTHS (Author-written baseline, inactive in live predictions) ──
-  {
-    id: 'tr-myth-1',
-    text: "The stars were born from the breath of Father Sky. In those ancient times, there were no stars in the heavens. The surface of the earth was still in deep darkness. Then Father Sky said, We shall give birth to the stars. D-anak te meogingon so mga bituen te amay he langit.",
-    genre: 'MYTH',
-    themes: ['COSMOGONY', 'ORIGINS'],
-    provenance: 'Agusan Manobo Origin Narrative',
-    source: 'author-written',
-    citation: 'Eugenio (1993)'
-  },
-  {
-    id: 'tr-myth-2',
-    text: "In the beginning of all things, the supreme creator shaped the primordial universe. The heavens and the earth were separated by spirits. Ancestral shamans recount the dawn of time when divine beings walked the world before human existence.",
-    genre: 'MYTH',
-    themes: ['CREATION_MYTHS', 'SPIRIT_WORLD'],
-    provenance: 'Agusan Manobo Cosmogony',
-    source: 'author-written',
-    citation: 'Eugenio (1993)'
-  },
-  {
-    id: 'tr-myth-3',
-    text: "How the first humans came to be from clay and breath of the great spirit. Spirits formed mankind to steward the soil and rivers of Mindanao.",
-    genre: 'MYTH',
-    themes: ['CREATION_MYTHS', 'NATURE_AND_ENVIRONMENT'],
-    provenance: 'Agusan Manobo Genesis',
-    source: 'author-written',
-    citation: 'Eugenio (1993)'
-  },
-
-  // ── LEGENDS (Author-written baseline, inactive in live predictions) ──
-  {
-    id: 'tr-legend-1',
-    text: "Lake Bababu was guarded by a water spirit. Long ago, ancient ancestors witnessed the lake form after a warrior struck the mountain with his spear. It came to be known as a gathering place of pilgrimage.",
-    genre: 'LEGEND',
-    themes: ['HISTORICAL_EVENTS', 'SUPERNATURAL_BEINGS'],
-    provenance: 'Agusan del Sur Landmark Narrative',
-    source: 'author-written',
-    citation: 'Eugenio (1993)'
-  },
-  {
-    id: 'tr-legend-2',
-    text: "The mountain was protected by guardian spirits. Villagers say that during ancient wars, the mountain concealed the warriors within mists, establishing the boundary between tribes.",
-    genre: 'LEGEND',
-    themes: ['HISTORICAL_EVENTS', 'HEROIC_DEEDS'],
-    provenance: 'Bunawan Landmark Narrative',
-    source: 'author-written',
-    citation: 'Eugenio (1993)'
-  },
-
-  // ── FOLKTALES (Active Genre) ──
-  {
-    id: 'tr-folktale-1',
-    text: "Once upon a time in a faraway village, the clever monkey outwitted the foolish crocodile at the river bank. The monkey leaped across the backs of turtles to escape to the other side of the water.",
-    genre: 'FOLKTALE',
-    themes: ['MORAL_LESSONS', 'NATURE_AND_ENVIRONMENT'],
-    provenance: 'Catipay & Curato (2024)',
-    source: 'author-written',
-    citation: 'Catipay & Curato (2024)'
-  },
-  {
-    id: 'tr-folktale-2',
-    text: "A story about the deer and the cunning bird. They competed to see who could harvest the wild fruits first across the forest.",
-    genre: 'FOLKTALE',
-    themes: ['MORAL_LESSONS'],
-    provenance: 'Agusan Manobo Oral Tale',
-    source: 'author-written',
-    citation: 'Eugenio (1993)'
-  },
-
-  // ── EPICS (Author-written baseline, inactive in live predictions) ──
-  {
-    id: 'tr-epic-1',
-    text: "The great warrior chieftain Agyu embarked on a long quest across mountains and seas with his golden sword to protect his clan from invaders. In the battle of Ulaging, the brave champion defeated the enemies and secured victory for his people.",
-    genre: 'EPIC',
-    themes: ['HEROIC_DEEDS', 'HISTORICAL_EVENTS'],
-    provenance: 'Ulaging Narrative Cycle',
-    source: 'author-written',
-    citation: 'Ulaging Epic Cycle'
-  },
-  {
-    id: 'tr-epic-2',
-    text: "Chieftain narratives of ancient journeys and clan defense. The champion defended the ancestral domain against foreign conquerors through strength and valor.",
-    genre: 'EPIC',
-    themes: ['HEROIC_DEEDS'],
-    provenance: 'Agusan Manobo Ulaging',
-    source: 'author-written',
-    citation: 'Ulaging Epic Cycle'
-  },
-
-  // ── RIDDLES (Active Genre) ──
-  {
-    id: 'tr-riddle-1',
-    text: "Tu maintok pad inggad pusilon buhi gihapon. When young it is small, when struck it does not cry.",
-    genre: 'RIDDLE',
-    themes: ['MORAL_LESSONS', 'NATURE_AND_ENVIRONMENT'],
-    provenance: 'Catipay & Curato (2024)',
-    source: 'archive-verbatim',
-    citation: 'Catipay & Curato (2024)',
-    archiveEntryId: 'cmvnxgovq000jawurtx7fu6gl'
-  },
-  {
-    id: 'tr-riddle-2',
-    text: "Atabay ni eba kunag ka yakasan. Guess the mystery that walks on water but leaves no footprint.",
-    genre: 'RIDDLE',
-    themes: ['NATURE_AND_ENVIRONMENT'],
-    provenance: 'Bunawan Collection',
-    source: 'archive-verbatim',
-    citation: 'Catipay & Curato (2024)',
-    archiveEntryId: 'cmvnxgopd000hawurnc0h6dkn'
-  },
-
-  // ── PROVERBS (Active Genre) ──
-  {
-    id: 'tr-proverb-1',
-    text: "Inggad nukoy ka lisud kan kinabuhi, mas marujow pad nug antus ki to ka buntas kaysa ug himo tu saya. No matter how hard life is, it is better to suffer from hunger than to do things you should not.",
-    genre: 'PROVERB',
-    themes: ['MORAL_LESSONS', 'SOCIAL_CUSTOMS'],
-    provenance: 'Catipay & Curato (2024)',
-    source: 'archive-verbatim',
-    citation: 'Catipay & Curato (2024)',
-    archiveEntryId: 'cmvnxgnne0005awur0f5n5v8w'
-  },
-  {
-    id: 'tr-proverb-2',
-    text: "Salig kilang permi su inggad hinuy hinuy, ugka abut tada inggad maintok. Trust is always slow, but consistent effort achieves lasting quietness.",
-    genre: 'PROVERB',
-    themes: ['SOCIAL_CUSTOMS', 'MORAL_LESSONS'],
-    provenance: 'Catipay & Curato (2024)',
-    source: 'archive-verbatim',
-    citation: 'Catipay & Curato (2024)',
-    archiveEntryId: 'cmvnxgnql0006awurlinvhtmg'
-  },
-
-  // ── FOLK SONGS (Active Genre) ──
-  {
-    id: 'tr-song-1',
-    text: "Lantawod diya lawod nig duma kan bayod soe tribu ko no daog-daog mahawig no katuigan, niglubong on tu kamingaw kunag pakabarog so wara ka silungan. What was buried deep under the water has surfaced again to the light.",
-    genre: 'SONG',
-    themes: ['HISTORICAL_EVENTS', 'HEROIC_DEEDS', 'NATURE_AND_ENVIRONMENT'],
-    provenance: 'Maravilla (2024) - Trento',
-    source: 'archive-verbatim',
-    citation: 'Maravilla (2024)',
-    archiveEntryId: 'cmvnxgn290000awurstdp4fdh'
-  },
-  {
-    id: 'tr-song-2',
-    text: "Kapait soe Kanak kahimtang bubungan SI Kanak pig ugpaan ug sinugow a Man usahay tug paka dumdum a tu kanay inoy. How hardship my situation is, for the mountains are my home and I weep when I remember my mother.",
-    genre: 'SONG',
-    themes: ['SOCIAL_CUSTOMS', 'DEATH_AND_AFTERLIFE'],
-    provenance: 'Maravilla (2024) - Trento',
-    source: 'archive-verbatim',
-    citation: 'Maravilla (2024)',
-    archiveEntryId: 'cmvnxgnad0001awur5hbvddjs'
-  },
-  {
-    id: 'tr-song-3',
-    text: "Kadikiluman kan adlaw madani ug sayop mig abot tu kakuba tu daegeha mga yuha migtagdo tu mata. The darkness has come when you are far away and heavy tears fall from my eyes.",
-    genre: 'SONG',
-    themes: ['COURTSHIP_AND_MARRIAGE', 'DEATH_AND_AFTERLIFE'],
-    provenance: 'Maravilla (2024) - Trento',
-    source: 'archive-verbatim',
-    citation: 'Maravilla (2024)',
-    archiveEntryId: 'cmvnxgnk20004awurerpzucdc'
-  },
-
-  // ── CHANTS (Author-written baseline, inactive in live predictions) ──
-  {
-    id: 'tr-chant-1',
-    text: "Ritual invocation of ancestral spirits during harvest ceremony. Prayer, blessing, and invocation by the babaylan for protection and communal healing.",
-    genre: 'CHANT',
-    themes: ['SPIRIT_WORLD', 'AGRICULTURAL_CYCLES'],
-    provenance: 'Agusan Manobo Ritual Field Notes',
-    source: 'author-written',
-    citation: 'Eugenio (1993)'
-  }
-]
+/**
+ * Default (fallback) training corpus. The data lives in data/training-corpus.json, not in code.
+ * At runtime the authoritative corpus is the TrainingCorpusDocument table (see corpusStore.ts);
+ * this file is used to seed that table and as a fallback when the database is unreachable.
+ */
+export const TRAINING_CORPUS: TrainingDocument[] = corpusData as TrainingDocument[]

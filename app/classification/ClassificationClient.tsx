@@ -1929,7 +1929,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                   <tr style={{ background: 'rgba(16, 185, 129, 0.08)', borderBottom: '2px solid #10b981' }}>
                     <td style={{ padding: '12px', fontWeight: 700, color: '#10b981' }}>
                       5. Hybrid Ensemble (Proposed)
-                      <div style={{ fontSize: '9.5px', color: '#10b981', fontWeight: 400 }}>NB + TF-IDF + Char N-gram + Rules + Dialect Fuzzy</div>
+                      <div style={{ fontSize: '9.5px', color: '#10b981', fontWeight: 400 }}>NB + TF-IDF + Char N-gram + k-NN (learned models only; rules = baseline)</div>
                     </td>
                     <td style={{ padding: '12px', fontWeight: 800, color: '#10b981' }}>{(comparativeReport.hybridEnsemble.accuracy * 100).toFixed(1)}%</td>
                     <td style={{ padding: '12px', fontWeight: 700 }}>{comparativeReport.hybridEnsemble.precision.toFixed(3)}</td>

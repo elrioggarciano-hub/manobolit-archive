@@ -8,6 +8,8 @@ import ReviewQueue from '@/components/admin/ReviewQueue'
 import MLMonitoring from '@/components/admin/MLMonitoring'
 import DatasetManagement from '@/components/admin/DatasetManagement'
 import ManualManagement from '@/components/admin/ManualManagement'
+import TrainingCorpusManagement from '@/components/admin/TrainingCorpusManagement'
+import TrainedModelManagement from '@/components/admin/TrainedModelManagement'
 
 export interface AdminEntry {
   id: string
@@ -38,7 +40,7 @@ interface Props {
 }
 
 export default function AdminClient({ initialEntries }: Props) {
-  const [adminTab, setAdminTab] = useState<'entries' | 'review' | 'ml' | 'dataset' | 'manual'>('entries')
+  const [adminTab, setAdminTab] = useState<'entries' | 'review' | 'ml' | 'dataset' | 'corpus' | 'manual'>('entries')
   const [filterType, setFilterType] = useState<'ALL' | 'ORAL_LITERATURE' | 'FOLK_SONG'>('ALL')
   const [filterGenre, setFilterGenre] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
@@ -189,6 +191,7 @@ export default function AdminClient({ initialEntries }: Props) {
             { id: 'review', label: '📋 Review Queue (Human Verification)' },
             { id: 'ml', label: '⚡ ML Pipeline & Retraining' },
             { id: 'dataset', label: '📦 Dataset & Taxonomies' },
+            { id: 'corpus', label: '🧠 Training Corpus' },
             { id: 'manual', label: '📄 User Manual & PDF' },
           ].map(tab => (
             <button
@@ -214,8 +217,14 @@ export default function AdminClient({ initialEntries }: Props) {
         </div>
 
         {adminTab === 'review' && <ReviewQueue />}
-        {adminTab === 'ml' && <MLMonitoring />}
+        {adminTab === 'ml' && (
+          <>
+            <TrainedModelManagement />
+            <MLMonitoring />
+          </>
+        )}
         {adminTab === 'dataset' && <DatasetManagement />}
+        {adminTab === 'corpus' && <TrainingCorpusManagement />}
         {adminTab === 'manual' && <ManualManagement />}
 
         {adminTab === 'entries' && (

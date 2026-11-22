@@ -6,6 +6,7 @@ import { TRAINING_CORPUS, TrainingDocument, ACTIVE_GENRES, ActiveGenre } from '.
 import { trainNaiveBayes } from './naiveBayes'
 import { trainTfidf } from './tfidf'
 import { trainCharNgram } from './charNgram'
+import { trainKnn } from './knn'
 import { classifyHybrid } from './hybrid'
 import { cleanClassificationText, stripGenreDescriptors, stripRiddleAnswer } from './textCleaning'
 import { tokenizeUnigrams } from './tokenizer'
@@ -16,6 +17,8 @@ export type TextAblationConfig = 'both' | 'transcription_only' | 'translation_on
 export interface LOOCVOptions {
   textConfig?: TextAblationConfig
   stripAnswer?: boolean
+  /** Base training corpus (defaults to the bundled fallback corpus). */
+  baseCorpus?: TrainingDocument[]
 }
 
 export interface PerClassMetrics {
@@ -72,28 +75,29 @@ export interface LOOCVReport {
     naiveBayes: ModeEvaluationResult
     tfidfVsm: ModeEvaluationResult
     charNgram: ModeEvaluationResult
+    knnMemory: ModeEvaluationResult
     hybridEnsemble: ModeEvaluationResult
   }
   winner: string
   academicDefenseSummary: string
 }
 
-// 7 docs in TRAINING_CORPUS that directly correspond to archive field collections
-export const ARCHIVE_OVERLAPPING_DOC_IDS = new Set<string>([
-  'tr-song-1',
-  'tr-song-2',
-  'tr-song-3',
-  'tr-proverb-1',
-  'tr-proverb-2',
-  'tr-riddle-1',
-  'tr-riddle-2',
-])
+// Docs in the training corpus that directly correspond to archive field collections
+// (flagged with overlapsArchive in the corpus data).
+export function overlappingDocIds(corpus: TrainingDocument[]): Set<string> {
+  return new Set(corpus.filter(d => d.overlapsArchive).map(d => d.id))
+}
+export const ARCHIVE_OVERLAPPING_DOC_IDS = overlappingDocIds(TRAINING_CORPUS)
 
 /**
  * Dynamically computes cosine token overlap between an entry and all training corpus docs
  * to prevent any latent data leakage across folds.
  */
-export function findOverlappingDocIds(entryText: string, threshold: number = 0.35): Set<string> {
+export function findOverlappingDocIds(
+  entryText: string,
+  threshold: number = 0.35,
+  corpus: TrainingDocument[] = TRAINING_CORPUS
+): Set<string> {
   const tokensA = tokenizeUnigrams(entryText, true)
   const freqA = new Map<string, number>()
   for (const t of tokensA) freqA.set(t, (freqA.get(t) || 0) + 1)
@@ -101,7 +105,7 @@ export function findOverlappingDocIds(entryText: string, threshold: number = 0.3
   for (const [_, c] of freqA) sqA += c * c
 
   const overlapping = new Set<string>()
-  for (const doc of TRAINING_CORPUS) {
+  for (const doc of corpus) {
     const tokensB = tokenizeUnigrams(doc.text, true)
     const freqB = new Map<string, number>()
     for (const t of tokensB) freqB.set(t, (freqB.get(t) || 0) + 1)
@@ -270,6 +274,8 @@ export function runLOOCV(
   const textConfig = options.textConfig || 'both'
   const stripAnswer = options.stripAnswer !== undefined ? options.stripAnswer : true
   const sampleSize = entries.length
+  const corpus = options.baseCorpus || TRAINING_CORPUS
+  const corpusOverlaps = overlappingDocIds(corpus)
 
   const actuals = entries.map(e => e.genre)
 
@@ -298,6 +304,7 @@ export function runLOOCV(
     { key: 'naiveBayes', name: 'NAIVE_BAYES_ML', algo: 'NAIVE_BAYES_ML' as const, profile: 'framework-only' as const, inSample: false },
     { key: 'tfidfVsm', name: 'TF_IDF_VSM', algo: 'TF_IDF_VSM' as const, profile: 'framework-only' as const, inSample: false },
     { key: 'charNgram', name: 'CHAR_NGRAM', algo: 'CHAR_NGRAM' as const, profile: 'framework-only' as const, inSample: false },
+    { key: 'knnMemory', name: 'KNN_MEMORY', algo: 'KNN_MEMORY' as const, profile: 'framework-only' as const, inSample: false },
     { key: 'hybridEnsemble', name: 'HYBRID_ENSEMBLE', algo: 'HYBRID_ENSEMBLE' as const, profile: 'framework-only' as const, inSample: false },
   ]
 
@@ -314,17 +321,17 @@ export function runLOOCV(
     const testText = extractEntryText(heldOut, textConfig, stripAnswer)
 
     // Dynamic + explicit map-based overlapping docs exclusion
-    const excludedDocs = new Set<string>([...ARCHIVE_OVERLAPPING_DOC_IDS])
-    for (const doc of TRAINING_CORPUS) {
+    const excludedDocs = new Set<string>([...corpusOverlaps])
+    for (const doc of corpus) {
       if (doc.archiveEntryId && (heldOut as any).id && doc.archiveEntryId === (heldOut as any).id) {
         excludedDocs.add(doc.id)
       }
     }
-    const dynamicOverlaps = findOverlappingDocIds(testText, 0.35)
+    const dynamicOverlaps = findOverlappingDocIds(testText, 0.35, corpus)
     for (const id of dynamicOverlaps) excludedDocs.add(id)
 
     // Clean base training corpus
-    const baseCorpus = TRAINING_CORPUS.filter(d => !excludedDocs.has(d.id))
+    const baseCorpus = corpus.filter(d => !excludedDocs.has(d.id))
 
     // Convert remaining N-1 entries into TrainingDocuments
     const otherArchiveDocs: TrainingDocument[] = entries
@@ -345,6 +352,7 @@ export function runLOOCV(
     const foldNbModel = trainNaiveBayes(foldDocs, 1.0)
     const foldTfidfModel = trainTfidf(foldDocs)
     const foldCharModel = trainCharNgram(foldDocs)
+    const foldKnnModel = trainKnn(foldDocs)
 
     // Provenance location metadata
     const locParts = [
@@ -361,6 +369,7 @@ export function runLOOCV(
         nb: foldNbModel,
         tfidf: foldTfidfModel,
         charNgram: foldCharModel,
+        knn: foldKnnModel,
         rulesProfile: m.profile,
       }
       const res = classifyHybrid(testText, 'ALL', m.algo, models, locInput)
@@ -389,6 +398,7 @@ export function runLOOCV(
     modeResults.hybridEnsemble,
     modeResults.ruleBasedFramework,
     modeResults.charNgram,
+    modeResults.knnMemory,
     modeResults.tfidfVsm,
     modeResults.naiveBayes,
   ]
@@ -434,6 +444,7 @@ export function runLOOCV(
       naiveBayes: modeResults.naiveBayes,
       tfidfVsm: modeResults.tfidfVsm,
       charNgram: modeResults.charNgram,
+      knnMemory: modeResults.knnMemory,
       hybridEnsemble: modeResults.hybridEnsemble,
     },
     winner: winnerString,

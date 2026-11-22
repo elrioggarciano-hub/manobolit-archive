@@ -9,6 +9,7 @@ export async function GET() {
   try {
     const dbModels = await prisma.mLModelRegistry.findMany({
       orderBy: { createdAt: 'desc' },
+      omit: { artifact: true }, // trained-model JSON can be hundreds of KB; served only via /api/ml/models/trained
     })
 
     const activeModel = dbModels.find(m => m.status === 'ACTIVE') || {

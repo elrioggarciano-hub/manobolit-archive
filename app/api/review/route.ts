@@ -3,7 +3,7 @@ import { revalidateTag, revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { computeContentHash } from '@/lib/classification/contentHash'
 import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/session'
-import { retrainFromDatabase } from '@/lib/classification/retrain'
+import { retrainFromDatabase, ensureActiveModels } from '@/lib/classification/retrain'
 
 // GET /api/review - Fetch records with review filters
 export async function GET(request: NextRequest) {
@@ -169,6 +169,9 @@ export async function POST(request: NextRequest) {
     })
 
     // 4. Trigger human-in-the-loop retraining when verified
+    // Rebuild models synchronously so this instance learns before responding; other instances
+    // pick up the change via the verified-set fingerprint. The full snapshot + LOOCV run stays async.
+    await ensureActiveModels(true)
     if (newStatus === 'VERIFIED') {
       retrainFromDatabase().catch((err: unknown) => {
         console.error('[Retrain Trigger Error]:', err)

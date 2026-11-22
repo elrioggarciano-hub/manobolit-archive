@@ -115,6 +115,7 @@ model MLModelRegistry {
   datasetSize     Int       @default(0)
   verifiedCounts  String    @default("{}") // JSON record counts per category
   pipelinePath    String?   // Path to serialized scikit-learn artifact
+  artifact        String?   // JSON model exported from the Colab trainer (vocabulary, IDF, coefficients)
   promotionReason String?
   activatedAt     DateTime?
   createdAt       DateTime  @default(now())
@@ -159,6 +160,23 @@ model ClassifierSnapshot {
   vocabularySize Int
   modelJson      String   // Serialized JSON of trained Naive Bayes, TF-IDF, and Char N-Gram models
   loocvJson      String   // Serialized JSON of out-of-sample LOOCV evaluation metrics
+}
+
+model TrainingCorpusDocument {
+  id              String   @id // e.g. "tr-riddle-1"
+  text            String
+  genre           String   // MYTH | LEGEND | FOLKTALE | EPIC | RIDDLE | PROVERB | SONG | CHANT
+  themes          String   @default("[]") // JSON array stored as string
+  provenance      String
+  source          String   // "archive-verbatim" | "author-written"
+  citation        String?
+  archiveEntryId  String?
+  overlapsArchive Boolean  @default(false) // Duplicates an archive record; excluded from training to avoid leakage
+  isActive        Boolean  @default(true)  // Disabled docs are kept for audit but not used for training
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([genre])
 }
 
 model SystemManual {

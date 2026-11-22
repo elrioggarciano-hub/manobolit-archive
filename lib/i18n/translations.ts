@@ -147,7 +147,7 @@ export const translations = {
     andress_06_title: 'Displacement & Land',
     andress_06_desc: 'Narratives of migration, loss of land, and the seeking of ancestral homes.',
 
-    class_engine_badge: 'Hybrid ML & Rule-Based Classification',
+    class_engine_badge: 'Machine-Learned Genre Classification',
     class_engine_defense_pill: 'Intelligent Classifier (Hybrid AI)',
     class_engine_title: 'Automated Literature Classification',
     class_engine_desc: 'Using Hybrid Machine Learning (Multinomial Naive Bayes, LinearSVC, TF-IDF) and Domain Expert Rules (Eugenio 1993), the system automatically analyzes Manobo oral literature and folk songs to determine Genre, Key Themes, and Geographic Provenance.',
@@ -393,7 +393,7 @@ export const translations = {
     andress_06_title: 'Paglikas at Lupang Ninuno',
     andress_06_desc: 'Mga salaysay ng paglikas, pagkaagaw ng lupa, at paghahanap sa sariling tahanan.',
 
-    class_engine_badge: 'Matalinong Pag-uuri (Hybrid ML at Rules)',
+    class_engine_badge: 'Pag-uuri gamit ang Machine Learning',
     class_engine_defense_pill: 'Matalinong Pag-uuri (Hybrid ML)',
     class_engine_title: 'Awtomatikong Pag-uuri ng Panitikan',
     class_engine_desc: 'Gamit ang Hybrid Machine Learning (Multinomial Naive Bayes, LinearSVC, TF-IDF) at Domain Expert Rules (Eugenio 1993), awtomatikong sinusuri ng system ang mga kwento at awiting Manobo upang matukoy ang kanilang Anyo (Genre), Pangunahing Tema, at Lugar ng Pinagmulan.',
@@ -639,7 +639,7 @@ export const translations = {
     andress_06_title: 'Pagbakwit ug Yutang Kabilin',
     andress_06_desc: 'Mga sugilanon sa paglalin, pagkahanaw sa yuta, ug pagpangita sa pinuy-anan.',
 
-    class_engine_badge: 'Matalinong Pagklasipikar (Hybrid ML ug Balaod)',
+    class_engine_badge: 'Pagklasipikar gamit ang Machine Learning',
     class_engine_defense_pill: 'Malamdong Pagklasipikar (Hybrid ML)',
     class_engine_title: 'Awtomatikong Pagklasipikar sa Literatura',
     class_engine_desc: 'Pinaagi sa Hybrid Machine Learning ug Domain Expert Rules (Eugenio 1993), awtomatikong susihon sa sistema ang mga sugilanon ug awit sa Manobo aron mailhan ang Matang (Genre), Pangunahing Tema, ug Sinugdanang Dapit.',
@@ -885,7 +885,7 @@ export const translations = {
     andress_06_title: 'Paglayas wey Tano to Kabilin',
     andress_06_desc: 'Gugud to pagbalhin to ugpaan, pagkawara to tano, wey pamiling to balay.',
 
-    class_engine_badge: 'Matalinong Pagbahin-bahin (Hybrid ML wey Balaod)',
+    class_engine_badge: 'Pagbahin-bahin gamit ang Machine Learning',
     class_engine_defense_pill: 'Maabtik no Pagbahin-bahin (Hybrid ML)',
     class_engine_title: 'Awtomatiko no Pagbahin-bahin to Panitikan',
     class_engine_desc: 'Pinaagi to Hybrid Machine Learning wey mgo Balaod ni Eugenio (1993), awtomatiko no susihon to sistema to mgo gugud wey kanta to Manobo agon matino to Matang, Punoan no Tema, wey Punoan no Ugpaan.',
