@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import AudioPlayer from './AudioPlayer'
 import SyncedTranscript from './SyncedTranscript'
 import { parseSegments } from '@/lib/transcriptSync'
+import { aggregateLocations } from '@/lib/geo'
 
 const RegionalMap = dynamic(() => import('./RegionalMap'), {
   ssr: false,
@@ -396,16 +397,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               overflow: 'hidden'
             }}
           >
-            <RegionalMap
-              locationStats={[
-                {
-                  location: entry.communityLocation,
-                  municipality: entry.municipality,
-                  province: entry.province,
-                  count: 1,
-                },
-              ]}
-            />
+            <RegionalMap locationStats={aggregateLocations([entry])} />
 
             {/* Overlay Text Tag */}
             <div

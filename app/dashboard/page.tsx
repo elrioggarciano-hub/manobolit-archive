@@ -1,6 +1,7 @@
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { getLatestSnapshot } from '@/lib/classification/retrain'
+import { aggregateLocations } from '@/lib/geo'
 import DashboardClient from './DashboardClient'
 
 // Edge ISR with 60s stale-while-revalidate for sub-50ms dashboard delivery
@@ -8,11 +9,7 @@ export const revalidate = 60
 
 const getProcessedDashboardData = unstable_cache(
   async () => {
-    const [grouped, genreGrouped, themeRows, allEntries] = await Promise.all([
-      prisma.literatureEntry.groupBy({
-        by: ['communityLocation', 'municipality', 'province'],
-        _count: { _all: true },
-      }),
+    const [genreGrouped, themeRows, allEntries] = await Promise.all([
       prisma.literatureEntry.groupBy({
         by: ['genre'],
         _count: { _all: true },
@@ -71,14 +68,8 @@ const getProcessedDashboardData = unstable_cache(
       audioFile: e.audioFile || '',
     }))
 
-    const locationStats = grouped
-      .map(g => ({
-        location: g.communityLocation,
-        municipality: g.municipality,
-        province: g.province,
-        count: g._count._all,
-      }))
-      .sort((a, b) => b.count - a.count)
+    // Counted per barangay (not per free-text sitio) with verified PhilAtlas coordinates
+    const locationStats = aggregateLocations(allEntries)
 
     const topGenre = [...genreGrouped].sort((a, b) => b._count._all - a._count._all)[0]
     const mostCommonGenre = topGenre
@@ -124,7 +115,7 @@ const getProcessedDashboardData = unstable_cache(
       exportRecords,
     }
   },
-  ['dashboard-processed-v6'],
+  ['dashboard-processed-v7'],
   { tags: ['entries'] }
 )
 

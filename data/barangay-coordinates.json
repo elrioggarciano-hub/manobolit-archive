@@ -1,0 +1,30 @@
+{
+  "source": "PhilAtlas barangay profiles (verified 2026-11-23)",
+  "barangays": [
+    {
+      "barangay": "Tudela",
+      "municipality": "Trento",
+      "province": "Agusan del Sur",
+      "lat": 8.0684,
+      "lng": 126.1032,
+      "url": "https://www.philatlas.com/mindanao/caraga/agusan-del-sur/trento/tudela.html"
+    },
+    {
+      "barangay": "Santa Maria",
+      "aliases": ["Sta Maria", "Sta. Maria"],
+      "municipality": "Trento",
+      "province": "Agusan del Sur",
+      "lat": 8.0211,
+      "lng": 126.1614,
+      "url": "https://www.philatlas.com/mindanao/caraga/agusan-del-sur/trento/santa-maria.html"
+    },
+    {
+      "barangay": "San Andres",
+      "municipality": "Bunawan",
+      "province": "Agusan del Sur",
+      "lat": 8.2066,
+      "lng": 125.9944,
+      "url": "https://www.philatlas.com/mindanao/caraga/agusan-del-sur/bunawan/san-andres.html"
+    }
+  ]
+}

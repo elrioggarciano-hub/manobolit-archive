@@ -3,6 +3,9 @@
 import { useEffect } from 'react'
 import L from 'leaflet'
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from 'react-leaflet'
+import type { LocationStat } from '@/lib/geo'
+
+export type { LocationStat }
 
 function MapAutoFit({ coords }: { coords: [number, number][] }) {
   const map = useMap()
@@ -13,8 +16,7 @@ function MapAutoFit({ coords }: { coords: [number, number][] }) {
       if (coords.length === 1) {
         map.setView(coords[0], 12)
       } else {
-        const bounds = L.latLngBounds(coords)
-        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 11 })
+        map.fitBounds(L.latLngBounds(coords), { padding: [36, 36], maxZoom: 11 })
       }
     }, 200)
     return () => clearTimeout(timer)
@@ -22,47 +24,16 @@ function MapAutoFit({ coords }: { coords: [number, number][] }) {
   return null
 }
 
-export interface LocationStat {
-  location: string
-  municipality: string
-  province: string
-  count: number
-}
-
-// Real coordinates (source: PhilAtlas official barangay profiles), keyed by
-// the exact `communityLocation` strings used in the archive's data entry.
-const KNOWN_COORDS: Record<string, [number, number]> = {
-  'trento': [8.0500, 126.0667],
-  'sta maria': [8.0211, 126.1614],
-  'sitio dam, brgy. tudela': [8.0684, 126.1032],
-  'tudela': [8.0684, 126.1032],
-  'san andres, bunawan': [8.2066, 125.9944],
-  'san andres': [8.2066, 125.9944],
-  'bunawan': [8.1633, 125.9902],
-}
-
-function resolveCoords(location: string): [number, number] | null {
-  const norm = (location || '').trim().toLowerCase()
-  if (KNOWN_COORDS[norm]) return KNOWN_COORDS[norm]
-  if (norm.includes('san andres')) return [8.2066, 125.9944]
-  if (norm.includes('bunawan')) return [8.1633, 125.9902]
-  if (norm.includes('sta maria') || norm.includes('santa maria')) return [8.0211, 126.1614]
-  if (norm.includes('dam') || norm.includes('tudela')) return [8.0684, 126.1032]
-  if (norm.includes('trento')) return [8.0500, 126.0667]
-  return null
-}
-
+// Markers are placed only at verified barangay coordinates (data/barangay-coordinates.json, from PhilAtlas).
+// Circle AREA is proportional to the number of entries, and the count is printed on each marker.
 export default function RegionalMap({ locationStats }: { locationStats: LocationStat[] }) {
-  const maxCount = Math.max(1, ...locationStats.map(l => l.count))
-  const plotted = locationStats
-    .map(l => ({ ...l, coords: resolveCoords(l.location) }))
-    .filter((l): l is LocationStat & { coords: [number, number] } => l.coords !== null)
-
+  const plotted = locationStats.filter((l): l is LocationStat & { coords: [number, number] } => l.coords !== null)
+  const maxCount = Math.max(1, ...plotted.map(l => l.count))
   const allCoords = plotted.map(l => l.coords)
 
   return (
     <MapContainer
-      center={[8.16, 126.05]}
+      center={[8.12, 126.05]}
       zoom={9}
       scrollWheelZoom={false}
       dragging={true}
@@ -76,27 +47,30 @@ export default function RegionalMap({ locationStats }: { locationStats: Location
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {plotted.map(loc => {
-        const ratio = loc.count / maxCount
+        const ratio = Math.sqrt(loc.count / maxCount)
         return (
           <CircleMarker
-            key={loc.location}
+            key={`${loc.barangay}|${loc.municipality}`}
             center={loc.coords}
-            radius={8 + ratio * 14}
-            pathOptions={{
-              color: '#ffffff',
-              weight: 2,
-              fillColor: '#8F000D',
-              fillOpacity: 0.55 + ratio * 0.25,
-            }}
+            radius={9 + ratio * 15}
+            pathOptions={{ color: '#ffffff', weight: 2, fillColor: '#8F000D', fillOpacity: 0.6 + ratio * 0.25 }}
           >
-            <Tooltip direction="top" offset={[0, -6]}>
-              <strong>{loc.location}</strong>
-              <br />
-              {loc.count} {loc.count === 1 ? 'entry' : 'entries'}
+            {/* Count printed on the marker */}
+            <Tooltip permanent direction="center" opacity={1} className="map-count-label">
+              {loc.count}
             </Tooltip>
           </CircleMarker>
         )
       })}
+      {plotted.map(loc => (
+        <CircleMarker key={`hover-${loc.barangay}|${loc.municipality}`} center={loc.coords} radius={9 + Math.sqrt(loc.count / maxCount) * 15} pathOptions={{ opacity: 0, fillOpacity: 0 }}>
+          <Tooltip direction="top" offset={[0, -10]}>
+            <strong>{loc.location}</strong>
+            <br />
+            {loc.count} {loc.count === 1 ? 'entry' : 'entries'}
+          </Tooltip>
+        </CircleMarker>
+      ))}
     </MapContainer>
   )
 }

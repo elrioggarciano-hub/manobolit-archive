@@ -4,12 +4,8 @@ import dynamic from 'next/dynamic'
 import CountUp from '@/components/CountUp'
 import { useLanguage } from '@/lib/context/LanguageContext'
 
-export interface LocationStat {
-  location: string
-  municipality: string
-  province: string
-  count: number
-}
+import type { LocationStat } from '@/lib/geo'
+export type { LocationStat }
 
 export interface GenreStat {
   genre: string
@@ -137,6 +133,7 @@ export default function DashboardClient({
     return `conic-gradient(${stops.join(', ')})`
   })()
   const topLocations = locationStats.slice(0, 5)
+  const unmappedCount = locationStats.filter(l => !l.coords).reduce((n, l) => n + l.count, 0)
 
   const downloadThemeDataset = () => {
     const header = 'theme,entries_tagged\n'
@@ -620,7 +617,7 @@ export default function DashboardClient({
                 }}
               >
                 {/* Left Part: Regional Heatmap */}
-                <div style={{ flex: 1.8, padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div style={{ flex: 1.8, padding: '20px', display: 'flex', flexDirection: 'column' }}>
                   <div>
                     <h3
                       style={{
@@ -641,7 +638,8 @@ export default function DashboardClient({
                   {/* Real interactive map (Leaflet + OpenStreetMap) — markers plot verified coordinates only */}
                   <div
                     style={{
-                      height: '220px',
+                      flex: 1,
+                      minHeight: '240px',
                       marginTop: '12px',
                       position: 'relative',
                       isolation: 'isolate',
@@ -651,7 +649,11 @@ export default function DashboardClient({
                       border: '1px solid var(--border-color)'
                     }}
                   >
-                    <RegionalMap locationStats={topLocations} />
+                    <RegionalMap locationStats={locationStats} />
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                    Circle size and number = entries per barangay · coordinates: PhilAtlas
+                    {unmappedCount > 0 && ` · ${unmappedCount} ${unmappedCount === 1 ? 'entry' : 'entries'} not mapped (no verified coordinates)`}
                   </div>
                 </div>
 
