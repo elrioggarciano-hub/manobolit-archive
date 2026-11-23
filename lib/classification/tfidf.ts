@@ -15,7 +15,7 @@
 
 import { normalizeText, tokenizeUnigrams, generateWordBigrams } from './tokenizer'
 import { FALLBACK_RULE_SET } from './rules'
-import { TRAINING_CORPUS, TrainingDocument, ACTIVE_GENRES } from './trainingCorpus'
+import { TRAINING_CORPUS, TrainingDocument, DEFAULT_ACTIVE_GENRES } from './trainingCorpus'
 import { cleanClassificationText } from './textCleaning'
 
 export interface TFIDFVector {
@@ -158,10 +158,11 @@ export function legacyRuleLexiconCentroids(): ClassCentroid[] {
  * and normalized class centroid vectors per genre and theme.
  */
 export function trainTfidf(
-  trainingDocs: TrainingDocument[] = TRAINING_CORPUS
+  trainingDocs: TrainingDocument[] = TRAINING_CORPUS,
+  genres: readonly string[] = DEFAULT_ACTIVE_GENRES
 ): TfidfModel {
-  // Train ONLY on ACTIVE_GENRES documents (DF, IDF, and class centroids)
-  const activeDocs = trainingDocs.filter(d => (ACTIVE_GENRES as readonly string[]).includes(d.genre))
+  // Train only on the active genres (derived from verified data)
+  const activeDocs = trainingDocs.filter(d => genres.includes(d.genre))
   const totalDocuments = activeDocs.length
   const dfMap = new Map<string, number>()
 
@@ -288,7 +289,7 @@ export function trainTfidf(
 
   // Build Genre Centroids from aggregated document term counts (active genres only)
   for (const [genre, counts] of Object.entries(genreTermCounts)) {
-    if ((ACTIVE_GENRES as readonly string[]).includes(genre)) {
+    if (genres.includes(genre)) {
       centroids.push(buildCentroidFromCounts(`GENRE_${genre}`, genre, 'GENRE', counts))
     }
   }
@@ -387,7 +388,8 @@ export function classifyWithVSM(
   const genreScores: VSMScore[] = []
   const themeScores: VSMScore[] = []
   const centroids = activeModel.centroids
-  const activeGenreSet = new Set<string>(ACTIVE_GENRES)
+  // Genre centroids exist only for the genres the model was trained on
+  const activeGenreSet = new Set<string>(centroids.filter(c => c.type === 'GENRE').map(c => c.category))
 
   for (const centroid of centroids) {
     if (centroid.type === 'GENRE') {

@@ -2,7 +2,7 @@
 // Enforces rigorous, honest, and defensible out-of-sample machine learning evaluation.
 // Every fold retrains all models without the held-out entry or any overlapping training documents.
 
-import { TRAINING_CORPUS, TrainingDocument, ACTIVE_GENRES, ActiveGenre } from './trainingCorpus'
+import { TRAINING_CORPUS, TrainingDocument, deriveActiveGenres } from './trainingCorpus'
 import { trainNaiveBayes } from './naiveBayes'
 import { trainTfidf } from './tfidf'
 import { trainCharNgram } from './charNgram'
@@ -161,17 +161,18 @@ export function evaluatePredictions(
   entries: ScorableEntry[],
   modeKey: string,
   modeName: string,
-  flaggedInSample: boolean = false
+  flaggedInSample: boolean = false,
+  genres: readonly string[] = deriveActiveGenres(actuals, 1)
 ): ModeEvaluationResult {
   const sampleSize = actuals.length
   let correct = 0
   let covered = 0
 
-  const allPossibleColumns = [...ACTIVE_GENRES, 'UNCLASSIFIED']
+  const allPossibleColumns = [...genres, 'UNCLASSIFIED']
 
   // Initialize confusion matrix
   const confusionMatrix: Record<string, Record<string, number>> = {}
-  for (const act of ACTIVE_GENRES) {
+  for (const act of genres) {
     confusionMatrix[act] = {}
     for (const pred of allPossibleColumns) {
       confusionMatrix[act][pred] = 0
@@ -212,7 +213,7 @@ export function evaluatePredictions(
   const coveredAccuracy = covered > 0 ? Math.round((correct / covered) * 1000) / 1000 : 0
 
   // Per-class metrics
-  const perClass: PerClassMetrics[] = ACTIVE_GENRES.map(genre => {
+  const perClass: PerClassMetrics[] = genres.map(genre => {
     let tp = 0
     let fp = 0
     let fn = 0
@@ -268,11 +269,14 @@ export function evaluatePredictions(
  * 4. Held-out entry i is scored across all 6 classification modes.
  */
 export function runLOOCV(
-  entries: ScorableEntry[],
+  allEntries: ScorableEntry[],
   options: LOOCVOptions = {}
 ): LOOCVReport {
   const textConfig = options.textConfig || 'both'
   const stripAnswer = options.stripAnswer !== undefined ? options.stripAnswer : true
+  // Genres with enough examples are evaluated (same rule as the notebook); others cannot be learned yet
+  const genres = deriveActiveGenres(allEntries.map(e => e.genre))
+  const entries = allEntries.filter(e => genres.includes(e.genre))
   const sampleSize = entries.length
   const corpus = options.baseCorpus || TRAINING_CORPUS
   const corpusOverlaps = overlappingDocIds(corpus)
@@ -283,7 +287,7 @@ export function runLOOCV(
   const genreCounts: Record<string, number> = {}
   for (const g of actuals) genreCounts[g] = (genreCounts[g] || 0) + 1
 
-  let maxGenre = ACTIVE_GENRES[0] as string
+  let maxGenre = genres[0]
   let maxCount = 0
   for (const [g, count] of Object.entries(genreCounts)) {
     if (count > maxCount) {
@@ -349,10 +353,10 @@ export function runLOOCV(
     const foldDocs = [...baseCorpus, ...otherArchiveDocs]
 
     // Retrain fold models
-    const foldNbModel = trainNaiveBayes(foldDocs, 1.0)
-    const foldTfidfModel = trainTfidf(foldDocs)
-    const foldCharModel = trainCharNgram(foldDocs)
-    const foldKnnModel = trainKnn(foldDocs)
+    const foldNbModel = trainNaiveBayes(foldDocs, 1.0, genres)
+    const foldTfidfModel = trainTfidf(foldDocs, genres)
+    const foldCharModel = trainCharNgram(foldDocs, genres)
+    const foldKnnModel = trainKnn(foldDocs, undefined, genres)
 
     // Provenance location metadata
     const locParts = [
@@ -370,6 +374,7 @@ export function runLOOCV(
         tfidf: foldTfidfModel,
         charNgram: foldCharModel,
         knn: foldKnnModel,
+        genres,
         rulesProfile: m.profile,
       }
       const res = classifyHybrid(testText, 'ALL', m.algo, models, locInput)
@@ -388,7 +393,8 @@ export function runLOOCV(
       entries,
       m.key,
       m.name,
-      m.inSample
+      m.inSample,
+      genres
     )
   }
 
@@ -502,11 +508,12 @@ export function runThemeLOOCV(entries: ScorableEntry[], options: LOOCVOptions = 
         source: 'archive-verbatim' as const,
       }))
     const text = extractEntryText(heldOut, textConfig, stripAnswer)
-    const knn = trainKnn([...base, ...others])
+    const genres = deriveActiveGenres(entries.map(e => e.genre))
+    const knn = trainKnn([...base, ...others], undefined, genres)
     const predicted = {
-      knn: new Set(classifyHybrid(text, 'ALL', 'KNN_MEMORY', { knn }).themes.map(t => t.value)),
+      knn: new Set(classifyHybrid(text, 'ALL', 'KNN_MEMORY', { knn, genres }).themes.map(t => t.value)),
       rules: new Set(classifyHybrid(text, 'ALL', 'RULE_BASED', { rulesProfile: 'framework-only' }).themes.map(t => t.value)),
-      combined: new Set(classifyHybrid(text, 'ALL', 'HYBRID_ENSEMBLE', { knn, rulesProfile: 'framework-only' }).themes.map(t => t.value)),
+      combined: new Set(classifyHybrid(text, 'ALL', 'HYBRID_ENSEMBLE', { knn, genres, rulesProfile: 'framework-only' }).themes.map(t => t.value)),
     }
     for (const key of ['knn', 'rules', 'combined'] as const) {
       for (const p of predicted[key]) gold.has(p) ? tally[key].tp++ : tally[key].fp++

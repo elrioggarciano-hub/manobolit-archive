@@ -12,7 +12,7 @@ import { ClassificationRule, RulesProfile, RULES_PROFILE, isExcludedByProfile, R
 import { MatchedTerm, RuleDetail } from './engine'
 import { predictNaiveBayes, NaiveBayesPrediction, NaiveBayesModel } from './naiveBayes'
 import { classifyWithCharNgram, CharNgramResult, CharNgramModel } from './charNgram'
-import { ACTIVE_GENRES } from './trainingCorpus'
+import { DEFAULT_ACTIVE_GENRES } from './trainingCorpus'
 import { cleanClassificationText } from './textCleaning'
 import { classifyWithKnn, predictThemesWithKnn, KnnModel, KnnResult } from './knn'
 
@@ -23,6 +23,8 @@ export interface InjectableModels {
   knn?: KnnModel
   /** Rule base (Eugenio / Andress / provenance) from the database; defaults to the bundled data file */
   rules?: RuleSet
+  /** genres to predict (derived from verified data); defaults to DEFAULT_ACTIVE_GENRES */
+  genres?: readonly string[]
   /** Dialect variants from the lexicon database (used for the orthographic tolerance display). */
   dialectVariants?: DialectVariant[]
   rulesProfile?: RulesProfile
@@ -223,7 +225,8 @@ export function classifyHybrid(
     : 0.0
 
   // 5. Run Heuristic Rule Engine
-  const activeGenreSet = new Set<string>(ACTIVE_GENRES)
+  const activeGenres: readonly string[] = models?.genres?.length ? models.genres : DEFAULT_ACTIVE_GENRES
+  const activeGenreSet = new Set<string>(activeGenres)
   const ruleDetails: Record<string, RuleDetail> = {}
   const genreScoresRule: { genre: string; confidence: number; ruleId: string }[] = []
 
@@ -303,10 +306,10 @@ export function classifyHybrid(
   const topLocation = locationResults[0] ?? null
 
   // 6. Synthesize Scores according to the selected Algorithm Mode
-  // TargetGenreFilter is removed from classification path (model evaluates across all ACTIVE_GENRES)
-  const candidateGenres = ACTIVE_GENRES as readonly string[]
+  // Evaluate across all active genres (derived from verified data)
+  const candidateGenres = activeGenres
 
-  // Convert each model's outputs across ACTIVE_GENRES into calibrated probability distributions
+  // Convert each model's outputs across the active genres into calibrated probability distributions
   const rawVsmScores = candidateGenres.map(g => {
     const m = vsmResult.allGenreScores.find(s => s.category === g)
     return m ? m.cosineSimilarity : 0
@@ -399,7 +402,7 @@ export function classifyHybrid(
     ...(topLocation ? [topLocation.ruleId] : []),
   ]
 
-  const topGenreCandidate = finalGenreScores[0]?.genre || ACTIVE_GENRES[0]
+  const topGenreCandidate = finalGenreScores[0]?.genre || activeGenres[0]
   const ruleMatchForTop = genreScoresRule.find(s => s.genre === topGenreCandidate)
   const vsmMatchForTop = vsmResult.allGenreScores.find(s => s.category === topGenreCandidate)
   const nbMatchForTop = nbResult.allProbabilities.find(s => s.genre === topGenreCandidate)

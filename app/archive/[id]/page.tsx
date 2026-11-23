@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import EntryDetail from '@/components/EntryDetail'
+import { aggregateLocations } from '@/lib/geo'
+import { getGazetteer } from '@/lib/geoStore'
 import BackButton from '@/components/BackButton'
 
 // Edge ISR with 60s stale-while-revalidate for sub-50ms entry retrieval
@@ -55,7 +57,7 @@ export default async function EntryDetailPage({ params }: Props) {
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 16px' }}>
         <BackButton fallbackHref="/explore" defaultLabel="Back to Explorer" />
       </div>
-      <EntryDetail entry={parsed} />
+      <EntryDetail entry={parsed} locationStats={aggregateLocations([parsed], await getGazetteer())} />
     </main>
   )
 }

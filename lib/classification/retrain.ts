@@ -8,7 +8,7 @@
 import fs from 'fs'
 import path from 'path'
 import { prisma } from '../database/prisma'
-import { TRAINING_CORPUS, TrainingDocument } from './trainingCorpus'
+import { TRAINING_CORPUS, TrainingDocument, DEFAULT_ACTIVE_GENRES, deriveActiveGenres } from './trainingCorpus'
 import { trainNaiveBayes, NaiveBayesModel, DEFAULT_TRAINED_NB_MODEL } from './naiveBayes'
 import { trainTfidf, TfidfModel, DEFAULT_TFIDF_MODEL } from './tfidf'
 import { trainCharNgram, CharNgramModel, DEFAULT_CHAR_NGRAM_MODEL } from './charNgram'
@@ -36,6 +36,8 @@ export interface ActiveModels {
   knn: KnnModel
   /** rule base (database) used by the rule-based component */
   rules: RuleSet
+  /** genres predicted — those with enough verified examples (derived from the data) */
+  genres: string[]
 }
 
 let isRetraining = false
@@ -82,15 +84,25 @@ export function verifiedRecordsToTrainingDocs(records: any[]): TrainingDocument[
   })
 }
 
-/** Trains every learned model on the given documents (and attaches the rule base). */
-export function buildModels(docs: TrainingDocument[], rules: RuleSet = FALLBACK_RULE_SET): ActiveModels {
+/** Trains every learned model on the given documents (and attaches the rule base and active genres). */
+export function buildModels(
+  docs: TrainingDocument[],
+  rules: RuleSet = FALLBACK_RULE_SET,
+  genres: string[] = [...DEFAULT_ACTIVE_GENRES]
+): ActiveModels {
   return {
-    nb: trainNaiveBayes(docs, 1.0),
-    tfidf: trainTfidf(docs),
-    charNgram: trainCharNgram(docs),
-    knn: trainKnn(docs),
+    nb: trainNaiveBayes(docs, 1.0, genres),
+    tfidf: trainTfidf(docs, genres),
+    charNgram: trainCharNgram(docs, genres),
+    knn: trainKnn(docs, undefined, genres),
     rules,
+    genres,
   }
+}
+
+/** Active genres = genres with enough human-verified entries. */
+function genresFromVerified(records: any[]): string[] {
+  return deriveActiveGenres(records.map(e => e.verifiedGenre || e.genre))
 }
 
 async function getVerifiedFingerprint(): Promise<string> {
@@ -140,7 +152,7 @@ export async function ensureActiveModels(force: boolean = false): Promise<Active
       if (!force && currentModels && fingerprint === modelsFingerprint) return currentModels
 
       const verified = await prisma.literatureEntry.findMany({ where: { reviewStatus: 'VERIFIED' } })
-      currentModels = buildModels([...trainableBase(corpus.docs), ...verifiedRecordsToTrainingDocs(verified)], rules.ruleSet)
+      currentModels = buildModels([...trainableBase(corpus.docs), ...verifiedRecordsToTrainingDocs(verified)], rules.ruleSet, genresFromVerified(verified))
       modelsFingerprint = fingerprint
       await loadLatestSnapshotFromDb()
       console.log(`[Models] Rebuilt from ${corpus.docs.length} corpus docs (${corpus.origin}) + ${verified.length} verified entries.`)
@@ -205,6 +217,7 @@ export function getActiveModels(): ActiveModels {
     charNgram: DEFAULT_CHAR_NGRAM_MODEL,
     knn: trainKnn(TRAINING_CORPUS),
     rules: FALLBACK_RULE_SET,
+    genres: [...DEFAULT_ACTIVE_GENRES],
   }
   return currentModels
 }
@@ -270,7 +283,7 @@ export async function retrainFromDatabase(
       console.log(`[Retrain] Combined training set size: ${combinedTrainingSet.length} documents.`);
 
       // 3. Train all models
-      const trained = buildModels(combinedTrainingSet, rules.ruleSet)
+      const trained = buildModels(combinedTrainingSet, rules.ruleSet, verifiedRecords.length ? genresFromVerified(verifiedRecords) : [...DEFAULT_ACTIVE_GENRES])
       const nbModel = trained.nb
       const tfidfModel = trained.tfidf
       const charModel = trained.charNgram

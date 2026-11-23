@@ -223,6 +223,21 @@ model ClassificationRule {
   @@index([type])
 }
 
+model BarangayLocation {
+  id           String   @id @default(cuid())
+  barangay     String
+  aliases      String   @default("[]") // JSON array of alternative spellings (e.g. "Sta Maria")
+  municipality String
+  province     String
+  lat          Float
+  lng          Float
+  sourceUrl    String?  // e.g. PhilAtlas barangay profile used to verify the coordinates
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([barangay, municipality])
+}
+
 model SystemManual {
   id            String   @id @default("active-manual")
   fileName      String

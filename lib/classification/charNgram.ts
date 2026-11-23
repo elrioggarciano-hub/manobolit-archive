@@ -2,7 +2,7 @@
 // Formulated for low-resource agglutinative morphological robustness.
 
 import { tokenizeUnigrams } from './tokenizer'
-import { TRAINING_CORPUS, TrainingDocument, ACTIVE_GENRES } from './trainingCorpus'
+import { TRAINING_CORPUS, TrainingDocument, DEFAULT_ACTIVE_GENRES } from './trainingCorpus'
 import { cleanClassificationText } from './textCleaning'
 
 export interface CharNgramCentroid {
@@ -56,10 +56,11 @@ export function extractWordBoundedCharNgrams(text: string): string[] {
  * Per-genre centroid = normalized sum of its document vectors.
  */
 export function trainCharNgram(
-  trainingDocs: TrainingDocument[] = TRAINING_CORPUS
+  trainingDocs: TrainingDocument[] = TRAINING_CORPUS,
+  genres: readonly string[] = DEFAULT_ACTIVE_GENRES
 ): CharNgramModel {
-  // Train ONLY on ACTIVE_GENRES documents (DF, IDF, and centroids)
-  const activeDocs = trainingDocs.filter(d => (ACTIVE_GENRES as readonly string[]).includes(d.genre))
+  // Train only on the active genres (derived from verified data)
+  const activeDocs = trainingDocs.filter(d => genres.includes(d.genre))
   const totalDocuments = activeDocs.length
   const dfMap = new Map<string, number>()
 
@@ -169,8 +170,8 @@ export function classifyWithCharNgram(
   const cleaned = cleanClassificationText(text)
   const grams = extractWordBoundedCharNgrams(cleaned)
 
-  const activeGenreSet = new Set<string>(ACTIVE_GENRES)
-  const defaultFallback = ACTIVE_GENRES[0] || 'RIDDLE'
+  // The model only contains centroids for the genres it was trained on
+  const activeGenreSet = new Set<string>(activeModel.centroids.map(c => c.genre))
 
   if (grams.length === 0 || activeModel.centroids.length === 0) {
     return {

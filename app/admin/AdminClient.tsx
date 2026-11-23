@@ -12,6 +12,7 @@ import TrainedModelManagement from '@/components/admin/TrainedModelManagement'
 import LexiconManagement from '@/components/admin/LexiconManagement'
 import LearnedSuggestions from '@/components/admin/LearnedSuggestions'
 import RuleManagement from '@/components/admin/RuleManagement'
+import LocationManagement from '@/components/admin/LocationManagement'
 
 export interface AdminEntry {
   id: string
@@ -222,7 +223,12 @@ export default function AdminClient({ initialEntries }: Props) {
 
         {adminTab === 'review' && <ReviewQueue />}
         {adminTab === 'ml' && <TrainedModelManagement />}
-        {adminTab === 'dataset' && <DatasetManagement />}
+        {adminTab === 'dataset' && (
+          <>
+            <DatasetManagement />
+            <LocationManagement />
+          </>
+        )}
         {adminTab === 'rules' && <RuleManagement />}
         {adminTab === 'corpus' && <TrainingCorpusManagement />}
         {adminTab === 'lexicon' && (

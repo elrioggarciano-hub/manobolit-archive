@@ -1,29 +1,39 @@
-// Barangay coordinates for the regional map. The coordinates are data (data/barangay-coordinates.json,
-// verified against PhilAtlas barangay profiles), not code. Locations without verified coordinates are
+// Barangay coordinates for the regional map. Coordinates are data, not code: they live in the
+// BarangayLocation table (managed in Admin → Dataset & Taxonomies → Barangay locations), with
+// data/barangay-coordinates.json as the seed/fallback. Locations without verified coordinates are
 // reported as "not mapped" instead of being placed at a guessed position.
-import gazetteer from '../data/barangay-coordinates.json'
+import fallbackGazetteer from '../data/barangay-coordinates.json'
 
-interface GazetteerEntry {
+export interface GazetteerEntry {
   barangay: string
   aliases?: string[]
   municipality: string
   province: string
   lat: number
   lng: number
-  url: string
+  url?: string | null
 }
 
-const norm = (s: string | null | undefined) =>
+export const FALLBACK_GAZETTEER: GazetteerEntry[] = (fallbackGazetteer as { barangays: GazetteerEntry[] }).barangays
+
+export const normPlace = (s: string | null | undefined) =>
   (s || '').toLowerCase().replace(/\b(brgy|barangay)\.?\s*/g, '').replace(/\./g, '').replace(/\s+/g, ' ').trim()
 
-const INDEX = new Map<string, GazetteerEntry>()
-for (const g of (gazetteer as { barangays: GazetteerEntry[] }).barangays) {
-  for (const name of [g.barangay, ...(g.aliases || [])]) INDEX.set(`${norm(name)}|${norm(g.municipality)}`, g)
+function buildIndex(gazetteer: GazetteerEntry[]) {
+  const index = new Map<string, GazetteerEntry>()
+  for (const g of gazetteer) {
+    for (const name of [g.barangay, ...(g.aliases || [])]) index.set(`${normPlace(name)}|${normPlace(g.municipality)}`, g)
+  }
+  return index
 }
 
 /** Canonical barangay entry for a recorded barangay + municipality, or null if not in the gazetteer. */
-export function lookupBarangay(barangay: string | null | undefined, municipality: string | null | undefined): GazetteerEntry | null {
-  return INDEX.get(`${norm(barangay)}|${norm(municipality)}`) ?? null
+export function lookupBarangay(
+  barangay: string | null | undefined,
+  municipality: string | null | undefined,
+  gazetteer: GazetteerEntry[] = FALLBACK_GAZETTEER
+): GazetteerEntry | null {
+  return buildIndex(gazetteer).get(`${normPlace(barangay)}|${normPlace(municipality)}`) ?? null
 }
 
 export interface LocationStat {
@@ -35,18 +45,20 @@ export interface LocationStat {
   count: number
   /** verified coordinates, or null when the barangay is not in the gazetteer */
   coords: [number, number] | null
-  source?: string
+  source?: string | null
 }
 
 /** Counts entries per barangay (not per free-text sitio), with verified coordinates attached. */
 export function aggregateLocations(
-  entries: { barangay?: string | null; communityLocation?: string | null; municipality: string; province: string }[]
+  entries: { barangay?: string | null; communityLocation?: string | null; municipality: string; province: string }[],
+  gazetteer: GazetteerEntry[] = FALLBACK_GAZETTEER
 ): LocationStat[] {
+  const index = buildIndex(gazetteer)
   const groups = new Map<string, LocationStat>()
   for (const e of entries) {
-    const g = lookupBarangay(e.barangay, e.municipality)
+    const g = index.get(`${normPlace(e.barangay)}|${normPlace(e.municipality)}`) ?? null
     const barangay = g?.barangay || (e.barangay || '').trim() || (e.communityLocation || '').trim() || 'Unspecified'
-    const key = `${norm(barangay)}|${norm(e.municipality)}`
+    const key = `${normPlace(barangay)}|${normPlace(e.municipality)}`
     const stat = groups.get(key) ?? {
       location: `Brgy. ${barangay}, ${e.municipality}`,
       barangay,

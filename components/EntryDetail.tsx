@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 import AudioPlayer from './AudioPlayer'
 import SyncedTranscript from './SyncedTranscript'
 import { parseSegments } from '@/lib/transcriptSync'
-import { aggregateLocations } from '@/lib/geo'
+import { aggregateLocations, type LocationStat } from '@/lib/geo'
 
 const RegionalMap = dynamic(() => import('./RegionalMap'), {
   ssr: false,
@@ -86,7 +86,7 @@ const getAnalysisText = (entry: Entry, latest?: Classification) => {
   return text
 }
 
-export default function EntryDetail({ entry }: { entry: Entry }) {
+export default function EntryDetail({ entry, locationStats }: { entry: Entry; locationStats?: LocationStat[] }) {
   const latestClassification = entry.classifications?.[0]
   // The stored model probability, shown as-is (never replaced by another number).
   const confidence = latestClassification ? Math.round((latestClassification.confidenceScore || 0) * 100) : 0
@@ -397,7 +397,7 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               overflow: 'hidden'
             }}
           >
-            <RegionalMap locationStats={aggregateLocations([entry])} />
+            <RegionalMap locationStats={locationStats ?? aggregateLocations([entry])} />
 
             {/* Overlay Text Tag */}
             <div

@@ -7,7 +7,7 @@
 // The same neighbors also vote for THEMES (multi-label): a theme is predicted when the
 // neighbors carrying it hold at least THEME_VOTE_THRESHOLD of the total neighbor similarity.
 
-import { TrainingDocument, ACTIVE_GENRES } from './trainingCorpus'
+import { TrainingDocument, DEFAULT_ACTIVE_GENRES } from './trainingCorpus'
 import { extractWordBoundedCharNgrams } from './charNgram'
 import { cleanClassificationText } from './textCleaning'
 
@@ -25,6 +25,8 @@ export interface KnnModel {
   dfMap: Map<string, number>
   totalDocuments: number
   k: number
+  /** genres present in the exemplar memory */
+  classes: string[]
 }
 
 export interface KnnNeighbor {
@@ -81,15 +83,15 @@ function cosine(a: SparseVec, b: SparseVec): number {
 /**
  * Builds the exemplar memory from training documents (active genres only).
  */
-export function trainKnn(docs: TrainingDocument[], k: number = DEFAULT_K): KnnModel {
-  const active = docs.filter(d => (ACTIVE_GENRES as readonly string[]).includes(d.genre))
+export function trainKnn(docs: TrainingDocument[], k: number = DEFAULT_K, genres: readonly string[] = DEFAULT_ACTIVE_GENRES): KnnModel {
+  const active = docs.filter(d => genres.includes(d.genre))
   const dfMap = new Map<string, number>()
   const gramSets = active.map(d => new Set(extractWordBoundedCharNgrams(cleanClassificationText(d.text))))
   for (const set of gramSets) for (const g of set) dfMap.set(g, (dfMap.get(g) || 0) + 1)
 
   const base = { dfMap, totalDocuments: active.length }
   const exemplars = active.map(d => ({ id: d.id, genre: d.genre, themes: d.themes || [], vector: vectorize(d.text, base) }))
-  return { exemplars, dfMap, totalDocuments: active.length, k }
+  return { exemplars, dfMap, totalDocuments: active.length, k, classes: genres.filter(g => active.some(d => d.genre === g)) }
 }
 
 /**
@@ -97,7 +99,7 @@ export function trainKnn(docs: TrainingDocument[], k: number = DEFAULT_K): KnnMo
  * Genre score = sum of neighbor similarities for that genre / sum of all neighbor similarities.
  */
 export function classifyWithKnn(text: string, model: KnnModel, targetGenreFilter: string = 'ALL'): KnnResult {
-  const genres = (ACTIVE_GENRES as readonly string[]).filter(g => targetGenreFilter === 'ALL' || g === targetGenreFilter)
+  const genres = (model?.classes?.length ? model.classes : [...DEFAULT_ACTIVE_GENRES]).filter(g => targetGenreFilter === 'ALL' || g === targetGenreFilter)
   const empty: KnnResult = {
     predictedGenre: 'UNCLASSIFIED',
     confidence: 0,

@@ -2,6 +2,7 @@ import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { getLatestSnapshot } from '@/lib/classification/retrain'
 import { aggregateLocations } from '@/lib/geo'
+import { getGazetteer } from '@/lib/geoStore'
 import { getActiveTrainedModel } from '@/lib/classification/trainedModel'
 import type { AccuracyMetrics } from './DashboardClient'
 import DashboardClient from './DashboardClient'
@@ -87,7 +88,7 @@ const getProcessedDashboardData = unstable_cache(
     }))
 
     // Counted per barangay (not per free-text sitio) with verified PhilAtlas coordinates
-    const locationStats = aggregateLocations(allEntries)
+    const locationStats = aggregateLocations(allEntries, await getGazetteer())
 
     const topGenre = [...genreGrouped].sort((a, b) => b._count._all - a._count._all)[0]
     const mostCommonGenre = topGenre

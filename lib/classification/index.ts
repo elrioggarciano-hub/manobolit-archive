@@ -43,8 +43,8 @@ export type { FuzzyMatchResult, DialectVariant } from './fuzzy'
 
 export { normalizeText, tokenizeUnigrams, generateWordBigrams, generateCharNgrams, STOPWORDS } from './tokenizer'
 
-export { TRAINING_CORPUS, ACTIVE_GENRES, ALL_GENRES } from './trainingCorpus'
-export type { TrainingDocument, ActiveGenre, AllGenre, TrainingDocSource } from './trainingCorpus'
+export { TRAINING_CORPUS, ACTIVE_GENRES, DEFAULT_ACTIVE_GENRES, ALL_GENRES, deriveActiveGenres, MIN_EXAMPLES_PER_GENRE } from './trainingCorpus'
+export type { TrainingDocument, AllGenre, TrainingDocSource } from './trainingCorpus'
 
 export {
   stripRiddleAnswer,

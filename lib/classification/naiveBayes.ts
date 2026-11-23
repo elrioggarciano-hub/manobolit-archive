@@ -12,7 +12,7 @@
 //        P(c | d) = exp(log P(c | d) - max_k log P(k | d)) / sum_j exp(log P(j | d) - max_k log P(k | d))
 
 import { tokenizeUnigrams, generateWordBigrams } from './tokenizer'
-import { TRAINING_CORPUS, TrainingDocument, ACTIVE_GENRES } from './trainingCorpus'
+import { TRAINING_CORPUS, TrainingDocument, DEFAULT_ACTIVE_GENRES } from './trainingCorpus'
 import { cleanClassificationText } from './textCleaning'
 
 export interface NaiveBayesModel {
@@ -51,11 +51,12 @@ export interface NaiveBayesPrediction {
  */
 export function trainNaiveBayes(
   trainingData: TrainingDocument[] = TRAINING_CORPUS,
-  alpha: number = 1.0
+  alpha: number = 1.0,
+  genres: readonly string[] = DEFAULT_ACTIVE_GENRES
 ): NaiveBayesModel {
-  // Train ONLY on ACTIVE_GENRES docs (priors, vocabulary, likelihoods)
-  const activeData = trainingData.filter(d => (ACTIVE_GENRES as readonly string[]).includes(d.genre))
-  const classes = [...ACTIVE_GENRES]
+  // Train only on the active genres (derived from verified data)
+  const activeData = trainingData.filter(d => genres.includes(d.genre))
+  const classes = [...genres]
   const vocabulary = new Set<string>()
   const classCounts: Record<string, number> = {}
   const wordCountsPerClass: Record<string, Record<string, number>> = {}
@@ -122,9 +123,8 @@ export function predictNaiveBayes(
   const tokens = [...unigrams, ...bigrams]
   const tokenCount = Math.max(1, tokens.length)
 
-  const activeGenreSet = new Set<string>(ACTIVE_GENRES)
-  const availableClasses = model.classes.filter(c => activeGenreSet.has(c))
-  const candidateClasses = availableClasses.length > 0 ? availableClasses : [...ACTIVE_GENRES]
+  // Predict over the genres the model was trained on
+  const candidateClasses = model.classes.length > 0 ? model.classes : [...DEFAULT_ACTIVE_GENRES]
 
   const logLikelihoods: Record<string, number> = {}
   const rawLogLikelihoods: Record<string, number> = {}

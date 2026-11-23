@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { classifyEntry, EntryLike } from '@/lib/classification/engine'
 import { AlgorithmMode } from '@/lib/classification/hybrid'
 import { getLatestSnapshot, ensureActiveModels } from '@/lib/classification/retrain'
-import { ACTIVE_GENRES } from '@/lib/classification/trainingCorpus'
 import { classifyWithGemini } from '@/lib/classification/geminiClassifier'
 import { prisma } from '@/lib/database/prisma'
 import { getActiveTrainedModel, predictWithCompiled } from '@/lib/classification/trainedModel'
@@ -111,7 +110,7 @@ export async function POST(request: NextRequest) {
 
     // 3. Compute individual model predictions and normalized per-model distributions
     const breakdown = result.algorithmicBreakdown
-    const candidateGenres = ACTIVE_GENRES as readonly string[]
+    const candidateGenres = activeModels.genres
 
     // Classify individual component predictions to measure inter-model agreement
     const nbOnly = classifyEntry(entryLike, additionalContext || '', 'ALL', 'NAIVE_BAYES_ML', activeModels)
