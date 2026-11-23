@@ -238,6 +238,17 @@ model BarangayLocation {
   @@unique([barangay, municipality])
 }
 
+model BibleVerse {
+  id       String @id // e.g. "MAT.5.3"
+  book     String // USFM book code
+  bookName String
+  chapter  Int
+  verse    Int
+  text     String // verse text exactly as published (Kasuyatan to Diyus, © 1999 Wycliffe Bible Translators, CC BY-NC-ND)
+
+  @@index([book, chapter])
+}
+
 model SystemManual {
   id            String   @id @default("active-manual")
   fileName      String

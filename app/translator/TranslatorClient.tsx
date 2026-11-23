@@ -660,6 +660,7 @@ export default function TranslatorClient() {
                     const isVerified = vw.status === 'VERIFIED_SIL'
                     const isAffixed = vw.status === 'AFFIXED_SIL_ROOT'
                     const isVariant = vw.status === 'DIALECT_VARIANT'
+                    const isBible = vw.status === 'ATTESTED_BIBLE'
 
                     const badgeBg = isVerified
                       ? 'rgba(34, 197, 94, 0.12)'
@@ -667,7 +668,9 @@ export default function TranslatorClient() {
                         ? 'rgba(14, 165, 233, 0.12)'
                         : isVariant
                           ? 'rgba(245, 158, 11, 0.12)'
-                          : 'rgba(113, 113, 122, 0.12)'
+                          : isBible
+                            ? 'rgba(168, 85, 247, 0.12)'
+                            : 'rgba(113, 113, 122, 0.12)'
 
                     const badgeColor = isVerified
                       ? '#4ade80'
@@ -675,7 +678,9 @@ export default function TranslatorClient() {
                         ? '#38bdf8'
                         : isVariant
                           ? '#fbbf24'
-                          : '#a1a1aa'
+                          : isBible
+                            ? '#c084fc'
+                            : '#a1a1aa'
 
                     const borderCol = isVerified
                       ? 'rgba(34, 197, 94, 0.3)'
@@ -683,7 +688,9 @@ export default function TranslatorClient() {
                         ? 'rgba(14, 165, 233, 0.3)'
                         : isVariant
                           ? 'rgba(245, 158, 11, 0.3)'
-                          : 'rgba(113, 113, 122, 0.25)'
+                          : isBible
+                            ? 'rgba(168, 85, 247, 0.3)'
+                            : 'rgba(113, 113, 122, 0.25)'
 
                     const tagLabel = isVerified
                       ? (vw.partOfSpeech || 'Verified')
@@ -691,7 +698,9 @@ export default function TranslatorClient() {
                         ? `Affixed Root: ${vw.rootWord || ''}`
                         : isVariant
                           ? `Variant: ${vw.rootWord || ''}`
-                          : 'Unregistered'
+                          : isBible
+                            ? `Bible: ${vw.notes?.replace(/^e\.g\. /, '') || 'attested'}`
+                            : 'Unregistered'
 
                     return (
                       <div
@@ -751,6 +760,12 @@ export default function TranslatorClient() {
                     {liveResult.webonaryValidation.summaryNote}
                   </span>
                 </div>
+                {liveResult.webonaryValidation.lexicalAuthority.includes('Bible') && (
+                  <div style={{ fontSize: '9px', color: '#71717a', marginTop: '6px' }}>
+                    Bible attestation: Kasuyatan to Diyus — The New Testament in Agusan Manobo © 1999 Wycliffe Bible Translators, Inc.
+                    (CC BY-NC-ND 4.0, via eBible.org).
+                  </div>
+                )}
               </div>
             )}
 

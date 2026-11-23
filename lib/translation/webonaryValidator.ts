@@ -112,7 +112,41 @@ export function validateSingleWord(rawWord: string, lex: Lexicon): WordValidatio
     }
   }
 
-  // 5. Unregistered oral word
+  // 5. Attested in the Agusan Manobo Bible (Kasuyatan to Diyus), directly or as an affixed form of an attested root
+  if (lex.attested && lex.attested.size > 0) {
+    const att = lex.attested.get(clean)
+    if (att) {
+      return {
+        word: rawWord,
+        normalizedWord: clean,
+        status: 'ATTESTED_BIBLE',
+        rootWord: clean,
+        definition: `Attested ${att.count}× in the Agusan Manobo Bible`,
+        notes: `e.g. ${att.ref}`,
+        source: 'Agusan Manobo Bible (Kasuyatan to Diyus, © 1999 Wycliffe Bible Translators)',
+      }
+    }
+    const roots: [string, string][] = [
+      ...lex.prefixes.filter(p => clean.startsWith(p) && clean.length > p.length + 2).map(p => [clean.slice(p.length), `prefix [${p}-]`] as [string, string]),
+      ...lex.suffixes.filter(s => clean.endsWith(s) && clean.length > s.length + 2).map(s => [clean.slice(0, -s.length), `suffix [-${s}]`] as [string, string]),
+    ]
+    for (const [root, affix] of roots) {
+      const r = lex.attested.get(root)
+      if (r) {
+        return {
+          word: rawWord,
+          normalizedWord: clean,
+          status: 'ATTESTED_BIBLE',
+          rootWord: root,
+          definition: `Affixed form of '${root}', attested ${r.count}× in the Agusan Manobo Bible`,
+          notes: `${affix} + root '${root}' (e.g. ${r.ref})`,
+          source: 'Agusan Manobo Bible (Kasuyatan to Diyus, © 1999 Wycliffe Bible Translators)',
+        }
+      }
+    }
+  }
+
+  // 6. Unregistered oral word
   return {
     word: rawWord,
     normalizedWord: clean,
@@ -155,7 +189,7 @@ export function validateTextWithWebonary(
 
   const validations: WordValidation[] = tokens.map((token) => validateSingleWord(token, lex))
   const verifiedCount = validations.filter(
-    (v) => v.status === 'VERIFIED_SIL' || v.status === 'AFFIXED_SIL_ROOT' || v.status === 'DIALECT_VARIANT'
+    (v) => v.status === 'VERIFIED_SIL' || v.status === 'AFFIXED_SIL_ROOT' || v.status === 'DIALECT_VARIANT' || v.status === 'ATTESTED_BIBLE'
   ).length
 
   const rate = tokens.length > 0 ? Math.round((verifiedCount / tokens.length) * 100) / 100 : 0
@@ -165,8 +199,10 @@ export function validateTextWithWebonary(
     verifiedTokens: verifiedCount,
     verificationRate: rate,
     validatedWords: validations,
-    lexicalAuthority: 'SIL International Webonary (Agusan Manobo, ISO 639-3: msm)',
-    summaryNote: `${verifiedCount} of ${tokens.length} words (${Math.round(rate * 100)}%) verified against SIL Webonary standard orthography.`,
+    lexicalAuthority: lex.attested && lex.attested.size > 0
+      ? 'SIL International Webonary (Agusan Manobo, ISO 639-3: msm) + Agusan Manobo Bible (Kasuyatan to Diyus)'
+      : 'SIL International Webonary (Agusan Manobo, ISO 639-3: msm)',
+    summaryNote: `${verifiedCount} of ${tokens.length} words (${Math.round(rate * 100)}%) validated against the SIL Webonary${lex.attested && lex.attested.size > 0 ? ' and the Agusan Manobo Bible' : ''}.`,
   }
 }
 

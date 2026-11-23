@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { SyncSegment, activeSegmentIndex, estimateTimings, formatClock, splitIntoLines, validateSegments } from '@/lib/transcriptSync'
+import { SyncSegment, activeSegmentIndex, alignToPauses, computeEnvelope, estimateTimings, formatClock, splitIntoLines, validateSegments } from '@/lib/transcriptSync'
 
 interface Props {
   entryId: string
@@ -25,6 +25,7 @@ export default function TranscriptSyncEditor({ entryId, audioFile, transcription
   const [now, setNow] = useState(0)
   const [duration, setDuration] = useState(0)
   const [saving, setSaving] = useState(false)
+  const [aligning, setAligning] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   const segments: SyncSegment[] = lines.map((text, i) => ({ text, start: times[i] ?? NaN }))
@@ -80,6 +81,33 @@ export default function TranscriptSyncEditor({ entryId, audioFile, transcription
     setMessage({ type: 'success', text: 'Estimated from line lengths. Listen and correct the times before saving — estimates are only a starting point.' })
   }
 
+  // Decodes the recording in the browser, finds the pauses between phrases, and aligns the lines to them.
+  const autoAlign = async () => {
+    setMessage(null)
+    setAligning(true)
+    try {
+      const res = await fetch(audioFile)
+      if (!res.ok) throw new Error(`Could not load the recording (HTTP ${res.status})`)
+      const Ctx = window.AudioContext || (window as any).webkitAudioContext
+      const ctx = new Ctx()
+      const buf = await ctx.decodeAudioData(await res.arrayBuffer())
+      const mono = new Float32Array(buf.length)
+      for (let c = 0; c < buf.numberOfChannels; c++) {
+        const ch = buf.getChannelData(c)
+        for (let i = 0; i < ch.length; i++) mono[i] += ch[i] / buf.numberOfChannels
+      }
+      ctx.close()
+      const segs = alignToPauses(lines, computeEnvelope(mono, buf.sampleRate))
+      setTimes(segs.map(s => s.start))
+      setDuration(buf.duration)
+      setMessage({ type: 'success', text: 'Lines aligned to the pauses detected in the recording. Play it and correct any line that is off, then save.' })
+    } catch (err: any) {
+      setMessage({ type: 'error', text: `Auto-align failed: ${err.message}. Use "Start tapping" instead.` })
+    } finally {
+      setAligning(false)
+    }
+  }
+
   const playFrom = (t: number | null) => {
     const a = audioRef.current
     if (!a || t === null) return
@@ -116,8 +144,10 @@ export default function TranscriptSyncEditor({ entryId, audioFile, transcription
     <div style={{ display: 'grid', gap: '16px' }}>
       <div style={card}>
         <p style={{ margin: '0 0 12px', fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
-          <strong style={{ color: '#f8fafc' }}>Tap to sync:</strong> press <em>Start tapping</em>, then press <em>Mark line</em> (or the space bar)
-          exactly when each line begins in the recording. You can also start from an estimate and correct the times by hand.
+          <strong style={{ color: '#f8fafc' }}>Fastest:</strong> press <em>✨ Auto-align</em> — the system finds the pauses between phrases in the
+          recording and places each line there — then play it and fix any line that is off.{' '}
+          <strong style={{ color: '#f8fafc' }}>Tap to sync:</strong> press <em>Start tapping</em>, then <em>Mark line</em> (or the space bar)
+          exactly when each line begins.
         </p>
         <audio
           ref={audioRef}
@@ -136,6 +166,9 @@ export default function TranscriptSyncEditor({ entryId, audioFile, transcription
               Mark line {tapIndex + 1} of {lines.length} (space)
             </button>
           )}
+          <button type="button" style={{ ...ghost, borderColor: '#8F000D', color: '#fecaca' }} onClick={autoAlign} disabled={aligning || lines.length === 0}>
+            {aligning ? 'Analysing recording…' : '✨ Auto-align (detect pauses)'}
+          </button>
           <button type="button" style={ghost} onClick={estimate}>Estimate from line lengths</button>
           <button type="button" style={ghost} onClick={() => { setLinesText(lines.join('\n')); setEditingLines(!editingLines) }}>
             {editingLines ? 'Cancel line editing' : 'Edit lines'}

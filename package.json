@@ -13,6 +13,7 @@
     "seed:lexicon": "ts-node -P tsconfig.scripts.json prisma/seedLexicon.ts",
     "seed:rules": "ts-node -P tsconfig.scripts.json prisma/seedRules.ts",
     "seed:locations": "ts-node -P tsconfig.scripts.json prisma/seedLocations.ts",
+    "import:bible": "ts-node -P tsconfig.scripts.json prisma/importBible.ts",
     "eval": "ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/eval-loocv.ts",
     "eval:learning-curve": "ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/eval-learning-curve.ts",
     "eval:dataset": "ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/export-seed-dataset.ts",

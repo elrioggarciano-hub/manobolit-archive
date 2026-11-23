@@ -69,7 +69,7 @@ const TOPICS: ManualTopic[] = [
     goodToKnow: [
       '1. Field Ingestion: Authentic oral narratives and songs recorded in Agusan del Sur municipalities.',
       '2. Rule-Based Classification with Machine Learning: genres (Eugenio 1993) and themes (Andress 1985) are scored by a rule base stored in the database and combined 50/50 with models learned from human-verified entries (Logistic Regression trained in Google Colab; k-NN for themes). New rule terms are discovered from verified entries and approved by reviewers.',
-      '3. Lexical Validation & Translation: Words cross-referenced against the SIL Webonary (ISO 639-3: msm) entries and archive lexicon stored in the database, with Finite-State Affix Decomposition and word translations learned from verified texts (IBM Model 1).',
+      '3. Lexical Validation & Translation: Words cross-referenced against the SIL Webonary (ISO 639-3: msm) entries, the archive lexicon, and the Agusan Manobo Bible (Kasuyatan to Diyus, © 1999 Wycliffe Bible Translators), with Finite-State Affix Decomposition and word translations learned from verified texts (IBM Model 1).',
       '4. Public Retrieval & Preservation: Multidimensional faceted exploration with open CSV and JSON data exports.',
     ],
   },

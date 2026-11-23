@@ -88,6 +88,126 @@ export function estimateTimings(lines: string[], duration: number, leadIn = 0): 
   })
 }
 
+/**
+ * Loudness envelope of a recording: RMS energy per frame (computed in the browser from the decoded audio).
+ */
+export interface Envelope {
+  frameSec: number
+  rms: Float32Array | number[]
+}
+
+/** RMS envelope from mono PCM samples. */
+export function computeEnvelope(samples: Float32Array, sampleRate: number, frameSec = 0.02): Envelope {
+  const size = Math.max(1, Math.round(sampleRate * frameSec))
+  const frames = Math.ceil(samples.length / size)
+  const rms = new Float32Array(frames)
+  for (let f = 0; f < frames; f++) {
+    let sum = 0
+    const end = Math.min(samples.length, (f + 1) * size)
+    for (let i = f * size; i < end; i++) sum += samples[i] * samples[i]
+    rms[f] = Math.sqrt(sum / Math.max(1, end - f * size))
+  }
+  return { frameSec, rms }
+}
+
+/**
+ * Pause-aware alignment: lines are spread over the VOICED part of the recording in proportion to their
+ * length, then each line start is snapped to the nearest detected pause (a stretch of low energy), because
+ * singers and narrators usually breathe between lines. The result is a starting point that a reviewer
+ * checks by listening; it is never treated as verified timing.
+ */
+export function alignToPauses(lines: string[], env: Envelope, opts: { minPauseSec?: number; snapWindowSec?: number } = {}): SyncSegment[] {
+  const minPause = opts.minPauseSec ?? 0.25
+  const snapWindow = opts.snapWindowSec ?? 3
+  const rms = Array.from(env.rms)
+  if (lines.length === 0 || rms.length === 0) return []
+  const sorted = [...rms].sort((a, b) => a - b)
+  const noise = sorted[Math.floor(sorted.length * 0.1)]
+  const loud = sorted[Math.floor(sorted.length * 0.9)]
+  const threshold = noise + (loud - noise) * 0.15
+  const voiced = rms.map(v => v > threshold)
+
+  // pause ends = moments where sound resumes after at least minPause of silence
+  const pauseEnds: number[] = []
+  let silentRun = 0
+  for (let f = 0; f < voiced.length; f++) {
+    if (!voiced[f]) silentRun++
+    else {
+      if (silentRun * env.frameSec >= minPause) pauseEnds.push(f * env.frameSec)
+      silentRun = 0
+    }
+  }
+
+  // cumulative voiced time per frame, to map "share of the text" to "position in the recording"
+  const voicedTimeline: number[] = []
+  for (let f = 0; f < voiced.length; f++) if (voiced[f]) voicedTimeline.push(f * env.frameSec)
+  if (voicedTimeline.length === 0) return estimateTimings(lines, rms.length * env.frameSec)
+
+  // expected start of each line: its share of the text mapped onto the voiced timeline
+  const weights = lines.map(l => Math.max(1, l.replace(/\s+/g, '').length))
+  const total = weights.reduce((a, b) => a + b, 0)
+  let cum = 0
+  const targets = lines.map((_, i) => {
+    const share = cum / total
+    cum += weights[i]
+    return voicedTimeline[Math.min(voicedTimeline.length - 1, Math.floor(share * voicedTimeline.length))]
+  })
+  const starts = [...targets]
+
+  // Lines 2..n each take a DIFFERENT pause, in order, choosing the set of pauses that best matches the
+  // expected positions overall (monotone dynamic programming), not just the nearest pause per line.
+  const first = targets[0]
+  const cands = pauseEnds.filter(p => p > first + 0.3)
+  const need = targets.length - 1
+  if (need > 0 && cands.length >= need) {
+    const m = cands.length
+    const cost = (i: number, j: number) => Math.abs(cands[j] - targets[i + 1])
+    const dp: Float64Array[] = Array.from({ length: need }, () => new Float64Array(m).fill(Infinity))
+    const back: Int32Array[] = Array.from({ length: need }, () => new Int32Array(m).fill(-1))
+    for (let j = 0; j < m; j++) dp[0][j] = cost(0, j)
+    for (let i = 1; i < need; i++) {
+      let best = Infinity
+      let bestK = -1
+      for (let j = i; j < m; j++) {
+        if (dp[i - 1][j - 1] < best) {
+          best = dp[i - 1][j - 1]
+          bestK = j - 1
+        }
+        if (bestK >= 0) {
+          dp[i][j] = best + cost(i, j)
+          back[i][j] = bestK
+        }
+      }
+    }
+    let j = 0
+    for (let k = 1; k < m; k++) if (dp[need - 1][k] < dp[need - 1][j]) j = k
+    for (let i = need - 1; i >= 0; i--) {
+      // only snap when the chosen pause is reasonably close to where the line is expected
+      if (Math.abs(cands[j] - targets[i + 1]) <= snapWindow * 2) starts[i + 1] = cands[j]
+      j = back[i][j]
+    }
+  } else {
+    // fewer pauses than lines: snap each line to the nearest unused pause within the window
+    let prevPause = first
+    for (let i = 1; i < targets.length; i++) {
+      const near = pauseEnds.filter(p => p > prevPause + 0.5 && Math.abs(p - targets[i]) <= snapWindow)
+      if (near.length) {
+        starts[i] = near.reduce((best, p) => (Math.abs(p - targets[i]) < Math.abs(best - targets[i]) ? p : best))
+        prevPause = starts[i]
+      }
+    }
+  }
+
+  const segments: SyncSegment[] = []
+  let prev = -1
+  lines.forEach((text, i) => {
+    const t = Math.max(starts[i], prev + 0.1)
+    prev = t
+    segments.push({ start: Math.round(t * 10) / 10, text })
+  })
+  return segments
+}
+
 export function formatClock(seconds: number): string {
   if (!isFinite(seconds) || seconds < 0) return '0:00.0'
   const m = Math.floor(seconds / 60)

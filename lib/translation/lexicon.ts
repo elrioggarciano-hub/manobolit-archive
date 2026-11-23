@@ -66,6 +66,8 @@ export interface Lexicon {
   /** Vocabulary group display order for the Translator page. */
   groupOrder: string[]
   origin: 'database' | 'fallback-json' | 'empty'
+  /** Server only: words attested in the Agusan Manobo Bible → example reference and frequency */
+  attested?: Map<string, { ref: string; count: number }>
 }
 
 export const EMPTY_LEXICON: Lexicon = {

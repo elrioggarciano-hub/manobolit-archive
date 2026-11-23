@@ -3,7 +3,7 @@ export type TranslationLang = 'en' | 'msm' | 'ceb'
 export interface WordValidation {
   word: string
   normalizedWord: string
-  status: 'VERIFIED_SIL' | 'AFFIXED_SIL_ROOT' | 'DIALECT_VARIANT' | 'UNREGISTERED'
+  status: 'VERIFIED_SIL' | 'AFFIXED_SIL_ROOT' | 'DIALECT_VARIANT' | 'ATTESTED_BIBLE' | 'UNREGISTERED'
   partOfSpeech?: string
   rootWord?: string
   definition?: string

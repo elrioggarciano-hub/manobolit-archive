@@ -47,7 +47,7 @@ export const MANUAL_METADATA = {
   systemUrl: 'http://localhost:3000',
   corpusBaseline: '17 Oral Literature Selections (Catipay & Curato, 2024) and 5 Folk Songs (Maravilla, 2024)',
   taxonomies: 'Damiana L. Eugenio (1993) & George C. Andress (1985)',
-  lexiconCorpus: 'SIL International Webonary (ISO 639-3: msm) & ManoboLit Archive Lexicon (database)',
+  lexiconCorpus: 'SIL International Webonary (ISO 639-3: msm), ManoboLit Archive Lexicon & Agusan Manobo Bible (Kasuyatan to Diyus, 7,825 verses)',
 }
 
 export const MANUAL_CHAPTERS: ManualChapter[] = [
@@ -396,7 +396,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           'Translate text between Agusan Manobo, English, and Sinugbuanong Binisaya',
           'Execute word-by-word Finite-State Affix Decomposition for morphological analysis',
           'Cross-reference tokens with the official SIL International Webonary (ISO 639-3: msm) dictionary',
-          'Validate translations against the archive lexicon and SIL Webonary entries',
+          'Validate words against the archive lexicon, the SIL Webonary entries and the Agusan Manobo Bible',
           'Copy translations with one click for research documentation',
         ],
         menuLocation: ['Header -> TRANSLATOR (/translator)'],
