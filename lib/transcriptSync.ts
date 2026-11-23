@@ -208,6 +208,47 @@ export function alignToPauses(lines: string[], env: Envelope, opts: { minPauseSe
   return segments
 }
 
+/** Moments where sound starts after at least `minSilenceSec` of quiet (speech/singing onsets). */
+export function detectOnsets(env: Envelope, minSilenceSec = 0.15): number[] {
+  const rms = Array.from(env.rms)
+  if (!rms.length) return []
+  const sorted = [...rms].sort((a, b) => a - b)
+  const noise = sorted[Math.floor(sorted.length * 0.1)]
+  const loud = sorted[Math.floor(sorted.length * 0.9)]
+  const threshold = noise + (loud - noise) * 0.15
+  const onsets: number[] = []
+  let quiet = minSilenceSec / env.frameSec // treat the very start as preceded by silence
+  for (let f = 0; f < rms.length; f++) {
+    if (rms[f] <= threshold) quiet++
+    else {
+      if (quiet * env.frameSec >= minSilenceSec) onsets.push(f * env.frameSec)
+      quiet = 0
+    }
+  }
+  return onsets
+}
+
+/**
+ * Refines approximate line starts (e.g. from an AI that listened to the recording) to the exact moment
+ * the sound begins: each start moves to the nearest acoustic onset within `windowSec`, keeping order.
+ */
+export function snapToOnsets(segments: SyncSegment[], env: Envelope, windowSec = 1.2): SyncSegment[] {
+  const onsets = detectOnsets(env)
+  let prev = -1
+  return segments.map(s => {
+    const near = onsets.filter(o => o > prev + 0.3 && Math.abs(o - s.start) <= windowSec)
+    let t = near.length ? near.reduce((b, o) => (Math.abs(o - s.start) < Math.abs(b - s.start) ? o : b)) : s.start
+    t = Math.max(t, prev + 0.1)
+    prev = t
+    return { start: Math.round(t * 10) / 10, text: s.text }
+  })
+}
+
+/** Lowercased words without punctuation — used to check that a re-segmentation kept the transcript intact. */
+export function transcriptWords(text: string): string[] {
+  return (text || '').toLowerCase().match(/[\p{L}\p{N}]+(?:['-][\p{L}\p{N}]+)*/gu) || []
+}
+
 export function formatClock(seconds: number): string {
   if (!isFinite(seconds) || seconds < 0) return '0:00.0'
   const m = Math.floor(seconds / 60)

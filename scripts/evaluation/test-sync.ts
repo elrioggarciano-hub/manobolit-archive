@@ -31,3 +31,17 @@ console.log('sync helper tests passed')
   starts.forEach((s: number, i: number) => assert.ok(Math.abs(s - phrases[i][0]) < 0.15, `line ${i + 1} at ${s}`))
   console.log('pause alignment test passed')
 }
+
+// onset snapping: approximate AI starts move to the exact moment the sound begins
+{
+  const { snapToOnsets, transcriptWords } = require('../../lib/transcriptSync')
+  const frameSec = 0.02
+  const phrases = [[0.5, 4.0], [4.6, 9.8], [10.4, 12.0]]
+  const rms: number[] = []
+  for (let t = 0; t < 13; t += frameSec) rms.push(phrases.some(([s, e]) => t >= s && t < e) ? 0.5 : 0.01)
+  const snapped = snapToOnsets([{ start: 0, text: 'a' }, { start: 5.3, text: 'b' }, { start: 9.9, text: 'c' }], { frameSec, rms })
+  console.log('snapped starts:', snapped.map((s: any) => s.start).join(', '), '(true: 0.5, 4.6, 10.4)')
+  snapped.forEach((s: any, i: number) => assert.ok(Math.abs(s.start - phrases[i][0]) < 0.05, `line ${i + 1} at ${s.start}`))
+  assert.deepStrictEqual(transcriptWords('Tu maintok pad, pig-aling pad!'), ['tu', 'maintok', 'pad', 'pig-aling', 'pad'])
+  console.log('onset snapping test passed')
+}

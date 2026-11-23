@@ -3,16 +3,25 @@
 // Audio is decoded with a local browser's Web Audio API (Puppeteer). Reviewers should still play the
 // long entries (songs, folktales) in Admin → Edit → Synchronize transcript and correct any line.
 //
-// Usage:  npm run sync:auto              dry run (shows the timings, saves nothing)
-//         npm run sync:auto -- --save    saves timings for entries that are not synchronized yet
+// Usage:  npm run sync:auto                      dry run, pause-based (saves nothing)
+//         npm run sync:auto -- --ai              dry run, AI listens to each recording (most accurate)
+//         npm run sync:auto -- --ai --save       saves timings for entries that are not synchronized yet
+//         add --replace to re-align entries that already have timings, and --keep "<title>" to protect one
+//         --only "<title>" (repeatable) aligns just those entries, e.g. to retry ones that hit the AI rate limit
 // Optional: BROWSER_PATH=<path to chrome.exe or msedge.exe> to choose the browser used for decoding.
 import 'dotenv/config'
 import fs from 'fs'
 import puppeteer from 'puppeteer'
 import { prisma } from '../lib/database/prisma'
-import { alignToPauses, splitIntoLines, validateSegments, formatClock } from '../lib/transcriptSync'
+import { alignToPauses, splitIntoLines, validateSegments, formatClock, snapToOnsets, SyncSegment } from '../lib/transcriptSync'
+import { aiAlignTranscript, mimeFor, DailyQuotaError } from '../lib/transcriptSyncAI'
 
 const SAVE = process.argv.includes('--save')
+const AI = process.argv.includes('--ai')
+const REPLACE = process.argv.includes('--replace')
+const argValues = (flag: string) => process.argv.flatMap((a, i, all) => (a === flag && all[i + 1] ? [all[i + 1]] : []))
+const KEEP = argValues('--keep')
+const ONLY = argValues('--only')
 const FRAME = 0.02
 const BROWSERS = [
   process.env.BROWSER_PATH,
@@ -33,12 +42,13 @@ async function main() {
   let aligned = 0
   let saved = 0
   for (const e of entries) {
+    if (ONLY.length && !ONLY.includes(e.title)) continue
     const lines = splitIntoLines(e.transcription || '')
     if (!lines.length) {
       console.log(`SKIP  ${e.title}: no transcription`)
       continue
     }
-    if (e.transcriptSync) {
+    if ((e.transcriptSync && !REPLACE) || KEEP.includes(e.title)) {
       console.log(`KEEP  ${e.title}: already synchronized`)
       continue
     }
@@ -64,17 +74,31 @@ async function main() {
         await ctx.close()
         return { duration: audio.duration, rms }
       }, e.audioFile!, FRAME)
-      const segs = alignToPauses(lines, { frameSec: FRAME, rms: env.rms })
+      let segs: SyncSegment[]
+      let how = 'pauses'
+      if (AI) {
+        const audio = Buffer.from(await (await fetch(e.audioFile!)).arrayBuffer())
+        const kind = e.genre === 'SONG' ? 'folk song' : `${e.genre.toLowerCase()} narration`
+        const ai = await aiAlignTranscript(audio, mimeFor(e.audioFile!), e.transcription || '', kind, 3)
+        segs = snapToOnsets(ai.segments, { frameSec: FRAME, rms: env.rms })
+        how = ai.mode === 'phrases' ? 'AI phrases' : 'AI lines'
+      } else {
+        segs = alignToPauses(lines, { frameSec: FRAME, rms: env.rms })
+      }
       const invalid = validateSegments(segs)
       if (invalid) throw new Error(invalid)
       aligned++
-      console.log(`${SAVE ? 'SAVE ' : 'DRY  '} ${e.genre.padEnd(8)} ${e.title.slice(0, 34).padEnd(34)} ${formatClock(env.duration).padStart(7)}  ${String(lines.length).padStart(2)} lines: ${segs.slice(0, 5).map(s => formatClock(s.start)).join(' ')}${segs.length > 5 ? ' …' : ''}`)
+      console.log(`${SAVE ? 'SAVE ' : 'DRY  '} ${e.genre.padEnd(8)} ${e.title.slice(0, 30).padEnd(30)} ${formatClock(env.duration).padStart(7)} ${how.padEnd(10)} ${String(segs.length).padStart(2)} lines: ${segs.slice(0, 5).map(s => formatClock(s.start)).join(' ')}${segs.length > 5 ? ' …' : ''}`)
       if (SAVE) {
         await prisma.literatureEntry.update({ where: { id: e.id }, data: { transcriptSync: JSON.stringify(segs) } })
         saved++
       }
     } catch (err: any) {
       console.log(`FAIL  ${e.title}: ${err.message}`)
+      if (err instanceof DailyQuotaError) {
+        console.log('STOP  the remaining entries keep their current timings; run again tomorrow with --only "<title>"')
+        break
+      }
     }
   }
   await browser.close()

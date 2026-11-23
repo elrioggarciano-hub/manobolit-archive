@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { SyncSegment, activeSegmentIndex, alignToPauses, computeEnvelope, estimateTimings, formatClock, splitIntoLines, validateSegments } from '@/lib/transcriptSync'
+import { SyncSegment, activeSegmentIndex, alignToPauses, computeEnvelope, estimateTimings, formatClock, snapToOnsets, splitIntoLines, validateSegments } from '@/lib/transcriptSync'
 
 interface Props {
   entryId: string
@@ -82,24 +82,57 @@ export default function TranscriptSyncEditor({ entryId, audioFile, transcription
   }
 
   // Decodes the recording in the browser, finds the pauses between phrases, and aligns the lines to them.
+  // Decodes the recording in the browser and returns its loudness envelope.
+  const decodeEnvelope = async () => {
+    const res = await fetch(audioFile)
+    if (!res.ok) throw new Error(`Could not load the recording (HTTP ${res.status})`)
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext
+    const ctx = new Ctx()
+    const buf = await ctx.decodeAudioData(await res.arrayBuffer())
+    const mono = new Float32Array(buf.length)
+    for (let c = 0; c < buf.numberOfChannels; c++) {
+      const ch = buf.getChannelData(c)
+      for (let i = 0; i < ch.length; i++) mono[i] += ch[i] / buf.numberOfChannels
+    }
+    ctx.close()
+    return { env: computeEnvelope(mono, buf.sampleRate), duration: buf.duration }
+  }
+
+  // AI listens to the recording, splits the transcript into the phrases as performed and times them;
+  // the browser then snaps each start to the exact moment the sound begins.
+  const aiAlign = async () => {
+    setMessage(null)
+    setAligning(true)
+    try {
+      const res = await fetch(`/api/entries/${entryId}/sync/ai`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'AI alignment failed')
+      const { env, duration: dur } = await decodeEnvelope()
+      const snapped = snapToOnsets(data.segments as SyncSegment[], env)
+      setLines(snapped.map(s => s.text))
+      setLinesText(snapped.map(s => s.text).join('\n'))
+      setTimes(snapped.map(s => s.start))
+      setDuration(dur)
+      setMessage({
+        type: 'success',
+        text: data.mode === 'phrases'
+          ? `The AI listened to the recording and split the transcript into ${snapped.length} phrases as performed (words unchanged). Play it to confirm, then save.`
+          : 'The AI listened to the recording and timed each line. Play it to confirm, then save.',
+      })
+    } catch (err: any) {
+      setMessage({ type: 'error', text: `AI alignment failed: ${err.message}. Try "Auto-align" or "Start tapping".` })
+    } finally {
+      setAligning(false)
+    }
+  }
+
   const autoAlign = async () => {
     setMessage(null)
     setAligning(true)
     try {
-      const res = await fetch(audioFile)
-      if (!res.ok) throw new Error(`Could not load the recording (HTTP ${res.status})`)
-      const Ctx = window.AudioContext || (window as any).webkitAudioContext
-      const ctx = new Ctx()
-      const buf = await ctx.decodeAudioData(await res.arrayBuffer())
-      const mono = new Float32Array(buf.length)
-      for (let c = 0; c < buf.numberOfChannels; c++) {
-        const ch = buf.getChannelData(c)
-        for (let i = 0; i < ch.length; i++) mono[i] += ch[i] / buf.numberOfChannels
-      }
-      ctx.close()
-      const segs = alignToPauses(lines, computeEnvelope(mono, buf.sampleRate))
+      const { env } = await decodeEnvelope()
+      const segs = alignToPauses(lines, env)
       setTimes(segs.map(s => s.start))
-      setDuration(buf.duration)
       setMessage({ type: 'success', text: 'Lines aligned to the pauses detected in the recording. Play it and correct any line that is off, then save.' })
     } catch (err: any) {
       setMessage({ type: 'error', text: `Auto-align failed: ${err.message}. Use "Start tapping" instead.` })
@@ -144,8 +177,9 @@ export default function TranscriptSyncEditor({ entryId, audioFile, transcription
     <div style={{ display: 'grid', gap: '16px' }}>
       <div style={card}>
         <p style={{ margin: '0 0 12px', fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
-          <strong style={{ color: '#f8fafc' }}>Fastest:</strong> press <em>✨ Auto-align</em> — the system finds the pauses between phrases in the
-          recording and places each line there — then play it and fix any line that is off.{' '}
+          <strong style={{ color: '#f8fafc' }}>Most accurate:</strong> press <em>🎧 AI listen &amp; align</em> — the AI listens to the recording, splits the
+          transcript into the phrases as they are performed and times them to the exact moment each begins. Play it, fix any line that is off, then save.{' '}
+          <strong style={{ color: '#f8fafc' }}>Offline:</strong> <em>✨ Auto-align</em> uses only the pauses in the recording.{' '}
           <strong style={{ color: '#f8fafc' }}>Tap to sync:</strong> press <em>Start tapping</em>, then <em>Mark line</em> (or the space bar)
           exactly when each line begins.
         </p>
@@ -166,8 +200,11 @@ export default function TranscriptSyncEditor({ entryId, audioFile, transcription
               Mark line {tapIndex + 1} of {lines.length} (space)
             </button>
           )}
+          <button type="button" style={{ ...ghost, borderColor: '#059669', color: '#a7f3d0' }} onClick={aiAlign} disabled={aligning || lines.length === 0}>
+            {aligning ? 'Listening to the recording…' : '🎧 AI listen & align (most accurate)'}
+          </button>
           <button type="button" style={{ ...ghost, borderColor: '#8F000D', color: '#fecaca' }} onClick={autoAlign} disabled={aligning || lines.length === 0}>
-            {aligning ? 'Analysing recording…' : '✨ Auto-align (detect pauses)'}
+            ✨ Auto-align (detect pauses)
           </button>
           <button type="button" style={ghost} onClick={estimate}>Estimate from line lengths</button>
           <button type="button" style={ghost} onClick={() => { setLinesText(lines.join('\n')); setEditingLines(!editingLines) }}>
