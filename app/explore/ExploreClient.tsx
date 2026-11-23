@@ -266,6 +266,8 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
 
       return true
     })
+      // Entries with an audio recording are listed first (stable sort keeps the original order otherwise)
+      .sort((a, b) => Number(!!b.audioFile) - Number(!!a.audioFile))
   }, [initialEntries, searchInput, appliedGenres, appliedThemes, appliedLocations])
 
   // Pagination calculations (5 per page to match mockup)
