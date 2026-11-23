@@ -28,6 +28,13 @@ export interface AccuracyMetrics {
   trainedSamples?: number
   vocabularySize?: number
   lastRetrainTime?: string
+  /** what was evaluated (e.g. rule-based + machine learning) */
+  method?: string
+  /** share of entries the system answers at its confidence threshold, and accuracy on those */
+  coverage?: number
+  answeredAccuracy?: number
+  rulesOnlyAccuracy?: number
+  mlOnlyAccuracy?: number
 }
 
 export interface ExportRecord {
@@ -106,7 +113,7 @@ export default function DashboardClient({
   genreDistribution = [],
   mostFrequentTheme = null,
   themeFrequency = [],
-  accuracyMetrics = { accuracy: 0, precision: 0, recall: 0, f1: 0, sampleSize: 0 },
+  accuracyMetrics = null,
   exportRecords = [],
 }: {
   totalEntries?: number
@@ -115,7 +122,7 @@ export default function DashboardClient({
   genreDistribution?: GenreStat[]
   mostFrequentTheme?: ThemeStat | null
   themeFrequency?: ThemeStat[]
-  accuracyMetrics?: AccuracyMetrics
+  accuracyMetrics?: AccuracyMetrics | null
   exportRecords?: ExportRecord[]
 }) {
   const { t } = useLanguage()
@@ -736,7 +743,7 @@ export default function DashboardClient({
                     System Accuracy
                   </h3>
                   <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, letterSpacing: '0.02em' }}>
-                    Hybrid NLP &amp; Domain Classifier Metrics
+                    {accuracyMetrics?.method || 'Not evaluated yet — upload a model trained in the Colab notebook'}
                   </span>
                 </div>
 
@@ -771,7 +778,11 @@ export default function DashboardClient({
                         lineHeight: 1
                       }}
                     >
-                      {(accuracyMetrics.accuracy * 100).toFixed(1)}<span style={{ fontSize: '18px', verticalAlign: 'super', marginLeft: '2px', fontWeight: 600 }}>%</span>
+                      {accuracyMetrics ? (
+                        <>
+                          {(accuracyMetrics.accuracy * 100).toFixed(1)}<span style={{ fontSize: '18px', verticalAlign: 'super', marginLeft: '2px', fontWeight: 600 }}>%</span>
+                        </>
+                      ) : '—'}
                     </span>
                     <span
                       style={{
@@ -783,7 +794,7 @@ export default function DashboardClient({
                         fontFamily: 'Inter, sans-serif'
                       }}
                     >
-                      LOOCV, N={accuracyMetrics.sampleSize}
+                      {accuracyMetrics ? `LOOCV, N=${accuracyMetrics.sampleSize}` : 'NOT EVALUATED'}
                     </span>
                   </div>
                 </div>
@@ -794,32 +805,40 @@ export default function DashboardClient({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
                     <span style={{ color: 'var(--text-primary)' }}>Precision (Macro)</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.precision.toFixed(3)}</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics ? accuracyMetrics.precision.toFixed(3) : '—'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
                     <span style={{ color: 'var(--text-primary)' }}>Recall (Macro)</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.recall.toFixed(3)}</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics ? accuracyMetrics.recall.toFixed(3) : '—'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
                     <span style={{ color: 'var(--text-primary)' }}>F1 Score (Macro)</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.f1.toFixed(3)}</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics ? accuracyMetrics.f1.toFixed(3) : '—'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
                     <span style={{ color: 'var(--text-primary)' }}>Trained Samples</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.trainedSamples || 31}</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics?.trainedSamples ?? '—'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 500 }}>
                     <span style={{ color: 'var(--text-primary)' }}>Vocabulary Size</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics.vocabularySize || 1350}</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{accuracyMetrics?.vocabularySize ?? '—'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)' }}>
                     <span>Last Retrained</span>
                     <span style={{ fontWeight: 600 }}>
-                      {accuracyMetrics.lastRetrainTime ? new Date(accuracyMetrics.lastRetrainTime).toLocaleDateString() : 'Baseline'}
+                      {accuracyMetrics?.lastRetrainTime ? new Date(accuracyMetrics.lastRetrainTime).toLocaleDateString() : '—'}
                     </span>
                   </div>
                   <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px', fontStyle: 'italic' }}>
-                    Out-of-sample Leave-One-Out Cross-Validation (LOOCV, N={accuracyMetrics.sampleSize}) across authenticated oral literature records.
+                    {accuracyMetrics ? (
+                      <>
+                        Out-of-sample Leave-One-Out Cross-Validation (LOOCV, N={accuracyMetrics.sampleSize}) on human-verified archive entries.
+                        {accuracyMetrics.rulesOnlyAccuracy !== undefined && accuracyMetrics.mlOnlyAccuracy !== undefined &&
+                          ` Rules alone: ${(accuracyMetrics.rulesOnlyAccuracy * 100).toFixed(1)}% · ML alone: ${(accuracyMetrics.mlOnlyAccuracy * 100).toFixed(1)}%.`}
+                        {accuracyMetrics.coverage !== undefined && accuracyMetrics.answeredAccuracy !== undefined &&
+                          ` When confident (${Math.round(accuracyMetrics.coverage * 100)}% of entries) it is right ${Math.round(accuracyMetrics.answeredAccuracy * 100)}% of the time; the rest go to human review.`}
+                      </>
+                    ) : 'No evaluation has been recorded yet.'}
                   </div>
                 </div>
 

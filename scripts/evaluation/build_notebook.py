@@ -52,7 +52,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import LeaveOneOut, cross_val_predict
-from sklearn.metrics import accuracy_score, f1_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix
 
 np.random.seed(RANDOM_SEED)
 print("scikit-learn", sklearn.__version__)
@@ -215,11 +215,23 @@ if all(isinstance(r.get("ruleScores"), dict) for r in rule_rows) and len(rule_ro
         {"method": "Machine learning only (this model)", "accuracy": round(acc, 3), "macro-F1": round(f1, 3)},
         {"method": "Rule-based + ML (system decision)", "accuracy": round(accuracy_score(y, blend_pred), 3), "macro-F1": round(f1_score(y, blend_pred, average="macro"), 3)},
     ])
+    def _summary(pred):
+        return {"accuracy": round(accuracy_score(y, pred), 4),
+                "macroPrecision": round(precision_score(y, pred, average="macro", zero_division=0), 4),
+                "macroRecall": round(recall_score(y, pred, average="macro", zero_division=0), 4),
+                "macroF1": round(f1_score(y, pred, average="macro", zero_division=0), 4)}
+    combined_metrics = {
+        "ruleBasedPlusML": {**_summary(blend_pred), "ruleWeight": RULE_WEIGHT,
+                            "coverageAtThreshold": round(float(answered.mean()), 4),
+                            "accuracyOnAnswered": round(float(accuracy_score(np.array(y)[answered], np.array(blend_pred)[answered])), 4) if answered.any() else None},
+        "rulesOnly": _summary(rule_pred),
+    }
     print(f"With the {UNCLASSIFIED_THRESHOLD} threshold the combined system answers {answered.mean():.0%} of entries, "
           f"accuracy on those {accuracy_score(np.array(y)[answered], np.array(blend_pred)[answered]) if answered.any() else 0:.0%}; "
           "the rest are sent to human review.")
 else:
     combo = None
+    combined_metrics = {}
     print("The dataset export has no rule scores (older app version) - skipping the combined evaluation.")
 combo
 """)
@@ -402,6 +414,7 @@ artifact = {
         "perClass": classification_report(y, pred, output_dict=True, zero_division=0),
         "confusionMatrix": {"labels": classes, "matrix": cm.tolist()},
         "learningCurve": [{"trainSize": int(s), "accuracy": round(float(m), 4)} for s, m, _ in curve],
+        **combined_metrics,
     },
     "topFeatures": top_features,
     "parityTests": [{"input": p, "probabilities": [float(v) for v in row]} for p, row in zip(probe_inputs, probe_proba)],

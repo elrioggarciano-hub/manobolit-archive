@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/session'
 import { compileArtifact, runParityTests, invalidateTrainedModelCache, ARTIFACT_FORMAT } from '@/lib/classification/trainedModel'
@@ -107,6 +108,7 @@ export async function POST(request: NextRequest) {
       }),
     ])
     invalidateTrainedModelCache()
+    revalidateTag('entries') // refresh dashboard accuracy and cached pages
 
     return NextResponse.json({
       success: true,
@@ -135,6 +137,7 @@ export async function PATCH(request: NextRequest) {
       prisma.mLModelRegistry.update({ where: { id: target.id }, data: { status: 'ACTIVE', activatedAt: new Date() } }),
     ])
     invalidateTrainedModelCache()
+    revalidateTag('entries') // refresh dashboard accuracy and cached pages
     return NextResponse.json({ success: true, active: version })
   } catch (error) {
     console.error('PATCH /api/ml/models/trained error:', error)

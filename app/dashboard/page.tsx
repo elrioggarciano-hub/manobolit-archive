@@ -2,6 +2,8 @@ import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { getLatestSnapshot } from '@/lib/classification/retrain'
 import { aggregateLocations } from '@/lib/geo'
+import { getActiveTrainedModel } from '@/lib/classification/trainedModel'
+import type { AccuracyMetrics } from './DashboardClient'
 import DashboardClient from './DashboardClient'
 
 // Edge ISR with 60s stale-while-revalidate for sub-50ms dashboard delivery
@@ -27,23 +29,39 @@ const getProcessedDashboardData = unstable_cache(
       loocvReport = JSON.parse(snapshot.loocvJson)
     } catch (e) { }
 
-    const ensemble = loocvReport?.modes?.hybridEnsemble || {
-      accuracy: 0.409,
-      macroPrecision: 0.517,
-      macroRecall: 0.413,
-      macroF1: 0.446,
-      sampleSize: 22,
-    }
-
-    const accuracyMetrics = {
-      accuracy: ensemble.accuracy,
-      precision: ensemble.macroPrecision,
-      recall: ensemble.macroRecall,
-      f1: ensemble.macroF1,
-      sampleSize: ensemble.sampleSize || totalEntries || 22,
-      trainedSamples: snapshot.trainedSamples,
-      vocabularySize: snapshot.vocabularySize,
-      lastRetrainTime: snapshot.createdAt,
+    // System accuracy comes only from real evaluations (no placeholder numbers):
+    // 1) the active Colab model's LOOCV of the full system decision (rule base + ML, computed in the notebook),
+    // 2) else the in-app LOOCV snapshot of the rule-based + learned ensemble,
+    // 3) else the Colab model's ML-only LOOCV, clearly labelled; otherwise "not evaluated yet".
+    const trained = await getActiveTrainedModel()
+    const tm = trained?.artifact.metrics || {}
+    const vocab = trained ? trained.artifact.vectorizers.reduce((n, v) => n + v.terms.length, 0) : undefined
+    const inApp = loocvReport?.modes?.hybridEnsemble
+    let accuracyMetrics: AccuracyMetrics | null = null
+    if (trained && tm.ruleBasedPlusML) {
+      const c = tm.ruleBasedPlusML
+      accuracyMetrics = {
+        accuracy: c.accuracy, precision: c.macroPrecision, recall: c.macroRecall, f1: c.macroF1,
+        sampleSize: trained.artifact.trainedSamples, trainedSamples: trained.artifact.trainedSamples, vocabularySize: vocab,
+        lastRetrainTime: trained.artifact.createdAt,
+        method: 'Rule-based (Eugenio/Andress) + machine learning',
+        coverage: c.coverageAtThreshold, answeredAccuracy: c.accuracyOnAnswered ?? undefined,
+        rulesOnlyAccuracy: tm.rulesOnly?.accuracy, mlOnlyAccuracy: tm.accuracy,
+      }
+    } else if (inApp?.accuracy !== undefined) {
+      accuracyMetrics = {
+        accuracy: inApp.accuracy, precision: inApp.macroPrecision, recall: inApp.macroRecall, f1: inApp.macroF1,
+        sampleSize: inApp.sampleSize, trainedSamples: snapshot.trainedSamples, vocabularySize: snapshot.vocabularySize,
+        lastRetrainTime: snapshot.createdAt, method: 'Rule-based + in-app learned models',
+      }
+    } else if (trained && typeof tm.accuracy === 'number') {
+      const per = tm.perClass?.['macro avg'] || {}
+      accuracyMetrics = {
+        accuracy: tm.accuracy, precision: per.precision ?? 0, recall: per.recall ?? 0, f1: tm.macroF1 ?? 0,
+        sampleSize: trained.artifact.trainedSamples, trainedSamples: trained.artifact.trainedSamples, vocabularySize: vocab,
+        lastRetrainTime: trained.artifact.createdAt,
+        method: 'Machine-learning component only — re-run the Colab notebook to include the rule-based combination',
+      }
     }
 
     const exportRecords = allEntries.map(e => ({
@@ -115,7 +133,7 @@ const getProcessedDashboardData = unstable_cache(
       exportRecords,
     }
   },
-  ['dashboard-processed-v7'],
+  ['dashboard-processed-v8'],
   { tags: ['entries'] }
 )
 
