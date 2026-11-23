@@ -133,8 +133,10 @@ const getProcessedDashboardData = unstable_cache(
       exportRecords,
     }
   },
-  ['dashboard-processed-v8'],
-  { tags: ['entries'] }
+  ['dashboard-processed-v9'],
+  // Refreshed when entries change (tag) and at least every 5 minutes, so model activations and other
+  // database updates always reach the dashboard.
+  { tags: ['entries'], revalidate: 300 }
 )
 
 export default async function DashboardPage() {
