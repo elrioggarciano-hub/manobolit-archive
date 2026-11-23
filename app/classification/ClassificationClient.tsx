@@ -1281,22 +1281,6 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                 </div>
                               </div>
                             )}
-                            {serverResult?.reasoning && (
-                              <div style={{ marginTop: '8px', marginBottom: '8px', padding: '10px 12px', background: 'rgba(59, 130, 246, 0.06)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '6px' }}>
-                                <div style={{ fontSize: '10px', fontWeight: 800, color: '#60a5fa', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <span>✨</span>
-                                  <span>GEMINI ADVISORY OPINION (NOT USED FOR THE DECISION)</span>
-                                </div>
-                                <div style={{ fontSize: '12px', color: '#d4d4d8', lineHeight: 1.5 }}>
-                                  {serverResult.reasoning}
-                                </div>
-                                {serverResult.linguisticObservations && (
-                                  <div style={{ fontSize: '11px', color: '#a1a1aa', marginTop: '6px', fontStyle: 'italic' }}>
-                                    Note: {serverResult.linguisticObservations}
-                                  </div>
-                                )}
-                              </div>
-                            )}
                             <div style={{ height: '4px', background: '#27272a', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' }}>
                               <div style={{ height: '100%', width: `${activePct}%`, background: color, borderRadius: '2px', transition: 'width 0.3s ease' }} />
                             </div>

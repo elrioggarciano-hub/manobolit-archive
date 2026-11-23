@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { classifyEntry, EntryLike } from '@/lib/classification/engine'
 import { AlgorithmMode } from '@/lib/classification/hybrid'
 import { getLatestSnapshot, ensureActiveModels } from '@/lib/classification/retrain'
-import { classifyWithGemini } from '@/lib/classification/geminiClassifier'
 import { prisma } from '@/lib/database/prisma'
 import { getActiveTrainedModel, predictWithCompiled } from '@/lib/classification/trainedModel'
 import { blendRulesWithModel } from '@/lib/classification/ruleMlBlend'
@@ -14,7 +13,8 @@ import { dialectVariantGroups } from '@/lib/translation/lexicon'
 // POST /api/classify
 // Rule-based genre/theme classification (Eugenio 1993 / Andress 1985 rule base stored in the database)
 // combined with machine learning: rule scores are blended with the Colab-trained model's probabilities
-// (or with the in-app learned models when no Colab model is uploaded). Gemini, if configured, is advisory only.
+// (or with the in-app learned models when no Colab model is uploaded). Gemini, if configured, only narrates
+// the explanation of the system's decision (see lib/classification/explain.ts).
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -88,20 +88,7 @@ export async function POST(request: NextRequest) {
       ? blendRulesWithModel(ruleOnly.genre.allScores, trained.probabilities, trainedModel!.artifact.unclassifiedThreshold)
       : null
 
-    // 2. Optional Gemini advisory opinion (runs in parallel; never overrides the engine)
-    const geminiPromise = classifyWithGemini({
-      title: title || manoboTitle || englishTitle,
-      transcription: transcription || (additionalContext ? additionalContext : undefined),
-      translation: translation || text,
-      bisayaTranslation: body.bisayaTranslation,
-      additionalContext,
-    }).catch((llmErr: any) => {
-      console.warn('[ClassifyAPI] Gemini advisory skipped:', llmErr?.message)
-      return null
-    })
-
-    // The system's own rule-based + ML engine decides; Gemini (if configured) is advisory only —
-    // its opinion and reasoning are returned for comparison but do not override the engine.
+    // 2. The system's own rule-based + ML engine decides the genre.
     const finalPredictedGenre = blended ? blended.genre : result.genre.value
     const finalConfidence = blended ? blended.confidence : result.genre.confidence
     const finalSource = blended ? 'RULES_PLUS_COLAB_MODEL' : 'RULES_PLUS_LEARNED_ENSEMBLE'
@@ -145,10 +132,7 @@ export async function POST(request: NextRequest) {
         : 'rule-based classification (Eugenio 1993 / Andress 1985) combined with learned models',
       usesTrainedModel: Boolean(blended),
     }
-    const [geminiResult, explanation] = await Promise.all([
-      geminiPromise,
-      explainClassification(evidence, toExplainLang(body.lang)),
-    ])
+    const explanation = await explainClassification(evidence, toExplainLang(body.lang))
 
     // 3. Compute individual model predictions and normalized per-model distributions
     const breakdown = result.algorithmicBreakdown
@@ -167,7 +151,6 @@ export async function POST(request: NextRequest) {
       charNgram: charOnly.genre.value,
       ruleBased: ruleOnly.genre.value,
       knnMemory: knnOnly.genre.value,
-      ...(geminiResult ? { geminiAdvisory: geminiResult.genre } : {}),
     }
 
     const predictedValue = finalPredictedGenre
@@ -204,18 +187,11 @@ export async function POST(request: NextRequest) {
       isUnclassified,
       isUncertain: isUnclassified,
 
-      // Semantic Reasoning Explanations
-      reasoning: geminiResult ? `Gemini advisory opinion (${geminiResult.genre}, not used for the final decision): ${geminiResult.reasoning}` : undefined,
-      culturalThemes: geminiResult && geminiResult.culturalThemes.length ? geminiResult.culturalThemes : undefined,
-      linguisticObservations: geminiResult ? geminiResult.linguisticObservations : undefined,
-
       // Truthful Architecture Provenance
       algorithm: trained
         ? `Rule-based classification (Eugenio 1993 / Andress 1985) + ${trainedModel!.artifact.algorithm} trained in Google Colab on human-verified entries`
         : 'Rule-based classification (Eugenio 1993 / Andress 1985) + in-app learned models (Naive Bayes, TF-IDF, Char N-gram, k-NN)',
       ruleWeight: 0.5,
-      // Gemini opinion (advisory only, never overrides the engine)
-      geminiAdvisory: geminiResult ? { genre: geminiResult.genre, confidence: geminiResult.confidence } : undefined,
       ruleNames: ruleIndex(activeModels.rules),
       algorithmMode,
       predictionSource: finalSource,
