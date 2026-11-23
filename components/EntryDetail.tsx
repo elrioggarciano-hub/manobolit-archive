@@ -4,6 +4,7 @@ import React from 'react'
 import dynamic from 'next/dynamic'
 import AudioPlayer from './AudioPlayer'
 import SyncedTranscript from './SyncedTranscript'
+import ExplainClassification from './ExplainClassification'
 import { parseSegments } from '@/lib/transcriptSync'
 import { aggregateLocations, type LocationStat } from '@/lib/geo'
 
@@ -383,6 +384,16 @@ export default function EntryDetail({ entry, locationStats }: { entry: Entry; lo
               </div>
             </div>
 
+            <ExplainClassification
+              entryId={entry.id}
+              title={entry.title}
+              transcription={entry.transcription}
+              translation={entry.translation}
+              bisayaTranslation={entry.bisayaTranslation}
+              communityLocation={entry.communityLocation}
+              municipality={entry.municipality}
+              barangay={entry.barangay}
+            />
           </div>
 
           {/* Card 3: Location Map */}

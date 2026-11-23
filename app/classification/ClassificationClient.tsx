@@ -122,7 +122,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
     return parts.join(' ')
   }
 
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [selectedEntryId, setSelectedEntryId] = useState<string>(initialEntry?.id || 'fb-stars')
   const [inputText, setInputText] = useState(initialEntry ? getEntryClassificationText(initialEntry) : DEFAULT_SIMULATOR_TEXT)
   const [inputTranscription, setInputTranscription] = useState(initialEntry ? (initialEntry.transcription || '') : '')
@@ -842,7 +842,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         const res = await fetch('/api/classify', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          signal: AbortSignal.timeout(5000),
+                          signal: AbortSignal.timeout(15000),
                           body: JSON.stringify({
                             text: inputText,
                             additionalContext: inputTranscription,
@@ -850,6 +850,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                             transcription: inputTranscription,
                             translation: selectedTranslation,
                             bisayaTranslation: selectedBisayaTranslation,
+                            lang: language,
+                            explainEntryId: activeEntry?.id,
                             title: activeEntry?.title,
                             manoboTitle: activeEntry?.manoboTitle,
                             englishTitle: activeEntry?.englishTitle,
@@ -1263,11 +1265,27 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                 )}
                               </div>
                             )}
+                            {serverResult?.explanation?.text && (
+                              <div style={{ marginTop: '8px', marginBottom: '8px', padding: '12px 14px', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '6px' }}>
+                                <div style={{ fontSize: '10px', fontWeight: 800, color: '#34d399', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <span>🧠</span>
+                                  <span>WHY THIS GENRE? · EXPLAINABLE AI</span>
+                                </div>
+                                <div style={{ fontSize: '12.5px', color: '#e4e4e7', lineHeight: 1.6 }}>
+                                  {serverResult.explanation.text}
+                                </div>
+                                <div style={{ fontSize: '10px', color: '#a1a1aa', marginTop: '6px', fontStyle: 'italic' }}>
+                                  {serverResult.explanation.source === 'gemini'
+                                    ? "Written by Gemini from the system's own evidence (matched rules, learned words, similar verified entries); it cannot change the decision."
+                                    : "Generated from the system's own evidence (matched rules, learned words, similar verified entries)."}
+                                </div>
+                              </div>
+                            )}
                             {serverResult?.reasoning && (
-                              <div style={{ marginTop: '8px', marginBottom: '8px', padding: '10px 12px', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: '6px' }}>
+                              <div style={{ marginTop: '8px', marginBottom: '8px', padding: '10px 12px', background: 'rgba(59, 130, 246, 0.06)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '6px' }}>
                                 <div style={{ fontSize: '10px', fontWeight: 800, color: '#60a5fa', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                   <span>✨</span>
-                                  <span>SEMANTIC FOLKLORIC REASONING</span>
+                                  <span>GEMINI ADVISORY OPINION (NOT USED FOR THE DECISION)</span>
                                 </div>
                                 <div style={{ fontSize: '12px', color: '#d4d4d8', lineHeight: 1.5 }}>
                                   {serverResult.reasoning}

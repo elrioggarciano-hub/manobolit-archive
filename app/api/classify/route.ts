@@ -7,6 +7,7 @@ import { prisma } from '@/lib/database/prisma'
 import { getActiveTrainedModel, predictWithCompiled } from '@/lib/classification/trainedModel'
 import { blendRulesWithModel } from '@/lib/classification/ruleMlBlend'
 import { ruleIndex } from '@/lib/classification/rules'
+import { explainClassification, toExplainLang, ExplanationEvidence } from '@/lib/classification/explain'
 import { getLexicon } from '@/lib/translation/lexiconStore'
 import { dialectVariantGroups } from '@/lib/translation/lexicon'
 
@@ -87,19 +88,17 @@ export async function POST(request: NextRequest) {
       ? blendRulesWithModel(ruleOnly.genre.allScores, trained.probabilities, trainedModel!.artifact.unclassifiedThreshold)
       : null
 
-    // 2. Optional Semantic LLM Reasoning: Gemini Flash (Option 1)
-    let geminiResult = null
-    try {
-      geminiResult = await classifyWithGemini({
-        title: title || manoboTitle || englishTitle,
-        transcription: transcription || (additionalContext ? additionalContext : undefined),
-        translation: translation || text,
-        bisayaTranslation: body.bisayaTranslation,
-        additionalContext,
-      })
-    } catch (llmErr: any) {
-      console.warn('[ClassifyAPI] Gemini call bypassed; utilizing local hybrid ensemble:', llmErr.message)
-    }
+    // 2. Optional Gemini advisory opinion (runs in parallel; never overrides the engine)
+    const geminiPromise = classifyWithGemini({
+      title: title || manoboTitle || englishTitle,
+      transcription: transcription || (additionalContext ? additionalContext : undefined),
+      translation: translation || text,
+      bisayaTranslation: body.bisayaTranslation,
+      additionalContext,
+    }).catch((llmErr: any) => {
+      console.warn('[ClassifyAPI] Gemini advisory skipped:', llmErr?.message)
+      return null
+    })
 
     // The system's own rule-based + ML engine decides; Gemini (if configured) is advisory only —
     // its opinion and reasoning are returned for comparison but do not override the engine.
@@ -107,6 +106,49 @@ export async function POST(request: NextRequest) {
     const finalConfidence = blended ? blended.confidence : result.genre.confidence
     const finalSource = blended ? 'RULES_PLUS_COLAB_MODEL' : 'RULES_PLUS_LEARNED_ENSEMBLE'
     const finalVersion = trained ? trained.modelVersion : snapshot.id
+
+    // 3a. Explanation of the system's own decision, from the evidence it actually produced (XAI)
+    const distribution = blended ? blended.distribution : result.genre.allScores
+    const finalRule = activeModels.rules.genre.find(r => r.value === finalPredictedGenre)
+    const knnForExplain = classifyEntry(entryLike, additionalContext || '', 'ALL', 'KNN_MEMORY', activeModels).algorithmicBreakdown?.knn
+    // When explaining an archive entry, never cite the entry itself as "similar"
+    const selfId: string | undefined = body.explainEntryId || entryId
+    const neighborIds = (knnForExplain?.neighbors || [])
+      .filter(n => n.genre === finalPredictedGenre && n.id.startsWith('verified-'))
+      .map(n => n.id.slice('verified-'.length))
+      .filter(id => id !== selfId)
+    const [definitions, neighborRows] = await Promise.all([
+      prisma.categoryDefinition.findMany({ where: { type: 'GENRE' }, select: { code: true, title: true, description: true } }).catch(() => []),
+      neighborIds.length
+        ? prisma.literatureEntry.findMany({ where: { id: { in: neighborIds } }, select: { id: true, title: true, genre: true } }).catch(() => [])
+        : Promise.resolve([] as { id: string; title: string; genre: string }[]),
+    ])
+    const def = (code: string) => definitions.find(d => d.code === code)
+    const label = (code: string) => def(code)?.title || code.charAt(0) + code.slice(1).toLowerCase()
+    const second = distribution.find(d => d.genre !== finalPredictedGenre)
+    const evidence: ExplanationEvidence = {
+      genre: finalPredictedGenre,
+      genreLabel: finalPredictedGenre === 'UNCLASSIFIED' ? 'Unclassified' : label(finalPredictedGenre),
+      confidence: finalConfidence,
+      runnerUp: second ? { genre: second.genre, label: label(second.genre), confidence: second.confidence } : undefined,
+      definition: finalPredictedGenre === 'UNCLASSIFIED' ? undefined : def(finalPredictedGenre)?.description,
+      ruleName: finalRule?.name,
+      ruleTerms: finalRule ? (ruleOnly.ruleDetails[finalRule.id]?.matched || []).map(m => m.term) : [],
+      learnedWords: (result.algorithmicBreakdown?.naiveBayes?.featuresByGenre?.[finalPredictedGenre] || []).map(f => f.word),
+      similarEntries: neighborIds
+        .map(id => neighborRows.find(r => r.id === id))
+        .filter((r): r is { id: string; title: string; genre: string } => !!r && r.title !== title)
+        .map(r => ({ title: r.title, genre: r.genre })),
+      themes: result.themes.map(t => t.value),
+      method: blended
+        ? 'rule-based classification (Eugenio 1993 / Andress 1985) combined with a machine-learning model trained on verified entries'
+        : 'rule-based classification (Eugenio 1993 / Andress 1985) combined with learned models',
+      usesTrainedModel: Boolean(blended),
+    }
+    const [geminiResult, explanation] = await Promise.all([
+      geminiPromise,
+      explainClassification(evidence, toExplainLang(body.lang)),
+    ])
 
     // 3. Compute individual model predictions and normalized per-model distributions
     const breakdown = result.algorithmicBreakdown
@@ -192,6 +234,9 @@ export async function POST(request: NextRequest) {
         totalModels: Object.keys(modelPredictions).length,
         predictions: modelPredictions,
       },
+
+      // Plain-language explanation of the decision (Gemini narrates the evidence; template if unavailable)
+      explanation,
 
       // Nearest human-verified exemplars (explains the k-NN vote)
       nearestVerifiedExemplars: knnOnly.algorithmicBreakdown?.knn?.neighbors ?? [],

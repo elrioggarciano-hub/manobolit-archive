@@ -38,6 +38,8 @@ export interface NaiveBayesPrediction {
   posteriorProbability: number
   allProbabilities: { genre: string; probability: number; logLikelihood: number }[]
   topPredictiveFeatures: PredictiveFeature[]
+  /** strongest evidence words (positive log-odds) for every genre, used to explain any final decision */
+  featuresByGenre?: Record<string, PredictiveFeature[]>
   modelMetadata: {
     algorithm: string
     trainedSampleCount: number
@@ -201,6 +203,9 @@ export function predictNaiveBayes(
     posteriorProbability: topPrediction.probability,
     allProbabilities,
     topPredictiveFeatures: topFeatures,
+    featuresByGenre: Object.fromEntries(
+      candidateClasses.map(c => [c, (wordContributions[c] || []).filter(f => f.logOddsRatio > 0).slice(0, 6)])
+    ),
     modelMetadata: {
       algorithm: 'Multinomial Naive Bayes (Supervised ML)',
       trainedSampleCount: model.totalDocuments,
