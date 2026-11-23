@@ -37,8 +37,9 @@ const getCachedEntry = unstable_cache(
       })),
     }
   },
-  ['entry-detail-v5'],
-  { tags: ['entries'] }
+  ['entry-detail-v6'],
+  // Refreshed when entries change (tag) and at least every 5 minutes, so database updates always show
+  { tags: ['entries'], revalidate: 300 }
 )
 
 interface Props {
