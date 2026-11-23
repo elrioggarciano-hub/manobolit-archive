@@ -1402,13 +1402,16 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '16px' }}>
                       <div style={{ fontSize: '11px', fontWeight: 800, color: '#f1b80d', letterSpacing: '0.04em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span>🌿</span>
-                        <span>1. MGA KATUTUBONG PATUNAY</span>
+                        <span>{t('rat_card1_title')}</span>
                       </div>
                       <p style={{ fontSize: '11px', color: '#a1a1aa', lineHeight: 1.5, margin: '0 0 10px 0' }}>
-                        Mga natukoy na salitang Manobo na nagpapatunay sa tema at anyo ng akda:
+                        {t('rat_card1_desc')}
                       </p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                        {classificationResult.algorithmicBreakdown.topFeatures.slice(0, 5).map((f, i) => (
+                        {(serverResult?.explanation?.evidence
+                          ? Array.from(new Set<string>([...serverResult.explanation.evidence.ruleTerms, ...serverResult.explanation.evidence.learnedWords])).slice(0, 6).map(term => ({ term }))
+                          : classificationResult.algorithmicBreakdown.topFeatures.slice(0, 5)
+                        ).map((f, i) => (
                           <span
                             key={i}
                             style={{
@@ -1431,43 +1434,39 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                     <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '16px' }}>
                       <div style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.04em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span>📜</span>
-                        <span>2. ALITUNTUNIN NG PAG-UURI</span>
+                        <span>{t('rat_card2_title')}</span>
                       </div>
                       <p style={{ fontSize: '11px', color: '#a1a1aa', lineHeight: 1.5, margin: '0 0 8px 0' }}>
-                        Inuri bilang <strong>{formatName(classificationResult.genre.value)}</strong> batay sa pamantayang akademiko nina Dr. Damiana Eugenio (1993) at Richard Andress (1985).
+                        {t('rat_card2_prefix')} <strong>{serverResult?.explanation?.evidence?.genreLabel || formatName(classificationResult.genre.value)}</strong> {t('rat_card2_suffix')}
                       </p>
-                      <div style={{ fontSize: '10.5px', color: '#94a3b8', lineHeight: 1.4 }}>
-                        {classificationResult.genre.value === 'MYTH' && 'Naglalaman ng mga salaysay tungkol sa paglikha ng mundo, mga bituin, at mga banal na espiritu (Oggayam).'}
-                        {classificationResult.genre.value === 'LEGEND' && 'Nagpapaliwanag sa pinagmulan ng mga hayop, bundok, lawa, o komunidad sa Agusan (Tudtul).'}
-                        {classificationResult.genre.value === 'EPIC' && 'Naglalaman ng kabayanihan, mahabang paglalakbay, at pakikidigma ng mga ninuno (Ulaging).'}
-                        {classificationResult.genre.value === 'FOLKTALE' && 'Kwentong-bayan na nagbibigay ng aral at nagpapakita ng pang-araw-araw na pamumuhay.'}
-                        {classificationResult.genre.value === 'SONG' && 'Tradisyonal na awit na naglalarawan ng pag-ibig, ritwal, o pamumuhay sa komunidad.'}
-                        {classificationResult.genre.value === 'CHANT' && 'Banal na panalangin at ritwal na iniaalay sa mga diwata at ninuno.'}
-                        {classificationResult.genre.value === 'RIDDLE' && 'Bugtong o talinghaga ng matalinong kaisipan ng mga katutubo.'}
-                        {classificationResult.genre.value === 'PROVERB' && 'Kasabihan o salawikain na nagsisilbing gabay sa moralidad at pag-uugali.'}
-                      </div>
+                      {/* Genre definition from the database (Eugenio 1993), not text written in code */}
+                      {serverResult?.explanation?.evidence?.definition && (
+                        <div style={{ fontSize: '10.5px', color: '#94a3b8', lineHeight: 1.4 }}>
+                          {serverResult.explanation.evidence.definition}
+                        </div>
+                      )}
                     </div>
 
                     {/* Card 3: Toleransya sa Katutubong Baybay (Dialect & Spelling Variations) */}
                     <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '16px' }}>
                       <div style={{ fontSize: '11px', fontWeight: 800, color: '#10b981', letterSpacing: '0.04em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span>🗣️</span>
-                        <span>3. TOLERANSYA SA DIALEKTO AT BAYBAY</span>
+                        <span>{t('rat_card3_title')}</span>
                       </div>
                       <p style={{ fontSize: '11px', color: '#a1a1aa', lineHeight: 1.5, margin: '0 0 8px 0' }}>
-                        Pagkilala sa iba&apos;t ibang bigkas at baybay ng mga tagapagsalaysay sa Agusan del Sur:
+                        {t('rat_card3_desc')}
                       </p>
                       {classificationResult.algorithmicBreakdown.fuzzyMatches.length > 0 ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           {classificationResult.algorithmicBreakdown.fuzzyMatches.slice(0, 2).map((fuz, idx) => (
                             <div key={idx} style={{ fontSize: '10.5px', color: '#d4d4d8' }}>
-                              ✓ Naintindihan ang &ldquo;<strong>{fuz.token}</strong>&rdquo; bilang katumbas ng <strong>{fuz.matchedCanonical}</strong> ({fuz.gloss}).
+                              ✓ {t('rat_card3_match_a')} &ldquo;<strong>{fuz.token}</strong>&rdquo; {t('rat_card3_match_b')} <strong>{fuz.matchedCanonical}</strong> ({fuz.gloss}).
                             </div>
                           ))}
                         </div>
                       ) : (
                         <div style={{ fontSize: '10.5px', color: '#71717a', fontStyle: 'italic' }}>
-                          ✓ Pamantayang baybay ng Agusan Manobo ang ginamit sa salaysay; wasto ang pagbasa ng system.
+                          ✓ {t('rat_card3_none')}
                         </div>
                       )}
                     </div>
