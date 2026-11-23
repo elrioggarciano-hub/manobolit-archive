@@ -547,7 +547,7 @@ export default function DashboardClient({
 
               {/* Theme Frequency Card */}
               <div
-                className="bg-[var(--bg-surface)] p-6 flex flex-col justify-between scroll-reveal card-hover"
+                className="bg-[var(--bg-surface)] p-6 flex flex-col justify-start scroll-reveal card-hover"
                 style={{
                   border: '1px solid var(--border-color)',
                   borderRadius: '0px',
@@ -673,7 +673,7 @@ export default function DashboardClient({
                     background: 'var(--bg-main)',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'space-between'
+                    justifyContent: 'flex-start'
                   }}
                 >
                   <div>
