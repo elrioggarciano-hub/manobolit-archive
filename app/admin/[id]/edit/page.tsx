@@ -26,6 +26,7 @@ export default async function EditEntryPage({ params }: Props) {
     source: entry.source,
     yearCollected: entry.yearCollected?.toString() || '',
     narrator: entry.narrator || '',
+    singer: entry.singer || '',
     communityLocation: entry.communityLocation,
     province: entry.province,
     municipality: entry.municipality,

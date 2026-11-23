@@ -22,7 +22,7 @@ interface FormData {
   type: string; content: string; transcription: string; translation: string
   bisayaTranslation: string
   audioFile: string; audioDuration: string; source: string; yearCollected: string
-  narrator: string; communityLocation: string; province: string
+  narrator: string; singer: string; communityLocation: string; province: string
   municipality: string; barangay: string; genre: string
   themes: string[]; culturalElements: string
 }
@@ -30,7 +30,7 @@ interface FormData {
 const EMPTY: FormData = {
   title: '', manoboTitle: '', englishTitle: '', type: 'ORAL_LITERATURE',
   content: '', transcription: '', translation: '', bisayaTranslation: '', audioFile: '',
-  audioDuration: '', source: '', yearCollected: '', narrator: '',
+  audioDuration: '', source: '', yearCollected: '', narrator: '', singer: '',
   communityLocation: '', province: 'Agusan del Sur', municipality: '', barangay: '',
   genre: 'MYTH', themes: [], culturalElements: '',
 }
@@ -365,6 +365,10 @@ export default function EntryForm({ initialData, mode }: Props) {
             <div>
               <label style={labelStyle}>NARRATOR</label>
               <input className="input-anim" style={inputStyle} value={form.narrator} onChange={e => set('narrator', e.target.value)} placeholder="Name of narrator" />
+            </div>
+            <div>
+              <label style={labelStyle}>SINGER (FOLK SONGS)</label>
+              <input className="input-anim" style={inputStyle} value={form.singer} onChange={e => set('singer', e.target.value)} placeholder="Name of the singer / performer" />
             </div>
             <div>
               <label style={labelStyle}>YEAR COLLECTED</label>

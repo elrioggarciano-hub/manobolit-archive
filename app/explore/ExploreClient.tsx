@@ -21,6 +21,7 @@ interface Entry {
   audioFile?: string | null
   confidence?: number
   narrator?: string | null
+  singer?: string | null
   communityLocation?: string | null
   municipality?: string | null
   barangay?: string | null
@@ -294,12 +295,10 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
       audioFile: entry.audioFile,
       title: entry.title,
       entryId: entry.id,
-      // Folk song recordings have no real credited vocalist, so this is
-      // labeled honestly as "AI Generated" rather than implying a real
-      // singer performed it. Oral literature narrations keep using the
-      // actual collected narrator when one is on record.
-      singer: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
-      narrator: isFolkSong ? 'AI Generated' : (entry.narrator || 'AI Generated'),
+      // Credit the recorded performer (folk songs: the singer; oral literature: the narrator).
+      // "AI Generated" is used only when no vocalist/narrator is on record (see Terms).
+      singer: isFolkSong ? (entry.singer || 'AI Generated') : (entry.narrator || entry.singer || 'AI Generated'),
+      narrator: isFolkSong ? (entry.singer || 'AI Generated') : (entry.narrator || entry.singer || 'AI Generated'),
       duration: 25,
       textToRecite: entry.content
     })

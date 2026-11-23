@@ -90,7 +90,10 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
   // The stored model probability, shown as-is (never replaced by another number).
   const confidence = latestClassification ? Math.round((latestClassification.confidenceScore || 0) * 100) : 0
   const syncSegments = parseSegments(entry.transcriptSync)
-  const narratorLabel = entry.type === 'FOLK_SONG' ? 'AI Generated' : (entry.narrator || entry.singer || 'AI Generated')
+  // Credit the recorded performer; 'AI Generated' only when no vocalist/narrator is on record (see Terms)
+  const narratorLabel = entry.type === 'FOLK_SONG'
+    ? (entry.singer || 'AI Generated')
+    : (entry.narrator || entry.singer || 'AI Generated')
 
   return (
     <div className="anim-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px 80px', fontFamily: 'Inter, sans-serif' }}>

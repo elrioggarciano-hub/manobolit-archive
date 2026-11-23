@@ -120,6 +120,7 @@ export async function PUT(
         source: body.source,
         yearCollected: body.yearCollected ? Number(body.yearCollected) : null,
         narrator: body.narrator || null,
+        singer: body.singer || null,
         communityLocation: body.communityLocation,
         province: body.province,
         municipality: body.municipality,

@@ -20,8 +20,9 @@ const getParsedExploreEntries = unstable_cache(
     })
 
     return entries.map(e => {
+      // Show the stored model probability as-is; only entries never classified get a live estimate
       const persistedScore = e.classifications[0]?.confidenceScore
-      const confidence = (persistedScore !== undefined && persistedScore >= 0.50)
+      const confidence = persistedScore !== undefined
         ? Math.round(persistedScore * 100)
         : Math.round(classifyEntry(e).overallConfidence * 100)
 
@@ -35,7 +36,7 @@ const getParsedExploreEntries = unstable_cache(
       }
     })
   },
-  ['explore-entries-v6'],
+  ['explore-entries-v7'],
   { tags: ['entries'] }
 )
 
