@@ -128,6 +128,7 @@ export async function PUT(
         genre: body.genre,
         themes: JSON.stringify(body.themes || []),
         culturalElements: JSON.stringify(body.culturalElements || []),
+        ...(typeof body.isPinned === 'boolean' ? { isPinned: body.isPinned } : {}),
         contentHash: newContentHash,
         reviewStatus: shouldInvalidateVerification ? 'PENDING' : existing.reviewStatus,
         verifiedContentHash: shouldInvalidateVerification ? null : existing.verifiedContentHash,

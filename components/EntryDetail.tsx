@@ -333,7 +333,7 @@ export default function EntryDetail({ entry, locationStats }: { entry: Entry; lo
             <div>
               <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>SOURCE / REFERENCE</div>
               <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 700 }}>
-                {entry.source || 'Catipay & Curato (2024)'}
+                {entry.source || 'Not recorded'}
               </div>
             </div>
 

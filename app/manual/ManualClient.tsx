@@ -39,7 +39,7 @@ const TOPICS: ManualTopic[] = [
       { num: 2, title: 'Navigation Menu', desc: 'Click EXPLORER, CLASSIFICATION, TRANSLATOR, DASHBOARD, ABOUT, or USER MANUAL to navigate to that feature.' },
       { num: 3, title: 'Search & Language', desc: 'Type keywords to quickly find literature, or switch interface language (English, Bisaya, Tagalog, Agusan Manobo).' },
       { num: 4, title: 'Admin Gateway', desc: 'Click the circular user icon at the top right to access the Administrator authentication portal.' },
-      { num: 5, title: 'Explore Archive', desc: 'Click the primary "Explore Archive" button on the hero banner to view all 22 archived works.' },
+      { num: 5, title: 'Explore Archive', desc: 'Click the primary "Explore Archive" button on the hero banner to view all archived works.' },
     ],
     goodToKnow: [
       'The archive preserves 17 authentic oral literature selections (Catipay & Curato, 2024) and 5 folk songs (Maravilla, 2024).',
@@ -85,14 +85,14 @@ const TOPICS: ManualTopic[] = [
     figureImg: '/manual/screenshots/fig2_explore.png',
     steps: [
       { num: 1, title: 'Search Query', desc: 'Type any keyword, title, character (e.g., "Pilanduk"), or storyteller name into the search bar.' },
-      { num: 2, title: 'Literary Form', desc: 'Filter between "All Works", "Oral Literature" (17 entries), or "Folk Song" (5 entries).' },
+      { num: 2, title: 'Literary Form', desc: 'Filter between "All Works", "Oral Literature", or "Folk Song".' },
       { num: 3, title: 'Genre Taxonomy Chips', desc: 'Click a genre chip (Folktale, Song, Riddle, Epic, Proverb, Myth, Legend) to isolate entries by Eugenio/Andress criteria.' },
-      { num: 4, title: 'Provenance Dropdown', desc: 'Select an Agusan del Sur municipality (Bayugan, Prosperidad, San Francisco, Esperanza) to view regional folklore.' },
+      { num: 4, title: 'Provenance Dropdown', desc: 'Select a municipality or barangay to view its folklore. The list is built from the places recorded in the archived entries, with the number of entries for each.' },
       { num: 5, title: 'Entry Card', desc: 'Click on any literature card to view its complete tri-lingual parallel text and audio player.' },
     ],
     goodToKnow: [
-      'You can combine multiple filters at once (e.g., Folk Songs in Bayugan).',
-      'Click "Clear All Filters" at any time to reset the list to all 22 works.',
+      'You can combine multiple filters at once (e.g., Folk Songs from one barangay).',
+      'Click "Clear All Filters" at any time to reset the list to all archived works.',
     ],
   },
   {
@@ -136,7 +136,7 @@ const TOPICS: ManualTopic[] = [
     ],
     goodToKnow: [
       'The Rule-Based view shows the Eugenio and Andress rule scores alone; the final decision combines them 50/50 with the machine-learning models.',
-      'Supervised ML mode uses Multinomial Naive Bayes trained on the 22-record corpus.',
+      'Supervised ML mode uses Multinomial Naive Bayes trained on the human-verified entries.',
       'Neural Semantic mode performs deep semantic contextual reasoning for implicit metaphors.',
     ],
   },
@@ -173,11 +173,11 @@ const TOPICS: ManualTopic[] = [
     figureTitle: 'Interactive Analytics Dashboard with Frequency Charts',
     figureImg: '/manual/screenshots/fig6_dashboard.png',
     steps: [
-      { num: 1, title: 'Corpus Metrics', desc: 'View summary numbers: Total Works (22), Oral Literature (17), Folk Songs (5), and surveyed municipalities.' },
+      { num: 1, title: 'Corpus Metrics', desc: 'View summary numbers computed live from the archive: total works, oral literature, folk songs, and surveyed municipalities.' },
       { num: 2, title: 'Export Buttons', desc: 'Quick-access buttons for CSV and JSON data export.' },
       { num: 3, title: 'Genre Chart', desc: 'Interactive bar chart showing frequency distribution across folktales, songs, riddles, epics, and proverbs.' },
       { num: 4, title: 'Thematic Distribution', desc: 'Visualization of core cultural themes (Cleverness, Nature Spirits, Courtship, Agrarian Life).' },
-      { num: 5, title: 'Geographic Breakdown', desc: 'Distribution across Bayugan, Prosperidad, San Francisco, and Esperanza communities.' },
+      { num: 5, title: 'Geographic Breakdown', desc: 'Distribution of entries across the municipalities and barangays recorded in the archive.' },
     ],
     goodToKnow: [
       'Charts update dynamically whenever new verified records are cataloged in the system.',
@@ -233,7 +233,7 @@ const TOPICS: ManualTopic[] = [
     steps: [
       { num: 1, title: 'Title & Native Title', desc: 'Enter the primary title and Agusan Manobo native title of the piece.' },
       { num: 2, title: 'Form & Genre', desc: 'Select Oral Literature or Folk Song, then choose the Eugenio/Andress genre.' },
-      { num: 3, title: 'Geographic Provenance', desc: 'Specify the Agusan del Sur Municipality (Bayugan, Prosperidad, etc.) and Barangay.' },
+      { num: 3, title: 'Geographic Provenance', desc: 'Specify the Agusan del Sur municipality and barangay where the piece was recorded.' },
       { num: 4, title: 'Storyteller & Audio', desc: 'Document the name of the elder/singer and provide the MP3 audio file URL.' },
       { num: 5, title: 'Save to Archive', desc: 'Enter parallel transcriptions and click "Save to Cultural Archive" to publish immediately.' },
     ],

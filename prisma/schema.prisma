@@ -23,6 +23,7 @@ model LiteratureEntry {
   audioFile         String?
   audioDuration     Int?
   transcriptSync    String?   // JSON [{ start: seconds, text }] — line timings set by a reviewer for synchronized playback
+  isPinned          Boolean  @default(false) // set by an admin: listed first in the Archive Explorer
   source            String
   yearCollected     Int?
   narrator          String?

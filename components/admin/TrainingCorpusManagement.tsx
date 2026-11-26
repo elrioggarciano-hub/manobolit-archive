@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
 const GENRES = ['RIDDLE', 'PROVERB', 'FOLKTALE', 'SONG', 'MYTH', 'LEGEND', 'EPIC', 'CHANT'] as const
-const ACTIVE = new Set(['RIDDLE', 'PROVERB', 'FOLKTALE', 'SONG'])
 const SOURCES = ['archive-verbatim', 'author-written'] as const
 
 interface CorpusDoc {
@@ -87,6 +86,9 @@ export default function TrainingCorpusManagement() {
   const [form, setForm] = useState<FormState | null>(null)
   const [saving, setSaving] = useState(false)
   const [genreFilter, setGenreFilter] = useState<string>('ALL')
+  // Genres the classifier currently predicts — derived on the server from the verified entries
+  const [activeGenres, setActiveGenres] = useState<Set<string>>(new Set())
+  const ACTIVE = activeGenres
 
   const load = async () => {
     setLoading(true)
@@ -96,6 +98,7 @@ export default function TrainingCorpusManagement() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to load training corpus')
       setDocs(data.docs)
+      setActiveGenres(new Set<string>(data.activeGenres || []))
     } catch (err: any) {
       setError(err.message)
     } finally {

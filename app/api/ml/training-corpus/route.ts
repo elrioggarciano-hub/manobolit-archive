@@ -12,9 +12,14 @@ async function isAdmin(request: NextRequest) {
 export async function GET(request: NextRequest) {
   if (!(await isAdmin(request))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
-    const docs = await prisma.trainingCorpusDocument.findMany({ orderBy: [{ genre: 'asc' }, { id: 'asc' }] })
+    const [docs, models] = await Promise.all([
+      prisma.trainingCorpusDocument.findMany({ orderBy: [{ genre: 'asc' }, { id: 'asc' }] }),
+      ensureActiveModels(),
+    ])
     return NextResponse.json({
       docs: docs.map(d => ({ ...d, themes: JSON.parse(d.themes || '[]') })),
+      // Genres the classifier currently predicts (derived from verified entries, not fixed in code)
+      activeGenres: models.genres,
     })
   } catch (error: any) {
     console.error('GET /api/ml/training-corpus error:', error)

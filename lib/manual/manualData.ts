@@ -86,7 +86,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
         description: 'The ManoboLit Archive is an advanced digital repository and computational linguistics platform dedicated to the preservation, classification, and retrieval of the oral literature and folk songs of the Agusan Manobo people of Agusan del Sur, Philippines. Genres (Eugenio, 1993) and themes (Andress, 1985) are classified by a rule-based engine whose rule base is stored in the database and grows through rule terms discovered from verified entries, combined 50/50 with machine-learning models that learn from human-verified entries (a Logistic Regression classifier trained in Google Colab, and a k-nearest-neighbour memory for themes). Translation and lexical validation combine a database lexicon, finite-state morphological validation against the SIL International Webonary dictionary, and word translations learned from verified texts.',
         goodToKnow: [
           'Baseline corpus: 17 authentic oral literature pieces collected by Catipay & Curato (2024) and 5 folk songs collected by Maravilla (2024).',
-          'Geographic provenance spans key municipalities of Agusan del Sur, including Bayugan, Prosperidad, San Francisco, and Esperanza.',
+          'Geographic provenance of the baseline corpus: Bunawan (Brgy. San Andres) and Trento (Brgy. Tudela and Sta. Maria), Agusan del Sur.',
         ],
       },
       {
@@ -210,7 +210,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
     title: 'Cultural Archive & Multidimensional Discovery',
     subtitle: 'Browsing, searching, filtering, audio playback, and reading parallel texts',
     role: 'PUBLIC',
-    summary: 'Learn how to explore the 22 authentic Agusan Manobo literary entries and folk songs, apply multi-criteria filters, search full transcriptions, and utilize synchronized audio playback.',
+    summary: 'Learn how to explore the archived Agusan Manobo oral literature and folk songs, apply multi-criteria filters, search full transcriptions, and utilize synchronized audio playback.',
     sections: [
       {
         id: '3.1',
@@ -221,12 +221,12 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
         capabilities: [
           'Filter entries by Literary Form (Oral Literature vs Folk Song)',
           'Filter by Eugenio (1993) and Andress (1985) Genres (Myth, Legend, Folktale, Epic, Song, etc.)',
-          'Filter by Agusan del Sur Geographic Provenance (Bayugan, Prosperidad, San Francisco, Esperanza)',
+          'Filter by geographic provenance (the municipalities and barangays recorded in the archive)',
           'Search across titles, storytellers, collectors, and keywords in real time',
           'Launch audio playback directly from entry cards',
         ],
         menuLocation: ['Header -> EXPLORER (/explore)'],
-        description: 'The Explorer module (/explore) provides an interactive catalog of all 22 curated entries. It features multidimensional facets enabling researchers to pinpoint specific cultural forms and regional variants.',
+        description: 'The Explorer module (/explore) provides an interactive catalog of all archived entries. It features multidimensional facets enabling researchers to pinpoint specific cultural forms and regional variants.',
         figureNumber: 2,
         figureTitle: 'The Multidimensional Archive Explorer with Search and Faceted Filters',
         figureImage: '/manual/screenshots/fig2_explore.png',
@@ -240,7 +240,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           {
             number: 2,
             label: 'Literary Form Selector',
-            instruction: 'Toggle between "All Works", "Oral Literature" (17 selections), and "Folk Song" (5 musical selections).',
+            instruction: 'Toggle between "All Works", "Oral Literature", and "Folk Song".',
           },
           {
             number: 3,
@@ -250,7 +250,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           {
             number: 4,
             label: 'Geographic Provenance Dropdown',
-            instruction: 'Select a specific municipality in Agusan del Sur (e.g., Prosperidad, Bayugan) to view folklore native to that community.',
+            instruction: 'Select a municipality or barangay (listed from the places recorded in the archive) to view folklore native to that community.',
           },
           {
             number: 5,
@@ -259,7 +259,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           },
         ],
         goodToKnow: [
-          'Multiple filters can be combined simultaneously (e.g., Folk Songs in Bayugan).',
+          'Multiple filters can be combined simultaneously (e.g., Folk Songs from one barangay).',
           'Click the "Clear All Filters" button whenever you wish to restore the full catalog view.',
         ],
       },
@@ -372,7 +372,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
         ],
         goodToKnow: [
           'Pattern-Based mode relies strictly on deterministic lexical and syntactic indicators formulated from Eugenio (1993).',
-          'Supervised ML mode calculates term frequencies normalized by inverse document frequency over the 22-record training corpus.',
+          'Supervised ML mode calculates term frequencies normalized by inverse document frequency over the human-verified training entries.',
           'Neural Semantic mode performs deep zero-shot contextual analysis using neural linguistic models with full prompt transparency.',
         ],
       },
@@ -470,7 +470,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           {
             number: 1,
             label: 'Archive Corpus Aggregate Metrics',
-            instruction: 'Review the high-level summary cards showing total cataloged works (22), oral literature count (17), folk songs (5), and surveyed municipalities.',
+            instruction: 'Review the high-level summary cards showing total cataloged works, oral literature count, folk songs, and surveyed municipalities (computed live from the archive).',
           },
           {
             number: 2,
@@ -490,7 +490,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           {
             number: 5,
             label: 'Municipal Provenance Geographic Breakdown',
-            instruction: 'Study the distribution of folklore across Agusan del Sur communities (Bayugan, Prosperidad, San Francisco, and Esperanza).',
+            instruction: 'Study the distribution of folklore across the Agusan del Sur municipalities and barangays recorded in the archive.',
           },
         ],
         goodToKnow: [
@@ -566,7 +566,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           'Safely delete obsolete or unverified drafts with confirmation modals',
         ],
         menuLocation: ['/admin -> Archive Entries tab'],
-        description: 'The Archive Entries tab (/admin) is the primary content control center. Administrators can oversee all 22 active records, inspect their verification state, and perform real-time updates.',
+        description: 'The Archive Entries tab (/admin) is the primary content control center. Administrators can oversee all archive records, inspect their verification state, and perform real-time updates.',
         figureNumber: 8,
         figureTitle: 'Administrator Management Dashboard and Archive Inventory Table',
         figureImage: '/manual/screenshots/fig8_admin_entries.png',
@@ -636,7 +636,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           {
             number: 3,
             label: 'Geographic Provenance Fields',
-            instruction: 'Specify the Agusan del Sur Municipality (Bayugan, Prosperidad, etc.) and Barangay provenance.',
+            instruction: 'Specify the Agusan del Sur municipality and barangay provenance.',
           },
           {
             number: 4,

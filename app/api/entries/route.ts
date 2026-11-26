@@ -135,6 +135,7 @@ export async function POST(request: NextRequest) {
         themes: JSON.stringify(body.themes || []),
         culturalElements: JSON.stringify(body.culturalElements || []),
         createdBy: body.createdBy || null,
+        isPinned: body.isPinned === true,
         reviewStatus: 'PENDING',
         contentHash,
       },

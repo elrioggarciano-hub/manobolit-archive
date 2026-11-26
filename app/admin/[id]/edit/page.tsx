@@ -34,6 +34,7 @@ export default async function EditEntryPage({ params }: Props) {
     genre: entry.genre,
     themes: JSON.parse(entry.themes || '[]'),
     culturalElements: (JSON.parse(entry.culturalElements || '[]') as string[]).join(', '),
+    isPinned: entry.isPinned,
   }
 
   return (

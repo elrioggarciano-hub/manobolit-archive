@@ -26,12 +26,78 @@ interface Entry {
   municipality?: string | null
   barangay?: string | null
   province?: string | null
+  isPinned?: boolean
 }
 
-// Folk song shown first among the folk songs in the Explorer list
-const PINNED_FOLK_SONG = 'kapoit to kanak kahimtang'
+interface FilterOption {
+  key: string
+  label: string
+  count: number
+  indent?: boolean
+}
 
-export default function ExploreClient({ initialEntries }: { initialEntries: Entry[] }) {
+const norm = (s?: string | null) => (s || '').trim().toUpperCase()
+
+/** "LOVE_AND_RELATIONSHIPS" → "Love & Relationships" (used when a code has no taxonomy title) */
+const prettifyCode = (code: string) =>
+  code
+    .split('_')
+    .map(w => w.charAt(0) + w.slice(1).toLowerCase())
+    .join(' ')
+    .replace(/ And /g, ' & ')
+
+/** Counts values across entries; most frequent first */
+function countOptions(values: string[], label: (key: string) => string): FilterOption[] {
+  const counts = new Map<string, number>()
+  values.map(norm).filter(Boolean).forEach(v => counts.set(v, (counts.get(v) || 0) + 1))
+  return Array.from(counts, ([key, count]) => ({ key, label: label(key), count })).sort(
+    (a, b) => b.count - a.count || a.label.localeCompare(b.label)
+  )
+}
+
+const locationKeys = (e: Entry) => [`M:${norm(e.municipality)}`, `B:${norm(e.municipality)}|${norm(e.barangay)}`]
+
+function FilterCheckbox({ option, checked, onToggle }: { option: FilterOption; checked: boolean; onToggle: () => void }) {
+  return (
+    <label
+      className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none py-0.5"
+      style={option.indent ? { paddingLeft: '18px' } : undefined}
+    >
+      <input type="checkbox" checked={checked} onChange={onToggle} className="sr-only" />
+      <div
+        style={{
+          width: '14px',
+          height: '14px',
+          border: checked ? 'none' : '1px solid var(--border-hover)',
+          background: checked ? '#8F000D' : 'transparent',
+          borderRadius: '0px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          transition: 'background-color 0.15s ease, border-color 0.15s ease',
+        }}
+      >
+        {checked && (
+          <svg className="check-pop" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        )}
+      </div>
+      <span>
+        {option.label} <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>({option.count})</span>
+      </span>
+    </label>
+  )
+}
+
+export default function ExploreClient({
+  initialEntries,
+  categoryLabels = {},
+}: {
+  initialEntries: Entry[]
+  categoryLabels?: Record<string, string>
+}) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { t } = useLanguage()
@@ -209,8 +275,53 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     setPage(1)
   }
 
+  // Filter options come from the archive itself: every genre, theme and place that has entries
+  const { genreOptions, themeOptions, locationOptions, validKeys } = useMemo(() => {
+    const label = (code: string) => (categoryLabels[code] || prettifyCode(code)).split(' (')[0]
+    const genreOptions = countOptions(initialEntries.map(e => e.genre), label)
+    const themeOptions = countOptions(initialEntries.flatMap(e => e.themes || []), label)
+
+    const municipalities = new Map<string, { label: string; count: number; barangays: Map<string, { label: string; count: number }> }>()
+    for (const e of initialEntries) {
+      const m = norm(e.municipality)
+      if (!m) continue
+      const mun = municipalities.get(m) || { label: (e.municipality || '').trim(), count: 0, barangays: new Map() }
+      mun.count++
+      const b = norm(e.barangay)
+      if (b) {
+        const brgy = mun.barangays.get(b) || { label: (e.barangay || '').trim(), count: 0 }
+        brgy.count++
+        mun.barangays.set(b, brgy)
+      }
+      municipalities.set(m, mun)
+    }
+    const locationOptions: FilterOption[] = Array.from(municipalities)
+      .sort((a, b) => b[1].count - a[1].count || a[1].label.localeCompare(b[1].label))
+      .flatMap(([m, mun]) => [
+        { key: `M:${m}`, label: mun.label, count: mun.count },
+        ...Array.from(mun.barangays)
+          .sort((a, b) => b[1].count - a[1].count || a[1].label.localeCompare(b[1].label))
+          .map(([b, brgy]) => ({ key: `B:${m}|${b}`, label: brgy.label, count: brgy.count, indent: true })),
+      ])
+
+    return {
+      genreOptions,
+      themeOptions,
+      locationOptions,
+      validKeys: {
+        genres: new Set(genreOptions.map(o => o.key)),
+        themes: new Set(themeOptions.map(o => o.key)),
+        locations: new Set(locationOptions.map(o => o.key)),
+      },
+    }
+  }, [initialEntries, categoryLabels])
+
   // Filter entries
   const filteredEntries = useMemo(() => {
+    // Ignore filter keys that no longer exist in the archive (e.g. restored from an older session)
+    const genres = appliedGenres.filter(k => validKeys.genres.has(k))
+    const themes = appliedThemes.filter(k => validKeys.themes.has(k))
+    const locations = appliedLocations.filter(k => validKeys.locations.has(k))
     const q = searchInput.trim().toLowerCase()
     const sorted = initialEntries.filter(entry => {
       // 1. Search filter
@@ -227,62 +338,23 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
       }
 
       // 2. Genre filter
-      if (appliedGenres.length > 0) {
-        const gNorm = entry.genre.toUpperCase()
-        const match = appliedGenres.some(sel => {
-          if (sel === 'MYTH') return gNorm === 'MYTH'
-          if (sel === 'EPIC') return gNorm === 'EPIC'
-          if (sel === 'LEGEND') return gNorm === 'LEGEND'
-          return gNorm === sel
-        })
-        if (!match) return false
-      }
+      if (genres.length > 0 && !genres.includes(norm(entry.genre))) return false
 
-      // 3. Theme filter with partial includes support
-      if (appliedThemes.length > 0) {
-        const matchTheme = appliedThemes.some(t =>
-          entry.themes.some(et => {
-            const etNorm = et.toUpperCase()
-            const tNorm = t.toUpperCase()
-            return etNorm === tNorm || etNorm.includes(tNorm) || tNorm.includes(etNorm)
-          })
-        )
-        if (!matchTheme) return false
-      }
+      // 3. Theme filter
+      if (themes.length > 0 && !(entry.themes || []).some(t => themes.includes(norm(t)))) return false
 
-      // 4. Location filter
-      if (appliedLocations.length > 0) {
-        const matchLocation = appliedLocations.some(loc => {
-          const mNorm = (entry.municipality || '').toUpperCase()
-          const bNorm = (entry.barangay || '').toUpperCase()
-          const cNorm = (entry.communityLocation || '').toUpperCase()
-
-          if (loc === 'TRENTO') return mNorm.includes('TRENTO')
-          if (loc === 'STA_MARIA') return bNorm.includes('MARIA') || cNorm.includes('MARIA')
-          if (loc === 'SITIO_DAM') return cNorm.includes('DAM')
-          if (loc === 'BUNAWAN') return mNorm.includes('BUNAWAN') || cNorm.includes('BUNAWAN')
-          if (loc === 'SAN_ANDRES') return bNorm.includes('ANDRES') || cNorm.includes('ANDRES')
-          return false
-        })
-        if (!matchLocation) return false
-      }
+      // 4. Location filter (municipality, or a barangay within it)
+      if (locations.length > 0 && !locationKeys(entry).some(k => locations.includes(k))) return false
 
       return true
     })
-      // Entries with an audio recording are listed first (stable sort keeps the original order otherwise)
-      .sort((a, b) => Number(!!b.audioFile) - Number(!!a.audioFile))
 
-    // "Kapoit to Kanak Kahimtang" always leads the folk songs: move it ahead of the first other folk song.
-    const isPinned = (e: Entry) =>
-      [e.title, e.manoboTitle].some(t => (t || '').trim().toLowerCase() === PINNED_FOLK_SONG)
-    const pinIdx = sorted.findIndex(isPinned)
-    const firstSongIdx = sorted.findIndex(e => e.type === 'FOLK_SONG')
-    if (pinIdx > firstSongIdx && firstSongIdx >= 0) {
-      const [pinned] = sorted.splice(pinIdx, 1)
-      sorted.splice(firstSongIdx, 0, pinned)
-    }
-    return sorted
-  }, [initialEntries, searchInput, appliedGenres, appliedThemes, appliedLocations])
+    // Pinned entries (set by an admin) first, then entries with an audio recording;
+    // the stable sort keeps the original order otherwise.
+    return sorted.sort(
+      (a, b) => Number(!!b.isPinned) - Number(!!a.isPinned) || Number(!!b.audioFile) - Number(!!a.audioFile)
+    )
+  }, [initialEntries, searchInput, appliedGenres, appliedThemes, appliedLocations, validKeys])
 
   // Pagination calculations (5 per page to match mockup)
   const itemsPerPage = 5
@@ -533,46 +605,15 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
             {/* Locations checkbox list (only shown if Locations is active) */}
             {activeCategory === 'LOCATIONS' && (
               <div className="mb-4 flex flex-col pl-7 pr-2 py-1 gap-1 border-l border-[var(--border-color)] ml-3">
-                {[
-                  { key: 'TRENTO', label: 'Trento' },
-                  { key: 'STA_MARIA', label: 'Sta. Maria' },
-                  { key: 'SITIO_DAM', label: 'Sitio Dam' },
-                  { key: 'BUNAWAN', label: 'Bunawan' },
-                  { key: 'SAN_ANDRES', label: 'San Andres' },
-                ].map(item => {
-                  const isChecked = selectedLocations.includes(item.key)
-                  return (
-                    <label key={item.key} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => toggleLocation(item.key)}
-                        className="sr-only"
-                      />
-                      <div
-                        style={{
-                          width: '14px',
-                          height: '14px',
-                          border: isChecked ? 'none' : '1px solid var(--border-hover)',
-                          background: isChecked ? '#8F000D' : 'transparent',
-                          borderRadius: '0px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                          transition: 'background-color 0.15s ease, border-color 0.15s ease',
-                        }}
-                      >
-                        {isChecked && (
-                          <svg className="check-pop" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        )}
-                      </div>
-                      <span>{item.label}</span>
-                    </label>
-                  )
-                })}
+                {locationOptions.length === 0 && <span className="text-xs text-[var(--text-muted)]">No locations recorded yet.</span>}
+                {locationOptions.map(option => (
+                  <FilterCheckbox
+                    key={option.key}
+                    option={option}
+                    checked={selectedLocations.includes(option.key)}
+                    onToggle={() => toggleLocation(option.key)}
+                  />
+                ))}
               </div>
             )}
 
@@ -581,60 +622,25 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
               <div className="mb-4">
                 <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">ACTIVE GENRES</div>
                 <div className="flex flex-col gap-1.5 pl-1">
-                  {[
-                    { key: 'RIDDLE', label: 'Riddle' },
-                    { key: 'SONG', label: 'Folk Song' },
-                    { key: 'PROVERB', label: 'Proverb' },
-                    { key: 'FOLKTALE', label: 'Folktale' },
-                  ].map(item => {
-                    const isChecked = selectedGenres.includes(item.key)
-                    return (
-                      <label key={item.key} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none py-0.5">
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => toggleGenre(item.key)}
-                          className="sr-only"
-                        />
-                        <div
-                          style={{
-                            width: '14px',
-                            height: '14px',
-                            border: isChecked ? 'none' : '1px solid var(--border-hover)',
-                            background: isChecked ? '#8F000D' : 'transparent',
-                            borderRadius: '0px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                            transition: 'background-color 0.15s ease, border-color 0.15s ease',
-                          }}
-                        >
-                          {isChecked && (
-                            <svg className="check-pop" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          )}
-                        </div>
-                        <span>{item.label}</span>
-                      </label>
-                    )
-                  })}
+                  {genreOptions.map(option => (
+                    <FilterCheckbox
+                      key={option.key}
+                      option={option}
+                      checked={selectedGenres.includes(option.key)}
+                      onToggle={() => toggleGenre(option.key)}
+                    />
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* PRIMARY THEMES Section — the four most frequent themes actually
-                present in the archive, so every chip here returns real results. */}
+            {/* THEMES Section — every theme present in the archive (most frequent first),
+                so every chip here returns real results. */}
             <div className="mb-5">
-              <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">PRIMARY THEMES</div>
+              <div className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider mb-2">THEMES</div>
               <div className="flex flex-wrap gap-2">
-                {[
-                  { key: 'NATURE', label: 'NATURE & ENVIRONMENT' },
-                  { key: 'MORAL', label: 'MORAL LESSONS' },
-                  { key: 'HEROIC', label: 'HEROIC JOURNEY' },
-                  { key: 'COURTSHIP', label: 'COURTSHIP' }
-                ].map(item => {
+                {themeOptions.map(option => {
+                  const item = { key: option.key, label: `${option.label.toUpperCase()} (${option.count})` }
                   const isChecked = selectedThemes.includes(item.key)
                   return (
                     <button

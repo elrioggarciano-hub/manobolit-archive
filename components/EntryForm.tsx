@@ -26,6 +26,7 @@ interface FormData {
   narrator: string; singer: string; communityLocation: string; province: string
   municipality: string; barangay: string; genre: string
   themes: string[]; culturalElements: string
+  isPinned: boolean
 }
 
 const EMPTY: FormData = {
@@ -33,7 +34,7 @@ const EMPTY: FormData = {
   content: '', transcription: '', translation: '', bisayaTranslation: '', audioFile: '',
   audioDuration: '', source: '', yearCollected: '', narrator: '', singer: '',
   communityLocation: '', province: 'Agusan del Sur', municipality: '', barangay: '',
-  genre: 'MYTH', themes: [], culturalElements: '',
+  genre: 'MYTH', themes: [], culturalElements: '', isPinned: false,
 }
 
 interface Props {
@@ -376,6 +377,12 @@ export default function EntryForm({ initialData, mode }: Props) {
             <div>
               <label style={labelStyle}>YEAR COLLECTED</label>
               <input style={inputStyle} type="number" value={form.yearCollected} onChange={e => set('yearCollected', e.target.value)} placeholder="e.g. 2023" min="1900" max="2100" />
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', cursor: 'pointer' }}>
+                <input type="checkbox" checked={form.isPinned} onChange={e => set('isPinned', e.target.checked)} />
+                <span>📌 <b>Pin to top</b> — list this entry first in the Archive Explorer</span>
+              </label>
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>

@@ -36,16 +36,30 @@ const getParsedExploreEntries = unstable_cache(
       }
     })
   },
-  ['explore-entries-v7'],
+  ['explore-entries-v8'],
+  { tags: ['entries'] }
+)
+
+// Display names of genre/theme codes, from the taxonomy table (Admin → Dataset & Taxonomies)
+const getCategoryLabels = unstable_cache(
+  async () => {
+    try {
+      const defs = await prisma.categoryDefinition.findMany({ select: { code: true, title: true } })
+      return Object.fromEntries(defs.map(d => [d.code.toUpperCase(), d.title]))
+    } catch {
+      return {} as Record<string, string>
+    }
+  },
+  ['explore-category-labels-v1'],
   { tags: ['entries'] }
 )
 
 export default async function ExplorePage() {
-  const parsed = await getParsedExploreEntries()
+  const [parsed, categoryLabels] = await Promise.all([getParsedExploreEntries(), getCategoryLabels()])
 
   return (
     <Suspense fallback={null}>
-      <ExploreClient initialEntries={parsed} />
+      <ExploreClient initialEntries={parsed} categoryLabels={categoryLabels} />
     </Suspense>
   )
 }
