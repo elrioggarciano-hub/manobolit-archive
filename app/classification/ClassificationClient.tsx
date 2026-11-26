@@ -1276,7 +1276,7 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                 </div>
                                 <div style={{ fontSize: '10px', color: '#a1a1aa', marginTop: '6px', fontStyle: 'italic' }}>
                                   {serverResult.explanation.source === 'gemini'
-                                    ? "Written by Gemini from the system's own evidence (matched rules, learned words, similar verified entries); it cannot change the decision."
+                                    ? "Written by AI"
                                     : "Generated from the system's own evidence (matched rules, learned words, similar verified entries)."}
                                 </div>
                               </div>

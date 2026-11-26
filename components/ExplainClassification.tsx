@@ -75,7 +75,7 @@ export default function ExplainClassification(props: Props) {
       <p style={{ margin: 0, fontSize: '12px', lineHeight: 1.6, color: 'var(--text-primary)' }}>{result.text}</p>
       <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '6px', fontStyle: 'italic' }}>
         {result.source === 'gemini'
-          ? "Written by Gemini from the classifier's own evidence; it cannot change the decision."
+          ? "Written by AI"
           : "Generated from the classifier's own evidence (matched rules, learned words, similar verified entries)."}
       </div>
     </div>
