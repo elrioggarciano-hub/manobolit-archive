@@ -28,6 +28,9 @@ interface Entry {
   province?: string | null
 }
 
+// Folk song shown first among the folk songs in the Explorer list
+const PINNED_FOLK_SONG = 'kapoit to kanak kahimtang'
+
 export default function ExploreClient({ initialEntries }: { initialEntries: Entry[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -209,7 +212,7 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
   // Filter entries
   const filteredEntries = useMemo(() => {
     const q = searchInput.trim().toLowerCase()
-    return initialEntries.filter(entry => {
+    const sorted = initialEntries.filter(entry => {
       // 1. Search filter
       if (q) {
         const matchText = [
@@ -268,6 +271,17 @@ export default function ExploreClient({ initialEntries }: { initialEntries: Entr
     })
       // Entries with an audio recording are listed first (stable sort keeps the original order otherwise)
       .sort((a, b) => Number(!!b.audioFile) - Number(!!a.audioFile))
+
+    // "Kapoit to Kanak Kahimtang" always leads the folk songs: move it ahead of the first other folk song.
+    const isPinned = (e: Entry) =>
+      [e.title, e.manoboTitle].some(t => (t || '').trim().toLowerCase() === PINNED_FOLK_SONG)
+    const pinIdx = sorted.findIndex(isPinned)
+    const firstSongIdx = sorted.findIndex(e => e.type === 'FOLK_SONG')
+    if (pinIdx > firstSongIdx && firstSongIdx >= 0) {
+      const [pinned] = sorted.splice(pinIdx, 1)
+      sorted.splice(firstSongIdx, 0, pinned)
+    }
+    return sorted
   }, [initialEntries, searchInput, appliedGenres, appliedThemes, appliedLocations])
 
   // Pagination calculations (5 per page to match mockup)
