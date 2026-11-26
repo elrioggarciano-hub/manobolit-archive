@@ -1,7 +1,8 @@
 // Trained Model Runtime (inference only)
-// The genre classifier is TRAINED in Google Colab (notebooks/ManoboLit_Genre_Classifier_Trainer.ipynb)
-// with scikit-learn on human-verified archive entries, exported as a JSON artifact, uploaded by an admin,
-// and stored in the MLModelRegistry table. This file contains NO vocabulary or keywords: every term,
+// The genre classifier is trained on human-verified archive entries either in Google Colab
+// (notebooks/ManoboLit_Genre_Classifier_Trainer.ipynb, uploaded by an admin) or automatically inside the
+// app whenever the verified dataset changes (autoTrainer.ts, same algorithm and artifact format).
+// Artifacts are stored in the MLModelRegistry table. This file contains NO vocabulary or keywords: every term,
 // IDF value and weight comes from the uploaded artifact. It only re-implements scikit-learn's
 // TfidfVectorizer (word / char_wb) + linear model (LogisticRegression) inference so it can run on Vercel.
 // Each artifact carries parity tests (inputs + sklearn probabilities) that must be reproduced on upload.
@@ -42,6 +43,9 @@ export interface TrainedModelArtifact {
   metrics: Record<string, any>
   topFeatures?: Record<string, { feature: string; weight: number }[]>
   parityTests: { input: Record<string, string>; probabilities: number[] }[]
+  /** Set by in-app automatic retraining: who trained it and on which verified dataset */
+  trainer?: string
+  datasetFingerprint?: string
 }
 
 interface CompiledVectorizer extends VectorizerArtifact {
@@ -70,10 +74,34 @@ function escapeRegex(s: string) {
 
 /** Mirrors the notebook's preprocess() exactly. */
 export function preprocessForModel(input: Record<string, string | null | undefined>, model: CompiledModel): string {
-  const fields = model.artifact.preprocessing.fields
+  return preprocessText(input, model.artifact.preprocessing.fields, model.answerRegex, model.stripRegex)
+}
+
+/** Builds the notebook's ANSWER_RE / STRIP_RE (Python's Unicode \b emulated with lookarounds). */
+export function buildPreprocessRegexes(p: TrainedModelArtifact['preprocessing']): { answerRegex: RegExp | null; stripRegex: RegExp | null } {
+  const B_START = '(?<![\\p{L}\\p{N}_])'
+  const B_END = '(?![\\p{L}\\p{N}_])'
+  const answerRegex = p.answerMarkers?.length
+    ? new RegExp(`${B_START}(?:${p.answerMarkers.map(escapeRegex).join('|')})${B_END}\\s*:[^\\n\\r]*`, 'giu')
+    : null
+  const stripRegex = p.stripTerms?.length
+    ? new RegExp(
+        `${B_START}(?:${[...p.stripTerms].sort((x, y) => y.length - x.length).map(t => escapeRegex(t).replace(/ /g, '\\s*')).join('|')})${B_END}`,
+        'giu'
+      )
+    : null
+  return { answerRegex, stripRegex }
+}
+
+export function preprocessText(
+  input: Record<string, string | null | undefined>,
+  fields: string[],
+  answerRegex: RegExp | null,
+  stripRegex: RegExp | null
+): string {
   let text = fields.map(f => (input[f] || '').toString()).filter(Boolean).join(' ')
-  if (model.answerRegex) text = text.replace(model.answerRegex, ' ')
-  if (model.stripRegex) text = text.replace(model.stripRegex, ' ')
+  if (answerRegex) text = text.replace(answerRegex, ' ')
+  if (stripRegex) text = text.replace(stripRegex, ' ')
   text = text.toLowerCase().replace(/\r/g, ' ').replace(/\n/g, ' ')
   // Python: re.sub(r"[^\w\s\-\']", " ", text) with Unicode \w = letters, numbers, underscore
   text = text.replace(/[^\p{L}\p{N}_\s\-']/gu, ' ')
@@ -106,7 +134,7 @@ function wordNgrams(tokens: string[], [minN, maxN]: [number, number]): string[] 
 }
 
 /** scikit-learn _char_wb_ngrams (operates on Unicode code points) */
-function charWbNgrams(text: string, [minN, maxN]: [number, number]): string[] {
+export function charWbNgrams(text: string, [minN, maxN]: [number, number]): string[] {
   const out: string[] = []
   for (const word of text.replace(/\s\s+/g, ' ').split(/\s+/).filter(Boolean)) {
     const w = Array.from(` ${word} `)
@@ -164,20 +192,7 @@ export function compileArtifact(raw: any): CompiledModel {
   if (a.coef.length !== rows || a.intercept.length !== rows) throw new Error('Coefficient shape does not match classes')
   if (a.coef.some(r => r.length !== offset)) throw new Error('Coefficient width does not match vocabulary size')
 
-  // Python's \b is Unicode-aware; emulate it with Unicode lookarounds.
-  const B_START = '(?<![\\p{L}\\p{N}_])'
-  const B_END = '(?![\\p{L}\\p{N}_])'
-  const p = a.preprocessing
-  const answerRegex = p.answerMarkers?.length
-    ? new RegExp(`${B_START}(?:${p.answerMarkers.map(escapeRegex).join('|')})${B_END}\\s*:[^\\n\\r]*`, 'giu')
-    : null
-  const stripRegex = p.stripTerms?.length
-    ? new RegExp(
-        `${B_START}(?:${[...p.stripTerms].sort((x, y) => y.length - x.length).map(t => escapeRegex(t).replace(/ /g, '\\s*')).join('|')})${B_END}`,
-        'giu'
-      )
-    : null
-
+  const { answerRegex, stripRegex } = buildPreprocessRegexes(a.preprocessing)
   return { artifact: a, vectorizers, answerRegex, stripRegex }
 }
 

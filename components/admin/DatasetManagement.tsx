@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { requestAutoRetrain } from '@/lib/classification/autoRetrainClient'
 
 export interface CategoryDef {
   id: string
@@ -102,6 +103,8 @@ export default function DatasetManagement() {
         })
         setImportJson('')
         fetchData()
+        // Records imported with valid verification provenance are training data: retrain if they changed it
+        requestAutoRetrain()
       } else {
         const errData = await res.json()
         setActionMessage({ text: errData.error || 'Import failed', type: 'error' })

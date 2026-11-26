@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import ClassificationViewer from '@/components/ClassificationViewer'
 import { useToast } from '@/lib/context/ToastContext'
+import { requestAutoRetrain } from '@/lib/classification/autoRetrainClient'
 import { supabase } from '@/lib/supabase/client'
 
 const AUDIO_BUCKET = 'audio'
@@ -262,6 +263,8 @@ export default function EntryForm({ initialData, mode }: Props) {
       if (!res.ok) throw new Error('Save failed')
       const data = await res.json()
       showToast('success', mode === 'create' ? 'Entry created successfully.' : 'Changes saved successfully.')
+      // Editing a verified entry changes the training data; the server skips retraining if nothing changed
+      if (mode === 'edit') requestAutoRetrain()
       router.push(`/archive/${data.entry.id}`)
     } catch (err) {
       raiseError('Failed to save entry. Please try again.')

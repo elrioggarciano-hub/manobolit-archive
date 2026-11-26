@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import ConfirmModal from '@/components/ConfirmModal'
 import { useToast } from '@/lib/context/ToastContext'
+import { requestAutoRetrain } from '@/lib/classification/autoRetrainClient'
 
 export default function DeleteButton({ id }: { id: string }) {
   const [open, setOpen] = useState(false)
@@ -15,6 +16,8 @@ export default function DeleteButton({ id }: { id: string }) {
       const res = await fetch(`/api/entries/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Delete failed')
       showToast('success', 'Entry deleted successfully.')
+      // A deleted verified entry leaves the training data; keepalive lets this finish across the reload
+      requestAutoRetrain()
       window.location.reload()
     } catch {
       setDeleting(false)

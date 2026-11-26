@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/database/prisma'
 import { computeContentHash } from '@/lib/classification/contentHash'
 import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth/session'
-import { ensureActiveModels } from '@/lib/classification/retrain'
-import { classifyHybrid } from '@/lib/classification/hybrid'
-import { extractEntryText } from '@/lib/classification/evaluation'
+import { loadVerifiedDataset } from '@/lib/classification/verifiedDataset'
 
 // The verified dataset must always be read live (never frozen at build time)
 export const dynamic = 'force-dynamic'
@@ -12,54 +10,11 @@ export const dynamic = 'force-dynamic'
 // GET /api/ml/dataset - Export strictly human-verified dataset
 export async function GET(request: NextRequest) {
   try {
-    const entries = await prisma.literatureEntry.findMany({
-      where: {
-        reviewStatus: 'VERIFIED',
-      },
-      orderBy: { reviewedAt: 'desc' },
-    })
-
-    const verifiedDataset = []
-    let excludedCount = 0
-    // Rule-based scores from the current rule base, so the Colab notebook can evaluate rule-based + ML
-    const { rules } = await ensureActiveModels()
-
-    for (const e of entries) {
-      const currHash = computeContentHash(e)
-      // Strict verification provenance check:
-      // If content was edited after verification, exclude from supervised dataset!
-      if (!e.verifiedContentHash || e.verifiedContentHash !== currHash) {
-        excludedCount++
-        continue
-      }
-
-      verifiedDataset.push({
-        id: e.id,
-        title: e.title,
-        manoboTitle: e.manoboTitle,
-        englishTitle: e.englishTitle,
-        transcription: e.transcription,
-        translation: e.translation,
-        bisayaTranslation: e.bisayaTranslation,
-        content: e.content,
-        ruleScores: Object.fromEntries(
-          classifyHybrid(extractEntryText(e as any, 'both', true), 'ALL', 'RULE_BASED', { rules, rulesProfile: 'framework-only' })
-            .genre.allScores.map(s => [s.genre, s.confidence])
-        ),
-        verifiedGenre: e.verifiedGenre || e.genre,
-        verifiedThemes: JSON.parse(e.verifiedThemes || '[]'),
-        source: e.source,
-        communityLocation: e.communityLocation,
-        reviewerId: e.reviewerId,
-        reviewedAt: e.reviewedAt,
-        contentHash: currHash,
-      })
-    }
-
+    const { dataset, excludedMismatched } = await loadVerifiedDataset()
     return NextResponse.json({
-      count: verifiedDataset.length,
-      excludedMismatched: excludedCount,
-      dataset: verifiedDataset,
+      count: dataset.length,
+      excludedMismatched,
+      dataset,
     })
   } catch (error) {
     console.error('GET /api/ml/dataset error:', error)

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { requestAutoRetrain, describeRetrain } from '@/lib/classification/autoRetrainClient'
 
 export interface ReviewEntry {
   id: string
@@ -136,15 +137,17 @@ export default function ReviewQueue() {
       })
 
       if (res.ok) {
-        const data = await res.json()
-        setActionMessage({
-          text: `Verification recorded: ${decision} for "${entry.title}"`,
-          type: 'success',
-        })
+        const recorded = `Verification recorded: ${decision} for "${entry.title}".`
+        setActionMessage({ text: `${recorded} Retraining the model on the verified entries…`, type: 'success' })
         setSelectedEntry(null)
         setReviewerNotes('')
         setCorrectingGenre('')
         fetchQueue()
+        // The verified dataset changed: retrain the genre model automatically (in the background)
+        requestAutoRetrain().then(r => {
+          const retrain = describeRetrain(r)
+          setActionMessage({ text: `${recorded} ${retrain.text}`, type: retrain.type === 'error' ? 'error' : 'success' })
+        })
       } else {
         const errData = await res.json()
         setActionMessage({ text: errData.error || 'Failed to save review', type: 'error' })

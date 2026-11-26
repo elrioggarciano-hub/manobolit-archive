@@ -19,6 +19,7 @@
     "eval:learning-curve": "ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/eval-learning-curve.ts",
     "eval:dataset": "ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/export-seed-dataset.ts",
     "eval:translation": "npm run eval:dataset && ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/eval-alignment.ts",
+    "test:auto-trainer": "ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/test-auto-trainer.ts",
     "test:unit": "npm run eval:dataset && ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/test-sync.ts && ts-node -P scripts/evaluation/tsconfig.json scripts/evaluation/test-blend.ts",
     "notebook:build": "python -I scripts/evaluation/build_notebook.py"
   },

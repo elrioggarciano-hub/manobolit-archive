@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { requestAutoRetrain, describeRetrain } from '@/lib/classification/autoRetrainClient'
 
 interface TrainedModelSummary {
   id: string
@@ -51,6 +52,7 @@ export default function TrainedModelManagement() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [retraining, setRetraining] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -103,6 +105,15 @@ export default function TrainedModelManagement() {
     }
   }
 
+  const retrainNow = async () => {
+    setRetraining(true)
+    setMessage(null)
+    const r = describeRetrain(await requestAutoRetrain({ trigger: 'MANUAL', force: true }))
+    setMessage({ type: r.type === 'error' ? 'error' : 'success', text: r.text })
+    setRetraining(false)
+    await load()
+  }
+
   const activate = async (version: string) => {
     setMessage(null)
     const res = await fetch('/api/ml/models/trained', {
@@ -121,14 +132,24 @@ export default function TrainedModelManagement() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
       <div style={{ ...card, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         <div style={{ maxWidth: '680px' }}>
-          <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--text-primary)' }}>🧪 Trained Model (Google Colab)</h2>
+          <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--text-primary)' }}>🧪 Trained Model (Genre Classifier)</h2>
           <p style={{ margin: '6px 0 0', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-            Train the genre classifier in <code>notebooks/ManoboLit_Genre_Classifier_Trainer.ipynb</code> on human-verified
-            entries, download the model file, and upload it here. The app checks that it reproduces the notebook&apos;s
-            predictions before using it.
+            The model <b>retrains automatically</b> whenever the human-verified entries change (an entry is verified or
+            corrected in the Review Queue, or a verified entry is edited, deleted or imported). Each new model is evaluated
+            with leave-one-out cross-validation and becomes active only if it beats the majority-class baseline. You can
+            still train in <code>notebooks/ManoboLit_Genre_Classifier_Trainer.ipynb</code> (same algorithm) and upload the
+            model file here.
           </p>
         </div>
-        <div>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            style={{ ...btn, background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-color)', opacity: retraining ? 0.6 : 1 }}
+            disabled={retraining}
+            onClick={retrainNow}
+          >
+            {retraining ? 'Retraining…' : '↻ Retrain now'}
+          </button>
           <input
             ref={fileRef}
             type="file"
@@ -169,7 +190,9 @@ export default function TrainedModelManagement() {
         <div style={{ ...card, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '14px' }}>
           {[
             ['Active version', active.version],
-            ['LOOCV accuracy', pct(active.accuracy)],
+            ['Trained by', active.version.startsWith('auto-') ? 'Automatic retraining' : 'Google Colab upload'],
+            ['Rules + ML (LOOCV)', pct(active.metrics?.ruleBasedPlusML?.accuracy)],
+            ['ML alone (LOOCV)', pct(active.accuracy)],
             ['Macro-F1', active.macroF1?.toFixed(3) ?? '—'],
             ['Majority baseline', pct(active.metrics?.majorityBaseline)],
             ['Training entries', String(active.datasetSize)],
@@ -194,8 +217,8 @@ export default function TrainedModelManagement() {
               key={m.id}
               style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', padding: '6px 0', borderTop: '1px solid var(--border-color)', fontSize: '12px', flexWrap: 'wrap' }}
             >
-              <span style={{ color: 'var(--text-primary)' }}>
-                {m.version} · acc {pct(m.accuracy)} · {m.datasetSize} entries · {m.status}
+              <span style={{ color: 'var(--text-primary)' }} title={m.promotionReason || undefined}>
+                {m.version} · rules + ML {pct(m.metrics?.ruleBasedPlusML?.accuracy)} · ML {pct(m.accuracy)} · {m.datasetSize} entries · {m.status}
               </span>
               {m.status !== 'ACTIVE' && (
                 <button type="button" style={ghost} onClick={() => activate(m.version)}>
