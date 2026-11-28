@@ -23,7 +23,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setIsMounted(true)
     try {
       const stored = localStorage.getItem(STORAGE_KEY) as Language | null
-      if (stored && (stored === 'en' || stored === 'fil' || stored === 'ceb' || stored === 'msm')) {
+      if (stored && (stored === 'en' || stored === 'ceb' || stored === 'msm')) {
         setLanguageState(stored)
         document.documentElement.setAttribute('lang', stored)
       }

@@ -10,7 +10,6 @@ export interface LanguageOption {
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: 'en', label: 'English', nativeLabel: 'English', shortLabel: 'EN' },
-  { code: 'fil', label: 'Tagalog', nativeLabel: 'Filipino / Tagalog', shortLabel: 'FIL' },
   { code: 'ceb', label: 'Bisaya', nativeLabel: 'Sinugbuanong Binisaya', shortLabel: 'CEB' },
   { code: 'msm', label: 'Agusan Manobo', nativeLabel: 'Minanubu (Agusan)', shortLabel: 'MSM' },
 ]
