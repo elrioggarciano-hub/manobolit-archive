@@ -65,7 +65,7 @@ export async function getDatabaseCorpusEntries(): Promise<CachedParallelEntry[]>
  * Dynamic Server-Side Async Translation Engine
  * 1. Checks external Google Colab / Hugging Face Seq2Seq API if configured (COLAB_TRANSLATION_URL)
  * 2. Queries dynamic Supabase PostgreSQL ParallelTranslation table (Agusan Manobo Corpus + SIL Webonary)
- * 3. Enhances sentences with Gemini Neural AI grounded in Agusan Manobo linguistics
+ * 3. Enhances sentences with the Gemini LLM (external), guided by Agusan Manobo linguistics
  */
 export async function translateTextDynamic(
   text: string,
@@ -186,7 +186,7 @@ export async function translateTextDynamic(
         }
       }
 
-      // If sentence has > 2 words and wasn't an exact database phrase, prioritize Gemini Neural AI
+      // If sentence has > 2 words and wasn't an exact database phrase, prioritize the Gemini LLM (external)
       // to preserve authentic Agusan Manobo grammatical syntax (VSO word order, focus affixes)
       if (words.length > 2 && process.env.GEMINI_API_KEY) {
         try {
@@ -201,8 +201,8 @@ export async function translateTextDynamic(
               matchedPhrases,
               matchedWordsCount: matchedCount,
               totalWordsCount: words.length,
-              corpusSource: 'ManoboLit Neural Engine (SIL Webonary Grounded)',
-              engineType: 'COLAB_NEURAL_NMT',
+              corpusSource: 'Google Gemini LLM (external), guided by the archive lexicon / SIL Webonary glossary',
+              engineType: 'GEMINI_LLM',
               webonaryValidation: validateTextWithWebonary(aiManobo, lex, 'msm'),
               aiReasoning: aiResult.linguisticNotes,
             }
@@ -297,8 +297,8 @@ export async function translateTextDynamic(
               matchedPhrases,
               matchedWordsCount: matchedCount,
               totalWordsCount: words.length,
-              corpusSource: 'ManoboLit Neural Engine (SIL Webonary Grounded)',
-              engineType: 'COLAB_NEURAL_NMT',
+              corpusSource: 'Google Gemini LLM (external), guided by the archive lexicon / SIL Webonary glossary',
+              engineType: 'GEMINI_LLM',
               webonaryValidation: validateTextWithWebonary(aiManobo, lex, 'msm'),
               aiReasoning: aiResult.linguisticNotes,
             }
@@ -323,10 +323,10 @@ export async function translateTextDynamic(
       }
     }
   } catch (dbErr) {
-    console.warn('Dynamic database translation failed, falling back to neural AI:', dbErr)
+    console.warn('Dynamic database translation failed, falling back to Gemini LLM:', dbErr)
   }
 
-  // 3. Fallback to Gemini Neural AI if database is unavailable
+  // 3. Fallback to the Gemini LLM (external) if database is unavailable
   if (process.env.GEMINI_API_KEY) {
     try {
       const aiResult = await translateWithGemini(cleanedInput, sourceLang, targetLang, undefined, glossaryFor(cleanedInput, sourceLang, targetLang, lex))
@@ -340,8 +340,8 @@ export async function translateTextDynamic(
           matchedPhrases: [],
           matchedWordsCount: 0,
           totalWordsCount: cleanedInput.split(/\s+/).length,
-          corpusSource: 'ManoboLit Neural Engine (SIL Webonary Grounded)',
-          engineType: 'COLAB_NEURAL_NMT',
+          corpusSource: 'Google Gemini LLM (external), guided by the archive lexicon / SIL Webonary glossary',
+          engineType: 'GEMINI_LLM',
           webonaryValidation: validateTextWithWebonary(aiManobo, lex, 'msm'),
           aiReasoning: aiResult.linguisticNotes,
         }

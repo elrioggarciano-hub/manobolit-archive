@@ -61,7 +61,8 @@ const SOURCE_LABELS: Record<string, string> = {
   TS_LEARNED_ENSEMBLE: 'the in-app learned ensemble (Naive Bayes, TF-IDF, character n-grams, k-NN)',
   TYPESCRIPT_HYBRID_ENGINE: 'the in-app learned ensemble (Naive Bayes, TF-IDF, character n-grams, k-NN)',
   TS_HYBRID_ENSEMBLE: 'the in-app learned ensemble (Naive Bayes, TF-IDF, character n-grams)',
-  NEURAL_SEMANTIC_MODEL: 'the Gemini large language model',
+  // Older stored classifications only; the current classifier never uses an LLM to decide the genre.
+  NEURAL_SEMANTIC_MODEL: 'an earlier version of the system that used the Gemini large language model',
 }
 
 const pretty = (g: string) => g.charAt(0) + g.slice(1).toLowerCase()

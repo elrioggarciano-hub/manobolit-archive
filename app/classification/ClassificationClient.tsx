@@ -1188,19 +1188,15 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                                     fontWeight: 700,
                                     padding: '2px 6px',
                                     borderRadius: '4px',
-                                    background: serverResult.predictionSource === 'NEURAL_SEMANTIC_MODEL' || serverResult.predictionSource === 'GEMINI_LLM_SEMANTIC'
-                                      ? 'rgba(59, 130, 246, 0.2)'
-                                      : serverResult.predictionSource === 'ML_PIPELINE'
-                                        ? 'rgba(16, 185, 129, 0.2)'
-                                        : 'rgba(245, 158, 11, 0.2)',
-                                    color: serverResult.predictionSource === 'NEURAL_SEMANTIC_MODEL' || serverResult.predictionSource === 'GEMINI_LLM_SEMANTIC'
-                                      ? '#60a5fa'
-                                      : serverResult.predictionSource === 'ML_PIPELINE'
-                                        ? '#10b981'
-                                        : '#f59e0b',
+                                    background: serverResult.predictionSource === 'RULE_BASED'
+                                      ? 'rgba(245, 158, 11, 0.2)'
+                                      : 'rgba(16, 185, 129, 0.2)',
+                                    color: serverResult.predictionSource === 'RULE_BASED'
+                                      ? '#f59e0b'
+                                      : '#10b981',
                                   }}
                                 >
-                                  {serverResult.predictionSource === 'GEMINI_LLM_SEMANTIC' ? 'NEURAL_SEMANTIC_MODEL' : serverResult.predictionSource} ({String(serverResult.modelVersion || 'v2.4').replace(/^gemini-gemini-/, 'v').replace(/^gemini-/, 'v')})
+                                  {serverResult.predictionSource} ({serverResult.modelVersion || 'unversioned'})
                                 </span>
                                 {selectedEntryId !== 'custom' ? (
                                   <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>

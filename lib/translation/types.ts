@@ -39,7 +39,8 @@ export interface TranslationResult {
   matchedWordsCount: number
   totalWordsCount: number
   corpusSource: string
-  engineType: 'DATABASE_DYNAMIC' | 'COLAB_NEURAL_NMT' | 'CORPUS_FALLBACK'
+  /** COLAB_NEURAL_NMT = the fine-tuned NLLB-200 served from Colab; GEMINI_LLM = Google's external LLM (not trained by us) */
+  engineType: 'DATABASE_DYNAMIC' | 'COLAB_NEURAL_NMT' | 'GEMINI_LLM' | 'CORPUS_FALLBACK'
   webonaryValidation?: WebonaryValidationReport
   aiReasoning?: string
   bibleWordsCount?: number

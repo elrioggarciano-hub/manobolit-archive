@@ -434,23 +434,30 @@ export default function TranslatorClient() {
                       background:
                         liveResult.engineType === 'COLAB_NEURAL_NMT'
                           ? 'rgba(241,184,13,0.18)'
-                          : liveResult.engineType === 'DATABASE_DYNAMIC'
-                            ? 'rgba(34,197,94,0.18)'
-                            : 'rgba(113,113,122,0.18)',
+                          : liveResult.engineType === 'GEMINI_LLM'
+                            ? 'rgba(59,130,246,0.18)'
+                            : liveResult.engineType === 'DATABASE_DYNAMIC'
+                              ? 'rgba(34,197,94,0.18)'
+                              : 'rgba(113,113,122,0.18)',
                       color:
                         liveResult.engineType === 'COLAB_NEURAL_NMT'
                           ? '#f1b80d'
-                          : liveResult.engineType === 'DATABASE_DYNAMIC'
-                            ? '#4ade80'
-                            : '#a1a1aa',
+                          : liveResult.engineType === 'GEMINI_LLM'
+                            ? '#60a5fa'
+                            : liveResult.engineType === 'DATABASE_DYNAMIC'
+                              ? '#4ade80'
+                              : '#a1a1aa',
                       border: '1px solid currentColor',
                     }}
+                    title={liveResult.corpusSource}
                   >
                     {liveResult.engineType === 'COLAB_NEURAL_NMT'
-                      ? '⚡ NEURAL NMT'
-                      : liveResult.engineType === 'DATABASE_DYNAMIC'
-                        ? '🟢 VERIFIED CORPUS'
-                        : 'CORPUS FALLBACK'}
+                      ? '⚡ NLLB-200 (FINE-TUNED)'
+                      : liveResult.engineType === 'GEMINI_LLM'
+                        ? '✨ GEMINI AI (UNVERIFIED)'
+                        : liveResult.engineType === 'DATABASE_DYNAMIC'
+                          ? '🟢 VERIFIED CORPUS'
+                          : 'CORPUS FALLBACK'}
                   </span>
                 )}
               </div>
@@ -464,7 +471,7 @@ export default function TranslatorClient() {
                     letterSpacing: '0.04em',
                   }}
                 >
-                  {isTranslating ? 'TRANSLATING...' : liveResult.engineType === 'COLAB_NEURAL_NMT' ? `${Math.round(liveResult.confidence * 100)}% CONFIDENCE` : `${Math.round(liveResult.confidence * 100)}% WORDS FOUND`}
+                  {isTranslating ? 'TRANSLATING...' : liveResult.engineType === 'COLAB_NEURAL_NMT' || liveResult.engineType === 'GEMINI_LLM' ? `${Math.round(liveResult.confidence * 100)}% CONFIDENCE` : `${Math.round(liveResult.confidence * 100)}% WORDS FOUND`}
                 </span>
               )}
             </div>
@@ -599,7 +606,7 @@ export default function TranslatorClient() {
                   }}
                 >
                   <span>✨</span>
-                  <span>AI LINGUISTIC OBSERVATION (SIL Webonary Grounded)</span>
+                  <span>GEMINI AI NOTE (SIL Webonary Grounded)</span>
                 </div>
                 <div style={{ fontSize: '12.5px', color: '#e4e4e7', lineHeight: 1.5 }}>
                   {liveResult.aiReasoning}
