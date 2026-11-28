@@ -3,9 +3,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 import AudioPlayer from './AudioPlayer'
-import SyncedTranscript from './SyncedTranscript'
 import ExplainClassification from './ExplainClassification'
-import { parseSegments } from '@/lib/transcriptSync'
 import { aggregateLocations, type LocationStat } from '@/lib/geo'
 
 const RegionalMap = dynamic(() => import('./RegionalMap'), {
@@ -92,7 +90,6 @@ export default function EntryDetail({ entry, locationStats }: { entry: Entry; lo
   const latestClassification = entry.classifications?.[0]
   // The stored model probability, shown as-is (never replaced by another number).
   const confidence = latestClassification ? Math.round((latestClassification.confidenceScore || 0) * 100) : 0
-  const syncSegments = parseSegments(entry.transcriptSync)
   // Credit the recorded performer; 'AI Generated' only when no vocalist/narrator is on record (see Terms)
   const narratorLabel = entry.type === 'FOLK_SONG'
     ? (entry.singer || 'AI Generated')
@@ -178,30 +175,19 @@ export default function EntryDetail({ entry, locationStats }: { entry: Entry; lo
             >
               TRANSCRIPTION (MANOBO)
             </h3>
-            {entry.audioFile && syncSegments.length > 0 ? (
-              <SyncedTranscript
-                entryId={entry.id}
-                audioFile={entry.audioFile}
-                title={entry.title}
-                duration={entry.audioDuration}
-                narrator={narratorLabel}
-                transcription={entry.transcription}
-                segments={syncSegments}
-              />
-            ) : (
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: '13px',
-                  lineHeight: 1.6,
-                  color: 'var(--text-secondary)',
-                  whiteSpace: 'pre-line',
-                  fontFamily: 'Inter, sans-serif'
-                }}
-              >
-                {entry.transcription || 'No transcription available.'}
-              </p>
-            )}
+            {/* Full lyrics / transcription (no line-by-line audio sync) */}
+            <p
+              style={{
+                margin: 0,
+                fontSize: '13px',
+                lineHeight: 1.6,
+                color: 'var(--text-secondary)',
+                whiteSpace: 'pre-line',
+                fontFamily: 'Inter, sans-serif'
+              }}
+            >
+              {entry.transcription || 'No transcription available.'}
+            </p>
           </div>
 
           {/* Metadata Row */}

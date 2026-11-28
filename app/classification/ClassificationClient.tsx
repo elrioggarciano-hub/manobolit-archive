@@ -83,7 +83,6 @@ export default function ClassificationClient({ dbEntries = [], comparativeReport
   const [inputTranscription, setInputTranscription] = useState(initialEntry ? (initialEntry.transcription || '') : '')
   const [selectedTranslation, setSelectedTranslation] = useState(initialEntry?.translation || '')
   const [selectedBisayaTranslation, setSelectedBisayaTranslation] = useState(initialEntry?.bisayaTranslation || '')
-  const [selectedContent, setSelectedContent] = useState(initialEntry?.content || '')
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>('ALL')
   const [showBenchmarkModal, setShowBenchmarkModal] = useState<boolean>(false)
   const [showTechnicalDetails, setShowTechnicalDetails] = useState<boolean>(false)
@@ -151,14 +150,12 @@ export default function ClassificationClient({ dbEntries = [], comparativeReport
         setInputTranscription(nextEntry.transcription || '')
         setSelectedTranslation(nextEntry.translation || '')
         setSelectedBisayaTranslation(nextEntry.bisayaTranslation || '')
-        setSelectedContent(nextEntry.content || '')
       } else {
         setSelectedEntryId('custom')
         setInputText('')
         setInputTranscription('')
         setSelectedTranslation('')
         setSelectedBisayaTranslation('')
-        setSelectedContent('')
       }
     }
   }, [selectedGenreFilter, entriesList, selectedEntryId, filteredEntriesList])
@@ -669,7 +666,6 @@ export default function ClassificationClient({ dbEntries = [], comparativeReport
                             setInputTranscription(found.transcription || '')
                             setSelectedTranslation(found.translation || '')
                             setSelectedBisayaTranslation(found.bisayaTranslation || '')
-                            setSelectedContent(found.content || '')
                           }
                         }
                       }}
@@ -1705,45 +1701,6 @@ export default function ClassificationClient({ dbEntries = [], comparativeReport
                       {selectedBisayaTranslation || 'No translation available.'}
                     </p>
                   </div>
-
-                  {selectedContent && (
-                    <div
-                      className="stagger-item card-hover"
-                      style={{
-                        background: 'var(--bg-surface)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '0px',
-                        padding: '20px',
-                      }}
-                    >
-                      <h3
-                        style={{
-                          margin: '0 0 12px',
-                          fontSize: '10px',
-                          fontWeight: 800,
-                          color: '#a1a1aa',
-                          letterSpacing: '0.05em',
-                          borderBottom: '1px solid var(--border-color)',
-                          paddingBottom: '8px'
-                        }}
-                      >
-                        RESEARCHER&apos;S ANALYSIS (CONTEXT &amp; COMMENTARY)
-                      </h3>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: '13px',
-                          lineHeight: 1.6,
-                          color: 'var(--text-secondary)',
-                          whiteSpace: 'pre-line',
-                          fontFamily: 'Inter, sans-serif',
-                          fontStyle: 'italic'
-                        }}
-                      >
-                        {selectedContent}
-                      </p>
-                    </div>
-                  )}
                 </div>
               </section>
             )}
