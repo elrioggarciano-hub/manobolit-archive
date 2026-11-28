@@ -202,7 +202,7 @@ export default function EntryDetail({ entry, locationStats }: { entry: Entry; lo
           >
             <div>
               <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '4px', letterSpacing: '0.05em' }}>RECORDING YEAR</div>
-              <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{entry.yearCollected || '1992'}</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{entry.yearCollected || 'Not documented'}</div>
             </div>
 
             <div>

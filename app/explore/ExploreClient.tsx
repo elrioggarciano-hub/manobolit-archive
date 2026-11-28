@@ -19,6 +19,7 @@ interface Entry {
   themes: string[]
   culturalElements: string[]
   audioFile?: string | null
+  audioDuration?: number | null
   confidence?: number
   narrator?: string | null
   singer?: string | null
@@ -387,8 +388,8 @@ export default function ExploreClient({
       // "AI Generated" is used only when no vocalist/narrator is on record (see Terms).
       singer: isFolkSong ? (entry.singer || 'AI Generated') : (entry.narrator || entry.singer || 'AI Generated'),
       narrator: isFolkSong ? (entry.singer || 'AI Generated') : (entry.narrator || entry.singer || 'AI Generated'),
-      duration: 25,
-      textToRecite: entry.content
+      duration: entry.audioDuration ?? undefined,
+      textToRecite: entry.transcription
     })
   }
 

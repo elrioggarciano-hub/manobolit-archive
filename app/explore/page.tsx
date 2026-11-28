@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/database/prisma'
 import { classifyEntry } from '@/lib/classification'
+import { ensureActiveModels } from '@/lib/classification/retrain'
 import ExploreClient from './ExploreClient'
 
 // Edge ISR with 60s stale-while-revalidate for sub-50ms page delivery
@@ -19,12 +20,16 @@ const getParsedExploreEntries = unstable_cache(
       }
     })
 
+    // Entries never classified get a live estimate from the models trained on the database corpus,
+    // verified entries and rule base (loaded only when such an entry exists)
+    const activeModels = entries.some(e => e.classifications.length === 0) ? await ensureActiveModels() : undefined
+
     return entries.map(e => {
       // Show the stored model probability as-is; only entries never classified get a live estimate
       const persistedScore = e.classifications[0]?.confidenceScore
       const confidence = persistedScore !== undefined
         ? Math.round(persistedScore * 100)
-        : Math.round(classifyEntry(e).overallConfidence * 100)
+        : Math.round(classifyEntry(e, '', 'ALL', 'HYBRID_ENSEMBLE', activeModels).overallConfidence * 100)
 
       return {
         ...e,
@@ -36,7 +41,7 @@ const getParsedExploreEntries = unstable_cache(
       }
     })
   },
-  ['explore-entries-v8'],
+  ['explore-entries-v9'],
   { tags: ['entries'] }
 )
 

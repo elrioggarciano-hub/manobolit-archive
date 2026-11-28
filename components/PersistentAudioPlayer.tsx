@@ -118,7 +118,7 @@ export default function PersistentAudioPlayer() {
             </button>
           </div>
           <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--text-secondary)', whiteSpace: 'pre-line', margin: 0, background: 'var(--bg-main)', padding: '12px', borderLeft: '3px solid #8F000D' }}>
-            {currentTrack.textToRecite || 'Lantawod diya lawod nig duma kan bayod soe tribu ko no daog-daog mahawig no katuigan...'}
+            {currentTrack.textToRecite || 'No transcription available.'}
           </p>
         </div>
       )}
