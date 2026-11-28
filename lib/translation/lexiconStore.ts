@@ -11,26 +11,47 @@ export const LEXICON_GROUP_ORDER = fallbackData.groupOrder
 const CACHE_TTL_MS = 60_000
 let cached: { lexicon: Lexicon; at: number } | null = null
 let inflight: Promise<Lexicon> | null = null
+let baseCached: { lexicon: Lexicon; at: number } | null = null
+let baseInflight: Promise<Lexicon> | null = null
 
-/** Active lexicon from the database (cached for a minute); falls back to the bundled JSON. */
+/**
+ * Active lexicon entries from the database (cached for a minute), WITHOUT the Bible attestation index.
+ * Use this when only the entries are needed (e.g. dialect variants for classification): it is one small
+ * query instead of also downloading every BibleVerse row.
+ */
+export async function getBaseLexicon(): Promise<Lexicon> {
+  if (baseCached && Date.now() - baseCached.at < CACHE_TTL_MS) return baseCached.lexicon
+  if (baseInflight) return baseInflight
+
+  baseInflight = (async () => {
+    try {
+      const rows = await prisma.lexiconEntry.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' } })
+      const lexicon = rows.length > 0 ? buildLexicon(rows as LexiconRow[], LEXICON_GROUP_ORDER, 'database') : FALLBACK_LEXICON
+      baseCached = { lexicon, at: Date.now() }
+      return lexicon
+    } catch (err: any) {
+      console.warn('[Lexicon] Database lexicon unavailable; using data/lexicon.json:', err.message)
+      return baseCached?.lexicon ?? FALLBACK_LEXICON
+    } finally {
+      baseInflight = null
+    }
+  })()
+  return baseInflight
+}
+
+/** Active lexicon from the database plus the Bible attestation index (cached); falls back to the bundled JSON. */
 export async function getLexicon(): Promise<Lexicon> {
   if (cached && Date.now() - cached.at < CACHE_TTL_MS) return cached.lexicon
   if (inflight) return inflight
 
   inflight = (async () => {
-    try {
-      const rows = await prisma.lexiconEntry.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' } })
-      const base = rows.length > 0 ? buildLexicon(rows as LexiconRow[], LEXICON_GROUP_ORDER, 'database') : FALLBACK_LEXICON
-      const lexicon = { ...base, attested: await getBibleIndex() }
-      cached = { lexicon, at: Date.now() }
-      return lexicon
-    } catch (err: any) {
-      console.warn('[Lexicon] Database lexicon unavailable; using data/lexicon.json:', err.message)
-      return cached?.lexicon ?? FALLBACK_LEXICON
-    } finally {
-      inflight = null
-    }
-  })()
+    const [base, attested] = await Promise.all([getBaseLexicon(), getBibleIndex()])
+    const lexicon = { ...base, attested }
+    cached = { lexicon, at: Date.now() }
+    return lexicon
+  })().finally(() => {
+    inflight = null
+  })
   return inflight
 }
 
@@ -59,4 +80,5 @@ export async function getBibleIndex(): Promise<Map<string, { ref: string; count:
 
 export function invalidateLexiconCache() {
   cached = null
+  baseCached = null
 }

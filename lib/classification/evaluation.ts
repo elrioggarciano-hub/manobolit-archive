@@ -11,6 +11,7 @@ import { classifyHybrid } from './hybrid'
 import { cleanClassificationText, stripGenreDescriptors, stripRiddleAnswer } from './textCleaning'
 import { tokenizeUnigrams } from './tokenizer'
 import { ScorableEntry } from './metrics'
+import type { RuleSet } from './rules'
 
 export type TextAblationConfig = 'both' | 'transcription_only' | 'translation_only' | 'with_title'
 
@@ -19,6 +20,8 @@ export interface LOOCVOptions {
   stripAnswer?: boolean
   /** Base training corpus (defaults to the bundled fallback corpus). */
   baseCorpus?: TrainingDocument[]
+  /** Rule base (defaults to the bundled fallback rules); pass the database rule set for live evaluation. */
+  rules?: RuleSet
 }
 
 export interface PerClassMetrics {
@@ -375,6 +378,7 @@ export function runLOOCV(
         charNgram: foldCharModel,
         knn: foldKnnModel,
         genres,
+        rules: options.rules,
         rulesProfile: m.profile,
       }
       const res = classifyHybrid(testText, 'ALL', m.algo, models, locInput)

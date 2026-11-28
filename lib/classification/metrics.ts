@@ -1,6 +1,6 @@
 import { classifyEntry } from './engine'
 import { AlgorithmMode, InjectableModels } from './hybrid'
-import { runLOOCV, LOOCVReport, MajorityBaseline } from './evaluation'
+import { runLOOCV, LOOCVReport, LOOCVOptions, MajorityBaseline } from './evaluation'
 
 export interface AccuracyMetrics {
   accuracy: number
@@ -109,7 +109,8 @@ export function computeAccuracyMetrics(
  */
 export function computeComparativeMetrics(
   entries: ScorableEntry[],
-  models?: InjectableModels
+  /** Pass the database corpus (baseCorpus) and rule base (rules) so the benchmark reflects the live data. */
+  options: Pick<LOOCVOptions, 'baseCorpus' | 'rules'> = {}
 ): ModelComparisonReport {
   if (entries.length === 0) {
     const emptyMetrics: AccuracyMetrics = { accuracy: 0, precision: 0, recall: 0, f1: 0, sampleSize: 0, coverage: 0 }
@@ -126,7 +127,7 @@ export function computeComparativeMetrics(
   }
 
   // Run LOOCV across all folds with fold-retrained models
-  const loocv: LOOCVReport = runLOOCV(entries, { textConfig: 'both', stripAnswer: true })
+  const loocv: LOOCVReport = runLOOCV(entries, { textConfig: 'both', stripAnswer: true, ...options })
 
   const ruleBased: AccuracyMetrics = {
     accuracy: loocv.modes.ruleBasedFramework.accuracy,

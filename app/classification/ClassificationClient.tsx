@@ -3,17 +3,18 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/context/LanguageContext'
-import {
-  classifyEntry,
-  AlgorithmMode,
-  computeComparativeMetrics,
-  FALLBACK_RULE_SET,
-  ruleIndex,
-} from '@/lib/classification'
-import type { ClassificationResult } from '@/lib/classification'
+import type { ClassificationResult, ModelComparisonReport } from '@/lib/classification'
 
-// Rule names for display; the server response (database rule base) takes precedence when available.
-const FALLBACK_RULE_NAMES = ruleIndex(FALLBACK_RULE_SET)
+// Every result on this page comes from the server (database rule base + models trained on the live corpus
+// and verified entries). Nothing is classified in the browser from the bundled seed files.
+const EMPTY_RESULT: ClassificationResult = {
+  genre: { value: 'UNCLASSIFIED', confidence: 0, rulesApplied: [], allScores: [] },
+  themes: [],
+  location: null,
+  rulesApplied: [],
+  overallConfidence: 0,
+  ruleDetails: {},
+}
 
 export interface DBEntry {
   id: string
@@ -35,6 +36,8 @@ export interface DBEntry {
 
 interface ClassificationClientProps {
   dbEntries?: DBEntry[]
+  /** LOOCV benchmark computed on the server from the database corpus, rule base and archive entries */
+  comparativeReport: ModelComparisonReport
 }
 
 function formatName(val: string): string {
@@ -58,7 +61,7 @@ function getConfidenceTier(pct: number, t?: (k: string) => string): { tier: Conf
   return { tier: 'strong', color: '#10b981', label: lbl }
 }
 
-export default function ClassificationClient({ dbEntries = [] }: ClassificationClientProps) {
+export default function ClassificationClient({ dbEntries = [], comparativeReport }: ClassificationClientProps) {
   const router = useRouter()
 
   // Entries come only from the archive database; with an empty archive the simulator starts in custom-text mode
@@ -82,7 +85,6 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [selectedBisayaTranslation, setSelectedBisayaTranslation] = useState(initialEntry?.bisayaTranslation || '')
   const [selectedContent, setSelectedContent] = useState(initialEntry?.content || '')
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>('ALL')
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState<AlgorithmMode>('HYBRID_ENSEMBLE')
   const [showBenchmarkModal, setShowBenchmarkModal] = useState<boolean>(false)
   const [showTechnicalDetails, setShowTechnicalDetails] = useState<boolean>(false)
   const [isDefenseMode, setIsDefenseMode] = useState<boolean>(false)
@@ -112,67 +114,27 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
   const [analysisProgress, setAnalysisProgress] = useState(0)
   const [serverResult, setServerResult] = useState<any>(null)
 
-  const localClassificationResult = useMemo(
-    () => {
-      const selected = selectedEntryId !== 'custom' ? entriesList.find(e => e.id === selectedEntryId) : null
-      if (selected) {
-        return classifyEntry(
-          {
-            title: selected.title,
-            manoboTitle: selected.manoboTitle,
-            englishTitle: selected.englishTitle,
-            transcription: inputTranscription || selected.transcription || '',
-            translation: selectedTranslation || selected.translation || '',
-            content: selected.content || '',
-            communityLocation: selected.communityLocation || '',
-            municipality: selected.municipality || '',
-            barangay: selected.barangay || '',
-          },
-          inputTranscription,
-          selectedGenreFilter,
-          selectedAlgorithm
-        )
-      }
-      return classifyEntry(inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm)
-    },
-    [inputText, inputTranscription, selectedGenreFilter, selectedAlgorithm, selectedEntryId, entriesList, selectedTranslation]
-  )
-
-  // After "Classify" runs, show the server's result (database rule base + trained model + k-NN themes)
-  // for the default rule-based + ML view; the other model views remain local comparisons.
+  // The server's result (database rule base + Colab-trained model / models trained on the live corpus and
+  // verified entries). If the server cannot be reached, the page says so instead of classifying locally.
   const classificationResult = useMemo((): ClassificationResult => {
-    const local = localClassificationResult
-    if (!serverResult || selectedAlgorithm !== 'HYBRID_ENSEMBLE' || !serverResult.algorithmicBreakdown) return local
+    if (!serverResult) return EMPTY_RESULT
     return {
-      ...local,
+      algorithmMode: 'HYBRID_ENSEMBLE',
       genre: {
-        ...local.genre,
-        value: serverResult.genre?.value ?? local.genre.value,
-        confidence: serverResult.genre?.confidence ?? local.genre.confidence,
-        allScores: serverResult.genre?.allScores ?? local.genre.allScores,
+        value: serverResult.genre?.value ?? 'UNCLASSIFIED',
+        confidence: serverResult.genre?.confidence ?? 0,
+        rulesApplied: serverResult.genre?.rulesApplied ?? serverResult.rulesApplied ?? [],
+        allScores: serverResult.genre?.allScores ?? [],
+        isUnclassified: serverResult.isUnclassified,
       },
-      themes: serverResult.themes ?? local.themes,
-      location: serverResult.location ?? local.location,
-      rulesApplied: serverResult.rulesApplied ?? local.rulesApplied,
-      ruleDetails: serverResult.ruleDetails ?? local.ruleDetails,
-      overallConfidence: serverResult.overallConfidence ?? local.overallConfidence,
-      algorithmicBreakdown: serverResult.algorithmicBreakdown ?? local.algorithmicBreakdown,
+      themes: serverResult.themes ?? [],
+      location: serverResult.location ?? null,
+      rulesApplied: serverResult.rulesApplied ?? [],
+      ruleDetails: serverResult.ruleDetails ?? {},
+      overallConfidence: serverResult.overallConfidence ?? 0,
+      algorithmicBreakdown: serverResult.algorithmicBreakdown,
     }
-  }, [localClassificationResult, serverResult, selectedAlgorithm])
-
-  const comparativeReport = useMemo(
-    () =>
-      computeComparativeMetrics(
-        entriesList.map(e => ({
-          title: e.title,
-          content: e.content,
-          transcription: e.transcription,
-          translation: e.translation,
-          genre: e.genre,
-        }))
-      ),
-    [entriesList]
-  )
+  }, [serverResult])
 
   const filteredEntriesList = useMemo(
     () => (selectedGenreFilter === 'ALL' ? entriesList : entriesList.filter(entry => entry.genre === selectedGenreFilter)),
@@ -794,7 +756,8 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                         const res = await fetch('/api/classify', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          signal: AbortSignal.timeout(15000),
+                          // The first request after a server cold start loads and trains the models, so allow a minute
+                          signal: AbortSignal.timeout(60000),
                           body: JSON.stringify({
                             text: inputText,
                             additionalContext: inputTranscription,
@@ -1015,9 +978,13 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                           {t('diag_waiting_desc')}
                         </p>
                       </div>
+                    ) : !serverResult ? (
+                      <div style={{ padding: '18px 14px', textAlign: 'center', border: '1px dashed #7f1d1d', borderRadius: '6px', background: '#09090b' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#f87171' }}>{t('diag_server_error_title')}</div>
+                      </div>
                     ) : classificationResult.rulesApplied.length > 0 ? (
                       classificationResult.rulesApplied.map(ruleId => {
-                        const rule = serverResult?.ruleNames?.[ruleId] ?? FALLBACK_RULE_NAMES[ruleId]
+                        const rule = serverResult?.ruleNames?.[ruleId]
                         const detail = classificationResult.ruleDetails[ruleId]
                         const pct = Math.round((detail?.confidence || 0) * 100)
                         const { tier, color } = getConfidenceTier(pct, t)
@@ -1157,6 +1124,29 @@ export default function ClassificationClient({ dbEntries = [] }: ClassificationC
                       <div style={{ fontSize: '12px', fontWeight: 700, color: '#e4e4e7' }}>{t('diag_ready_title')}</div>
                       <p style={{ fontSize: '10px', color: '#71717a', margin: 0, maxWidth: '210px', lineHeight: 1.5 }}>
                         {t('diag_ready_desc')}
+                      </p>
+                    </div>
+                  ) : !serverResult ? (
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        minHeight: '200px',
+                        background: '#09090b',
+                        border: '1px dashed #7f1d1d',
+                        borderRadius: '6px',
+                        padding: '24px 16px',
+                        textAlign: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      <span style={{ fontSize: '24px' }}>⚠️</span>
+                      <div style={{ fontSize: '12px', fontWeight: 700, color: '#f87171' }}>{t('diag_server_error_title')}</div>
+                      <p style={{ fontSize: '10px', color: '#71717a', margin: 0, maxWidth: '210px', lineHeight: 1.5 }}>
+                        {t('diag_server_error_desc')}
                       </p>
                     </div>
                   ) : (

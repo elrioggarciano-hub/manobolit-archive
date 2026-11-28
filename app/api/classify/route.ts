@@ -7,7 +7,7 @@ import { getActiveTrainedModel, predictWithCompiled } from '@/lib/classification
 import { blendRulesWithModel } from '@/lib/classification/ruleMlBlend'
 import { ruleIndex } from '@/lib/classification/rules'
 import { explainClassification, toExplainLang, ExplanationEvidence } from '@/lib/classification/explain'
-import { getLexicon } from '@/lib/translation/lexiconStore'
+import { getBaseLexicon } from '@/lib/translation/lexiconStore'
 import { dialectVariantGroups } from '@/lib/translation/lexicon'
 
 // POST /api/classify
@@ -57,7 +57,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Load models trained on base corpus + all human-verified entries (rebuilt after cold start / new verifications)
-    const lexicon = await getLexicon()
+    // Only the lexicon entries are needed (dialect variants), not the Bible attestation index
+    const lexicon = await getBaseLexicon()
     const activeModels = { ...(await ensureActiveModels()), dialectVariants: dialectVariantGroups(lexicon) }
     const snapshot = getLatestSnapshot()
 

@@ -298,7 +298,7 @@ export async function retrainFromDatabase(
       // 4. Run out-of-sample LOOCV evaluation on authentic entries
       let loocvReport: LOOCVReport
       if (archiveEntriesForLOOCV.length > 0) {
-        loocvReport = runLOOCV(archiveEntriesForLOOCV, { textConfig: 'both', stripAnswer: true, baseCorpus: corpus.docs })
+        loocvReport = runLOOCV(archiveEntriesForLOOCV, { textConfig: 'both', stripAnswer: true, baseCorpus: corpus.docs, rules: rules.ruleSet })
       } else {
         loocvReport = {
           sampleSize: combinedTrainingSet.length,
