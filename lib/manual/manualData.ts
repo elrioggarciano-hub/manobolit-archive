@@ -210,7 +210,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
     title: 'Cultural Archive & Multidimensional Discovery',
     subtitle: 'Browsing, searching, filtering, audio playback, and reading parallel texts',
     role: 'PUBLIC',
-    summary: 'Learn how to explore the archived Agusan Manobo oral literature and folk songs, apply multi-criteria filters, search full transcriptions, and utilize synchronized audio playback.',
+    summary: 'Learn how to explore the archived Agusan Manobo oral literature and folk songs, apply multi-criteria filters, search full transcriptions, and listen to the field audio recordings.',
     sections: [
       {
         id: '3.1',
@@ -266,7 +266,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
       {
         id: '3.2',
         sectionNumber: '3.2',
-        title: 'Entry Detail View, Synchronized Audio & Tri-Lingual Transcriptions',
+        title: 'Entry Detail View, Audio Playback & Tri-Lingual Transcriptions',
         role: 'PUBLIC',
         whoUsesIt: 'Linguists, cultural researchers, and students.',
         capabilities: [
@@ -277,9 +277,9 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
           'Review computational classification metrics and AI confidence scores',
         ],
         menuLocation: ['Explorer -> Click on any literature card (/archive/[id])'],
-        description: 'The Entry Detail page displays the complete cultural and linguistic record for an individual selection. It features a synchronized audio player accompanied by side-by-side parallel columns.',
+        description: 'The Entry Detail page displays the complete cultural and linguistic record for an individual selection. It features an audio player accompanied by the full transcription and side-by-side parallel columns.',
         figureNumber: 3,
-        figureTitle: 'Literary Entry Detail View with Synchronized Audio and Parallel Transcriptions',
+        figureTitle: 'Literary Entry Detail View with Audio Playback and Parallel Transcriptions',
         figureImage: '/manual/screenshots/fig3_detail.png',
         figureAlt: 'Detail page showing audio player, Agusan Manobo text, and English/Bisaya parallel columns',
         steps: [
@@ -776,7 +776,7 @@ export const MANUAL_CHAPTERS: ManualChapter[] = [
         goodToKnow: [
           '/ (Home): Portal overview, quick statistics, audio highlights, hero exploration. (Public)',
           '/explore: Multidimensional faceted archive search, genre filters, provenance selector. (Public)',
-          '/archive/[id]: Full entry details, synchronized audio player, parallel translations. (Public)',
+          '/archive/[id]: Full entry details, audio player, parallel translations. (Public)',
           '/classification: Interactive hybrid classification workbench (Rule, ML, LLM). (Public)',
           '/translator: Bidirectional translation with Finite-State Affix Decomposition. (Public)',
           '/dashboard: Statistical frequency charts, provenance map, CSV/JSON data export. (Public)',

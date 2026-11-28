@@ -48,15 +48,6 @@ export default async function EditEntryPage({ params }: Props) {
           </Link>
           <span style={{ color: '#334155' }}>/</span>
           <h1 style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: '#f8fafc' }}>Edit</h1>
-          {entry.audioFile && (
-            <Link
-              href={`/admin/${entry.id}/sync`}
-              className="btn-anim"
-              style={{ marginLeft: 'auto', padding: '7px 14px', borderRadius: '8px', border: '1px solid #334155', color: '#e2e8f0', textDecoration: 'none', fontSize: '13px', fontWeight: 600 }}
-            >
-              ♪ Synchronize transcript
-            </Link>
-          )}
         </div>
         <EntryForm mode="edit" initialData={initialData} />
       </div>

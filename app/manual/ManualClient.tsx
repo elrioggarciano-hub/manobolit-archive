@@ -98,10 +98,10 @@ const TOPICS: ManualTopic[] = [
   {
     id: 'sec-5',
     num: 5,
-    title: 'Step 2 - Synchronized audio playback & transcripts',
+    title: 'Step 2 - Audio playback & transcripts',
     role: 'PUBLIC',
     whoUsesIt: 'Linguists, educators, students, and the community.',
-    desc: 'Each literary entry page (/archive/[id]) features field audio playback synchronized with side-by-side parallel columns.',
+    desc: 'Each literary entry page (/archive/[id]) features field audio playback alongside the full transcription and side-by-side parallel columns.',
     figureNum: 3,
     figureTitle: 'Literary Entry Detail View with Audio Playback and Parallel Columns',
     figureImg: '/manual/screenshots/fig3_detail.png',

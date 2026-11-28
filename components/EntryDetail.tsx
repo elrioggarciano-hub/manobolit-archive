@@ -49,7 +49,6 @@ interface Entry {
   classifications: Classification[]
   reviewStatus?: string | null
   verifiedGenre?: string | null
-  transcriptSync?: string | null
 }
 
 const SOURCE_LABELS: Record<string, string> = {

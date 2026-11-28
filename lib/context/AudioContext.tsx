@@ -12,7 +12,7 @@ export interface Track {
   duration?: number | null
   textToRecite?: string | null
   entryId?: string | null
-  /** Start playback at this position (seconds), e.g. when a synchronized transcript line is clicked */
+  /** Start playback at this position (seconds), e.g. to resume from a given point */
   startAt?: number | null
 }
 
