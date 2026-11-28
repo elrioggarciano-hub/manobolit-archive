@@ -24,7 +24,8 @@ function MapAutoFit({ coords }: { coords: [number, number][] }) {
   return null
 }
 
-// Markers are placed only at verified barangay coordinates (data/barangay-coordinates.json, from PhilAtlas).
+// Markers are placed only at verified barangay coordinates from the BarangayLocation table (Admin → Dataset & Taxonomies → Barangay locations;
+// seeded from PhilAtlas via data/barangay-coordinates.json, which is also the offline fallback).
 // Circle AREA is proportional to the number of entries, and the count is printed on each marker.
 export default function RegionalMap({ locationStats }: { locationStats: LocationStat[] }) {
   const plotted = locationStats.filter((l): l is LocationStat & { coords: [number, number] } => l.coords !== null)
